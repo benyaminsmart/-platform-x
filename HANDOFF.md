@@ -189,36 +189,78 @@ The project is considered successful when:
 
 ---
 
-## 11. How to Continue This Project
 
-### When starting a new chat:
-Send the AI:
-1. `PROJECT-RULES.md` — quality standards
-2. `HANDOFF.md` (this file) — overview and roadmap
-3. `PROJECT-NOTES.md` — technical decisions
-4. Current folder structure: `ls -la ~/platform-x/`
+## 11. Documentation Map
 
-Then say:
-> "Continue Platform-X. Read the attached files. Environment: Termux on Android. Always respond in Persian. Follow PROJECT-RULES.md strictly."
+All project docs are in docs/:
+
+- docs/01-ARCHITECTURE.md — Technical architecture (multi-tenant design)
+- docs/02-ROADMAP.md — Full 8-phase roadmap with deliverables
+- docs/03-BUSINESS-MODEL.md — Revenue model, pricing, unit economics
+- docs/04-FEATURES.md — Complete feature list by user type and phase
+- docs/05-TENANT-GUIDE.md — Onboarding guide for businesses joining
+- docs/06-DECISIONS.md — 15 ADRs (Architectural Decision Records)
+
+Root-level files:
+
+- PROJECT-RULES.md — Quality standards and working rules
+- HANDOFF.md — This file — project overview + roadmap
+- PROJECT-NOTES.md — Technical context and reasoning
+- generate-handoff.sh — Auto-generates HANDOFF-STATE.txt
+
+---
+
+## 12. How to Continue This Project (New Chat)
+
+### Step 1 — Send context
+Send the new AI three files (concatenated):
+
+cd ~/platform-x && cat HANDOFF.md PROJECT-RULES.md PROJECT-NOTES.md
+
+Copy the output and send to the new chat.
+
+### Step 2 — Send current state
+
+cd ~/platform-x && bash generate-handoff.sh && cat HANDOFF-STATE.txt
+
+Copy this too.
+
+### Step 3 — Send docs (optional)
+If the AI needs architectural details:
+
+cd ~/platform-x && cat docs/01-ARCHITECTURE.md
+cd ~/platform-x && cat docs/02-ROADMAP.md
+
+And so on for 03, 04, 05, 06.
+
+### Step 4 — Opening message for the AI
+
+I am continuing Platform-X (multi-tenant hospitality/travel platform).
+Read the attached context files. Environment: Termux on Android.
+Always respond in Persian. Follow PROJECT-RULES.md strictly.
+Backup before every change. Test after every change.
+Commit after every success.
+Continue from where we left off. See HANDOFF-STATE.txt for current state.
 
 ### Every session:
-1. Check current state (`ls -la`, `git log --oneline -5`)
+1. Check state (ls -la, git log --oneline -5)
 2. Pick next task from roadmap
-3. Backup before change
+3. Backup before change (per file)
 4. Test after change
 5. Commit after success
 6. Update HANDOFF.md if phase changed
+7. Update docs if decisions changed
 
 ---
 
-## 12. Contact & Authority
+## 13. Contact & Authority
 
-**Owner:** Trianon Royal Hotel management
-**First Tenant:** Trianon Royal Hotel
-**Business Partner:** (to be added)
-**Developer:** Platform-X team
+Owner: Trianon Royal Hotel management
+First Tenant: Trianon Royal Hotel
+Business Partner: (to be added)
+Lead Developer: Platform-X team
 
 ---
 
-**Last updated:** September 2026
-**Next review:** When Phase 1 begins
+Last updated: September 2026
+Next review: When Phase 1 development begins
