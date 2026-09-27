@@ -17,7 +17,7 @@ RESERVED_SLUGS = {
     "auth", "tenants", "login", "register", "services", "bookings", "orders",
     "payments", "rewards", "referrals", "notifications",
     "analytics", "platform", "businesses", "about", "contact",
-    "hotels", "restaurants", "travel", "entertainment", "partners",
+    "hotels", "restaurants", "travel", "entertainment", "partners", "docs",
     "favicon.ico",
 }
 
@@ -288,6 +288,31 @@ def partners_thanks_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(
         request,
         "pages/partners_thanks.html",
+        {"tenant": None},
+    )
+
+
+
+
+# ---------- Docs (PDF-ready documents) ----------
+
+DOCS = {
+    "overview": {
+        "template": "docs/overview.html",
+        "title": "Platform-X — Overview",
+    },
+}
+
+
+@router.get("/docs/{doc_name}", response_class=HTMLResponse)
+def docs_page(doc_name: str, request: Request) -> HTMLResponse:
+    """Render a PDF-ready document by name."""
+    if doc_name not in DOCS:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    meta = DOCS[doc_name]
+    return templates.TemplateResponse(
+        request,
+        meta["template"],
         {"tenant": None},
     )
 

@@ -1,0 +1,374 @@
+/* Platform-X — Docs (A4 print-ready) */
+
+@page {
+  size: A4;
+  margin: 18mm 16mm 20mm 16mm;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #f4f1ec;
+  font-family: "Inter", system-ui, sans-serif;
+  color: #0a1628;
+  font-size: 11pt;
+  line-height: 1.6;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* ---------- Document wrapper ---------- */
+
+.doc {
+  max-width: 210mm;
+  margin: 24px auto;
+  background: #ffffff;
+  box-shadow: 0 8px 32px rgba(10, 22, 40, 0.12);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+@media print {
+  html, body {
+    background: #ffffff;
+  }
+  .doc {
+    margin: 0;
+    box-shadow: none;
+    border-radius: 0;
+    max-width: none;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .page-break {
+    page-break-after: always;
+  }
+  h1, h2, h3 {
+    page-break-after: avoid;
+  }
+  .cover {
+    page-break-after: always;
+  }
+}
+
+/* ---------- Cover page ---------- */
+
+.cover {
+  background: linear-gradient(135deg, #0f3d5c 0%, #082a42 100%);
+  color: #ffffff;
+  padding: 80px 64px 100px;
+  min-height: 260mm;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.cover::before {
+  content: "";
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(201, 169, 97, 0.35), transparent 70%);
+}
+
+.cover-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+  margin-bottom: auto;
+}
+
+.cover-logo-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #c9a961 0%, #ddc48f 100%);
+  color: #0f3d5c;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cover-logo-text {
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+
+.cover-content {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+}
+
+.cover-eyebrow {
+  font-size: 11pt;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #c9a961;
+  margin-bottom: 24px;
+}
+
+.cover-title {
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-size: 40pt;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  margin: 0 0 24px;
+  color: #ffffff;
+}
+
+.cover-subtitle {
+  font-size: 14pt;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 140mm;
+  line-height: 1.5;
+  margin: 0 0 48px;
+}
+
+.cover-meta {
+  display: flex;
+  gap: 48px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cover-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cover-meta-label {
+  font-size: 9pt;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.cover-meta-value {
+  font-size: 12pt;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* ---------- Content pages ---------- */
+
+.doc-content {
+  padding: 60px 64px;
+}
+
+h1 {
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-size: 26pt;
+  font-weight: 800;
+  color: #0f3d5c;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin: 0 0 24px;
+}
+
+h2 {
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-size: 16pt;
+  font-weight: 700;
+  color: #0f3d5c;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  margin: 40px 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e8e4dd;
+}
+
+h2:first-of-type {
+  margin-top: 0;
+}
+
+h3 {
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-size: 12pt;
+  font-weight: 700;
+  color: #0a1628;
+  margin: 24px 0 10px;
+}
+
+h4 {
+  font-size: 11pt;
+  font-weight: 700;
+  color: #0a1628;
+  margin: 16px 0 8px;
+}
+
+p {
+  margin: 0 0 14px;
+  color: #2a3547;
+  line-height: 1.65;
+}
+
+ul, ol {
+  margin: 0 0 14px;
+  padding-left: 24px;
+}
+
+li {
+  margin-bottom: 6px;
+  color: #2a3547;
+  line-height: 1.6;
+}
+
+li strong {
+  color: #0a1628;
+}
+
+a {
+  color: #0f3d5c;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(15, 61, 92, 0.3);
+}
+
+blockquote {
+  margin: 20px 0;
+  padding: 16px 24px;
+  background: #faf8f5;
+  border-left: 4px solid #c9a961;
+  color: #2a3547;
+  font-style: italic;
+}
+
+code {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10pt;
+  background: #f4f1ec;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #0f3d5c;
+}
+
+/* ---------- Stats grid ---------- */
+
+.doc-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.doc-stat {
+  padding: 20px;
+  background: #faf8f5;
+  border: 1px solid #e8e4dd;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.doc-stat-value {
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-size: 24pt;
+  font-weight: 800;
+  color: #0f3d5c;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.doc-stat-label {
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8896a8;
+}
+
+/* ---------- Feature cards ---------- */
+
+.doc-features {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.doc-feature {
+  padding: 20px;
+  background: #faf8f5;
+  border: 1px solid #e8e4dd;
+  border-radius: 8px;
+}
+
+.doc-feature-icon {
+  font-size: 24pt;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.doc-feature h4 {
+  margin: 0 0 6px;
+  color: #0f3d5c;
+}
+
+.doc-feature p {
+  margin: 0;
+  font-size: 10pt;
+  color: #4a5568;
+}
+
+/* ---------- Category colors ---------- */
+
+.cat-hotels { color: #2b6cb0; }
+.cat-restaurants { color: #c53030; }
+.cat-travel { color: #2f855a; }
+.cat-entertainment { color: #805ad5; }
+
+/* ---------- Footer ---------- */
+
+.doc-footer {
+  padding: 24px 64px;
+  border-top: 1px solid #e8e4dd;
+  display: flex;
+  justify-content: space-between;
+  font-size: 9pt;
+  color: #8896a8;
+  background: #faf8f5;
+}
+
+.doc-footer strong {
+  color: #0f3d5c;
+}
+
+/* ---------- Print hint (not in PDF) ---------- */
+
+.print-hint {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0f3d5c;
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(15, 61, 92, 0.3);
+  z-index: 100;
+  cursor: pointer;
+}
+
+.print-hint:hover {
+  background: #082a42;
+}
