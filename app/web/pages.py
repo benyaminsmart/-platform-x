@@ -47,7 +47,7 @@ def home(request: Request, db: DBSession = Depends(get_db)) -> HTMLResponse:
     """Platform-X landing page."""
     return templates.TemplateResponse(
         request,
-        "pages/home.html",
+        "pages/platform_home.html",
         {
             "tenant": None,
             "businesses": _active_tenants(db),

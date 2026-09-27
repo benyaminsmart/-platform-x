@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="{{ lang|default('en') }}" dir="{{ 'rtl' if lang in ['ar'] else 'ltr' }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Platform-X — Discover hotels, restaurants, travel & entertainment{% endblock %}</title>
+  <meta name="description" content="{% block description %}One platform for hotels, restaurants, travel agencies, and entertainment venues.{% endblock %}">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/typography.css">
+  <link rel="stylesheet" href="/static/css/platform.css">
+  <link rel="stylesheet" href="/static/css/platform-home.css">
+
+  {% block head %}{% endblock %}
+</head>
+<body class="px-body">
+
+  {% include "partials/platform_header.html" %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include "partials/platform_footer.html" %}
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

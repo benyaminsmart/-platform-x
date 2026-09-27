@@ -10,7 +10,7 @@ def test_home_page(client: TestClient, sample_tenant: Tenant) -> None:
     resp = client.get("/")
     assert resp.status_code == 200
     assert "Platform-X" in resp.text
-    assert "Everything your guests need" in resp.text
+    assert "One platform" in resp.text
 
 
 def test_businesses_page_lists_tenants(

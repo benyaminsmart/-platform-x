@@ -1,0 +1,137 @@
+{% extends "layouts/platform_base.html" %}
+
+{% block content %}
+
+<!-- HERO with Search -->
+<section class="px-hero">
+  <div class="px-container">
+    <div class="px-hero-content">
+      <h1 class="px-hero-title">
+        One platform.<br>
+        <span class="px-hero-gradient">Thousands of experiences.</span>
+      </h1>
+      <p class="px-hero-sub">
+        Discover and book hotels, restaurants, travel packages, and entertainment — all in one place.
+      </p>
+
+      <form class="px-search" action="/search" method="get">
+        <div class="px-search-field">
+          <label>Where</label>
+          <input type="text" name="q" placeholder="City, hotel, or service">
+        </div>
+        <div class="px-search-divider"></div>
+        <div class="px-search-field">
+          <label>Category</label>
+          <select name="category">
+            <option value="">Any</option>
+            <option value="hotel">Hotels</option>
+            <option value="restaurant">Restaurants</option>
+            <option value="travel_agency">Travel</option>
+            <option value="entertainment">Entertainment</option>
+          </select>
+        </div>
+        <button type="submit" class="px-btn px-btn-primary px-search-submit">
+          Search
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="px-section">
+  <div class="px-container">
+    <div class="px-section-head">
+      <h2>Browse by category</h2>
+      <p class="px-section-sub">Four kinds of experiences, one platform.</p>
+    </div>
+
+    <div class="px-cat-grid">
+      <a href="/hotels" class="px-cat-card px-cat-card-hotels">
+        <div class="px-cat-icon">🏨</div>
+        <h3>Hotels</h3>
+        <p>Boutique, luxury, and business stays.</p>
+        <span class="px-cat-cta">Explore →</span>
+      </a>
+      <a href="/restaurants" class="px-cat-card px-cat-card-restaurants">
+        <div class="px-cat-icon">🍽</div>
+        <h3>Restaurants</h3>
+        <p>Fine dining, casual, and authentic cuisine.</p>
+        <span class="px-cat-cta">Explore →</span>
+      </a>
+      <a href="/travel" class="px-cat-card px-cat-card-travel">
+        <div class="px-cat-icon">✈️</div>
+        <h3>Travel</h3>
+        <p>Agencies, packages, and flights.</p>
+        <span class="px-cat-cta">Explore →</span>
+      </a>
+      <a href="/entertainment" class="px-cat-card px-cat-card-entertainment">
+        <div class="px-cat-icon">🎢</div>
+        <h3>Entertainment</h3>
+        <p>Attractions, activities, and experiences.</p>
+        <span class="px-cat-cta">Explore →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED BUSINESSES -->
+<section class="px-section">
+  <div class="px-container">
+    <div class="px-section-head">
+      <h2>Featured on Platform-X</h2>
+      <p class="px-section-sub">Curated from our partners.</p>
+    </div>
+
+    <div class="px-biz-grid">
+      {% for b in businesses[:6] %}
+        {% set btype = (b.config.type if b.config else 'business')|lower %}
+        {% set cat_class = 'px-cat-hotels' if 'hotel' in btype else
+                           'px-cat-restaurants' if 'restaurant' in btype else
+                           'px-cat-travel' if 'travel' in btype or 'agency' in btype else
+                           'px-cat-entertainment' %}
+        <a href="/{{ b.slug }}/" class="px-biz-card">
+          {% set branding = (b.config or {}).get('branding', {}) if b.config else {} %}
+          <div class="px-biz-thumb" style="background: linear-gradient(135deg, {{ branding.get('primary_color', '#6366f1') }}, {{ branding.get('secondary_color', '#818cf8') }});">
+            <span class="px-biz-thumb-initial">{{ b.name[0] }}</span>
+          </div>
+          <div class="px-biz-body">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span class="px-cat {{ cat_class }}">{{ b.config.type|default('Business')|replace('_',' ')|title }}</span>
+            </div>
+            <h3 class="px-biz-name">{{ b.name }}</h3>
+            <p class="px-biz-tagline">{{ b.config.tagline|default('') }}</p>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="px-section">
+  <div class="px-container">
+    <div class="px-section-head">
+      <h2>How it works</h2>
+    </div>
+    <div class="px-steps">
+      <div class="px-step">
+        <div class="px-step-num">1</div>
+        <h4>Discover</h4>
+        <p>Browse thousands of businesses across four categories.</p>
+      </div>
+      <div class="px-step">
+        <div class="px-step-num">2</div>
+        <h4>Book</h4>
+        <p>Reserve instantly with our unified booking flow.</p>
+      </div>
+      <div class="px-step">
+        <div class="px-step-num">3</div>
+        <h4>Earn rewards</h4>
+        <p>Points carry across every business you visit.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

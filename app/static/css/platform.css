@@ -1,0 +1,333 @@
+/* Platform-X — Platform-wide Design System (Navy + Multi-color) */
+
+/* Platform pages override base tokens */
+.platform-root {
+  --px-navy-deep: #060a14;
+  --px-navy: #0a0e1a;
+  --px-navy-soft: #0f1424;
+  --px-surface: #14192b;
+  --px-surface-2: #1a2036;
+  --px-surface-3: #222a44;
+
+  --px-line: rgba(255, 255, 255, 0.08);
+  --px-line-2: rgba(255, 255, 255, 0.14);
+  --px-line-soft: rgba(255, 255, 255, 0.04);
+
+  --px-text: #f5f7fb;
+  --px-text-soft: #c8cdd9;
+  --px-muted: #8890a3;
+  --px-muted-deep: #5a6175;
+
+  /* Brand accent (Platform) */
+  --px-brand: #6366f1;
+  --px-brand-soft: #818cf8;
+  --px-brand-deep: #4f46e5;
+  --px-brand-glow: rgba(99, 102, 241, 0.25);
+
+  /* Category colors */
+  --px-cat-hotels: #3b82f6;
+  --px-cat-hotels-soft: rgba(59, 130, 246, 0.12);
+  --px-cat-hotels-line: rgba(59, 130, 246, 0.3);
+
+  --px-cat-restaurants: #ef4444;
+  --px-cat-restaurants-soft: rgba(239, 68, 68, 0.12);
+  --px-cat-restaurants-line: rgba(239, 68, 68, 0.3);
+
+  --px-cat-travel: #10b981;
+  --px-cat-travel-soft: rgba(16, 185, 129, 0.12);
+  --px-cat-travel-line: rgba(16, 185, 129, 0.3);
+
+  --px-cat-entertainment: #a855f7;
+  --px-cat-entertainment-soft: rgba(168, 85, 247, 0.12);
+  --px-cat-entertainment-line: rgba(168, 85, 247, 0.3);
+
+  /* Status */
+  --px-success: #34d399;
+  --px-warning: #fbbf24;
+  --px-error: #f87171;
+
+  /* Fonts */
+  --px-font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --px-font-body: "Inter", system-ui, sans-serif;
+  --px-font-mono: "JetBrains Mono", monospace;
+
+  /* Radius (modern, slightly rounded) */
+  --px-radius-sm: 6px;
+  --px-radius: 10px;
+  --px-radius-lg: 16px;
+  --px-radius-xl: 24px;
+  --px-radius-full: 999px;
+
+  /* Shadows */
+  --px-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --px-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --px-shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.45);
+  --px-shadow-brand: 0 8px 30px rgba(99, 102, 241, 0.28);
+
+  /* Motion */
+  --px-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --px-fast: 0.15s;
+  --px-normal: 0.25s;
+  --px-slow: 0.4s;
+
+  /* Layout */
+  --px-container: 1240px;
+  --px-container-narrow: 800px;
+}
+
+/* ---------- Platform base ---------- */
+
+.px-body {
+  background: var(--px-navy);
+  color: var(--px-text);
+  font-family: var(--px-font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+}
+
+.px-body a {
+  color: var(--px-brand-soft);
+  text-decoration: none;
+  transition: color var(--px-fast) var(--px-ease);
+}
+
+.px-body a:hover {
+  color: var(--px-brand);
+}
+
+.px-body h1,
+.px-body h2,
+.px-body h3,
+.px-body h4 {
+  font-family: var(--px-font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--px-text);
+  line-height: 1.15;
+  margin: 0 0 16px 0;
+}
+
+.px-body h1 { font-size: 56px; letter-spacing: -0.03em; }
+.px-body h2 { font-size: 36px; }
+.px-body h3 { font-size: 24px; }
+.px-body h4 { font-size: 18px; }
+
+.px-body p {
+  color: var(--px-text-soft);
+  margin: 0 0 16px 0;
+}
+
+/* ---------- Containers ---------- */
+
+.px-container {
+  width: 92%;
+  max-width: var(--px-container);
+  margin: 0 auto;
+}
+
+.px-container-narrow {
+  width: 92%;
+  max-width: var(--px-container-narrow);
+  margin: 0 auto;
+}
+
+/* ---------- Header (platform) ---------- */
+
+.px-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(10, 14, 26, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--px-line);
+}
+
+.px-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+  gap: 32px;
+}
+
+.px-logo {
+  font-family: var(--px-font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--px-text);
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.px-logo-mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--px-brand) 0%, var(--px-brand-deep) 100%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px var(--px-brand-glow);
+}
+
+.px-nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.px-nav a:not(.px-btn) {
+  font-family: var(--px-font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--px-text-soft);
+  letter-spacing: 0;
+  transition: color var(--px-fast) var(--px-ease);
+}
+
+.px-nav a:not(.px-btn):hover {
+  color: var(--px-text);
+}
+
+/* ---------- Buttons ---------- */
+
+.px-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border: 1px solid transparent;
+  border-radius: var(--px-radius);
+  font-family: var(--px-font-body);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--px-normal) var(--px-ease);
+}
+
+.px-btn-primary {
+  background: var(--px-brand);
+  color: white;
+  border-color: var(--px-brand);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.px-btn-primary:hover {
+  background: var(--px-brand-deep);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: var(--px-shadow-brand);
+}
+
+.px-btn-ghost {
+  background: transparent;
+  color: var(--px-text-soft);
+  border-color: var(--px-line-2);
+}
+
+.px-btn-ghost:hover {
+  background: var(--px-surface-2);
+  color: var(--px-text);
+  border-color: var(--px-line-2);
+}
+
+.px-btn-lg {
+  padding: 14px 28px;
+  font-size: 15px;
+  border-radius: var(--px-radius-lg);
+}
+
+.px-btn-block {
+  width: 100%;
+}
+
+/* ---------- Cards ---------- */
+
+.px-card {
+  background: var(--px-surface);
+  border: 1px solid var(--px-line);
+  border-radius: var(--px-radius-lg);
+  padding: 24px;
+  transition: all var(--px-normal) var(--px-ease);
+}
+
+.px-card:hover {
+  border-color: var(--px-line-2);
+  transform: translateY(-4px);
+  box-shadow: var(--px-shadow-lg);
+}
+
+/* ---------- Category Pills ---------- */
+
+.px-cat {
+  --cat-color: var(--px-brand);
+  --cat-soft: rgba(99, 102, 241, 0.12);
+  --cat-line: rgba(99, 102, 241, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--px-radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  background: var(--cat-soft);
+  color: var(--cat-color);
+  border: 1px solid var(--cat-line);
+}
+
+.px-cat-hotels       { --cat-color: var(--px-cat-hotels);       --cat-soft: var(--px-cat-hotels-soft);       --cat-line: var(--px-cat-hotels-line); }
+.px-cat-restaurants  { --cat-color: var(--px-cat-restaurants);  --cat-soft: var(--px-cat-restaurants-soft);  --cat-line: var(--px-cat-restaurants-line); }
+.px-cat-travel       { --cat-color: var(--px-cat-travel);       --cat-soft: var(--px-cat-travel-soft);       --cat-line: var(--px-cat-travel-line); }
+.px-cat-entertainment{ --cat-color: var(--px-cat-entertainment);--cat-soft: var(--px-cat-entertainment-soft);--cat-line: var(--px-cat-entertainment-line); }
+
+/* ---------- Footer ---------- */
+
+.px-footer {
+  border-top: 1px solid var(--px-line);
+  margin-top: 80px;
+  padding: 40px 0 32px;
+  color: var(--px-muted);
+  font-size: 13px;
+}
+
+.px-footer-inner {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.px-footer a {
+  color: var(--px-muted);
+}
+
+.px-footer a:hover {
+  color: var(--px-text);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 720px) {
+  .px-body h1 { font-size: 36px; }
+  .px-body h2 { font-size: 26px; }
+  .px-body h3 { font-size: 20px; }
+  .px-header-inner { height: 62px; gap: 16px; }
+  .px-nav { gap: 16px; }
+  .px-nav a:not(.px-btn) { display: none; }
+  .px-nav a.px-mobile-hide { display: none; }
+  .px-logo { font-size: 18px; }
+  .px-logo-mark { width: 26px; height: 26px; font-size: 14px; }
+}
