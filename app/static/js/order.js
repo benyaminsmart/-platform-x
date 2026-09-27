@@ -111,58 +111,47 @@ PX.initOrder = function (slug) {
     var created = [];
 
     try {
-      for (var i = 0; i < ids.length; i++) {
-        var id = ids[i];
+      // Aggregate all cart items into ONE order
+      var total = 0;
+      var currency = "AED";
+      var lines = [];
+      var totalQty = 0;
+
+      ids.forEach(function (id) {
         var item = cart[id];
-        var subtotal = (parseFloat(item.price) * item.qty).toFixed(2);
-        var payload = {
-          service_type: "dining",
-          service_name: item.name + (item.qty > 1 ? " ×" + item.qty : ""),
-          quantity: item.qty,
-          amount: subtotal,
-          currency: item.currency,
-          notes: null,
-        };
-        var res = await fetch("/orders", {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify(payload),
-        });
-        var data = await res.json();
-        if (!res.ok) {
-          var msg = data.detail;
-          if (Array.isArray(msg)) msg = msg.map(function (e) { return e.msg; }).join(", ");
-          PX.showAlert(msg || "Order failed");
-          checkoutBtn.disabled = false;
-          checkoutBtn.textContent = "Proceed to checkout";
-          return;
-        }
-        created.push(data.id);
+        var subtotal = parseFloat(item.price) * item.qty;
+        total += subtotal;
+        totalQty += item.qty;
+        currency = item.currency;
+        lines.push(item.qty + "× " + item.name);
+      });
+
+      var payload = {
+        service_type: "dining",
+        service_name: totalQty + " item" + (totalQty > 1 ? "s" : "") + " order",
+        quantity: totalQty,
+        amount: total.toFixed(2),
+        currency: currency,
+        notes: lines.join(", "),
+      };
+
+      var res = await fetch("/orders", {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(payload),
+      });
+      var data = await res.json();
+      if (!res.ok) {
+        var msg = data.detail;
+        if (Array.isArray(msg)) msg = msg.map(function (e) { return e.msg; }).join(", ");
+        PX.showAlert(msg || "Order failed");
+        checkoutBtn.disabled = false;
+        checkoutBtn.textContent = "Proceed to checkout";
+        return;
       }
 
-      // For demo: pay the first order and redirect to /account
-      if (created.length) {
-        var firstId = created[0];
-        // Get the order amount
-        var orderRes = await fetch("/orders/" + firstId, { headers: headers });
-        var order = await orderRes.json();
-        var intentRes = await fetch("/payments/intent", {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify({
-            order_id: firstId,
-            amount: order.amount,
-            currency: order.currency,
-            method: "card",
-          }),
-        });
-        var intent = await intentRes.json();
-        if (intentRes.ok && intent.redirect_url) {
-          await fetch(intent.redirect_url);
-        }
-      }
-
-      window.location.href = "/account";
+      // Redirect to order payment page
+      window.location.href = "/" + slug + "/pay/order?order=" + data.id;
     } catch (err) {
       PX.showAlert("Network error. Please try again.");
       checkoutBtn.disabled = false;

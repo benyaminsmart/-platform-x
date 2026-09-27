@@ -318,6 +318,28 @@ def tenant_account_page(
     )
 
 
+
+
+@router.get("/{tenant_slug}/pay/order", response_class=HTMLResponse)
+def tenant_pay_order_page(
+    tenant_slug: str,
+    request: Request,
+    order: str | None = None,
+    db: DBSession = Depends(get_db),
+) -> HTMLResponse:
+    """Payment page for an order (restaurant)."""
+    if tenant_slug in RESERVED_SLUGS:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    tenant = _get_tenant_by_slug(db, tenant_slug)
+    if tenant is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return templates.TemplateResponse(
+        request,
+        "pages/tenant_pay_order.html",
+        {"tenant": tenant, "order_id": order or ""},
+    )
+
+
 @router.get("/{tenant_slug}/pay", response_class=HTMLResponse)
 def tenant_pay_page(
     tenant_slug: str,
