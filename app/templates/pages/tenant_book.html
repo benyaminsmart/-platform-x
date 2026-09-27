@@ -15,18 +15,34 @@
     </div>
 
     <div class="px-book-grid">
-      <!-- FORM -->
       <div class="px-book-form">
-        <h1 style="margin-bottom: 8px;">Make a booking</h1>
-        <p class="px-muted" style="margin-bottom: 32px;">Choose your service and dates. Instant confirmation.</p>
+        <h1 style="margin-bottom: 8px;">
+          {% if tenant.config.type == 'hotel' %}Reserve a room
+          {% elif tenant.config.type == 'restaurant' %}Reserve a table
+          {% elif tenant.config.type == 'travel_agency' %}Book a package
+          {% elif tenant.config.type == 'entertainment' %}Book tickets
+          {% else %}Make a booking{% endif %}
+        </h1>
+        <p class="px-muted" style="margin-bottom: 32px;">
+          {% if tenant.config.type == 'hotel' %}Choose your room and dates. Instant confirmation.
+          {% elif tenant.config.type == 'restaurant' %}Pick your date, time and party size.
+          {% elif tenant.config.type == 'travel_agency' %}Select a package and departure date.
+          {% elif tenant.config.type == 'entertainment' %}Choose your date and number of tickets.
+          {% else %}Choose your service and dates. Instant confirmation.{% endif %}
+        </p>
 
         <div id="alert-box" style="display: none;"></div>
 
         <form id="booking-form">
           <div class="px-field" style="margin-bottom: 20px;">
-            <label for="service_id">Service</label>
+            <label for="service_id">
+              {% if tenant.config.type == 'restaurant' %}Menu
+              {% elif tenant.config.type == 'travel_agency' %}Package
+              {% elif tenant.config.type == 'entertainment' %}Ticket type
+              {% else %}Service{% endif %}
+            </label>
             <select id="service_id" name="service_id" required>
-              <option value="">— Select a service —</option>
+              <option value="">— Select —</option>
               {% for s in services %}
                 <option
                   value="{{ s.id }}"
@@ -41,21 +57,74 @@
             </select>
           </div>
 
-          <div class="px-field-row" style="margin-bottom: 20px;">
-            <div class="px-field">
-              <label for="check_in">Check-in</label>
+          {% if tenant.config.type == 'hotel' %}
+            <div class="px-field-row" style="margin-bottom: 20px;">
+              <div class="px-field">
+                <label for="check_in">Check-in</label>
+                <input type="date" id="check_in" name="check_in" required>
+              </div>
+              <div class="px-field">
+                <label for="check_out">Check-out</label>
+                <input type="date" id="check_out" name="check_out" required>
+              </div>
+            </div>
+            <div class="px-field" style="margin-bottom: 20px;">
+              <label for="guests">Guests</label>
+              <input type="number" id="guests" name="guests" value="2" min="1" max="20" required>
+            </div>
+
+          {% elif tenant.config.type == 'restaurant' %}
+            <div class="px-field-row" style="margin-bottom: 20px;">
+              <div class="px-field">
+                <label for="check_in">Date</label>
+                <input type="date" id="check_in" name="check_in" required>
+              </div>
+              <div class="px-field">
+                <label for="booking_time">Time</label>
+                <input type="time" id="booking_time" name="booking_time" value="19:00" required>
+              </div>
+            </div>
+            <div class="px-field" style="margin-bottom: 20px;">
+              <label for="guests">Number of guests</label>
+              <input type="number" id="guests" name="guests" value="2" min="1" max="20" required>
+            </div>
+
+          {% elif tenant.config.type == 'travel_agency' %}
+            <div class="px-field" style="margin-bottom: 20px;">
+              <label for="check_in">Departure date</label>
               <input type="date" id="check_in" name="check_in" required>
             </div>
-            <div class="px-field">
-              <label for="check_out">Check-out (optional)</label>
-              <input type="date" id="check_out" name="check_out">
+            <div class="px-field" style="margin-bottom: 20px;">
+              <label for="guests">Passengers</label>
+              <input type="number" id="guests" name="guests" value="2" min="1" max="30" required>
             </div>
-          </div>
 
-          <div class="px-field" style="margin-bottom: 20px;">
-            <label for="guests">Guests</label>
-            <input type="number" id="guests" name="guests" value="1" min="1" max="20" required>
-          </div>
+          {% elif tenant.config.type == 'entertainment' %}
+            <div class="px-field" style="margin-bottom: 20px;">
+              <label for="check_in">Visit date</label>
+              <input type="date" id="check_in" name="check_in" required>
+            </div>
+            <div class="px-field" style="margin-bottom: 20px;">
+              <label for="guests">Number of tickets</label>
+              <input type="number" id="guests" name="guests" value="2" min="1" max="50" required>
+            </div>
+
+          {% else %}
+            <div class="px-field-row" style="margin-bottom: 20px;">
+              <div class="px-field">
+                <label for="check_in">Date</label>
+                <input type="date" id="check_in" name="check_in" required>
+              </div>
+              <div class="px-field">
+                <label for="check_out">End (optional)</label>
+                <input type="date" id="check_out" name="check_out">
+              </div>
+            </div>
+            <div class="px-field" style="margin-bottom: 20px;">
+              <label for="guests">Guests</label>
+              <input type="number" id="guests" name="guests" value="1" min="1" max="20" required>
+            </div>
+          {% endif %}
 
           <div class="px-field" style="margin-bottom: 24px;">
             <label for="notes">Notes (optional)</label>
@@ -63,38 +132,37 @@
           </div>
 
           <button type="submit" class="px-btn px-btn-primary px-btn-block px-btn-lg">
-            Confirm booking
+            {% if tenant.config.type == 'hotel' %}Reserve room
+            {% elif tenant.config.type == 'restaurant' %}Reserve table
+            {% elif tenant.config.type == 'travel_agency' %}Book package
+            {% elif tenant.config.type == 'entertainment' %}Get tickets
+            {% else %}Confirm booking{% endif %}
           </button>
         </form>
       </div>
 
-      <!-- SIDEBAR -->
       <aside class="px-book-side">
         <div class="px-book-card">
           <div class="px-book-card-title">Summary</div>
-
           <div class="px-book-summary">
             <div class="px-book-row">
-              <span class="px-muted">Service</span>
+              <span class="px-muted">Selected</span>
               <strong id="summary-service">—</strong>
             </div>
             <div class="px-book-row">
-              <span class="px-muted">Guests</span>
+              <span class="px-muted" id="summary-guests-label">Guests</span>
               <strong id="summary-guests">1</strong>
             </div>
             <div class="px-book-row">
-              <span class="px-muted">Dates</span>
+              <span class="px-muted" id="summary-dates-label">Dates</span>
               <strong id="summary-dates">—</strong>
             </div>
           </div>
-
           <hr style="border: none; border-top: 1px solid var(--px-line); margin: 20px 0;">
-
           <div style="display: flex; justify-content: space-between; align-items: baseline;">
             <span class="px-muted">Total</span>
             <span class="px-book-total" id="summary-total">—</span>
           </div>
-
           <p class="px-muted" style="margin-top: 16px; font-size: 12px;">
             No charge yet. Payment on next step.
           </p>
