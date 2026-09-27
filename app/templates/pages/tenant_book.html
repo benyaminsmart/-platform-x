@@ -4,68 +4,102 @@
 
 {% block content %}
 
-<section class="section-sm">
-  <div class="container-narrow" style="max-width: 640px;">
-    <div class="eyebrow">{{ tenant.name }}</div>
-    <h1>Make a booking</h1>
-    <p class="text-muted">Choose your service and dates. We'll confirm instantly.</p>
+<section class="px-book">
+  <div class="px-container">
+    <div class="px-breadcrumb" style="justify-content: flex-start; margin-bottom: 24px;">
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/{{ tenant.slug }}/">{{ tenant.name }}</a>
+      <span>/</span>
+      <span>Book</span>
+    </div>
 
-    <div class="card" style="margin-top: var(--space-7);">
-      <div id="alert-box" style="display: none;"></div>
+    <div class="px-book-grid">
+      <!-- FORM -->
+      <div class="px-book-form">
+        <h1 style="margin-bottom: 8px;">Make a booking</h1>
+        <p class="px-muted" style="margin-bottom: 32px;">Choose your service and dates. Instant confirmation.</p>
 
-      <form id="booking-form">
-        <div class="form-group">
-          <label class="form-label" for="service_id">Service</label>
-          <select class="form-select" id="service_id" name="service_id" required>
-            <option value="">— Select a service —</option>
-            {% for s in services %}
-              <option
-                value="{{ s.id }}"
-                data-name="{{ s.name }}"
-                data-price="{{ s.price }}"
-                data-currency="{{ s.currency }}"
-                {% if selected_service and selected_service.id == s.id %}selected{% endif %}
-              >
-                {{ s.name }} — {{ s.price }} {{ s.currency }}
-              </option>
-            {% endfor %}
-          </select>
-        </div>
+        <div id="alert-box" style="display: none;"></div>
 
-        <div class="grid grid-2">
-          <div class="form-group">
-            <label class="form-label" for="check_in">Check-in</label>
-            <input class="form-input" type="date" id="check_in" name="check_in" required>
+        <form id="booking-form">
+          <div class="px-field" style="margin-bottom: 20px;">
+            <label for="service_id">Service</label>
+            <select id="service_id" name="service_id" required>
+              <option value="">— Select a service —</option>
+              {% for s in services %}
+                <option
+                  value="{{ s.id }}"
+                  data-name="{{ s.name }}"
+                  data-price="{{ s.price }}"
+                  data-currency="{{ s.currency }}"
+                  {% if selected_service and selected_service.id == s.id %}selected{% endif %}
+                >
+                  {{ s.name }} — {{ s.price }} {{ s.currency }}
+                </option>
+              {% endfor %}
+            </select>
           </div>
-          <div class="form-group">
-            <label class="form-label" for="check_out">Check-out (optional)</label>
-            <input class="form-input" type="date" id="check_out" name="check_out">
+
+          <div class="px-field-row" style="margin-bottom: 20px;">
+            <div class="px-field">
+              <label for="check_in">Check-in</label>
+              <input type="date" id="check_in" name="check_in" required>
+            </div>
+            <div class="px-field">
+              <label for="check_out">Check-out (optional)</label>
+              <input type="date" id="check_out" name="check_out">
+            </div>
           </div>
-        </div>
 
-        <div class="form-group">
-          <label class="form-label" for="guests">Guests</label>
-          <input class="form-input" type="number" id="guests" name="guests" value="1" min="1" max="20" required>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="notes">Notes (optional)</label>
-          <textarea class="form-textarea" id="notes" name="notes" rows="3"></textarea>
-        </div>
-
-        <div class="card-flat" style="margin-bottom: var(--space-5);">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span class="text-muted">Total</span>
-            <span id="total-display" class="text-gold" style="font-family: var(--font-serif); font-size: var(--text-xl);">
-              —
-            </span>
+          <div class="px-field" style="margin-bottom: 20px;">
+            <label for="guests">Guests</label>
+            <input type="number" id="guests" name="guests" value="1" min="1" max="20" required>
           </div>
-        </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%;">
-          Confirm booking
-        </button>
-      </form>
+          <div class="px-field" style="margin-bottom: 24px;">
+            <label for="notes">Notes (optional)</label>
+            <textarea id="notes" name="notes" rows="3" placeholder="Any special requests?"></textarea>
+          </div>
+
+          <button type="submit" class="px-btn px-btn-primary px-btn-block px-btn-lg">
+            Confirm booking
+          </button>
+        </form>
+      </div>
+
+      <!-- SIDEBAR -->
+      <aside class="px-book-side">
+        <div class="px-book-card">
+          <div class="px-book-card-title">Summary</div>
+
+          <div class="px-book-summary">
+            <div class="px-book-row">
+              <span class="px-muted">Service</span>
+              <strong id="summary-service">—</strong>
+            </div>
+            <div class="px-book-row">
+              <span class="px-muted">Guests</span>
+              <strong id="summary-guests">1</strong>
+            </div>
+            <div class="px-book-row">
+              <span class="px-muted">Dates</span>
+              <strong id="summary-dates">—</strong>
+            </div>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid var(--px-line); margin: 20px 0;">
+
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <span class="px-muted">Total</span>
+            <span class="px-book-total" id="summary-total">—</span>
+          </div>
+
+          <p class="px-muted" style="margin-top: 16px; font-size: 12px;">
+            No charge yet. Payment on next step.
+          </p>
+        </div>
+      </aside>
     </div>
   </div>
 </section>

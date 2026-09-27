@@ -19,21 +19,35 @@ PX.initBooking = function (slug) {
   if (!form) return;
 
   var select = document.getElementById("service_id");
-  var totalDisplay = document.getElementById("total-display");
+  var totalDisplay = document.getElementById("summary-total");
+  var serviceDisplay = document.getElementById("summary-service");
+  var guestsDisplay = document.getElementById("summary-guests");
+  var datesDisplay = document.getElementById("summary-dates");
 
-  function refreshTotal() {
+  function refreshSummary() {
     var opt = select.options[select.selectedIndex];
     if (!opt || !opt.value) {
       totalDisplay.textContent = "—";
-      return;
+      serviceDisplay.textContent = "—";
+    } else {
+      totalDisplay.textContent = opt.getAttribute("data-price") + " " + opt.getAttribute("data-currency");
+      serviceDisplay.textContent = opt.getAttribute("data-name");
     }
-    var price = opt.getAttribute("data-price");
-    var cur = opt.getAttribute("data-currency");
-    totalDisplay.textContent = price + " " + cur;
+
+    guestsDisplay.textContent = form.guests.value || "1";
+
+    var ci = form.check_in.value;
+    var co = form.check_out.value;
+    if (ci && co) datesDisplay.textContent = ci + " → " + co;
+    else if (ci) datesDisplay.textContent = ci;
+    else datesDisplay.textContent = "—";
   }
 
-  select.addEventListener("change", refreshTotal);
-  refreshTotal();
+  select.addEventListener("change", refreshSummary);
+  form.guests.addEventListener("input", refreshSummary);
+  form.check_in.addEventListener("change", refreshSummary);
+  form.check_out.addEventListener("change", refreshSummary);
+  refreshSummary();
 
   form.addEventListener("submit", async function (ev) {
     ev.preventDefault();

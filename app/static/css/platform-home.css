@@ -1301,3 +1301,76 @@
   .px-list-item { flex-direction: column; align-items: flex-start; }
   .px-list-item-side { text-align: left; }
 }
+
+
+/* ---------- Booking Page ---------- */
+
+.px-book {
+  padding: 40px 0 100px;
+}
+
+.px-book-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 40px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .px-book-grid { grid-template-columns: 1fr; }
+}
+
+.px-book-form {
+  background: var(--px-surface);
+  border: 1px solid var(--px-line);
+  border-radius: var(--px-radius-xl);
+  padding: 40px;
+}
+
+@media (max-width: 520px) {
+  .px-book-form { padding: 24px; }
+}
+
+.px-book-side {
+  position: sticky;
+  top: 100px;
+}
+
+.px-book-card {
+  background: var(--px-surface);
+  border: 1px solid var(--px-line);
+  border-radius: var(--px-radius-lg);
+  padding: 28px;
+}
+
+.px-book-card-title {
+  font-family: var(--px-font-display);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.px-book-summary {
+  display: grid;
+  gap: 14px;
+}
+
+.px-book-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.px-book-row strong {
+  color: var(--px-text);
+  font-weight: 600;
+}
+
+.px-book-total {
+  font-family: var(--px-font-display);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--px-brand);
+  letter-spacing: -0.02em;
+}
