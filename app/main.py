@@ -8,6 +8,7 @@ from app.api import bookings as bookings_router
 from app.api import notifications as notifications_router
 from app.api import orders as orders_router
 from app.api import payments as payments_router
+from app.api import platform_admin as platform_admin_router
 from app.api import referrals as referrals_router
 from app.api import rewards as rewards_router
 from app.api import services as services_router
@@ -37,6 +38,7 @@ app.include_router(services_router.router)
 app.include_router(orders_router.router)
 app.include_router(notifications_router.router)
 app.include_router(payments_router.router)
+app.include_router(platform_admin_router.router)
 app.include_router(rewards_router.router)
 app.include_router(referrals_router.router)
 

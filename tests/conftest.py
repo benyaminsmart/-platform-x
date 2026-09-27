@@ -94,3 +94,27 @@ def client(db: Session):
     with TestClient(app) as c:
         yield c
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def admin_client(client, db):
+    """Test client authenticated as a platform admin.
+
+    Creates an admin, logs in, and returns (client, headers) tuple.
+    """
+    from app.services import admin_service
+
+    admin_service.create(
+        db,
+        email="admin@example.com",
+        password="AdminPass1234",
+        name="Test Admin",
+        role="super_admin",
+    )
+    resp = client.post(
+        "/platform/auth/login",
+        json={"email": "admin@example.com", "password": "AdminPass1234"},
+    )
+    assert resp.status_code == 200, resp.text
+    token = resp.json()["access_token"]
+    return client, {"Authorization": f"Bearer {token}"}

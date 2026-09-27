@@ -2,11 +2,11 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session as DBSession
 
 from app.api.deps import get_current_tenant
-from app.core.config import settings
+from app.api.deps_admin import require_role
 from app.db.session import get_db
 from app.models.tenant import Tenant
 from app.schemas.common import MessageResponse, PaginatedResponse
@@ -14,18 +14,6 @@ from app.schemas.service import ServiceCreate, ServicePublic, ServiceUpdate
 from app.services import service_service
 
 router = APIRouter(prefix="/services", tags=["services"])
-
-
-def require_admin_key(
-    x_admin_key: Annotated[str | None, Header(alias="X-Admin-Key")] = None,
-) -> None:
-    """Temporary admin guard until Platform Admin auth is implemented."""
-    expected = getattr(settings, "ADMIN_API_KEY", None) or "dev-admin-key"
-    if x_admin_key != expected:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin access required",
-        )
 
 
 @router.get("", response_model=PaginatedResponse[ServicePublic])
@@ -70,7 +58,7 @@ def get_service(
     "",
     response_model=ServicePublic,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(require_admin_key)],
+    dependencies=[Depends(require_role("super_admin", "admin"))],
 )
 def create_service(
     payload: ServiceCreate,
@@ -85,7 +73,7 @@ def create_service(
 @router.patch(
     "/{service_id}",
     response_model=ServicePublic,
-    dependencies=[Depends(require_admin_key)],
+    dependencies=[Depends(require_role("super_admin", "admin"))],
 )
 def update_service(
     service_id: str,
@@ -105,7 +93,7 @@ def update_service(
 @router.delete(
     "/{service_id}",
     response_model=MessageResponse,
-    dependencies=[Depends(require_admin_key)],
+    dependencies=[Depends(require_role("super_admin", "admin"))],
 )
 def delete_service(
     service_id: str,

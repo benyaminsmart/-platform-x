@@ -42,9 +42,6 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: list[str] = ["http://localhost:8000", "http://127.0.0.1:8000"]
 
-    # Admin (temporary, until platform admin auth is built)
-    ADMIN_API_KEY: str = "dev-admin-key"
-
     # Multi-tenancy
     DEFAULT_TENANT_SLUG: str = "demo"
 

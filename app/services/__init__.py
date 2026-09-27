@@ -1,6 +1,7 @@
 """Business logic services for Platform-X."""
 
 from app.services import (
+    admin_service,
     booking_service,
     notification_service,
     order_service,
@@ -13,6 +14,7 @@ from app.services import (
 )
 
 __all__ = [
+    "admin_service",
     "booking_service",
     "notification_service",
     "order_service",

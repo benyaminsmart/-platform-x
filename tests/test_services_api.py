@@ -1,10 +1,8 @@
-"""End-to-end tests for service endpoints."""
+"""End-to-end tests for service endpoints (admin uses real platform admin auth)."""
 
 from fastapi.testclient import TestClient
 
 from app.models.tenant import Tenant
-
-ADMIN = {"X-Admin-Key": "dev-admin-key"}
 
 
 def _service_payload(**overrides):
@@ -23,114 +21,157 @@ def _service_payload(**overrides):
     return base
 
 
-def _headers(tenant: Tenant, admin: bool = False) -> dict:
-    h = {"X-Tenant-Slug": tenant.slug}
-    if admin:
-        h.update(ADMIN)
-    return h
+def _tenant_headers(tenant: Tenant) -> dict:
+    return {"X-Tenant-Slug": tenant.slug}
+
+
+def _admin_headers(tenant: Tenant, admin_client) -> dict:
+    _, auth = admin_client
+    return {"X-Tenant-Slug": tenant.slug, **auth}
 
 
 def test_list_empty(client: TestClient, sample_tenant: Tenant) -> None:
-    resp = client.get("/services", headers=_headers(sample_tenant))
+    resp = client.get("/services", headers=_tenant_headers(sample_tenant))
     assert resp.status_code == 200
     assert resp.json()["total"] == 0
 
 
-def test_create_requires_admin_key(
+def test_create_requires_admin(
     client: TestClient, sample_tenant: Tenant
 ) -> None:
+    """Without admin token, POST should 401."""
     resp = client.post(
-        "/services", json=_service_payload(), headers=_headers(sample_tenant)
+        "/services", json=_service_payload(), headers=_tenant_headers(sample_tenant)
     )
-    assert resp.status_code == 403
+    assert resp.status_code == 401
 
 
-def test_create_with_admin_key(
-    client: TestClient, sample_tenant: Tenant
+def test_create_with_admin(
+    client: TestClient, sample_tenant: Tenant, admin_client
 ) -> None:
     resp = client.post(
         "/services",
         json=_service_payload(),
-        headers=_headers(sample_tenant, admin=True),
+        headers=_admin_headers(sample_tenant, admin_client),
     )
     assert resp.status_code == 201, resp.text
-    data = resp.json()
-    assert data["name"] == "Deluxe Suite"
-    assert data["status"] == "active"
-    assert data["attributes"]["bed"] == "king"
-    assert data["image_urls"] == ["/img/1.jpg"]
+    d = resp.json()
+    assert d["name"] == "Deluxe Suite"
+    assert d["status"] == "active"
+    assert d["attributes"]["bed"] == "king"
+    assert d["image_urls"] == ["/img/1.jpg"]
+
+
+def test_create_requires_super_admin_or_admin_role(
+    client: TestClient, sample_tenant: Tenant, db
+) -> None:
+    """A 'support' role cannot create services."""
+    from app.services import admin_service
+
+    admin_service.create(
+        db,
+        email="support@example.com",
+        password="SupportPass1234",
+        name="Support",
+        role="support",
+    )
+    r = client.post(
+        "/platform/auth/login",
+        json={"email": "support@example.com", "password": "SupportPass1234"},
+    )
+    auth = {"Authorization": f"Bearer {r.json()['access_token']}"}
+
+    resp = client.post(
+        "/services",
+        json=_service_payload(),
+        headers={"X-Tenant-Slug": sample_tenant.slug, **auth},
+    )
+    assert resp.status_code == 403
 
 
 def test_list_returns_created(
-    client: TestClient, sample_tenant: Tenant
+    client: TestClient, sample_tenant: Tenant, admin_client
 ) -> None:
-    h = _headers(sample_tenant, admin=True)
+    h = _admin_headers(sample_tenant, admin_client)
     client.post("/services", json=_service_payload(), headers=h)
     client.post("/services", json=_service_payload(name="Standard"), headers=h)
 
-    resp = client.get("/services", headers=_headers(sample_tenant))
+    resp = client.get("/services", headers=_tenant_headers(sample_tenant))
     assert resp.status_code == 200
-    data = resp.json()
-    assert data["total"] == 2
+    assert resp.json()["total"] == 2
 
 
 def test_list_filter_by_type(
-    client: TestClient, sample_tenant: Tenant
+    client: TestClient, sample_tenant: Tenant, admin_client
 ) -> None:
-    h = _headers(sample_tenant, admin=True)
+    h = _admin_headers(sample_tenant, admin_client)
     client.post("/services", json=_service_payload(type="room"), headers=h)
     client.post("/services", json=_service_payload(type="dish", name="Kebab"), headers=h)
 
-    resp = client.get("/services?type=dish", headers=_headers(sample_tenant))
-    data = resp.json()
-    assert data["total"] == 1
-    assert data["items"][0]["type"] == "dish"
+    resp = client.get(
+        "/services?type=dish", headers=_tenant_headers(sample_tenant)
+    )
+    d = resp.json()
+    assert d["total"] == 1
+    assert d["items"][0]["type"] == "dish"
 
 
-def test_get_detail(client: TestClient, sample_tenant: Tenant) -> None:
-    h = _headers(sample_tenant, admin=True)
+def test_get_detail(
+    client: TestClient, sample_tenant: Tenant, admin_client
+) -> None:
+    h = _admin_headers(sample_tenant, admin_client)
     r = client.post("/services", json=_service_payload(), headers=h)
     sid = r.json()["id"]
 
-    resp = client.get(f"/services/{sid}", headers=_headers(sample_tenant))
+    resp = client.get(
+        f"/services/{sid}", headers=_tenant_headers(sample_tenant)
+    )
     assert resp.status_code == 200
     assert resp.json()["id"] == sid
 
 
 def test_get_unknown_404(client: TestClient, sample_tenant: Tenant) -> None:
-    resp = client.get("/services/nope", headers=_headers(sample_tenant))
+    resp = client.get("/services/nope", headers=_tenant_headers(sample_tenant))
     assert resp.status_code == 404
 
 
-def test_update_partial(client: TestClient, sample_tenant: Tenant) -> None:
-    h = _headers(sample_tenant, admin=True)
+def test_update_partial(
+    client: TestClient, sample_tenant: Tenant, admin_client
+) -> None:
+    h = _admin_headers(sample_tenant, admin_client)
     r = client.post("/services", json=_service_payload(), headers=h)
     sid = r.json()["id"]
 
     resp = client.patch(
-        f"/services/{sid}", json={"price": "650.00", "name": "New Name"}, headers=h
+        f"/services/{sid}",
+        json={"price": "650.00", "name": "New Name"},
+        headers=h,
     )
     assert resp.status_code == 200
-    data = resp.json()
-    assert data["price"] == "650.00"
-    assert data["name"] == "New Name"
+    d = resp.json()
+    assert d["price"] == "650.00"
+    assert d["name"] == "New Name"
 
 
 def test_update_requires_admin(
-    client: TestClient, sample_tenant: Tenant
+    client: TestClient, sample_tenant: Tenant, admin_client
 ) -> None:
-    h_admin = _headers(sample_tenant, admin=True)
-    r = client.post("/services", json=_service_payload(), headers=h_admin)
+    h = _admin_headers(sample_tenant, admin_client)
+    r = client.post("/services", json=_service_payload(), headers=h)
     sid = r.json()["id"]
 
     resp = client.patch(
-        f"/services/{sid}", json={"price": "1.00"}, headers=_headers(sample_tenant)
+        f"/services/{sid}",
+        json={"price": "1.00"},
+        headers=_tenant_headers(sample_tenant),
     )
-    assert resp.status_code == 403
+    assert resp.status_code == 401
 
 
-def test_delete_soft(client: TestClient, sample_tenant: Tenant) -> None:
-    h = _headers(sample_tenant, admin=True)
+def test_delete_soft(
+    client: TestClient, sample_tenant: Tenant, admin_client
+) -> None:
+    h = _admin_headers(sample_tenant, admin_client)
     r = client.post("/services", json=_service_payload(), headers=h)
     sid = r.json()["id"]
 
@@ -138,16 +179,16 @@ def test_delete_soft(client: TestClient, sample_tenant: Tenant) -> None:
     assert resp.status_code == 200
     assert "deactivated" in resp.json()["message"]
 
-    # No longer in public list
-    lst = client.get("/services", headers=_headers(sample_tenant))
+    lst = client.get("/services", headers=_tenant_headers(sample_tenant))
     assert lst.json()["total"] == 0
 
-    # But GET by id should 404 (status != active)
-    g = client.get(f"/services/{sid}", headers=_headers(sample_tenant))
+    g = client.get(f"/services/{sid}", headers=_tenant_headers(sample_tenant))
     assert g.status_code == 404
 
 
-def test_tenant_isolation(client: TestClient, sample_tenant: Tenant, db) -> None:
+def test_tenant_isolation(
+    client: TestClient, sample_tenant: Tenant, admin_client, db
+) -> None:
     """Services of tenant A are not visible to tenant B."""
     from app.models.tenant import Tenant as T
 
@@ -155,8 +196,8 @@ def test_tenant_isolation(client: TestClient, sample_tenant: Tenant, db) -> None
     db.add(other)
     db.commit()
 
-    h_a = _headers(sample_tenant, admin=True)
-    client.post("/services", json=_service_payload(), headers=h_a)
+    h = _admin_headers(sample_tenant, admin_client)
+    client.post("/services", json=_service_payload(), headers=h)
 
     resp = client.get("/services", headers={"X-Tenant-Slug": "other"})
     assert resp.status_code == 200
