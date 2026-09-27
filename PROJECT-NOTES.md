@@ -1,186 +1,199 @@
+k
 # Platform-X — Project Notes
 
-> **Purpose:** Technical decisions, architectural context, and reasoning behind choices.
->
-> Read together with HANDOFF.md.
+> Technical decisions, architectural context, reasoning.
+> Read with HANDOFF.md and AI-CONTEXT.md.
 
 ---
 
-## 1. Why Platform-X (not just Trianon)
+## 1. Why Platform-X
 
-Trianon Royal Hotel is the first project. But we saw the bigger opportunity:
+Market observation:
+- Hotels pay 15-20% commission to Booking.com/Agoda.
+- Restaurants, entertainment, travel agencies — same problem.
+- All need same infrastructure: auth, payments, bookings, notifications.
+- Build once → serve many.
 
-- Hotels pay 15-20% commission to Booking.com and Agoda.
-- Restaurants, entertainment centers, travel agencies — same problem.
-- All of them need the same infrastructure (auth, payments, bookings, notifications).
-- Building it once → serving many.
-
-Platform-X is that infrastructure. Trianon is the first proof it works.
+Platform-X is that infrastructure.
+Multi-tenant platform. Many businesses onboard. Each has own branded presence.
 
 ---
 
 ## 2. Why Multi-Tenant (not Multi-Instance)
 
-Two options were considered:
+Option A — Multi-Instance: separate install per business.
+- Pros: full isolation.
+- Cons: duplication, unmaintainable.
 
-**Option A — Multi-Instance:** Each business gets its own separate installation.
-- Pros: full isolation, simple code.
-- Cons: massive duplication, impossible to maintain, no shared features.
+Option B — Multi-Tenant: one codebase, many businesses.
+- Pros: single codebase, shared features, economies of scale.
+- Cons: need tenant isolation.
 
-**Option B — Multi-Tenant:** One codebase, one database, many businesses.
-- Pros: single codebase, shared features, shared updates, economies of scale.
-- Cons: slightly more complex (need tenant isolation).
-
-**Decision: Option B — Multi-Tenant.**
+Decision: Option B.
 
 ---
 
-## 3. Database Architecture (Preliminary)
+## 3. Database Architecture
 
-Two sub-options within multi-tenant:
+Sub-option A — Shared DB, Shared Schema:
+- One DB, tenant_id column on all tables.
+- Pros: simple, cheap.
+- Cons: harder beyond 100 tenants.
 
-**Sub-option A — Shared Database, Shared Schema:**
-- One database, tables have `tenant_id` column.
-- Pros: simple, cheap, easy to query across tenants.
-- Cons: harder to scale beyond 100 tenants.
+Sub-option B — Shared DB, Schema per Tenant.
+- Pros: better isolation.
+- Cons: complex migrations.
 
-**Sub-option B — Shared Database, Separate Schemas:**
-- One database, one schema per tenant (PostgreSQL feature).
-- Pros: better isolation, easier per-tenant backup.
-- Cons: more complex migrations.
+Sub-option C — DB per Tenant.
+- Pros: max isolation.
+- Cons: expensive.
 
-**Sub-option C — Database per Tenant:**
-- One database per tenant.
-- Pros: maximum isolation.
-- Cons: expensive, hard to manage at scale.
-
-**Preliminary decision: Sub-option A** — suitable for first 100 tenants. We can migrate to B or C later if needed.
+Decision: Sub-option A. Migrate to B/C later if needed.
 
 ---
 
-## 4. Why PostgreSQL (for Platform-X)
+## 4. Why PostgreSQL (Production)
 
-SQLite is perfect for Trianon (single hotel, low traffic).
-But Platform-X needs:
+SQLite OK for dev. Platform-X needs:
 - Multi-tenant queries
 - Concurrent writes
-- Row-level security (optional)
 - Better scaling
 
-**Decision: PostgreSQL for production, SQLite for local dev.**
-
-Can use SQLAlchemy ORM to support both.
+Decision: PostgreSQL production, SQLite dev. SQLAlchemy ORM for both.
 
 ---
 
-## 5. Why FastAPI (Again)
+## 5. Why FastAPI
 
-Same reasoning as Trianon:
-- Modern, fast, type-safe.
-- Auto-generated API docs.
-- Great for APIs + microservices.
-- Python ecosystem.
+Modern, fast, type-safe. Auto API docs. Pydantic validation. Async support. Python ecosystem.
 
-**Decision: FastAPI for the platform backend.**
+Decision: FastAPI.
 
 ---
 
 ## 6. Frontend Strategy
 
-**Phase 1 (Trianon + early platform):** Vanilla HTML/CSS/JS
-- Fast, no build step, easy to deploy.
-- Perfect for hotel websites.
+Phase 1: Vanilla HTML/CSS/JS. Fast, no build step.
+Phase 2+: React or Next.js. Component model, state management.
 
-**Phase 2+ (Full platform dashboard):** React or Next.js
-- Complex dashboards need component model.
-- State management.
-- Better DX for large apps.
-
-**Decision: Start vanilla, migrate to React when complexity demands.**
+Decision: Start vanilla, migrate to React later.
 
 ---
 
-## 7. Authentication Strategy
+## 7. Authentication
 
-**For end-users (guests):**
-- Session tokens (same as Trianon).
-- Server-side revocation.
-- Works well on web.
+Web: Session tokens. Server-side revocation.
+API/Mobile: JWT. Refresh tokens.
 
-**For API (mobile apps + third parties):**
-- JWT with short expiry.
-- Refresh tokens for long sessions.
-- Better for stateless clients.
-
-**Decision: Dual auth** — session for web, JWT for API/mobile.
+Decision: Dual auth.
 
 ---
 
 ## 8. Domain Strategy
 
-**Tenant domains:**
-- Option A: Subdomain per tenant (`hotelname.platform.com`)
-- Option B: Custom domain per tenant (`hotelname.com` pointing to platform)
-- Option C: Both
+Options: subdomain, custom domain, both.
 
-**Decision: Option C — Both supported.**
+Decision: Both.
 - Default: subdomain
 - Premium: custom domain
-- DNS verified per tenant
 
 ---
 
 ## 9. Payment Strategy
 
-**Providers under consideration:**
-- Stripe (global, limited UAE support)
-- Telr (UAE-based, split payment)
-- PayTabs (Middle East, marketplace)
-- Checkout.com (enterprise)
+Considered: Stripe, Telr, PayTabs, Checkout.com.
 
-**For multi-tenant split payments:**
-- Telr or PayTabs support marketplace model.
-- Each tenant needs a sub-account.
+For multi-tenant split: Telr or PayTabs marketplace.
+Each tenant needs sub-account.
 
-**Decision: Multi-provider adapter pattern.**
-- Start with Telr (UAE-native).
-- Add others as needed.
-- Abstract payment logic behind an interface.
+Decision: Multi-provider adapter pattern. Start with Telr.
 
 ---
 
 ## 10. Testing Strategy
 
-**Phase 1:**
-- Manual smoke tests.
-- No formal test suite.
+Phase 1: Manual smoke tests.
+Phase 2+: pytest, unit + integration + E2E. Coverage 80%+.
 
-**Phase 2+:**
-- pytest for backend.
-- Unit tests for all business logic.
-- Integration tests for API endpoints.
-- E2E tests for critical flows (booking → payment → confirmation).
-- Coverage target: 80%+
-- CI/CD runs tests on every commit.
-
-**Decision: Defer test infrastructure to Phase 2, but structure code to be testable from Phase 1.**
+Decision: Defer infra to Phase 2, structure code testable from Phase 1.
 
 ---
 
 ## 11. Backup & Recovery
 
-**Backup layers:**
-1. Per file change: quick file copy in `backups/`
-2. Per session: full project checkpoint
-3. Per phase: tagged git release + full backup
+Layers:
+1. Per file change: file copy
+2. Per session: checkpoint
+3. Per phase: git tag + backup
 
-**Disaster recovery:**
-- Database: daily dump + weekly full backup
-- Code: git (off-site via GitHub/GitLab)
-- Config: `.env` stored securely, never in git
-
-**Decision: Backup automation script + manual checkpoints.**
+DR:
+- DB: daily dump, weekly full
+- Code: git off-site
+- Config: .env never in git
 
 ---
 
-## 12. Code Organization (Planned)
+## 12. Code Organization
+
+backend/
+  api/ — routes
+  core/ — config, db, security
+  models/ — db models
+  services/ — business logic
+  schemas/ — pydantic
+  utils/ — helpers
+  tests/ — test suite
+
+frontend/, mobile/, telegram-bot/, deploy/, docs/, backups/
+
+---
+
+## 13. Security Standards
+
+- Secrets in .env only
+- Input validated
+- Passwords hashed (bcrypt/argon2)
+- Sessions validated server-side
+- HTTPS only
+- Rate limiting on auth
+- SQL injection prevention (ORM)
+- XSS prevention
+- CSRF tokens
+
+---
+
+## 14. Performance Targets
+
+- API: <200ms (95%)
+- Page load: <2s on 3G
+- DB: indexed, no N+1
+- Redis cache (Phase 3+)
+
+---
+
+## 15. Known Challenges
+
+1. Tenant isolation
+2. Scaling 1 → 1000 tenants
+3. SSL per domain
+4. Payment splits
+5. Multi-currency
+6. Multi-language
+7. Mobile apps
+8. Telegram bot
+
+---
+
+## 16. Open Questions
+
+- Final brand name + domain
+- Payment provider choice
+- Mobile framework
+- CI/CD provider
+- Monitoring stack
+- Hosting location
+
+---
+
+Last updated: September 2026
+Status: Living document.

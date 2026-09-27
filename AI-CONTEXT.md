@@ -16,7 +16,7 @@ Developer uses Termux on Android (mobile).
 
 ## Project goal
 Multi-tenant smart platform for hotels, restaurants, entertainment, travel agencies.
-First tenant: Trianon Royal Hotel.
+First tenant: (to be onboarded — Phase 3)
 Each business gets branded website + dashboard.
 Competes with Booking.com/Agoda, better and multi-service.
 
@@ -37,7 +37,7 @@ Competes with Booking.com/Agoda, better and multi-service.
    - Do not refactor without approval
 
 ## Current phase
-Phase 1 — Trianon Royal Live
+Phase 0.5 — Executive Documents
 Full roadmap: docs/02-ROADMAP.md
 
 ## Read before starting
