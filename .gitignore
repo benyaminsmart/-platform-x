@@ -44,3 +44,6 @@ dist/
 build/
 HANDOFF-STATE.txt
 CONTEXT-FULL.txt
+logs/
+*.db
+.pytest_cache/
