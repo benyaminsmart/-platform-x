@@ -1,0 +1,78 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Book — {{ tenant.name }}{% endblock %}
+
+{% block content %}
+
+<section class="section-sm">
+  <div class="container-narrow" style="max-width: 640px;">
+    <div class="eyebrow">{{ tenant.name }}</div>
+    <h1>Make a booking</h1>
+    <p class="text-muted">Choose your service and dates. We'll confirm instantly.</p>
+
+    <div class="card" style="margin-top: var(--space-7);">
+      <div id="alert-box" style="display: none;"></div>
+
+      <form id="booking-form">
+        <div class="form-group">
+          <label class="form-label" for="service_id">Service</label>
+          <select class="form-select" id="service_id" name="service_id" required>
+            <option value="">— Select a service —</option>
+            {% for s in services %}
+              <option
+                value="{{ s.id }}"
+                data-name="{{ s.name }}"
+                data-price="{{ s.price }}"
+                data-currency="{{ s.currency }}"
+                {% if selected_service and selected_service.id == s.id %}selected{% endif %}
+              >
+                {{ s.name }} — {{ s.price }} {{ s.currency }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label class="form-label" for="check_in">Check-in</label>
+            <input class="form-input" type="date" id="check_in" name="check_in" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="check_out">Check-out (optional)</label>
+            <input class="form-input" type="date" id="check_out" name="check_out">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="guests">Guests</label>
+          <input class="form-input" type="number" id="guests" name="guests" value="1" min="1" max="20" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="notes">Notes (optional)</label>
+          <textarea class="form-textarea" id="notes" name="notes" rows="3"></textarea>
+        </div>
+
+        <div class="card-flat" style="margin-bottom: var(--space-5);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="text-muted">Total</span>
+            <span id="total-display" class="text-gold" style="font-family: var(--font-serif); font-size: var(--text-xl);">
+              —
+            </span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          Confirm booking
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/booking.js"></script>
+<script>PX.initBooking("{{ tenant.slug }}");</script>
+{% endblock %}
