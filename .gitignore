@@ -47,3 +47,5 @@ CONTEXT-FULL.txt
 logs/
 *.db
 .pytest_cache/
+logs/
+*.url
