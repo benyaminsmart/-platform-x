@@ -1891,3 +1891,57 @@ html { scroll-behavior: smooth; }
 .px-account-browse {
   margin-bottom: 40px;
 }
+
+
+/* ---------- Fix: primary button text always readable ---------- */
+
+.px-btn-primary,
+.px-btn-primary * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.px-btn-primary:hover,
+.px-btn-primary:hover * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.px-btn-accent,
+.px-btn-accent * {
+  color: var(--px-text) !important;
+  -webkit-text-fill-color: var(--px-text) !important;
+}
+
+
+/* ---------- Payment: user details ---------- */
+
+.px-user-details {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.px-user-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--px-line);
+}
+
+.px-user-detail:last-child {
+  border-bottom: none;
+}
+
+.px-user-detail span {
+  font-size: 13px;
+  color: var(--px-muted);
+}
+
+.px-user-detail strong {
+  font-size: 14px;
+  color: var(--px-text);
+  font-weight: 600;
+  text-align: right;
+}

@@ -53,7 +53,7 @@ PX.initBooking = function (slug) {
     var co = form.check_out ? form.check_out.value : "";
     var tm = form.booking_time ? form.booking_time.value : "";
 
-    if (tenantType === "restaurant" && ci && tm) {
+    if ((tenantType === "restaurant" || tenantType === "entertainment") && ci && tm) {
       datesDisplay.textContent = ci + " @ " + tm;
     } else if (ci && co) {
       datesDisplay.textContent = ci + " → " + co;

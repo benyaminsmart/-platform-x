@@ -29,6 +29,20 @@ PX.initPayment = function (slug, bookingId) {
 
   var headers = PX.authHeaders(slug);
 
+  // Fetch user info first
+  fetch("/auth/me", { headers: headers })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (u) {
+      if (!u) return;
+      var nameEl = document.getElementById("user-name");
+      var emailEl = document.getElementById("user-email");
+      var phoneEl = document.getElementById("user-phone");
+      if (nameEl) nameEl.textContent = (u.first_name || "") + " " + (u.last_name || "");
+      if (emailEl) emailEl.textContent = u.email || "—";
+      if (phoneEl) phoneEl.textContent = u.phone || "Not provided";
+    })
+    .catch(function () {});
+
   fetch("/bookings/" + bookingId, { headers: headers })
     .then(function (res) {
       if (!res.ok) throw new Error("Cannot load booking");

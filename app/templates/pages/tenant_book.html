@@ -100,9 +100,15 @@
             </div>
 
           {% elif tenant.config.type == 'entertainment' %}
-            <div class="px-field" style="margin-bottom: 20px;">
-              <label for="check_in">Visit date</label>
-              <input type="date" id="check_in" name="check_in" required>
+            <div class="px-field-row" style="margin-bottom: 20px;">
+              <div class="px-field">
+                <label for="check_in">Visit date</label>
+                <input type="date" id="check_in" name="check_in" required>
+              </div>
+              <div class="px-field">
+                <label for="booking_time">Time slot</label>
+                <input type="time" id="booking_time" name="booking_time" value="14:00" required>
+              </div>
             </div>
             <div class="px-field" style="margin-bottom: 20px;">
               <label for="guests">Number of tickets</label>
