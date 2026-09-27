@@ -24,7 +24,7 @@ PX.initLogin = function () {
       }
       PX.saveToken(data.access_token);
       var slug = PX.getTenantSlug();
-      window.location.href = slug ? "/" + slug + "/" : "/businesses";
+      window.location.href = "/account";
     } catch (err) {
       PX.showAlert("Network error. Try again.");
     }
@@ -69,7 +69,7 @@ PX.initRegister = function () {
       }
       PX.saveToken(data.access_token);
       var slug = PX.getTenantSlug();
-      window.location.href = slug ? "/" + slug + "/" : "/businesses";
+      window.location.href = "/account";
     } catch (err) {
       PX.showAlert("Network error. Try again.");
     }

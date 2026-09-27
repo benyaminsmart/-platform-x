@@ -32,5 +32,5 @@ def _tenant_path(request: Request, suffix: str = "") -> str:
 
 
 templates.env.globals["now_year"] = datetime.now(timezone.utc).year
-templates.env.globals["asset_version"] = "v4"
+templates.env.globals["asset_version"] = "v5"
 templates.env.globals["tenant_path"] = _tenant_path
