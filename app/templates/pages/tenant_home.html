@@ -1,52 +1,106 @@
-{% extends "layouts/base.html" %}
+k{% extends "layouts/platform_base.html" %}
 
-{% block title %}{{ tenant.name }}{% endblock %}
+{% block title %}{{ tenant.name }} — {{ tenant.config.tagline|default('') }}{% endblock %}
 {% block description %}{{ tenant.config.tagline|default(tenant.name) }}{% endblock %}
-
-{% block head %}
-{% set branding = tenant.config.branding|default({}) %}
-<style>
-  {% if branding.primary_color %}--gold: {{ branding.primary_color }};{% endif %}
-  {% if branding.secondary_color %}--gold-soft: {{ branding.secondary_color }};{% endif %}
-  {% if branding.accent_color %}--bg: {{ branding.accent_color }};{% endif %}
-</style>
-{% endblock %}
 
 {% block content %}
 
-<section class="hero">
-  <div class="container">
-    <div class="eyebrow">{{ tenant.config.type|default('Business')|replace('_',' ')|title }}</div>
-    <h1>{{ tenant.name }}</h1>
-    <p class="hero-sub">{{ tenant.config.tagline|default('') }}</p>
+<!-- HERO -->
+<section class="px-tenant-hero" {% if tenant.config.cover_image %}style="background-image: url('{{ tenant.config.cover_image }}');"{% endif %}>
+  <div class="px-tenant-hero-overlay"></div>
+  <div class="px-container px-tenant-hero-content">
+    <div class="px-tenant-hero-meta">
+      <span class="px-tenant-type">{{ tenant.config.type|default('Business')|replace('_',' ')|title }}</span>
+      {% if tenant.config.rating %}
+        <span class="px-tenant-rating">⭐ {{ tenant.config.rating }} · {{ tenant.config.reviews_count|default(0) }} reviews</span>
+      {% endif %}
+    </div>
+    <h1 class="px-tenant-title">{{ tenant.name }}</h1>
+    <p class="px-tenant-tagline">{{ tenant.config.tagline|default('') }}</p>
+    {% if tenant.config.location %}
+      <p class="px-tenant-location">📍 {{ tenant.config.location }}</p>
+    {% endif %}
   </div>
 </section>
 
-<hr class="divider-gold container">
+<!-- INFO BAR -->
+<section class="px-tenant-info-bar">
+  <div class="px-container">
+    <div class="px-tenant-info-grid">
+      <div class="px-tenant-info-item">
+        <div class="px-tenant-info-label">Price from</div>
+        <div class="px-tenant-info-value">{{ tenant.config.price_from }} {{ tenant.config.currency }}</div>
+      </div>
+      <div class="px-tenant-info-item">
+        <div class="px-tenant-info-label">Services</div>
+        <div class="px-tenant-info-value">{{ services|length }} available</div>
+      </div>
+      {% if tenant.config.contact %}
+        <div class="px-tenant-info-item">
+          <div class="px-tenant-info-label">Phone</div>
+          <div class="px-tenant-info-value">{{ tenant.config.contact.phone }}</div>
+        </div>
+        <div class="px-tenant-info-item">
+          <div class="px-tenant-info-label">Email</div>
+          <div class="px-tenant-info-value">{{ tenant.config.contact.email }}</div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
 
-<section class="section-sm">
-  <div class="container">
-    <h2>Our Services</h2>
-    <p class="text-muted">{{ services|length }} offerings</p>
+<!-- GALLERY -->
+{% if tenant.config.gallery %}
+<section class="px-section-tight">
+  <div class="px-container">
+    <h2>Gallery</h2>
+    <div class="px-gallery">
+      {% for img in tenant.config.gallery %}
+        <div class="px-gallery-item" style="background-image: url('{{ img }}');"></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
 
-    <div class="grid grid-3" style="margin-top: var(--space-7);">
+<!-- SERVICES -->
+<section class="px-section">
+  <div class="px-container">
+    <div class="px-section-head">
+      <h2>Our Services</h2>
+      <p class="px-section-sub">Book instantly with our unified booking flow.</p>
+    </div>
+
+    <div class="px-svc-grid">
       {% for service in services %}
-        <div class="card">
-          <div class="eyebrow">{{ service.type|title }}</div>
-          <h3>{{ service.name }}</h3>
-          {% if service.description %}
-            <p class="text-sm text-muted">{{ service.description }}</p>
+        <div class="px-svc-card">
+          {% if service.image_urls and service.image_urls|length > 0 %}
+            <div class="px-svc-thumb" style="background-image: url('{{ service.image_urls[0] }}');"></div>
+          {% else %}
+            <div class="px-svc-thumb" style="background: linear-gradient(135deg, #0f3d5c, #1e5a7d);"></div>
           {% endif %}
-          <div style="margin-top: var(--space-5); display: flex; justify-content: space-between; align-items: center;">
-            <span class="text-gold" style="font-size: var(--text-lg); font-family: var(--font-serif);">
-              {{ service.price }} {{ service.currency }}
-            </span>
-            <a href="/{{ tenant.slug }}/book?service={{ service.id }}" class="btn btn-primary">Book</a>
+          <div class="px-svc-body">
+            <div class="px-svc-type">{{ service.type|title }}</div>
+            <h3 class="px-svc-name">{{ service.name }}</h3>
+            {% if service.description %}
+              <p class="px-svc-desc">{{ service.description }}</p>
+            {% endif %}
+            {% if service.attributes and service.attributes.size_sqm %}
+              <div class="px-svc-attrs">{{ service.attributes.size_sqm }} m² · up to {{ service.capacity }} guests</div>
+            {% endif %}
+            <div class="px-svc-foot">
+              <div>
+                <span class="px-svc-price-from">From</span>
+                <span class="px-svc-price">{{ service.price }} {{ service.currency }}</span>
+              </div>
+              <a href="/{{ tenant.slug }}/book?service={{ service.id }}" class="px-btn px-btn-primary">Book</a>
+            </div>
           </div>
         </div>
       {% else %}
-        <div class="card-flat" style="grid-column: 1 / -1; text-align: center;">
-          <p class="text-muted">No services available yet.</p>
+        <div class="px-empty">
+          <h3>No services available</h3>
+          <p>Check back soon.</p>
         </div>
       {% endfor %}
     </div>
