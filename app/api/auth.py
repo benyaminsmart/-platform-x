@@ -36,6 +36,11 @@ def register(
             status_code=status.HTTP_409_CONFLICT,
             detail="Email already registered for this tenant",
         )
+    if payload.phone and user_service.get_user_by_phone(db, tenant.id, payload.phone):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Phone already registered for this tenant",
+        )
     user = user_service.create_user(
         db,
         tenant_id=tenant.id,
@@ -80,6 +85,7 @@ def me(current_user: User = Depends(get_current_user)) -> CurrentUserResponse:
     return CurrentUserResponse(
         id=current_user.id,
         email=current_user.email,
+        phone=current_user.phone,
         first_name=current_user.first_name,
         last_name=current_user.last_name,
         tenant_id=current_user.tenant_id,

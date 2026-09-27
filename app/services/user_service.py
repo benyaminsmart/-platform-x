@@ -26,6 +26,17 @@ def get_user_by_email(db: DBSession, tenant_id: str, email: str) -> User | None:
     return db.execute(stmt).scalar_one_or_none()
 
 
+def get_user_by_phone(db: DBSession, tenant_id: str, phone: str) -> User | None:
+    """Return user by tenant + phone, excluding soft-deleted."""
+    stmt = select(User).where(
+        User.tenant_id == tenant_id,
+        User.phone == phone,
+        User.status == "active",
+        User.deleted_at.is_(None),
+    )
+    return db.execute(stmt).scalar_one_or_none()
+
+
 def get_user_by_id(db: DBSession, user_id: str) -> User | None:
     """Return user by id (active only)."""
     stmt = select(User).where(

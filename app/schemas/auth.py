@@ -44,6 +44,7 @@ class CurrentUserResponse(BaseModel):
 
     id: str
     email: str
+    phone: str | None = None
     first_name: str
     last_name: str
     tenant_id: str

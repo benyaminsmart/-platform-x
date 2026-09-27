@@ -10,6 +10,7 @@ PX.initPayment = function (slug, bookingId) {
   var summaryTotal = document.getElementById("summary-total");
 
   function showAlert(msg) {
+    if (!alertBox) { alert(msg); return; }
     alertBox.className = "alert alert-error";
     alertBox.textContent = msg;
     alertBox.style.display = "block";
@@ -21,28 +22,45 @@ PX.initPayment = function (slug, bookingId) {
     alertBox.style.marginBottom = "20px";
   }
 
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
   if (!bookingId) {
     loadingPanel.style.display = "none";
     showAlert("No booking specified.");
     return;
   }
 
+  var token = PX.getToken();
+  if (!token) {
+    loadingPanel.style.display = "none";
+    showAlert("Please sign in to continue.");
+    return;
+  }
+
   var headers = PX.authHeaders(slug);
 
-  // Fetch user info first
+  // 1. Fetch user info and populate "Your details"
   fetch("/auth/me", { headers: headers })
-    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (r) {
+      if (!r.ok) return null;
+      return r.json();
+    })
     .then(function (u) {
       if (!u) return;
       var nameEl = document.getElementById("user-name");
       var emailEl = document.getElementById("user-email");
       var phoneEl = document.getElementById("user-phone");
-      if (nameEl) nameEl.textContent = (u.first_name || "") + " " + (u.last_name || "");
+      if (nameEl) nameEl.textContent = ((u.first_name || "") + " " + (u.last_name || "")).trim() || "—";
       if (emailEl) emailEl.textContent = u.email || "—";
       if (phoneEl) phoneEl.textContent = u.phone || "Not provided";
     })
     .catch(function () {});
 
+  // 2. Fetch booking details
   fetch("/bookings/" + bookingId, { headers: headers })
     .then(function (res) {
       if (!res.ok) throw new Error("Cannot load booking");
