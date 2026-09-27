@@ -1,78 +1,107 @@
-/* Platform-X — Base styles + Design tokens */
+/* Platform-X — Design System (Luxury Dark, sharp) */
 
 :root {
-  /* Backgrounds */
+  /* ---------- Backgrounds ---------- */
   --bg-deep: #050608;
   --bg: #08090b;
   --surface: #101216;
   --surface-2: #15171c;
   --surface-3: #1a1c22;
 
-  /* Brand — Gold */
+  /* ---------- Brand — Gold ---------- */
   --gold: #c9a66b;
   --gold-soft: #dfc18c;
   --gold-bright: #e8d5a8;
 
-  /* Text */
+  /* ---------- Text ---------- */
   --cream: #f4efe6;
   --cream-soft: #e8e2d5;
   --muted: #96928a;
   --muted-deep: #66645f;
 
-  /* Lines */
+  /* ---------- Lines ---------- */
   --line: rgba(255, 255, 255, 0.08);
   --line-gold: rgba(201, 166, 107, 0.28);
 
-  /* Status */
+  /* ---------- Status ---------- */
   --success: #8dc88d;
   --warning: #e8c878;
   --error: #e88a8a;
   --info: #8ab4d8;
 
-  /* Type scale */
+  /* ---------- Typography — sizes ---------- */
   --text-xs: 10px;
   --text-sm: 12px;
-  --text-base: 14px;
-  --text-md: 16px;
+  --text-base: 13px;
+  --text-md: 15px;
   --text-lg: 20px;
   --text-xl: 28px;
   --text-2xl: 40px;
   --text-3xl: 56px;
   --text-4xl: 72px;
 
-  /* Spacing */
+  /* ---------- Typography — weights ---------- */
+  --fw-light: 300;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* ---------- Typography — line heights ---------- */
+  --lh-tight: 1.05;
+  --lh-normal: 1.1;
+  --lh-relaxed: 1.5;
+  --lh-body: 1.75;
+
+  /* ---------- Typography — letter spacing ---------- */
+  --ls-tight: -0.03em;
+  --ls-normal: -0.02em;
+  --ls-wide: 0.02em;
+  --ls-extra: 0.24em;
+
+  /* ---------- Spacing (4px base) ---------- */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
   --space-5: 24px;
   --space-6: 32px;
-  --space-7: 48px;
-  --space-8: 64px;
-  --space-9: 96px;
-  --space-10: 128px;
+  --space-7: 40px;
+  --space-8: 60px;
+  --space-9: 90px;
 
-  /* Radius */
-  --radius-sm: 4px;
-  --radius: 8px;
-  --radius-lg: 16px;
-  --radius-full: 999px;
+  /* ---------- Border Radius (sharp luxury) ---------- */
+  --radius-none: 0;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-full: 9999px;
 
-  /* Shadow */
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
-  --shadow: 0 4px 12px rgba(0,0,0,0.5);
-  --shadow-lg: 0 12px 32px rgba(0,0,0,0.6);
-  --shadow-gold: 0 0 40px rgba(201,166,107,0.15);
+  /* ---------- Shadows ---------- */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.35);
+  --shadow-gold: 0 8px 30px rgba(201, 166, 107, 0.25);
 
-  /* Fonts */
+  /* ---------- Fonts ---------- */
   --font-serif: "Playfair Display", "Cormorant Garamond", Georgia, serif;
   --font-sans: "Inter", "Helvetica Neue", Arial, sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", Consolas, monospace;
 
-  /* Layout */
-  --container: 1200px;
-  --container-narrow: 800px;
+  /* ---------- Motion ---------- */
+  --ease-default: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-smooth: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --motion-fast: 0.2s;
+  --motion-normal: 0.3s;
+  --motion-slow: 0.5s;
+  --motion-very-slow: 1.2s;
+
+  /* ---------- Layout ---------- */
+  --container: 1180px;
+  --container-narrow: 720px;
 }
+
+/* ---------- Reset ---------- */
 
 *,
 *::before,
@@ -85,53 +114,104 @@ html, body {
   padding: 0;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ---------- Base ---------- */
+
 body {
   background: var(--bg);
   color: var(--cream);
   font-family: var(--font-sans);
-  font-size: var(--text-md);
-  line-height: 1.6;
+  font-size: var(--text-base);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-wide);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
 }
+
+/* ---------- Links ---------- */
 
 a {
   color: var(--gold);
   text-decoration: none;
-  transition: color 0.15s ease;
+  transition: color var(--motion-fast) var(--ease-default);
 }
 
 a:hover {
   color: var(--gold-bright);
 }
 
+/* ---------- Headings ---------- */
+
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-serif);
-  font-weight: 400;
+  font-weight: var(--fw-regular);
   margin: 0 0 var(--space-4) 0;
   color: var(--cream);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--ls-normal);
+  line-height: var(--lh-normal);
 }
 
-h1 { font-size: var(--text-3xl); line-height: 1.1; }
-h2 { font-size: var(--text-2xl); line-height: 1.15; }
-h3 { font-size: var(--text-xl); line-height: 1.2; }
+h1 { font-size: var(--text-3xl); letter-spacing: var(--ls-tight); line-height: var(--lh-tight); }
+h2 { font-size: var(--text-2xl); letter-spacing: var(--ls-tight); }
+h3 { font-size: var(--text-xl); }
 h4 { font-size: var(--text-lg); }
 h5 { font-size: var(--text-md); }
-h6 { font-size: var(--text-base); text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); }
+h6 {
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  font-weight: var(--fw-medium);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-extra);
+  color: var(--gold);
+}
+
+/* ---------- Paragraphs ---------- */
 
 p {
   margin: 0 0 var(--space-4) 0;
   color: var(--cream-soft);
+  line-height: var(--lh-body);
 }
 
-img {
+/* ---------- Media ---------- */
+
+img, video, svg {
   max-width: 100%;
   height: auto;
   display: block;
 }
 
+/* ---------- Forms ---------- */
+
 button, input, textarea, select {
   font: inherit;
   color: inherit;
+}
+
+/* ---------- Focus (accessibility) ---------- */
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ---------- Reduced motion (accessibility) ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- Selection ---------- */
+
+::selection {
+  background: rgba(201, 166, 107, 0.25);
+  color: var(--cream);
 }

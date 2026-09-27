@@ -4,15 +4,29 @@
 .font-sans  { font-family: var(--font-sans); }
 .font-mono  { font-family: var(--font-mono); }
 
-.weight-light    { font-weight: 300; }
-.weight-regular  { font-weight: 400; }
-.weight-medium   { font-weight: 500; }
-.weight-semibold { font-weight: 600; }
+.weight-light    { font-weight: var(--fw-light); }
+.weight-regular  { font-weight: var(--fw-regular); }
+.weight-medium   { font-weight: var(--fw-medium); }
+.weight-semibold { font-weight: var(--fw-semibold); }
+.weight-bold     { font-weight: var(--fw-bold); }
 
-.tracking-wide  { letter-spacing: 0.05em; }
-.tracking-wider { letter-spacing: 0.15em; }
-.uppercase      { text-transform: uppercase; }
+.tracking-tight { letter-spacing: var(--ls-tight); }
+.tracking-normal { letter-spacing: var(--ls-normal); }
+.tracking-wide  { letter-spacing: var(--ls-wide); }
+.tracking-extra { letter-spacing: var(--ls-extra); }
 
-.leading-tight { line-height: 1.15; }
-.leading-snug  { line-height: 1.35; }
-.leading-loose { line-height: 1.8; }
+.uppercase { text-transform: uppercase; }
+
+.leading-tight   { line-height: var(--lh-tight); }
+.leading-normal  { line-height: var(--lh-normal); }
+.leading-relaxed { line-height: var(--lh-relaxed); }
+.leading-body    { line-height: var(--lh-body); }
+
+.text-xs   { font-size: var(--text-xs); }
+.text-sm   { font-size: var(--text-sm); }
+.text-base { font-size: var(--text-base); }
+.text-md   { font-size: var(--text-md); }
+.text-xl   { font-size: var(--text-xl); }
+.text-2xl  { font-size: var(--text-2xl); }
+.text-3xl  { font-size: var(--text-3xl); }
+.text-4xl  { font-size: var(--text-4xl); }
