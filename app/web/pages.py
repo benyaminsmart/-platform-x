@@ -14,9 +14,9 @@ router = APIRouter(tags=["web"])
 # Paths that must never be treated as tenant slugs
 RESERVED_SLUGS = {
     "docs", "redoc", "openapi.json", "static", "health",
-    "auth", "tenants", "services", "bookings", "orders",
+    "auth", "tenants", "login", "register", "services", "bookings", "orders",
     "payments", "rewards", "referrals", "notifications",
-    "analytics", "platform", "businesses", "about", "contact",
+    "analytics", "platform", "businesses", "about", "contact", "login", "register",
     "favicon.ico",
 }
 
@@ -66,6 +66,18 @@ def businesses(request: Request, db: DBSession = Depends(get_db)) -> HTMLRespons
             "businesses": _active_tenants(db),
         },
     )
+
+
+@router.get("/login", response_class=HTMLResponse)
+def auth_login_page(request: Request) -> HTMLResponse:
+    """Login page."""
+    return templates.TemplateResponse(request, "pages/login.html", {"tenant": None})
+
+
+@router.get("/register", response_class=HTMLResponse)
+def auth_register_page(request: Request) -> HTMLResponse:
+    """Register page."""
+    return templates.TemplateResponse(request, "pages/register.html", {"tenant": None})
 
 
 @router.get("/about", response_class=HTMLResponse)

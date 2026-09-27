@@ -12,7 +12,7 @@ RESERVED_PREFIXES = {
     "docs", "redoc", "openapi.json", "static", "health",
     "auth", "tenants", "services", "bookings", "orders",
     "payments", "rewards", "referrals", "notifications",
-    "analytics", "platform", "businesses", "about", "contact",
+    "analytics", "platform", "businesses", "about", "contact", "login", "register",
     "favicon.ico",
 }
 
