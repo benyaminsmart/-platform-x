@@ -319,6 +319,25 @@ Throughout all phases:
 
 **Phase 4 closed.**
 
+
+
+### v0.4.0-full-flow — Phase 5 Complete
+- Platform-wide auth (users book across all tenants)
+- Cross-tenant Bookings + Orders in account
+- Dynamic booking form per business type (hotel/restaurant/travel/entertainment)
+- Restaurant Menu + Order Cart + Order Payment page
+- Partner Onboarding Form (/partners/apply) — 6-step dynamic, type-specific
+- Rewards auto-award on successful payment
+- Account Dashboard: Rewards Panel + Stats + Recent Activity + Tabs + Category browse
+- Header: avatar/initials dropdown with logout (outside mobile menu)
+- Stats Strip on home with count-up animation
+- Phone uniqueness handling (409 instead of 500)
+- Payment page shows user details (name/email/phone)
+- 154 tests passing
+- Live at: https://larger-stable-are-southwest.trycloudflare.com
+
+**Phase 5 closed.**
+
 **Last updated:** September 2026
 **Current phase:** Phase 4 — Next (TBD)
 
