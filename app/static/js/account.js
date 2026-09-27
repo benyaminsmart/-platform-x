@@ -143,7 +143,7 @@ PX.initAccount = function (slug) {
     .catch(function () {});
 
   // Bookings
-  fetch("/bookings?limit=50", { headers: headers })
+  fetch("/bookings?all=true&limit=50", { headers: headers })
     .then(function (r) { return r.json(); })
     .then(function (d) {
       document.getElementById("stat-bookings").textContent = d.total;
@@ -179,7 +179,7 @@ PX.initAccount = function (slug) {
     .catch(function () {});
 
   // Orders
-  fetch("/orders?limit=50", { headers: headers })
+  fetch("/orders?all=true&limit=50", { headers: headers })
     .then(function (r) { return r.json(); })
     .then(function (d) {
       document.getElementById("stat-orders").textContent = d.total;

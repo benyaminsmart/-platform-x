@@ -35,14 +35,15 @@ def list_my_orders(
     status_filter: Annotated[str | None, Query(alias="status")] = None,
     page: Annotated[int, Query(ge=1)] = 1,
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
+    all_tenants: Annotated[bool, Query(alias="all")] = False,
     tenant: Tenant = Depends(get_current_tenant),
     user: User = Depends(get_current_user),
     db: DBSession = Depends(get_db),
 ) -> PaginatedResponse[OrderPublic]:
-    """List current user's orders."""
+    """List current user's orders. Pass ?all=true for cross-tenant."""
     items, total = order_service.list_orders(
         db,
-        tenant_id=tenant.id,
+        tenant_id=None if all_tenants else tenant.id,
         user_id=user.id,
         status_filter=status_filter,
         page=page,
@@ -65,7 +66,7 @@ def get_order(
 ) -> OrderPublic:
     """Return an order by id."""
     order = order_service.get_order(
-        db, tenant_id=tenant.id, user_id=user.id, order_id=order_id
+        db, user_id=user.id, order_id=order_id, tenant_id=None
     )
     if order is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")
@@ -82,7 +83,7 @@ def cancel_order(
     """Cancel an order if allowed."""
     try:
         order = order_service.cancel_order(
-            db, tenant_id=tenant.id, user_id=user.id, order_id=order_id
+            db, user_id=user.id, order_id=order_id, tenant_id=None
         )
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc

@@ -34,28 +34,32 @@ def create_order(
 
 
 def get_order(
-    db: DBSession, *, tenant_id: str, user_id: str, order_id: str
+    db: DBSession, *, user_id: str, order_id: str, tenant_id: str | None = None
 ) -> Order | None:
-    """Return an order owned by the user."""
-    stmt = select(Order).where(
-        Order.id == order_id,
-        Order.tenant_id == tenant_id,
-        Order.user_id == user_id,
-    )
+    """Return an order owned by the user. tenant_id optional (cross-tenant when None)."""
+    conditions = [Order.id == order_id, Order.user_id == user_id]
+    if tenant_id is not None:
+        conditions.append(Order.tenant_id == tenant_id)
+    stmt = select(Order).where(*conditions)
     return db.execute(stmt).scalar_one_or_none()
 
 
 def list_orders(
     db: DBSession,
     *,
-    tenant_id: str,
     user_id: str,
+    tenant_id: str | None = None,
     status_filter: str | None = None,
     page: int = 1,
     limit: int = 20,
 ) -> tuple[list[Order], int]:
-    """Return (orders, total) with filters and pagination."""
-    filters = [Order.tenant_id == tenant_id, Order.user_id == user_id]
+    """Return (orders, total) with filters and pagination.
+
+    If tenant_id is None, returns orders across all tenants for the user.
+    """
+    filters = [Order.user_id == user_id]
+    if tenant_id is not None:
+        filters.append(Order.tenant_id == tenant_id)
     if status_filter:
         filters.append(Order.status == status_filter)
 
@@ -74,10 +78,10 @@ def list_orders(
 
 
 def cancel_order(
-    db: DBSession, *, tenant_id: str, user_id: str, order_id: str
+    db: DBSession, *, user_id: str, order_id: str, tenant_id: str | None = None
 ) -> Order | None:
     """Cancel an order if allowed. Raises ValueError otherwise. None if not found."""
-    order = get_order(db, tenant_id=tenant_id, user_id=user_id, order_id=order_id)
+    order = get_order(db, user_id=user_id, order_id=order_id, tenant_id=tenant_id)
     if order is None:
         return None
     if order.status not in _CANCELLABLE:

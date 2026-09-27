@@ -47,30 +47,34 @@ def create_booking(
 
 
 def get_booking(
-    db: DBSession, *, tenant_id: str, user_id: str, booking_id: str
+    db: DBSession, *, user_id: str, booking_id: str, tenant_id: str | None = None
 ) -> Booking | None:
-    """Return a booking owned by the user."""
-    stmt = select(Booking).where(
-        Booking.id == booking_id,
-        Booking.tenant_id == tenant_id,
-        Booking.user_id == user_id,
-    )
+    """Return a booking owned by the user. tenant_id optional (cross-tenant when None)."""
+    conditions = [Booking.id == booking_id, Booking.user_id == user_id]
+    if tenant_id is not None:
+        conditions.append(Booking.tenant_id == tenant_id)
+    stmt = select(Booking).where(*conditions)
     return db.execute(stmt).scalar_one_or_none()
 
 
 def list_bookings(
     db: DBSession,
     *,
-    tenant_id: str,
     user_id: str,
+    tenant_id: str | None = None,
     status: str | None = None,
     from_date: date | None = None,
     to_date: date | None = None,
     page: int = 1,
     limit: int = 20,
 ) -> tuple[list[Booking], int]:
-    """Return (bookings, total_count) with filters and pagination."""
-    filters = [Booking.tenant_id == tenant_id, Booking.user_id == user_id]
+    """Return (bookings, total_count) with filters and pagination.
+
+    If tenant_id is None, returns bookings across all tenants for the user.
+    """
+    filters = [Booking.user_id == user_id]
+    if tenant_id is not None:
+        filters.append(Booking.tenant_id == tenant_id)
     if status:
         filters.append(Booking.status == status)
     if from_date:
@@ -94,13 +98,13 @@ def list_bookings(
 
 
 def cancel_booking(
-    db: DBSession, *, tenant_id: str, user_id: str, booking_id: str
+    db: DBSession, *, user_id: str, booking_id: str, tenant_id: str | None = None
 ) -> Booking | None:
     """Cancel a booking if allowed. Returns None if not found.
 
     Raises ValueError if the booking is not in a cancellable state.
     """
-    booking = get_booking(db, tenant_id=tenant_id, user_id=user_id, booking_id=booking_id)
+    booking = get_booking(db, user_id=user_id, booking_id=booking_id, tenant_id=tenant_id)
     if booking is None:
         return None
     if booking.status not in _CANCELLABLE:

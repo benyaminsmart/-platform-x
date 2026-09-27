@@ -38,14 +38,18 @@ def list_my_bookings(
     to_date: Annotated[date | None, Query()] = None,
     page: Annotated[int, Query(ge=1)] = 1,
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
+    all_tenants: Annotated[bool, Query(alias="all")] = False,
     tenant: Tenant = Depends(get_current_tenant),
     user: User = Depends(get_current_user),
     db: DBSession = Depends(get_db),
 ) -> PaginatedResponse[BookingPublic]:
-    """List current user's bookings with filters and pagination."""
+    """List current user's bookings with filters and pagination.
+
+    Pass ?all=true to get bookings across every tenant.
+    """
     items, total = booking_service.list_bookings(
         db,
-        tenant_id=tenant.id,
+        tenant_id=None if all_tenants else tenant.id,
         user_id=user.id,
         status=status_filter,
         from_date=from_date,
@@ -70,7 +74,7 @@ def get_booking(
 ) -> BookingPublic:
     """Return booking details (must belong to current user)."""
     booking = booking_service.get_booking(
-        db, tenant_id=tenant.id, user_id=user.id, booking_id=booking_id
+        db, user_id=user.id, booking_id=booking_id, tenant_id=None
     )
     if booking is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
@@ -87,7 +91,7 @@ def cancel_booking(
     """Cancel a booking if it is in a cancellable state."""
     try:
         booking = booking_service.cancel_booking(
-            db, tenant_id=tenant.id, user_id=user.id, booking_id=booking_id
+            db, user_id=user.id, booking_id=booking_id, tenant_id=None
         )
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
