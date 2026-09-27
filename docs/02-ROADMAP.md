@@ -276,7 +276,29 @@ Throughout all phases:
 - Parallel running during migrations
 - Regular backups
 
+
 ---
 
-Last updated: September 2026
-Status: Living document.
+## Progress Log
+
+### v0.1.0-core — Phase 2 Complete
+- 14 ORM models, 46 API routes, 114 tests
+- Alembic migrations
+- Production hardening
+- Full demo seed (5 tenants, 23 services, 1 admin)
+- End-to-end demo flow test
+
+### v0.2.0-frontend — Phase 3 Complete
+- Jinja2 + custom CSS Design System (Luxury Dark)
+- 12 HTML pages: home, businesses, login, register, about, contact,
+  tenant_home, tenant_book, tenant_pay, tenant_account
+- 5 JS modules: auth, booking, payment, account
+- Cloudflare Tunnel deploy (always-on like Trianon)
+- 147 tests
+- Live at: https://larger-stable-are-southwest.trycloudflare.com
+
+---
+
+**Last updated:** September 2026
+**Current phase:** Phase 4 — Next (TBD)
+
