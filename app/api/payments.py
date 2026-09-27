@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session as DBSession
 
 from app.api.deps import get_current_tenant, get_current_user
+from app.core.config import settings
 from app.db.session import get_db
 from app.models.tenant import Tenant
 from app.models.user import User
@@ -115,7 +116,15 @@ def mock_confirm(
     provider_reference: str,
     db: DBSession = Depends(get_db),
 ) -> JSONResponse:
-    """Dev-only confirmation endpoint used by MockPaymentProvider redirects."""
+    """Dev-only confirmation endpoint used by MockPaymentProvider redirects.
+
+    Disabled in production via ENABLE_MOCK_PAYMENTS flag.
+    """
+    if not settings.ENABLE_MOCK_PAYMENTS:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Not found",
+        )
     payment = payment_service.mark_success(db, provider_reference=provider_reference)
     if payment is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown reference")

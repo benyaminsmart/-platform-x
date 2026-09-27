@@ -1,13 +1,16 @@
 """Platform-X application configuration.
 
 Loads settings from environment variables with sensible defaults
-for local development.
+for local development. Includes production hardening validators.
 """
 
 from functools import lru_cache
 from typing import Literal
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_DEV_SECRET = "dev-secret-key-change-in-production"
 
 
 class Settings(BaseSettings):
@@ -34,16 +37,35 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./platform_x.db"
 
     # Security
-    SECRET_KEY: str = "dev-secret-key-change-in-production"
+    SECRET_KEY: str = _DEV_SECRET
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
-    BCRYPT_ROUNDS: int = 12
     ALGORITHM: str = "HS256"
+    BCRYPT_ROUNDS: int = 12
 
     # CORS
     CORS_ORIGINS: list[str] = ["http://localhost:8000", "http://127.0.0.1:8000"]
 
     # Multi-tenancy
     DEFAULT_TENANT_SLUG: str = "demo"
+
+    # Feature flags
+    ENABLE_MOCK_PAYMENTS: bool = True
+
+    @model_validator(mode="after")
+    def _enforce_production_safety(self) -> "Settings":
+        """Fail fast if production is configured unsafely."""
+        if self.APP_ENV == "production":
+            if self.SECRET_KEY == _DEV_SECRET or len(self.SECRET_KEY) < 32:
+                raise ValueError(
+                    "SECRET_KEY must be set to a strong value (>=32 chars) in production"
+                )
+            if self.APP_DEBUG:
+                raise ValueError("APP_DEBUG must be False in production")
+            if self.ENABLE_MOCK_PAYMENTS:
+                raise ValueError("ENABLE_MOCK_PAYMENTS must be False in production")
+            if any("localhost" in origin or "127.0.0.1" in origin for origin in self.CORS_ORIGINS):
+                raise ValueError("CORS_ORIGINS must not contain localhost in production")
+        return self
 
 
 @lru_cache
