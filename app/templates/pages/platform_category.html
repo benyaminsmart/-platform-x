@@ -1,0 +1,58 @@
+{% extends "layouts/platform_base.html" %}
+
+{% block title %}{{ cat_label }} — Platform-X{% endblock %}
+
+{% block content %}
+
+<section class="px-hero px-hero-compact">
+  <div class="px-container">
+    <div class="px-hero-content">
+      <div class="px-breadcrumb">
+        <a href="/">Home</a>
+        <span>/</span>
+        <span>{{ cat_label }}</span>
+      </div>
+      <h1 class="px-hero-title-sm">
+        {{ cat_icon }} {{ cat_label }}
+      </h1>
+      <p class="px-hero-sub-sm">
+        {{ cat_description }}
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="px-section">
+  <div class="px-container">
+    <div class="px-section-head">
+      <h2>{{ businesses|length }} {{ 'business' if businesses|length == 1 else 'businesses' }} available</h2>
+    </div>
+
+    <div class="px-biz-grid">
+      {% for b in businesses %}
+        <a href="/{{ b.slug }}/" class="px-biz-card">
+          {% set branding = (b.config or {}).get('branding', {}) if b.config else {} %}
+          <div class="px-biz-thumb" style="background: linear-gradient(135deg, {{ branding.get('primary_color', '#6366f1') }}, {{ branding.get('secondary_color', '#818cf8') }});">
+            <span class="px-biz-thumb-initial">{{ b.name[0] }}</span>
+          </div>
+          <div class="px-biz-body">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span class="px-cat {{ cat_class }}">{{ cat_label }}</span>
+            </div>
+            <h3 class="px-biz-name">{{ b.name }}</h3>
+            <p class="px-biz-tagline">{{ b.config.tagline|default('') }}</p>
+          </div>
+        </a>
+      {% else %}
+        <div class="px-empty">
+          <div class="px-empty-icon">{{ cat_icon }}</div>
+          <h3>No {{ cat_label|lower }} yet</h3>
+          <p>Check back soon — new partners are joining.</p>
+          <a href="/" class="px-btn px-btn-primary">Back to home</a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

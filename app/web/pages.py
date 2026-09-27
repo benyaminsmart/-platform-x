@@ -16,7 +16,8 @@ RESERVED_SLUGS = {
     "docs", "redoc", "openapi.json", "static", "health",
     "auth", "tenants", "login", "register", "services", "bookings", "orders",
     "payments", "rewards", "referrals", "notifications",
-    "analytics", "platform", "businesses", "about", "contact", "login", "register",
+    "analytics", "platform", "businesses", "about", "contact",
+    "hotels", "restaurants", "travel", "entertainment",
     "favicon.ico",
 }
 
@@ -78,6 +79,91 @@ def auth_login_page(request: Request) -> HTMLResponse:
 def auth_register_page(request: Request) -> HTMLResponse:
     """Register page."""
     return templates.TemplateResponse(request, "pages/register.html", {"tenant": None})
+
+
+
+# ---------- Category pages ----------
+
+
+CATEGORIES = {
+    "hotels": {
+        "label": "Hotels",
+        "icon": "🏨",
+        "class": "px-cat-hotels",
+        "types": ["hotel"],
+        "description": "Boutique, luxury, and business stays across the platform.",
+    },
+    "restaurants": {
+        "label": "Restaurants",
+        "icon": "🍽",
+        "class": "px-cat-restaurants",
+        "types": ["restaurant"],
+        "description": "Fine dining, casual, and authentic cuisine — reserve a table.",
+    },
+    "travel": {
+        "label": "Travel",
+        "icon": "✈️",
+        "class": "px-cat-travel",
+        "types": ["travel_agency", "agency"],
+        "description": "Agencies, packages, and flights for every journey.",
+    },
+    "entertainment": {
+        "label": "Entertainment",
+        "icon": "🎢",
+        "class": "px-cat-entertainment",
+        "types": ["entertainment"],
+        "description": "Attractions, activities, and experiences for all ages.",
+    },
+}
+
+
+def _businesses_by_types(db: DBSession, types: list[str]) -> list[Tenant]:
+    """Return active tenants whose config.type is in types."""
+    all_tenants = _active_tenants(db)
+    wanted = {t.lower() for t in types}
+    return [
+        t for t in all_tenants
+        if isinstance(t.config, dict) and str(t.config.get("type", "")).lower() in wanted
+    ]
+
+
+def _render_category(
+    request: Request, db: DBSession, slug: str
+) -> HTMLResponse:
+    meta = CATEGORIES[slug]
+    businesses = _businesses_by_types(db, meta["types"])
+    return templates.TemplateResponse(
+        request,
+        "pages/platform_category.html",
+        {
+            "tenant": None,
+            "cat_label": meta["label"],
+            "cat_icon": meta["icon"],
+            "cat_class": meta["class"],
+            "cat_description": meta["description"],
+            "businesses": businesses,
+        },
+    )
+
+
+@router.get("/hotels", response_class=HTMLResponse)
+def hotels_page(request: Request, db: DBSession = Depends(get_db)) -> HTMLResponse:
+    return _render_category(request, db, "hotels")
+
+
+@router.get("/restaurants", response_class=HTMLResponse)
+def restaurants_page(request: Request, db: DBSession = Depends(get_db)) -> HTMLResponse:
+    return _render_category(request, db, "restaurants")
+
+
+@router.get("/travel", response_class=HTMLResponse)
+def travel_page(request: Request, db: DBSession = Depends(get_db)) -> HTMLResponse:
+    return _render_category(request, db, "travel")
+
+
+@router.get("/entertainment", response_class=HTMLResponse)
+def entertainment_page(request: Request, db: DBSession = Depends(get_db)) -> HTMLResponse:
+    return _render_category(request, db, "entertainment")
 
 
 @router.get("/about", response_class=HTMLResponse)

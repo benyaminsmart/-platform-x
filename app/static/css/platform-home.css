@@ -365,3 +365,74 @@
   font-size: 14px;
   margin: 0;
 }
+
+/* ---------- Category page (compact hero) ---------- */
+
+.px-hero-compact {
+  padding: 50px 0 40px;
+}
+
+.px-hero-title-sm {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: -0.03em;
+}
+
+.px-hero-sub-sm {
+  font-size: 16px;
+  color: var(--px-text-soft);
+  margin: 0;
+}
+
+.px-breadcrumb {
+  font-size: 13px;
+  color: var(--px-muted);
+  margin-bottom: 20px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.px-breadcrumb a {
+  color: var(--px-muted);
+}
+
+.px-breadcrumb a:hover {
+  color: var(--px-brand-soft);
+}
+
+.px-breadcrumb span:last-child {
+  color: var(--px-text-soft);
+}
+
+@media (max-width: 720px) {
+  .px-hero-title-sm { font-size: 32px; }
+  .px-hero-sub-sm { font-size: 14px; }
+}
+
+/* ---------- Empty state ---------- */
+
+.px-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  background: var(--px-surface);
+  border: 1px dashed var(--px-line-2);
+  border-radius: var(--px-radius-lg);
+}
+
+.px-empty-icon {
+  font-size: 56px;
+  margin-bottom: 20px;
+  opacity: 0.6;
+}
+
+.px-empty h3 {
+  margin-bottom: 8px;
+}
+
+.px-empty p {
+  color: var(--px-muted);
+  margin-bottom: 24px;
+}
