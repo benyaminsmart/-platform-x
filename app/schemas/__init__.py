@@ -19,6 +19,12 @@ from app.schemas.common import (
     PaginatedResponse,
     TimestampedModel,
 )
+from app.schemas.order import (
+    OrderCreate,
+    OrderPaymentStatus,
+    OrderPublic,
+    OrderStatus,
+)
 from app.schemas.service import ServiceCreate, ServicePublic, ServiceType, ServiceUpdate
 from app.schemas.tenant import TenantPublic
 
@@ -31,6 +37,10 @@ __all__ = [
     "LoginRequest",
     "MessageResponse",
     "ORMModel",
+    "OrderCreate",
+    "OrderPaymentStatus",
+    "OrderPublic",
+    "OrderStatus",
     "PaginatedResponse",
     "PaymentStatus",
     "RegisterRequest",
