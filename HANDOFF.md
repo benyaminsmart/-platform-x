@@ -1,6 +1,7 @@
 # Platform-X — Project Handoff
 
-> Complete overview for any AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
+> Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
+> Version: v0.3.0-polish (Phase 5 in progress)
 
 Last updated: 2026-09-27
 
@@ -11,24 +12,25 @@ Last updated: 2026-09-27
 **Name:** Platform-X (working name)
 **Type:** Multi-tenant smart platform for hospitality, travel, entertainment
 **Purpose:** Hotels, restaurants, entertainment centers, travel agencies — one platform
-**Long-term vision:** Modern alternative to Booking.com/Agoda/Expedia, but multi-service
+**Long-term vision:** Modern alternative to Booking.com/Agoda/Expedia, multi-service
 
-**First real tenant:** Trianon Hotel (already exists as separate site: https://intermediate-aims-insights-metal.trycloudflare.com)
+**First real tenant (future):** Trianon Royal Hotel
+**Trianon existing site:** https://intermediate-aims-insights-metal.trycloudflare.com
 
 ---
 
 ## 2. Working Rules (NON-NEGOTIABLE)
 
-1. **Backup before every change** (file-level with timestamp)
-2. **One step at a time** — test after each change
-3. **Commit after every success**
-4. **Handoff after every session**
-5. **Test before claiming done**
-6. **NEVER add features from yourself** — follow roadmap
-7. **NEVER change architecture without explicit user approval**
-8. **Do NOT ask the user technical decisions** — decide as Tech Lead
-9. **Do NOT skip phases** — finish current phase before next
-10. **Quality bar: EXCELLENCE** — no shortcuts, no bugs, production-ready
+1. Backup before every change (file-level with timestamp)
+2. One step at a time — test after each change
+3. Commit after every success
+4. Handoff after every session
+5. Test before claiming done
+6. NEVER add features from yourself — follow roadmap
+7. NEVER change architecture without explicit user approval
+8. Do NOT ask the user technical decisions — decide as Tech Lead
+9. Do NOT skip phases — finish current phase before next
+10. Quality bar: EXCELLENCE — no shortcuts, no bugs, production-ready
 
 **Language:** All responses in Persian (Farsi). Direct, no fluff.
 
@@ -36,85 +38,187 @@ Last updated: 2026-09-27
 
 ## 3. Environment
 
-- **Platform:** Termux on Android (mobile phone)
-- **Python:** 3.13.13
-- **Repo:** ~/platform-x
-- **Venv:** ~/platform-x/venv
+- Platform: Termux on Android (mobile phone)
+- Python: 3.13.13
+- Repo: ~/platform-x
+- Venv: ~/platform-x/venv
 
-**Backups location:** ~/platform-x/backups/
-**Logs location:** ~/platform-x/logs/
+Backups: ~/platform-x/backups/
+Logs: ~/platform-x/logs/
 
 ---
 
 ## 4. Tech Stack (Locked)
 
-- **Backend:** FastAPI 0.115
-- **Database:** SQLite (dev/Termux) → PostgreSQL (production VPS later)
-- **ORM:** SQLAlchemy 2.0
-- **Migrations:** Alembic
-- **Auth:** JWT (python-jose) + bcrypt
-- **Templating:** Jinja2
-- **Styling:** Custom CSS (Design System, Luxury Dark) + Tailwind CDN
-- **Fonts:** Playfair Display (headings), Inter (body), JetBrains Mono (code)
-- **Testing:** pytest + httpx TestClient
-- **Deploy:** Cloudflare Quick Tunnel (Termux) → Named Tunnel + VPS later
+- Backend: FastAPI 0.115
+- Database: SQLite (dev/Termux) → PostgreSQL (production VPS later)
+- ORM: SQLAlchemy 2.0
+- Migrations: Alembic
+- Auth: JWT (python-jose) + bcrypt
+- Templating: Jinja2
+- Styling: Custom CSS (Light Hospitality theme) + Design System
+- Fonts: Plus Jakarta Sans (display), Inter (body), JetBrains Mono (code)
+- Testing: pytest + httpx TestClient
+- Deploy: Cloudflare Quick Tunnel (Termux) → Named Tunnel + VPS later
 
 ---
 
-## 5. Current Status
+## 5. Phases Status
 
 ### Phase 0 — Strategic Documents: COMPLETE
 ### Phase 0.5 — Executive Documents: COMPLETE
 
-### Phase 1 — First Tenant Live: SKIPPED
-(Decision: build platform core first, tenant migration later)
+### Phase 1 — First Tenant Live: SKIPPED (intentional)
+Reason: Build platform core first, migrate real tenants later.
 
 ### Phase 2 — Core Architecture: COMPLETE
 Tag: v0.1.0-core
-- 14 ORM models: Tenant, User, Session, Booking, Service, Order, Payment,
-  Reward, Referral, Notification, AnalyticsEvent, PlatformAdmin, AuditLog, Subscription
-- 46 API routes across 11 routers
+- 16 ORM models (see section 6)
+- ~65 API routes
 - JWT auth (users + platform admins, separated)
-- Multi-tenant isolation (X-Tenant-Slug header, JWT bound to tenant)
-- Payment provider abstraction (mock for dev, Telr later)
+- Payment provider abstraction (mock for dev)
 - Rewards tiers: welcome→silver→gold→platinum→royal
 - Referrals with point awards (100/50)
 - Notifications (5 channels)
 - Analytics events
-- Alembic initial migration (all tables)
-- Production hardening (fail-fast config validation)
-- Full demo seed: 5 tenants, 23 services, 1 admin
+- Alembic migrations
+- Production hardening (fail-fast config)
+- Full demo seed
 
 ### Phase 3 — Frontend: COMPLETE
 Tag: v0.2.0-frontend
-- Jinja2 + custom CSS Design System (Luxury Dark: black + gold + cream)
-- 12 HTML pages: home, businesses, login, register, about, contact,
+- Jinja2 + custom CSS
+- Design System v1 (dark luxury, later replaced)
+- All pages: home, businesses, login, register, about, contact,
   tenant_home, tenant_book, tenant_pay, tenant_account
-- 5 JS modules: auth.js, booking.js, payment.js, account.js
-- Reserved-slug protection (API routes never shadowed by tenant slugs)
-- Deploy: Cloudflare Quick Tunnel (always-on, verified with Termux closed)
-- URL: https://larger-stable-are-southwest.trycloudflare.com
-- 147 tests passing
+- Cloudflare Tunnel #2 online
+- Always-on (wakelock + Termux:Boot)
 
-### Phase 4 — UI Polish + i18n + Content: NEXT
-Planned 23 steps (see section 9)
+### Phase 4 — UI Redesign + Rich Demo: COMPLETE
+Tag: v0.3.0-polish
+- **NEW: Light Hospitality theme** (cream white + navy #0f3d5c + gold accent #c9a961)
+- **NEW: 4 Category colors** (hotels blue, restaurants red, travel green, entertainment purple)
+- **NEW: platform.css** (light theme tokens + components)
+- **NEW: platform-home.css** (all home/category/detail styles, 1500+ lines)
+- **NEW: Plus Jakarta Sans** display font
+- **NEW: 21 businesses seeded** with Unsplash images (5 hotels, 5 restaurants, 6 agencies, 5 entertainment)
+- **NEW: Home** (Hero + Stats Strip + Categories + 4 Featured sections + Steps + CTA)
+- **NEW: Business Detail** (Hero + Info bar + Gallery + Services)
+- **NEW: Split Auth layout**
+- **NEW: Account Dashboard** (Category browser + Rewards Panel + Stats + Recent Activity + Tabs)
+- **NEW: 404 page**
+- **NEW: Micro-interactions**
+
+### Phase 5 — Full Feature Verification + Partner Onboarding: IN PROGRESS
+Tag: (will be v0.4.0-...)
+- Platform-wide auth: users book across ALL tenants (major architecture change)
+- Cross-tenant Bookings/Orders in account
+- Rewards auto-award on payment
+- Dynamic booking form per business type (hotel/restaurant/travel/entertainment)
+- Payment page shows user details (name/email/phone)
+- Phone uniqueness handling (409, not 500)
+- Entertainment time slot added
+- Account: category browser removed New Booking (misleading)
+- Partner onboarding form (/partners/apply)
+  - 6-step dynamic form (type → contact → business → specifics → plan → about)
+  - Type-specific fields for each business type
+  - Backend: PartnerApplication model + POST /partners/apply + admin list endpoint
+- Header restructure: avatar outside mobile menu
+- Stats strip on home (businesses, services, categories, locations) with count-up animation
 
 ---
 
-## 6. Live URLs
+## 6. Data Models (16 tables)
 
-**Platform-X (dev demo):**
+Global:
+- tenants (slug, name, tier, status, config JSON with branding/images/rating)
+- platform_admins (email, role, mfa fields)
+- audit_logs (actor, action, target, changes)
+- subscriptions (tenant plan, billing)
+
+Per-tenant (all have tenant_id):
+- users (email, phone, password_hash, points, tier, referral_code, home_tenant_id via tenant_id)
+- sessions (auth tokens)
+- bookings (booking_type, service_id, check_in, check_out, guests, amount, status)
+- services (type, name, price, image_urls, attributes)
+- orders (service_type, quantity, amount, status)
+- payments (booking_id OR order_id, provider, provider_reference, status)
+- rewards (reward_type: earn/redeem/adjust, points)
+- referrals (referrer_user_id, referred_user_id, reward_points)
+- notifications (channel, template, content, status)
+- analytics_events (event_type, metadata)
+
+New in Phase 5:
+- partner_applications (tenant_type, contact info, business info, tier_interest, languages, details JSON, status)
+
+---
+
+## 7. Key Architecture Decisions
+
+### Platform-wide Users (Phase 5, CRITICAL)
+- Users register on a "home tenant" but can book across ALL tenants
+- JWT carries user_id + home tenant_id (reference only)
+- Active tenant always from X-Tenant-Slug header
+- get_current_user does NOT enforce tenant match
+- Bookings/Orders/Payments use X-Tenant-Slug for the target tenant
+- Account dashboard uses ?all=true to fetch across all tenants
+
+### Multi-Tenancy
+- Every tenant-scoped API needs X-Tenant-Slug header
+- Fallback to DEFAULT_TENANT_SLUG for dev convenience
+- Frontend: tenant slug from URL path (/{slug}/...) or default fallback
+
+### Routes
+- HTML routes at /login, /register, /hotels, /restaurants, /travel, /entertainment, /account, /partners/apply, /partners/thanks
+- Tenant-scoped HTML: /{slug}/, /{slug}/book, /{slug}/pay, /{slug}/account
+- API under /auth, /bookings, /orders, /payments, /rewards, /referrals, /notifications, /analytics, /platform, /partners
+- Catch-all 404 last (after API, after reserved, after tenant)
+- TrailingSlashRedirectMiddleware: /login/ → /login (for reserved slugs)
+
+### Auth
+- Users: POST /auth/register, POST /auth/login, GET /auth/me
+- JWT contains sub (user_id), tenant_id (home), iat, exp
+- Platform admins: POST /platform/auth/login, GET /platform/me
+- JWT contains sub, actor=platform_admin, role
+
+### Payment
+- MockPaymentProvider for dev
+- POST /payments/intent → returns redirect_url
+- GET /payments/mock/confirm/{ref} → confirms (disabled in production via ENABLE_MOCK_PAYMENTS=false)
+- POST /payments/webhook/{provider} → real provider callbacks
+- On successful payment: booking.status confirmed, payment_status paid, reward points awarded (1pt per 10 units, min 5)
+
+### Rewards
+- Tiers: welcome (0), silver (500), gold (2000), platinum (5000), royal (15000)
+- Auto-award on booking/order payment
+- GET /rewards/me → summary with progress
+- GET /rewards/history → paginated
+- POST /rewards/redeem → redeem earn reward
+
+### Referrals
+- Each user has referral_code
+- POST /referrals/apply → link user to referrer (once)
+- Awards 100 pts (referrer) + 50 pts (referred)
+- GET /referrals/me → code + list
+
+---
+
+## 8. Live URLs
+
+Platform-X (dev demo):
 https://larger-stable-are-southwest.trycloudflare.com
 
-**Trianon (existing, separate):**
+Trianon (existing, separate):
 https://intermediate-aims-insights-metal.trycloudflare.com
 
-**Tunnel type:** Cloudflare Quick Tunnel (URL changes on cloudflared restart)
-**Tunnel URL saved at:** ~/platform-x/logs/tunnel.url
+Tunnel type: Cloudflare Quick Tunnel (URL may change on cloudflared restart)
+Tunnel URL saved at: ~/platform-x/logs/tunnel.url
+
+Get current URL: cat ~/platform-x/logs/tunnel.url
 
 ---
 
-## 7. Runit Services (Termux)
+## 9. Runit Services (Termux)
 
 Location: /data/data/com.termux/files/usr/var/service/
 
@@ -126,102 +230,198 @@ Location: /data/data/com.termux/files/usr/var/service/
 | platform-x-api | Platform-X FastAPI | 8030 |
 | platform-x-tunnel | Platform-X Cloudflare tunnel | — |
 
-**Boot script:** ~/.termux/boot/start-services.sh (requires Termux:Boot app)
-**Wake lock:** Enabled (keeps services alive when Termux closed)
+Boot script: ~/.termux/boot/start-services.sh (requires Termux:Boot app)
+Wake lock: Enabled (keeps services alive when Termux closed)
 
-**Management commands:**
-- `sv status platform-x-api platform-x-tunnel`
-- `sv up platform-x-api`
-- `sv down platform-x-api`
-- `sv restart platform-x-api`
+Management:
+  sv status platform-x-api platform-x-tunnel
+  sv up platform-x-api
+  sv down platform-x-api
+  sv restart platform-x-api
 
 ---
 
-## 8. Demo Data (Seeded)
+## 10. Demo Data
 
-**5 Tenants:**
-- trianon-hotel (Trianon Hotel) — 5 rooms
-- saffron-restaurant (Saffron Restaurant) — 6 dishes
-- skyways-travel (Skyways Travel) — 4 packages
-- oasis-entertainment (Oasis Entertainment) — 4 tickets
-- desert-tours (Desert Tours) — 4 tours
+5 hotels:
+- trianon-hotel (Trianon Royal Hotel) — 4.8★, Downtown Dubai
+- azure-palm-resort (Azure Palm Resort) — 4.9★, Palm Jumeirah
+- aurora-boutique (Aurora Boutique Hotel) — 4.7★, Alserkal
+- marina-skylines (Marina Skylines Hotel) — 4.6★, Dubai Marina
+- desert-rose-hotel (Desert Rose Hotel) — 4.5★, Al Fahidi
 
-**Platform Admin:**
+5 restaurants:
+- saffron-restaurant (Modern Middle Eastern)
+- olive-grove (Mediterranean)
+- sakura-sushi (Japanese)
+- the-copper-kitchen (European)
+- spice-route-indian (Indian)
+
+6 travel agencies:
+- skyways-travel, horizon-voyages, caravan-tours, euro-explorer, blue-ocean-cruises, desert-tours
+
+5 entertainment:
+- oasis-entertainment (Family park), skypark-adventures (Ziplines),
+- aqua-world (Waterpark), virtual-realm (VR), cinema-royale (Cinema)
+
+Services: 127 across all tenants (auto-generated via seed_services_auto.py)
+
+Platform Admin:
 - Email: admin@platform-x.local
 - Password: ChangeMe123! (CHANGE BEFORE PUBLIC DEMO)
 
-**Seed commands:**
-- `python -m app.scripts.seed_all` (all)
-- `python -m app.scripts.seed_tenants` (tenants only)
-- `python -m app.scripts.seed_services` (services only)
-- `python -m app.scripts.seed_admin` (admin only)
+Seed commands:
+  python -m app.scripts.seed_all
+  python -m app.scripts.seed_tenants
+  python -m app.scripts.seed_services_auto
+  python -m app.scripts.seed_admin
 
 All idempotent.
 
 ---
 
-## 9. Phase 4 Plan — 23 Steps
+## 11. Remaining Work in Phase 5
 
-1. Design System Polish (typography, spacing, components)
-2. Tenant Branding Config (per-tenant colors/fonts/logo)
-3. Home Landing Redesign
-4. Businesses Directory Redesign
-5. Tenant Home by Type (hotel / restaurant / tour / ticket)
-6. Booking Flow Polish (multi-step, date picker, live price)
-7. Payment Flow Polish (method select, confirm, invoice)
-8. Account Dashboard Polish (tabs, history, loyalty card)
-9. i18n Foundation (EN/AR/FIL/HI + RTL)
-10. i18n Content — English
-11. i18n Content — Arabic (+ RTL)
-12. i18n Content — Filipino
-13. i18n Content — Hindi
-14. Images & Assets
-15. Responsive Polish (mobile/tablet/desktop)
-16. Micro-interactions (animations, transitions, loading)
-17. Admin Panel UI (platform admin frontend)
-18. Named Tunnel Setup (custom domain + Cloudflare Named Tunnel)
-19. SEO + Meta (OpenGraph, Twitter Card, sitemap)
-20. Performance (cache, compression, lazy loading)
-21. Security Frontend (CSP, rate limit, XSS)
-22. E2E Playwright Tests
-23. Milestone Close (v0.3.0-polish)
+1. **Order UI for Restaurants** (NOT DONE)
+   - Menu display with images
+   - Add-to-cart
+   - Checkout → Order → Pay
+   - Decision pending: A) Restaurant both Booking + Order, B) only Order
+
+2. **Milestone Close Phase 5**
+   - Final test, tag v0.4.0
 
 ---
 
-## 10. Key Decisions Made
+## 12. Future Phases (Planned)
 
-1. **Multi-tenant via X-Tenant-Slug header** (not subdomain yet)
-2. **SQLite for dev, PostgreSQL for production** (DATABASE_URL switch)
-3. **JWT carries tenant_id** — token bound to tenant, cross-tenant use → 401
-4. **Routes never touch DB directly** — always via services/
-5. **Users and Platform Admins are separate auth flows** (different JWT claims)
-6. **Payment provider abstraction** — Mock now, real later
-7. **Frontend: Jinja2 + Tailwind CDN** (no build step, no separate server)
-8. **Design: Luxury Dark** (from 07-DESIGN-SYSTEM.md) — black + gold + cream
-9. **Trianon stays independent** — will be migrated into platform later
-10. **Phase 1 skipped** — core first, then migration
-11. **Phase 3 extended** — split into Frontend (done) + Polish (Phase 4)
-12. **No framework build step** — Termux constraints, no npm
+### Phase 6 — Rewards + Referral Complete
+- User to provide detailed plan
+- Likely: tiers page, redeem catalog, referral dashboard, milestones
+
+### Phase 7 — Admin Panel UI
+- Platform Admin dashboard HTML
+- Tenants list/approve/suspend
+- Applications review
+- Analytics dashboard
+- Audit logs UI
+
+### Phase 8 — i18n (4 languages)
+- EN, AR (RTL), FIL, HI
+- Foundation + content
+
+### Phase 9 — Real Payment (Telr)
+- Replace MockPaymentProvider with Telr
+- Production webhook with signature verification
+
+### Phase 10 — VPS Deploy
+- Ubuntu 22.04 + Nginx + PostgreSQL
+- Named Cloudflare Tunnel with custom domain
+- SSL
+
+### Phase 11 — Trianon Migration
+- Move real Trianon hotel onto Platform-X
+- Domain: trianon.com → platform
 
 ---
 
-## 11. Files Reference
+## 13. Commands Cheat Sheet
 
-- **PROJECT-RULES.md** — Quality bar (EXCELLENCE)
-- **AI-CONTEXT.md** — AI-specific context
-- **PROJECT-NOTES.md** — Notes
-- **docs/00-WORK-PLAN.md** through **docs/12-TESTING.md** — All project docs
-- **docs/02-ROADMAP.md** — Roadmap + Progress Log
-- **docs/07-DESIGN-SYSTEM.md** — Colors, fonts, spacing, components
-- **docs/08-DATA-MODEL.md** — All tables
-- **docs/09-API-SPEC.md** — All endpoints
-- **README.md** — Setup + run instructions
+Run dev server:
+  cd ~/platform-x && source venv/bin/activate && uvicorn app.main:app --reload --port 8000
+
+Run tests:
+  pytest
+
+Apply migrations:
+  alembic upgrade head
+
+Create migration:
+  alembic revision --autogenerate -m "description"
+
+Seed demo data:
+  python -m app.scripts.seed_all
+
+Check services:
+  sv status platform-x-api platform-x-tunnel
+
+Restart Platform-X:
+  sv restart platform-x-api
+
+Get current tunnel URL:
+  cat ~/platform-x/logs/tunnel.url
 
 ---
 
-## 12. How to Start a New Session
+## 14. Test Count: 154 tests, all passing
+
+Test files:
+- test_health.py
+- test_security.py (11)
+- test_schemas.py (7)
+- test_auth_api.py (11)
+- test_tenants_api.py (5)
+- test_bookings_api.py (11)
+- test_services_api.py (12)
+- test_orders_api.py (11)
+- test_payments_api.py (11)
+- test_rewards_referrals_api.py (12)
+- test_notifications_api.py (8)
+- test_analytics_api.py (6)
+- test_production_hardening.py (7)
+- test_demo_flow.py (2)
+- test_web_pages.py (10)
+- test_auth_pages.py (7)
+- test_booking_page.py (5)
+- test_payment_page.py (5)
+- test_account_page.py (6)
+- test_category_pages.py (7)
+
+Speed: BCRYPT_ROUNDS=4 in tests, schema created once per session.
+
+---
+
+## 15. Key Files
+
+- app/core/config.py — Settings (production hardening)
+- app/core/security.py — bcrypt hash, JWT
+- app/api/deps.py — get_current_tenant, get_current_user
+- app/api/deps_admin.py — get_current_admin, require_role
+- app/web/pages.py — HTML routes + CATEGORIES registry
+- app/web/templates.py — shared Jinja2 env + globals (tenant_path, now_year)
+- app/static/css/platform.css — light theme tokens + components
+- app/static/css/platform-home.css — all page-specific styles (1500+ lines)
+- app/static/js/px-core.js — shared utilities (getToken, authHeaders, initHeaderAuth, logout, count-up)
+- app/templates/layouts/platform_base.html — main layout
+- app/templates/partials/platform_header.html — dynamic header with avatar
+
+---
+
+## 16. How to Start a New Session
 
 1. Read this HANDOFF.md fully
 2. Read PROJECT-RULES.md
-3. Read docs/02-ROADMAP.md (Progress Log at bottom)
-4. Check current state:
+3. Check current state:
+   cd ~/platform-x
+   git log --oneline -5
+   git tag -l
+   sv status platform-x-api platform-x-tunnel
+4. Ask user what to work on next
+5. Follow working rules: backup → change → test → commit → report
+
+---
+
+## 17. Contact / User Preferences
+
+User's goal: Professional Demo online to show to business partners.
+
+User's style:
+- Persian only, direct
+- Does not want to be asked technical decisions
+- Wants excellence quality
+- Wants full phases completed (no skipping)
+- Does not want features outside roadmap
+
+---
+
+END OF HANDOFF
