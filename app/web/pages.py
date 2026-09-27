@@ -228,6 +228,21 @@ def entertainment_page(request: Request, db: DBSession = Depends(get_db)) -> HTM
     return _render_category(request, db, "entertainment")
 
 
+
+
+@router.get("/account", response_class=HTMLResponse)
+def account_page_platform(
+    request: Request,
+    db: DBSession = Depends(get_db),
+) -> HTMLResponse:
+    """Account dashboard (platform-level, no tenant slug)."""
+    return templates.TemplateResponse(
+        request,
+        "pages/tenant_account.html",
+        {"tenant": None},
+    )
+
+
 @router.get("/about", response_class=HTMLResponse)
 def about(request: Request) -> HTMLResponse:
     """About page."""

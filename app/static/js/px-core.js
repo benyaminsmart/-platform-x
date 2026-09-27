@@ -107,7 +107,7 @@ PX.initHeaderAuth = function () {
     .then(function (u) {
       var initials = (u.first_name ? u.first_name[0] : "") + (u.last_name ? u.last_name[0] : "");
       initials = initials.toUpperCase() || "U";
-      var accountHref = "/" + slug + "/account";
+      var accountHref = "/account";
       slot.innerHTML =
         '<div class="px-user-menu">' +
           '<button class="px-user-avatar" id="px-user-toggle" aria-haspopup="true" aria-expanded="false" title="Account">' +

@@ -1870,3 +1870,24 @@ html { scroll-behavior: smooth; }
     min-width: auto;
   }
 }
+
+
+/* ---------- Account: compact category grid ---------- */
+
+.px-cat-grid-sm {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.px-cat-grid-sm .px-cat-card {
+  height: 140px;
+  border-radius: var(--px-radius);
+}
+
+@media (max-width: 720px) {
+  .px-cat-grid-sm { grid-template-columns: repeat(2, 1fr); }
+}
+
+.px-account-browse {
+  margin-bottom: 40px;
+}

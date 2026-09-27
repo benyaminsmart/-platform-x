@@ -1,6 +1,6 @@
 {% extends "layouts/platform_base.html" %}
 
-{% block title %}My Account — {{ tenant.name }}{% endblock %}
+{% block title %}My Account — Platform-X{% endblock %}
 
 {% block content %}
 
@@ -8,10 +8,9 @@
   <div class="px-container">
     <div class="px-dash-head">
       <div>
-        <div class="eyebrow">{{ tenant.name }}</div>
+        <div class="eyebrow">Platform-X</div>
         <h1 style="margin: 0;">My Account</h1>
       </div>
-      <a href="/{{ tenant.slug }}/book" class="px-btn px-btn-primary">New booking</a>
     </div>
 
     <div id="not-logged-in" class="px-empty" style="display: none; text-align: center;">
@@ -25,10 +24,50 @@
     </div>
 
     <div id="dashboard" style="display: none;">
+
+      <!-- BROWSE CATEGORIES -->
+      <section class="px-account-browse">
+        <div class="px-section-head" style="margin-bottom: 20px;">
+          <h2 style="font-size: 22px; margin-bottom: 4px;">Browse businesses</h2>
+          <p class="px-section-sub" style="font-size: 14px;">Choose a category to start booking.</p>
+        </div>
+
+        <div class="px-cat-grid px-cat-grid-sm">
+          <a href="/hotels" class="px-cat-card">
+            <div class="px-cat-card-bg" style="background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80&auto=format&fit=crop');"></div>
+            <div class="px-cat-card-icon" style="width: 36px; height: 36px; font-size: 18px;">🏨</div>
+            <div class="px-cat-card-content" style="padding: 16px;">
+              <h3 style="font-size: 17px;">Hotels</h3>
+            </div>
+          </a>
+          <a href="/restaurants" class="px-cat-card">
+            <div class="px-cat-card-bg" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80&auto=format&fit=crop');"></div>
+            <div class="px-cat-card-icon" style="width: 36px; height: 36px; font-size: 18px;">🍽</div>
+            <div class="px-cat-card-content" style="padding: 16px;">
+              <h3 style="font-size: 17px;">Restaurants</h3>
+            </div>
+          </a>
+          <a href="/travel" class="px-cat-card">
+            <div class="px-cat-card-bg" style="background-image: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&q=80&auto=format&fit=crop');"></div>
+            <div class="px-cat-card-icon" style="width: 36px; height: 36px; font-size: 18px;">✈️</div>
+            <div class="px-cat-card-content" style="padding: 16px;">
+              <h3 style="font-size: 17px;">Travel</h3>
+            </div>
+          </a>
+          <a href="/entertainment" class="px-cat-card">
+            <div class="px-cat-card-bg" style="background-image: url('https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?w=600&q=80&auto=format&fit=crop');"></div>
+            <div class="px-cat-card-icon" style="width: 36px; height: 36px; font-size: 18px;">🎢</div>
+            <div class="px-cat-card-content" style="padding: 16px;">
+              <h3 style="font-size: 17px;">Entertainment</h3>
+            </div>
+          </a>
+        </div>
+      </section>
+
       <!-- REWARDS PANEL -->
       <div class="px-rewards-panel">
         <div class="px-rewards-left">
-          <div class="px-dash-stat-label">Rewards points</div>
+          <div class="px-dash-stat-label" style="color: rgba(255,255,255,0.75);">Rewards points</div>
           <div class="px-rewards-points" id="rewards-points">—</div>
           <div class="px-rewards-tier" id="rewards-tier">—</div>
         </div>
@@ -110,5 +149,5 @@
 
 {% block scripts %}
 <script src="/static/js/account.js"></script>
-<script>PX.initAccount("{{ tenant.slug }}");</script>
+<script>PX.initAccount("{{ tenant.slug if tenant else 'trianon-hotel' }}");</script>
 {% endblock %}
