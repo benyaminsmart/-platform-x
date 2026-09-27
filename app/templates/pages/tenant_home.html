@@ -1,0 +1,56 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ tenant.name }}{% endblock %}
+{% block description %}{{ tenant.config.tagline|default(tenant.name) }}{% endblock %}
+
+{% block head %}
+{% set branding = tenant.config.branding|default({}) %}
+<style>
+  {% if branding.primary_color %}--gold: {{ branding.primary_color }};{% endif %}
+  {% if branding.secondary_color %}--gold-soft: {{ branding.secondary_color }};{% endif %}
+  {% if branding.accent_color %}--bg: {{ branding.accent_color }};{% endif %}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <div class="container">
+    <div class="eyebrow">{{ tenant.config.type|default('Business')|replace('_',' ')|title }}</div>
+    <h1>{{ tenant.name }}</h1>
+    <p class="hero-sub">{{ tenant.config.tagline|default('') }}</p>
+  </div>
+</section>
+
+<hr class="divider-gold container">
+
+<section class="section-sm">
+  <div class="container">
+    <h2>Our Services</h2>
+    <p class="text-muted">{{ services|length }} offerings</p>
+
+    <div class="grid grid-3" style="margin-top: var(--space-7);">
+      {% for service in services %}
+        <div class="card">
+          <div class="eyebrow">{{ service.type|title }}</div>
+          <h3>{{ service.name }}</h3>
+          {% if service.description %}
+            <p class="text-sm text-muted">{{ service.description }}</p>
+          {% endif %}
+          <div style="margin-top: var(--space-5); display: flex; justify-content: space-between; align-items: center;">
+            <span class="text-gold" style="font-size: var(--text-lg); font-family: var(--font-serif);">
+              {{ service.price }} {{ service.currency }}
+            </span>
+            <a href="/{{ tenant.slug }}/book?service={{ service.id }}" class="btn btn-primary">Book</a>
+          </div>
+        </div>
+      {% else %}
+        <div class="card-flat" style="grid-column: 1 / -1; text-align: center;">
+          <p class="text-muted">No services available yet.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}
