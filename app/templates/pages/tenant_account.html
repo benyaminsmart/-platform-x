@@ -4,62 +4,68 @@
 
 {% block content %}
 
-<section class="section-sm">
-  <div class="container">
-    <div id="not-logged-in" class="container-narrow text-center" style="display: none; padding: var(--space-8) 0;">
-      <div class="eyebrow">Account</div>
-      <h1>Sign in to continue</h1>
-      <p class="text-muted">You need an account to view your bookings.</p>
-      <div style="margin-top: var(--space-6); display: flex; gap: var(--space-3); justify-content: center;">
-        <a href="/login" class="btn btn-primary">Sign in</a>
-        <a href="/register" class="btn btn-outline">Create account</a>
+<section class="px-dash">
+  <div class="px-container">
+    <div class="px-dash-head">
+      <div>
+        <div class="eyebrow">{{ tenant.name }}</div>
+        <h1 style="margin: 0;">My Account</h1>
+      </div>
+      <a href="/{{ tenant.slug }}/book" class="px-btn px-btn-primary">New booking</a>
+    </div>
+
+    <div id="not-logged-in" class="px-empty" style="display: none; text-align: center;">
+      <div class="px-empty-icon">🔒</div>
+      <h3>Sign in to continue</h3>
+      <p>You need an account to view your bookings and orders.</p>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <a href="/login" class="px-btn px-btn-primary">Sign in</a>
+        <a href="/register" class="px-btn px-btn-ghost">Create account</a>
       </div>
     </div>
 
     <div id="dashboard" style="display: none;">
-      <div class="eyebrow">{{ tenant.name }}</div>
-      <h1 style="margin-bottom: var(--space-6);">My Account</h1>
-
-      <div class="grid grid-3" style="margin-bottom: var(--space-7);">
-        <div class="card-flat">
-          <div class="eyebrow">Profile</div>
-          <h3 id="user-name" style="margin-bottom: var(--space-2);"></h3>
-          <p class="text-sm text-muted" id="user-email"></p>
+      <div class="px-dash-stats">
+        <div class="px-dash-stat">
+          <div class="px-dash-stat-label">Rewards points</div>
+          <div class="px-dash-stat-value" id="stat-points">—</div>
+          <div class="px-dash-stat-sub" id="stat-tier">—</div>
         </div>
-        <div class="card-flat">
-          <div class="eyebrow">Rewards</div>
-          <h3 class="text-gold" id="user-points">—</h3>
-          <p class="text-sm text-muted">Tier: <span id="user-tier">—</span></p>
+        <div class="px-dash-stat">
+          <div class="px-dash-stat-label">Bookings</div>
+          <div class="px-dash-stat-value" id="stat-bookings">—</div>
+          <div class="px-dash-stat-sub">all time</div>
         </div>
-        <div class="card-flat">
-          <div class="eyebrow">Referral Code</div>
-          <h3 class="text-gold" id="referral-code" style="font-family: var(--font-mono); font-size: var(--text-lg);">—</h3>
-          <p class="text-sm text-muted">Share & earn points</p>
+        <div class="px-dash-stat">
+          <div class="px-dash-stat-label">Referrals</div>
+          <div class="px-dash-stat-value" id="stat-referrals">—</div>
+          <div class="px-dash-stat-sub" id="stat-referral-code">—</div>
         </div>
-      </div>
-
-      <div class="card" style="margin-bottom: var(--space-5);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
-          <h3 style="margin: 0;">My Bookings</h3>
-          <a href="/{{ tenant.slug }}/book" class="btn btn-outline">New booking</a>
-        </div>
-        <div id="bookings-list">
-          <p class="text-muted">Loading…</p>
+        <div class="px-dash-stat">
+          <div class="px-dash-stat-label">Profile</div>
+          <div class="px-dash-stat-value" id="stat-name" style="font-size: 18px;">—</div>
+          <div class="px-dash-stat-sub" id="stat-email">—</div>
         </div>
       </div>
 
-      <div class="card" style="margin-bottom: var(--space-5);">
-        <h3 style="margin-bottom: var(--space-4);">My Orders</h3>
-        <div id="orders-list">
-          <p class="text-muted">Loading…</p>
-        </div>
+      <div class="px-dash-tabs">
+        <button class="px-tab is-active" data-tab="bookings">Bookings</button>
+        <button class="px-tab" data-tab="orders">Orders</button>
+        <button class="px-tab" data-tab="rewards">Rewards</button>
+        <button class="px-tab" data-tab="referrals">Referrals</button>
       </div>
 
-      <div class="card">
-        <h3 style="margin-bottom: var(--space-4);">Referrals</h3>
-        <div id="referrals-list">
-          <p class="text-muted">Loading…</p>
-        </div>
+      <div id="tab-bookings" class="px-tab-panel">
+        <div id="bookings-list"><p class="px-muted">Loading…</p></div>
+      </div>
+      <div id="tab-orders" class="px-tab-panel" style="display: none;">
+        <div id="orders-list"><p class="px-muted">Loading…</p></div>
+      </div>
+      <div id="tab-rewards" class="px-tab-panel" style="display: none;">
+        <div id="rewards-list"><p class="px-muted">Loading…</p></div>
+      </div>
+      <div id="tab-referrals" class="px-tab-panel" style="display: none;">
+        <div id="referrals-list"><p class="px-muted">Loading…</p></div>
       </div>
     </div>
   </div>

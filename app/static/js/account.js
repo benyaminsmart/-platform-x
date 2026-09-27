@@ -22,15 +22,27 @@ PX.initAccount = function (slug) {
   }
 
   function badge(status) {
-    var cls = "badge";
-    if (status === "confirmed" || status === "delivered") cls += " badge-success";
-    else if (status === "pending" || status === "preparing") cls += " badge-warning";
-    else if (status === "cancelled" || status === "failed") cls += " badge-error";
-    else cls += " badge-info";
-    return '<span class="' + cls + '">' + esc(status) + "</span>";
+    var cls = "px-cat";
+    if (status === "confirmed" || status === "delivered") cls += " px-cat-travel";
+    else if (status === "pending" || status === "preparing") cls += " px-cat-restaurants";
+    else if (status === "cancelled" || status === "failed") cls += " px-cat-restaurants";
+    else cls += " px-cat-hotels";
+    return '<span class="' + cls + '" style="text-transform: capitalize;">' + esc(status) + "</span>";
   }
 
-  // 1. Profile
+  // Tabs
+  document.querySelectorAll(".px-tab").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var target = btn.getAttribute("data-tab");
+      document.querySelectorAll(".px-tab").forEach(function (b) { b.classList.remove("is-active"); });
+      document.querySelectorAll(".px-tab-panel").forEach(function (p) { p.style.display = "none"; });
+      btn.classList.add("is-active");
+      var panel = document.getElementById("tab-" + target);
+      if (panel) panel.style.display = "block";
+    });
+  });
+
+  // Profile + stats
   fetch("/auth/me", { headers: headers })
     .then(function (r) {
       if (r.status === 401) {
@@ -41,83 +53,99 @@ PX.initAccount = function (slug) {
       return r.json();
     })
     .then(function (u) {
-      document.getElementById("user-name").textContent =
-        u.first_name + " " + u.last_name;
-      document.getElementById("user-email").textContent = u.email;
-      document.getElementById("user-points").textContent = u.points + " pts";
-      document.getElementById("user-tier").textContent = u.tier;
+      document.getElementById("stat-name").textContent = u.first_name + " " + u.last_name;
+      document.getElementById("stat-email").textContent = u.email;
+      document.getElementById("stat-points").textContent = u.points;
+      document.getElementById("stat-tier").textContent = u.tier;
     })
     .catch(function () {});
 
-  // 2. Referral code
+  // Referrals
   fetch("/referrals/me", { headers: headers })
     .then(function (r) { return r.json(); })
     .then(function (d) {
-      document.getElementById("referral-code").textContent = d.referral_code;
+      document.getElementById("stat-referrals").textContent = d.referred_count;
+      document.getElementById("stat-referral-code").textContent = d.referral_code;
       var list = document.getElementById("referrals-list");
-      if (!d.referrals.length) {
-        list.innerHTML = '<p class="text-muted">No referrals yet. Share your code.</p>';
+      if (!d.referrals || !d.referrals.length) {
+        list.innerHTML = '<p class="px-muted">No referrals yet. Share your code: <strong style="color: var(--px-brand);">' + esc(d.referral_code) + "</strong></p>";
         return;
       }
-      var html = '<div style="display: grid; gap: var(--space-3);">';
+      var html = "";
       d.referrals.forEach(function (r) {
-        html += '<div class="card-flat" style="display: flex; justify-content: space-between;">' +
-          "<span>" + esc(r.referred_user_id.substring(0, 8)) + "…</span>" +
-          '<span class="text-gold">+' + r.reward_points + " pts</span></div>";
+        html += '<div class="px-list-item"><div class="px-list-item-main">' +
+          '<div class="px-list-item-title">' + esc(r.referred_user_id.substring(0, 8)) + "…</div>" +
+          '<div class="px-list-item-sub">' + esc(r.status) + "</div></div>" +
+          '<div class="px-list-item-side"><div class="px-list-item-amount">+' + r.reward_points + " pts</div></div></div>";
       });
-      html += "</div>";
       list.innerHTML = html;
     })
     .catch(function () {});
 
-  // 3. Bookings
+  // Bookings
   fetch("/bookings?limit=20", { headers: headers })
     .then(function (r) { return r.json(); })
     .then(function (d) {
+      document.getElementById("stat-bookings").textContent = d.total;
       var list = document.getElementById("bookings-list");
       if (!d.items.length) {
-        list.innerHTML = '<p class="text-muted">No bookings yet.</p>';
+        list.innerHTML = '<p class="px-muted">No bookings yet.</p>';
         return;
       }
-      var html = '<div style="display: grid; gap: var(--space-3);">';
+      var html = "";
       d.items.forEach(function (b) {
-        html += '<div class="card-flat">' +
-          '<div style="display: flex; justify-content: space-between; align-items: center;">' +
-          "<div><strong>" + esc(b.service_name) + "</strong>" +
-          '<div class="text-sm text-muted">' + esc(b.check_in) +
-          (b.check_out ? " → " + esc(b.check_out) : "") + "</div></div>" +
-          "<div style=\"text-align: right;\">" +
-          badge(b.status) + "<br>" +
-          '<span class="text-sm text-gold" style="margin-top: var(--space-2); display: inline-block;">' +
-          esc(b.total_amount) + " " + esc(b.currency) + "</span>" +
-          "</div></div></div>";
+        html += '<div class="px-list-item">' +
+          '<div class="px-list-item-main">' +
+          '<div class="px-list-item-title">' + esc(b.service_name) + "</div>" +
+          '<div class="px-list-item-sub">' + esc(b.check_in) +
+          (b.check_out ? " → " + esc(b.check_out) : "") + " · " + b.guests + " guests</div></div>" +
+          '<div class="px-list-item-side">' + badge(b.status) +
+          '<div class="px-list-item-amount">' + esc(b.total_amount) + " " + esc(b.currency) + "</div></div></div>";
       });
-      html += "</div>";
       list.innerHTML = html;
     })
     .catch(function () {});
 
-  // 4. Orders
+  // Orders
   fetch("/orders?limit=20", { headers: headers })
     .then(function (r) { return r.json(); })
     .then(function (d) {
       var list = document.getElementById("orders-list");
       if (!d.items.length) {
-        list.innerHTML = '<p class="text-muted">No orders yet.</p>';
+        list.innerHTML = '<p class="px-muted">No orders yet.</p>';
         return;
       }
-      var html = '<div style="display: grid; gap: var(--space-3);">';
+      var html = "";
       d.items.forEach(function (o) {
-        html += '<div class="card-flat" style="display: flex; justify-content: space-between; align-items: center;">' +
-          "<div><strong>" + esc(o.service_name) + "</strong>" +
-          '<div class="text-sm text-muted">Qty ' + o.quantity + "</div></div>" +
-          "<div style=\"text-align: right;\">" +
-          badge(o.status) +
-          '<div class="text-sm text-gold" style="margin-top: var(--space-2);">' +
-          esc(o.amount) + " " + esc(o.currency) + "</div>" +
-          "</div></div>";
+        html += '<div class="px-list-item">' +
+          '<div class="px-list-item-main">' +
+          '<div class="px-list-item-title">' + esc(o.service_name) + "</div>" +
+          '<div class="px-list-item-sub">Qty ' + o.quantity + "</div></div>" +
+          '<div class="px-list-item-side">' + badge(o.status) +
+          '<div class="px-list-item-amount">' + esc(o.amount) + " " + esc(o.currency) + "</div></div></div>";
       });
-      html += "</div>";
+      list.innerHTML = html;
+    })
+    .catch(function () {});
+
+  // Rewards
+  fetch("/rewards/history?limit=20", { headers: headers })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      var list = document.getElementById("rewards-list");
+      if (!d.items.length) {
+        list.innerHTML = '<p class="px-muted">No rewards yet. Book something to earn points!</p>';
+        return;
+      }
+      var html = "";
+      d.items.forEach(function (rw) {
+        var sign = rw.points > 0 ? "+" : "";
+        html += '<div class="px-list-item">' +
+          '<div class="px-list-item-main">' +
+          '<div class="px-list-item-title">' + esc(rw.description || rw.reward_type) + "</div>" +
+          '<div class="px-list-item-sub">' + new Date(rw.created_at).toLocaleDateString() + "</div></div>" +
+          '<div class="px-list-item-side"><div class="px-list-item-amount">' + sign + rw.points + " pts</div></div></div>";
+      });
       list.innerHTML = html;
     })
     .catch(function () {});
