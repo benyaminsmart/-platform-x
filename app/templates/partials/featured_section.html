@@ -1,0 +1,42 @@
+{% if featured %}
+  {% for cat in featured %}
+    <section class="px-section">
+      <div class="px-container">
+        <div class="px-section-head">
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
+            <div>
+              <span class="px-section-eyebrow">{{ cat.eyebrow }}</span>
+              <h2 style="margin-bottom: 0;">{{ cat.title }}</h2>
+            </div>
+            <a href="{{ cat.href }}" class="px-btn px-btn-ghost">View all {{ cat.count }} →</a>
+          </div>
+        </div>
+
+        <div class="px-biz-grid">
+          {% for b in cat['items'] %}
+            <a href="/{{ b.slug }}/" class="px-biz-card">
+              <div class="px-biz-thumb" style="background-image: url('{{ b.config.cover_image }}');">
+                <div class="px-biz-thumb-overlay"></div>
+              </div>
+              <div class="px-biz-body">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <span class="px-cat {{ cat.pill }}">{{ cat.label }}</span>
+                  <span style="font-size: 13px; color: var(--px-muted);">⭐ {{ b.config.rating }}</span>
+                </div>
+                <h3 class="px-biz-name">{{ b.name }}</h3>
+                <p class="px-biz-tagline">{{ b.config.tagline|default('') }}</p>
+                <div class="px-biz-meta">
+                  <div>
+                    <span class="px-biz-price-from">From</span>
+                    <span class="px-biz-price">{{ b.config.price_from }} {{ b.config.currency }}</span>
+                  </div>
+                  <span style="color: var(--px-muted); font-size: 12px;">📍 {{ b.config.location|default('') }}</span>
+                </div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endfor %}
+{% endif %}

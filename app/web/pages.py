@@ -43,15 +43,77 @@ def _get_tenant_by_slug(db: DBSession, slug: str) -> Tenant | None:
     )
 
 
+def _counts_by_type(tenants: list[Tenant]) -> dict[str, int]:
+    """Count active tenants by config.type."""
+    counts: dict[str, int] = {}
+    for t in tenants:
+        if isinstance(t.config, dict):
+            tp = str(t.config.get("type", "")).lower()
+            if tp:
+                counts[tp] = counts.get(tp, 0) + 1
+    return counts
+
+
+def _top_by_type(tenants: list[Tenant], ttype: str, n: int = 3) -> list[Tenant]:
+    """Top N tenants of a given type, sorted by rating desc."""
+    wanted = [t for t in tenants if isinstance(t.config, dict)
+              and str(t.config.get("type", "")).lower() == ttype]
+    return sorted(wanted, key=lambda t: t.config.get("rating", 0), reverse=True)[:n]
+
+
 @router.get("/", response_class=HTMLResponse)
 def home(request: Request, db: DBSession = Depends(get_db)) -> HTMLResponse:
     """Platform-X landing page."""
+    tenants = _active_tenants(db)
+    counts = _counts_by_type(tenants)
+
+    featured = [
+        {
+            "eyebrow": "Hotels",
+            "title": "Places to stay",
+            "label": "Hotel",
+            "pill": "px-cat-hotels",
+            "href": "/hotels",
+            "count": counts.get("hotel", 0),
+            "items": _top_by_type(tenants, "hotel", 3),
+        },
+        {
+            "eyebrow": "Restaurants",
+            "title": "Where to eat",
+            "label": "Restaurant",
+            "pill": "px-cat-restaurants",
+            "href": "/restaurants",
+            "count": counts.get("restaurant", 0),
+            "items": _top_by_type(tenants, "restaurant", 3),
+        },
+        {
+            "eyebrow": "Travel",
+            "title": "Plan your journey",
+            "label": "Travel",
+            "pill": "px-cat-travel",
+            "href": "/travel",
+            "count": counts.get("travel_agency", 0),
+            "items": _top_by_type(tenants, "travel_agency", 3),
+        },
+        {
+            "eyebrow": "Entertainment",
+            "title": "Things to do",
+            "label": "Fun",
+            "pill": "px-cat-entertainment",
+            "href": "/entertainment",
+            "count": counts.get("entertainment", 0),
+            "items": _top_by_type(tenants, "entertainment", 3),
+        },
+    ]
+
     return templates.TemplateResponse(
         request,
         "pages/platform_home.html",
         {
             "tenant": None,
-            "businesses": _active_tenants(db),
+            "businesses": tenants,
+            "counts": counts,
+            "featured": featured,
         },
     )
 
