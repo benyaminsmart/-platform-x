@@ -1,5 +1,6 @@
 """ORM models for Platform-X."""
 
+from app.models.analytics_event import AnalyticsEvent
 from app.models.audit_log import AuditLog
 from app.models.booking import Booking
 from app.models.notification import Notification
@@ -15,6 +16,7 @@ from app.models.tenant import Tenant
 from app.models.user import User
 
 __all__ = [
+    "AnalyticsEvent",
     "AuditLog",
     "Booking",
     "Notification",
