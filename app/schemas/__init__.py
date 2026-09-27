@@ -25,6 +25,14 @@ from app.schemas.order import (
     OrderPublic,
     OrderStatus,
 )
+from app.schemas.payment import (
+    PaymentIntentRequest,
+    PaymentIntentResponse,
+    PaymentMethod,
+    PaymentProvider,
+    PaymentPublic,
+    PaymentStatus as PaymentStatusEnum,
+)
 from app.schemas.service import ServiceCreate, ServicePublic, ServiceType, ServiceUpdate
 from app.schemas.tenant import TenantPublic
 
@@ -42,7 +50,13 @@ __all__ = [
     "OrderPublic",
     "OrderStatus",
     "PaginatedResponse",
+    "PaymentIntentRequest",
+    "PaymentIntentResponse",
+    "PaymentMethod",
+    "PaymentProvider",
+    "PaymentPublic",
     "PaymentStatus",
+    "PaymentStatusEnum",
     "RegisterRequest",
     "ServiceCreate",
     "ServicePublic",
