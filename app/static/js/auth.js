@@ -1,43 +1,7 @@
-/* Platform-X — Auth pages JS */
+/* Platform-X — Auth pages JS (login + register handlers only)
+   Shared utilities live in px-core.js */
 
 window.PX = window.PX || {};
-
-PX.getTenantSlug = function () {
-  /* Tenant slug from URL: /{slug}/... or null on platform pages */
-  var reserved = ["docs","redoc","static","health","auth","tenants","services",
-    "bookings","orders","payments","rewards","referrals","notifications",
-    "analytics","platform","businesses","about","contact",
-    "login","register","hotels","restaurants","travel","entertainment"];
-  var parts = window.location.pathname.split("/").filter(Boolean);
-  if (parts.length && reserved.indexOf(parts[0]) === -1) return parts[0];
-  return null;
-};
-
-PX.apiHeaders = function () {
-  var h = { "Content-Type": "application/json" };
-  var slug = PX.getTenantSlug();
-  if (slug) h["X-Tenant-Slug"] = slug;
-  else h["X-Tenant-Slug"] = "trianon-hotel"; // dev fallback: pick a live tenant
-  return h;
-};
-
-PX.showAlert = function (message, kind) {
-  var box = document.getElementById("alert-box");
-  if (!box) return;
-  box.className = "alert alert-" + (kind || "error");
-  box.textContent = message;
-  box.style.display = "block";
-  box.style.marginBottom = "var(--space-5)";
-};
-
-PX.hideAlert = function () {
-  var box = document.getElementById("alert-box");
-  if (box) box.style.display = "none";
-};
-
-PX.saveToken = function (token) {
-  try { localStorage.setItem("px_token", token); } catch (e) {}
-};
 
 PX.initLogin = function () {
   var form = document.getElementById("login-form");
@@ -69,9 +33,7 @@ PX.initLogin = function () {
 
 PX.initRegister = function () {
   var form = document.getElementById("register-form");
-  if (!form) {
-    return;
-  }
+  if (!form) return;
   form.addEventListener("submit", async function (ev) {
     ev.preventDefault();
     PX.hideAlert();

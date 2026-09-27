@@ -31,13 +31,15 @@ def test_account_js_served(client: TestClient) -> None:
     assert "/bookings" in resp.text
 
 
-def test_tenant_header_shows_account_link(
+def test_tenant_header_has_auth_slot(
     client: TestClient, sample_tenant: Tenant
 ) -> None:
+    """Header now renders a dynamic auth slot populated by px-core.js."""
     resp = client.get(f"/{sample_tenant.slug}/")
     assert resp.status_code == 200
-    assert f"/{sample_tenant.slug}/account" in resp.text
-    assert "My Account" in resp.text
+    assert 'id="px-auth-slot"' in resp.text
+    # Static fallback (visible before JS hydrates)
+    assert 'href="/login"' in resp.text
 
 
 def test_platform_header_hides_account_link(client: TestClient) -> None:

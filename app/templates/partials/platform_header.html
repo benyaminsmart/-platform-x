@@ -15,11 +15,10 @@
       <a href="/travel">Travel</a>
       <a href="/entertainment">Entertainment</a>
 
-      {% if tenant %}
-        <a href="/{{ tenant.slug }}/account">My Account</a>
-      {% endif %}
-      <a href="/login" class="px-btn px-btn-ghost">Sign in</a>
-      <a href="/register" class="px-btn px-btn-primary">Get started</a>
+      <span id="px-auth-slot" class="px-auth-slot">
+        <a href="/login" class="px-btn px-btn-ghost">Sign in</a>
+        <a href="/register" class="px-btn px-btn-primary">Get started</a>
+      </span>
     </nav>
   </div>
 </header>

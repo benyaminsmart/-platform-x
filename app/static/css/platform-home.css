@@ -1749,3 +1749,124 @@ html { scroll-behavior: smooth; }
   padding: 24px;
   margin-bottom: 32px;
 }
+
+
+/* ---------- User avatar + dropdown ---------- */
+
+.px-auth-slot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.px-user-menu {
+  position: relative;
+}
+
+.px-user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--px-radius-full);
+  background: linear-gradient(135deg, var(--px-brand) 0%, var(--px-brand-deep) 100%);
+  color: white;
+  border: 2px solid var(--px-surface);
+  font-family: var(--px-font-display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--px-fast) var(--px-ease);
+  box-shadow: 0 2px 8px rgba(15, 61, 92, 0.25);
+}
+
+.px-user-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(15, 61, 92, 0.35);
+}
+
+.px-user-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 240px;
+  background: var(--px-surface);
+  border: 1px solid var(--px-line);
+  border-radius: var(--px-radius-lg);
+  padding: 8px;
+  box-shadow: var(--px-shadow-lg);
+  display: none;
+  z-index: 100;
+}
+
+.px-user-dropdown.is-open {
+  display: block;
+}
+
+.px-user-info {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--px-line);
+  margin-bottom: 6px;
+}
+
+.px-user-info strong {
+  display: block;
+  font-size: 14px;
+  color: var(--px-text);
+  margin-bottom: 2px;
+}
+
+.px-user-info span {
+  display: block;
+  font-size: 12px;
+  color: var(--px-muted);
+  word-break: break-all;
+}
+
+.px-user-dropdown a,
+.px-logout-btn {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  color: var(--px-text-soft);
+  font-size: 14px;
+  font-family: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: var(--px-radius-sm);
+  transition: all var(--px-fast) var(--px-ease);
+}
+
+.px-user-dropdown a:hover,
+.px-logout-btn:hover {
+  background: var(--px-surface-2);
+  color: var(--px-text);
+}
+
+.px-logout-btn {
+  color: var(--px-error);
+  border-top: 1px solid var(--px-line);
+  margin-top: 6px;
+  padding-top: 12px;
+}
+
+.px-logout-btn:hover {
+  background: var(--px-error-soft);
+  color: var(--px-error);
+}
+
+@media (max-width: 720px) {
+  .px-auth-slot { margin-left: auto; }
+  .px-user-dropdown {
+    position: fixed;
+    top: 70px;
+    right: 16px;
+    left: 16px;
+    min-width: auto;
+  }
+}
