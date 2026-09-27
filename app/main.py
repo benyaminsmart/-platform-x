@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import auth as auth_router
 from app.api import bookings as bookings_router
+from app.api import notifications as notifications_router
 from app.api import orders as orders_router
 from app.api import payments as payments_router
 from app.api import referrals as referrals_router
@@ -34,6 +35,7 @@ app.include_router(tenants_router.router)
 app.include_router(bookings_router.router)
 app.include_router(services_router.router)
 app.include_router(orders_router.router)
+app.include_router(notifications_router.router)
 app.include_router(payments_router.router)
 app.include_router(rewards_router.router)
 app.include_router(referrals_router.router)

@@ -1,6 +1,7 @@
 """ORM models for Platform-X."""
 
 from app.models.booking import Booking
+from app.models.notification import Notification
 from app.models.order import Order
 from app.models.payment import Payment
 from app.models.referral import Referral
@@ -12,6 +13,7 @@ from app.models.user import User
 
 __all__ = [
     "Booking",
+    "Notification",
     "Order",
     "Payment",
     "Referral",
