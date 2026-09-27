@@ -1,0 +1,73 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}My Account — {{ tenant.name }}{% endblock %}
+
+{% block content %}
+
+<section class="section-sm">
+  <div class="container">
+    <div id="not-logged-in" class="container-narrow text-center" style="display: none; padding: var(--space-8) 0;">
+      <div class="eyebrow">Account</div>
+      <h1>Sign in to continue</h1>
+      <p class="text-muted">You need an account to view your bookings.</p>
+      <div style="margin-top: var(--space-6); display: flex; gap: var(--space-3); justify-content: center;">
+        <a href="/login" class="btn btn-primary">Sign in</a>
+        <a href="/register" class="btn btn-outline">Create account</a>
+      </div>
+    </div>
+
+    <div id="dashboard" style="display: none;">
+      <div class="eyebrow">{{ tenant.name }}</div>
+      <h1 style="margin-bottom: var(--space-6);">My Account</h1>
+
+      <div class="grid grid-3" style="margin-bottom: var(--space-7);">
+        <div class="card-flat">
+          <div class="eyebrow">Profile</div>
+          <h3 id="user-name" style="margin-bottom: var(--space-2);"></h3>
+          <p class="text-sm text-muted" id="user-email"></p>
+        </div>
+        <div class="card-flat">
+          <div class="eyebrow">Rewards</div>
+          <h3 class="text-gold" id="user-points">—</h3>
+          <p class="text-sm text-muted">Tier: <span id="user-tier">—</span></p>
+        </div>
+        <div class="card-flat">
+          <div class="eyebrow">Referral Code</div>
+          <h3 class="text-gold" id="referral-code" style="font-family: var(--font-mono); font-size: var(--text-lg);">—</h3>
+          <p class="text-sm text-muted">Share & earn points</p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom: var(--space-5);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+          <h3 style="margin: 0;">My Bookings</h3>
+          <a href="/{{ tenant.slug }}/book" class="btn btn-outline">New booking</a>
+        </div>
+        <div id="bookings-list">
+          <p class="text-muted">Loading…</p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom: var(--space-5);">
+        <h3 style="margin-bottom: var(--space-4);">My Orders</h3>
+        <div id="orders-list">
+          <p class="text-muted">Loading…</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom: var(--space-4);">Referrals</h3>
+        <div id="referrals-list">
+          <p class="text-muted">Loading…</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/account.js"></script>
+<script>PX.initAccount("{{ tenant.slug }}");</script>
+{% endblock %}
