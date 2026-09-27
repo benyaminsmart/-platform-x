@@ -424,4 +424,208 @@ User's style:
 
 ---
 
+
+
+---
+
+## 18. Future Phases v2 (Full Roadmap)
+
+### Phase 6 — Security Hardening (NEXT)
+- Rate Limiting (login, register, partners, APIs)
+- Security Headers (CSP, HSTS, X-Frame-Options, X-Content-Type-Options)
+- JWT Refresh Tokens (access + refresh pattern)
+- Password Policy + account lockout after 5 fails
+- Session Revocation (real logout)
+- CSRF Protection (HTML forms)
+- XSS Sanitization audit
+- SQL Injection audit
+- HTTPS Enforcement (redirect HTTP → HTTPS)
+- CORS Production (real domains only)
+- 2FA for Platform Admin (model exists, UI needed)
+- Audit Log coverage
+- Secrets Management
+- Backup Strategy (daily + off-site)
+Estimate: 10-12 steps
+
+### Phase 7 — Admin Panel UI
+- Platform Admin Login
+- Dashboard (analytics overview)
+- Tenants list/detail, approve/suspend
+- Applications review (partner applications)
+- Subscriptions management
+- Audit logs viewer
+- Analytics dashboard (charts)
+- User management (impersonate, reset, ban)
+Estimate: 8-10 steps
+
+### Phase 8 — Rewards + Referral Complete
+- Redeem catalog (rewards shop)
+- Rewards dashboard (tier progress, milestones)
+- Referral dashboard (referred users, total earned)
+- Referral milestones (bonus at 5, 10, 25 referrals)
+- Special offers / promo codes
+- Birthday rewards
+- Tier benefits (real perks)
+Estimate: 6-10 steps
+
+### Phase 9 — i18n (EN / AR / FIL / HI)
+- i18n foundation
+- English complete
+- Arabic + RTL layout
+- Filipino
+- Hindi
+- Language switcher in header
+- Currency switcher
+- Locale-aware dates and numbers
+Estimate: 5-8 steps
+
+### Phase 10 — Payment Production (Telr)
+- Telr provider (replace Mock)
+- Webhook signature verification
+- Refund flow (API + UI)
+- Payment reconciliation (daily job)
+- PCI compliance check
+- Multi-currency
+- Invoice / receipt PDF
+- Failed payment retry
+Estimate: 6-8 steps
+
+### Phase 11 — Notifications (Real Providers)
+- Email provider (SendGrid / Mailgun)
+- SMS provider (Twilio / Unifonic)
+- WhatsApp Business API
+- Templates per notification type
+- User notification preferences
+- Digest emails
+- Notification center UI
+Estimate: 5-6 steps
+
+### Phase 12 — VPS Deploy + Domain + Named Tunnel
+- VPS provisioning (Ubuntu 22.04)
+- Nginx reverse proxy
+- Gunicorn/Uvicorn workers
+- PostgreSQL migration (from SQLite)
+- SSL certificate (Let's Encrypt / Certbot)
+- Custom domain + Cloudflare DNS
+- Named Cloudflare Tunnel (replaces Quick Tunnel)
+- Subdomain per tenant (slug.platform-x.com)
+- Custom domain support per tenant
+- Monitoring (uptime + error tracking)
+- Log aggregation
+- Backup automation (cron + off-site)
+- Deployment script / CI-CD
+- Health checks
+- Environment separation (dev/staging/prod)
+- Graceful restart (zero-downtime)
+Estimate: 8-10 steps
+
+### Phase 13 — Business Onboarding Tools
+- Subdomain routing per tenant
+- Custom domain support
+- SSL for custom domains (wildcard)
+- DNS configuration guide
+- Tenant self-service setup wizard
+- Data import tools (from legacy systems)
+- Tenant analytics dashboard
+- Tenant staff accounts (Owner / Manager / Staff)
+- Tenant billing (Platform-X → business)
+- Subscriptions enforcement
+Estimate: 10-15 steps
+
+### Phase 14 — API + Webhooks + SDK
+- Public API keys for businesses
+- Webhooks outbound (Platform-X → business systems)
+- API rate limiting per tenant
+- API documentation (OpenAPI + examples)
+- SDKs (Python, JavaScript)
+- Flight API integration (Amadeus / Sabre)
+- Google Maps integration
+- Email service
+- SMS service
+- WhatsApp Business API
+- Push notifications (future mobile)
+Estimate: 6-8 steps
+
+### Phase 15 — Trianon Migration
+- Move real Trianon hotel onto Platform-X
+- Import existing bookings, users, payments
+- Adapt Trianon frontend to platform APIs
+- Configure Trianon tenant
+- Redirect trianon.com to platform
+- Parallel run (2 weeks)
+- Cutover
+Estimate: 5-8 steps
+
+### Phase 16 — Mobile App
+- Framework decision (React Native vs Flutter)
+- Shared API layer
+- Customer app (iOS + Android)
+- Business staff app
+- Push notifications
+- App Store + Play Store
+Estimate: weeks/months
+
+---
+
+## 19. Security Checklist (Before Production)
+
+- [ ] Rate Limiting enabled
+- [ ] Security headers configured
+- [ ] JWT Refresh tokens implemented
+- [ ] Password policy enforced
+- [ ] Account lockout after failures
+- [ ] Session revocation works
+- [ ] CSRF protection on forms
+- [ ] XSS audit complete
+- [ ] SQL injection audit complete
+- [ ] HTTPS enforced
+- [ ] CORS restricted to real domains
+- [ ] 2FA for admins
+- [ ] Audit logs complete
+- [ ] Secrets in secure store
+- [ ] Backup strategy active
+- [ ] Payment webhook signature verified
+- [ ] PCI compliance reviewed
+
+---
+
+## 20. Production Deployment Checklist
+
+- [ ] VPS provisioned
+- [ ] PostgreSQL installed and migrated
+- [ ] Nginx configured
+- [ ] SSL certificate issued
+- [ ] Custom domain configured
+- [ ] Named Cloudflare Tunnel set up
+- [ ] Subdomain routing per tenant
+- [ ] Monitoring active (uptime + errors)
+- [ ] Logs aggregated
+- [ ] Backup automation running
+- [ ] Health checks configured
+- [ ] Environment variables secure
+- [ ] DNS records verified
+- [ ] Custom domain per tenant ready
+
+---
+
+## 21. Business Onboarding Checklist (per new tenant)
+
+- [ ] Partner application received
+- [ ] Application reviewed and approved
+- [ ] Tenant created in DB
+- [ ] Subdomain or custom domain configured
+- [ ] SSL certificate issued
+- [ ] Branding configured (colors, fonts, logo)
+- [ ] Services imported (rooms, menu, packages, tickets)
+- [ ] Staff accounts created
+- [ ] Billing activated
+- [ ] Tenant admin dashboard access granted
+- [ ] Email/notifications configured
+- [ ] Tenant live
+
+---
+
+**END OF v2 ROADMAP SECTIONS**
+
+
 END OF HANDOFF
