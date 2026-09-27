@@ -6,7 +6,8 @@ PX.getTenantSlug = function () {
   /* Tenant slug from URL: /{slug}/... or null on platform pages */
   var reserved = ["docs","redoc","static","health","auth","tenants","services",
     "bookings","orders","payments","rewards","referrals","notifications",
-    "analytics","platform","businesses","about","contact"];
+    "analytics","platform","businesses","about","contact",
+    "login","register","hotels","restaurants","travel","entertainment"];
   var parts = window.location.pathname.split("/").filter(Boolean);
   if (parts.length && reserved.indexOf(parts[0]) === -1) return parts[0];
   return null;
@@ -68,7 +69,9 @@ PX.initLogin = function () {
 
 PX.initRegister = function () {
   var form = document.getElementById("register-form");
-  if (!form) return;
+  if (!form) {
+    return;
+  }
   form.addEventListener("submit", async function (ev) {
     ev.preventDefault();
     PX.hideAlert();
