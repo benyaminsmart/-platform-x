@@ -25,21 +25,47 @@
     </div>
 
     <div id="dashboard" style="display: none;">
-      <div class="px-dash-stats">
-        <div class="px-dash-stat">
+      <!-- REWARDS PANEL -->
+      <div class="px-rewards-panel">
+        <div class="px-rewards-left">
           <div class="px-dash-stat-label">Rewards points</div>
-          <div class="px-dash-stat-value" id="stat-points">—</div>
-          <div class="px-dash-stat-sub" id="stat-tier">—</div>
+          <div class="px-rewards-points" id="rewards-points">—</div>
+          <div class="px-rewards-tier" id="rewards-tier">—</div>
         </div>
+        <div class="px-rewards-right">
+          <div class="px-rewards-progress-label">
+            <span id="rewards-next-label">Next tier</span>
+            <span id="rewards-next-points">—</span>
+          </div>
+          <div class="px-progress">
+            <div class="px-progress-bar" id="rewards-progress-bar" style="width: 0%;"></div>
+          </div>
+          <div class="px-rewards-referral">
+            <span>Referral code:</span>
+            <button class="px-referral-code" id="referral-copy" type="button" title="Copy code">
+              <span id="rewards-referral-code">—</span>
+              <span class="px-referral-copy-icon">📋</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS ROW -->
+      <div class="px-dash-stats">
         <div class="px-dash-stat">
           <div class="px-dash-stat-label">Bookings</div>
           <div class="px-dash-stat-value" id="stat-bookings">—</div>
           <div class="px-dash-stat-sub">all time</div>
         </div>
         <div class="px-dash-stat">
+          <div class="px-dash-stat-label">Orders</div>
+          <div class="px-dash-stat-value" id="stat-orders">—</div>
+          <div class="px-dash-stat-sub">all time</div>
+        </div>
+        <div class="px-dash-stat">
           <div class="px-dash-stat-label">Referrals</div>
           <div class="px-dash-stat-value" id="stat-referrals">—</div>
-          <div class="px-dash-stat-sub" id="stat-referral-code">—</div>
+          <div class="px-dash-stat-sub">completed</div>
         </div>
         <div class="px-dash-stat">
           <div class="px-dash-stat-label">Profile</div>
@@ -48,6 +74,15 @@
         </div>
       </div>
 
+      <!-- RECENT ACTIVITY -->
+      <div class="px-recent">
+        <h3 style="margin-bottom: 16px; font-size: 18px;">Recent activity</h3>
+        <div id="recent-list">
+          <p class="px-muted">Loading…</p>
+        </div>
+      </div>
+
+      <!-- TABS -->
       <div class="px-dash-tabs">
         <button class="px-tab is-active" data-tab="bookings">Bookings</button>
         <button class="px-tab" data-tab="orders">Orders</button>
