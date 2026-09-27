@@ -19,7 +19,7 @@ def _to_bytes(password: str) -> bytes:
 
 def hash_password(password: str) -> str:
     """Return a bcrypt hash for the given plaintext password."""
-    salt = bcrypt.gensalt()
+    salt = bcrypt.gensalt(rounds=settings.BCRYPT_ROUNDS)
     return bcrypt.hashpw(_to_bytes(password), salt).decode("utf-8")
 
 

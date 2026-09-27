@@ -36,6 +36,7 @@ class Settings(BaseSettings):
     # Security
     SECRET_KEY: str = "dev-secret-key-change-in-production"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
+    BCRYPT_ROUNDS: int = 12
     ALGORITHM: str = "HS256"
 
     # CORS

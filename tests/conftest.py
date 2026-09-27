@@ -1,43 +1,61 @@
-"""Pytest fixtures for Platform-X tests."""
+"""Pytest fixtures for Platform-X tests (speed-optimized)."""
 
 import os
 import tempfile
-from collections.abc import Generator
 
-import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+# Set env vars BEFORE importing app modules.
+# Use minimal bcrypt rounds in tests (default 12 is ~10x slower).
+os.environ.setdefault("BCRYPT_ROUNDS", "4")
+os.environ.setdefault("SECRET_KEY", "test-secret-key")
 
-# Set DB to a temp file BEFORE importing app modules
 _tmp_db_fd, _tmp_db_path = tempfile.mkstemp(suffix=".db", prefix="platform_x_test_")
 os.close(_tmp_db_fd)
 os.environ["DATABASE_URL"] = f"sqlite:///{_tmp_db_path}"
-os.environ["SECRET_KEY"] = "test-secret-key"
 
+import pytest  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
+from sqlalchemy import create_engine  # noqa: E402
+from sqlalchemy.orm import Session, sessionmaker  # noqa: E402
+
+import app.models  # noqa: E402,F401  (register all models with Base.metadata)
 from app.db.base import Base  # noqa: E402
 from app.db.session import get_db  # noqa: E402
 from app.main import app  # noqa: E402
 from app.models.tenant import Tenant  # noqa: E402
 
-# Dedicated engine for tests
 engine = create_engine(
     f"sqlite:///{_tmp_db_path}",
     connect_args={"check_same_thread": False},
 )
-TestingSessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False, expire_on_commit=False)
+TestingSessionLocal = sessionmaker(
+    bind=engine, autocommit=False, autoflush=False, expire_on_commit=False
+)
+
+# Create schema ONCE per session — drop at end.
+Base.metadata.create_all(bind=engine)
+
+
+def pytest_sessionfinish(session, exitstatus):  # noqa: ARG001
+    """Drop all tables and remove the temp DB file at the end."""
+    Base.metadata.drop_all(bind=engine)
+    engine.dispose()
+    try:
+        os.unlink(_tmp_db_path)
+    except OSError:
+        pass
 
 
 @pytest.fixture(scope="function", autouse=True)
-def _setup_db() -> Generator[None, None, None]:
-    """Create all tables before each test, drop after."""
-    Base.metadata.create_all(bind=engine)
+def _clean_tables() -> None:
+    """Fast TRUNCATE-like cleanup between tests instead of drop_all/create_all."""
     yield
-    Base.metadata.drop_all(bind=engine)
+    with engine.begin() as conn:
+        for table in reversed(Base.metadata.sorted_tables):
+            conn.execute(table.delete())
 
 
 @pytest.fixture
-def db() -> Generator[Session, None, None]:
+def db() -> Session:
     """Direct DB session for test setup/asserts."""
     s = TestingSessionLocal()
     try:
@@ -63,10 +81,10 @@ def sample_tenant(db: Session) -> Tenant:
 
 
 @pytest.fixture
-def client(db: Session) -> Generator[TestClient, None, None]:
+def client(db: Session):
     """FastAPI test client with DB override."""
 
-    def _override_get_db() -> Generator[Session, None, None]:
+    def _override_get_db():
         try:
             yield db
         finally:
