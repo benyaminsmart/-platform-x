@@ -1,11 +1,15 @@
 <header class="px-header">
   <div class="px-container px-header-inner">
-    <a href="/" class="px-logo">
-      <span class="px-logo-mark">X</span>
+    <a href="/" class="px-logo" aria-label="Platform-X home">
+      <span class="px-logo-mark" aria-hidden="true">X</span>
       <span>Platform-X</span>
     </a>
 
-    <nav class="px-nav">
+    <button class="px-mobile-toggle" id="px-mobile-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="px-nav" id="px-nav" role="navigation" aria-label="Main">
       <a href="/hotels">Hotels</a>
       <a href="/restaurants">Restaurants</a>
       <a href="/travel">Travel</a>
@@ -19,3 +23,16 @@
     </nav>
   </div>
 </header>
+
+<script>
+(function () {
+  var toggle = document.getElementById("px-mobile-toggle");
+  var nav = document.getElementById("px-nav");
+  if (!toggle || !nav) return;
+  toggle.addEventListener("click", function () {
+    var open = nav.classList.toggle("is-open");
+    toggle.classList.toggle("is-open", open);
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+})();
+</script>
