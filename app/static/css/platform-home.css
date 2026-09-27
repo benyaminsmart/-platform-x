@@ -1374,3 +1374,56 @@
   color: var(--px-brand);
   letter-spacing: -0.02em;
 }
+
+
+/* ---------- Payment methods ---------- */
+
+.px-pay-methods {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 520px) {
+  .px-pay-methods { grid-template-columns: 1fr; }
+}
+
+.px-pay-method {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 2px solid var(--px-line);
+  border-radius: var(--px-radius);
+  cursor: pointer;
+  transition: all var(--px-fast) var(--px-ease);
+  background: var(--px-surface);
+}
+
+.px-pay-method:hover {
+  border-color: var(--px-line-2);
+}
+
+.px-pay-method input {
+  display: none;
+}
+
+.px-pay-method input:checked ~ .px-pay-method-label {
+  color: var(--px-brand);
+  font-weight: 700;
+}
+
+.px-pay-method:has(input:checked) {
+  border-color: var(--px-brand);
+  background: rgba(15, 61, 92, 0.04);
+}
+
+.px-pay-method-icon {
+  font-size: 22px;
+}
+
+.px-pay-method-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--px-text);
+}

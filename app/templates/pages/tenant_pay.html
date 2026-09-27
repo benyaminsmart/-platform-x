@@ -4,69 +4,108 @@
 
 {% block content %}
 
-<section class="section-sm">
-  <div class="container-narrow" style="max-width: 560px;">
-    <div class="eyebrow">{{ tenant.name }}</div>
-    <h1>Complete payment</h1>
-
-    <div id="alert-box" style="display: none;"></div>
-
-    <div id="loading" class="card-flat" style="margin-top: var(--space-7);">
-      <p class="text-muted">Loading booking…</p>
+<section class="px-book">
+  <div class="px-container">
+    <div class="px-breadcrumb" style="justify-content: flex-start; margin-bottom: 24px;">
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/{{ tenant.slug }}/">{{ tenant.name }}</a>
+      <span>/</span>
+      <span>Payment</span>
     </div>
 
-    <div id="payment-panel" class="card" style="display: none; margin-top: var(--space-7);">
-      <h3 id="service-name" style="margin-bottom: var(--space-4);"></h3>
+    <div class="px-book-grid">
+      <!-- LEFT: info -->
+      <div class="px-book-form">
+        <h1 style="margin-bottom: 8px;">Complete payment</h1>
+        <p class="px-muted" style="margin-bottom: 32px;">Your booking is held for 15 minutes.</p>
 
-      <div style="display: grid; gap: var(--space-3); margin-bottom: var(--space-5);">
-        <div style="display: flex; justify-content: space-between;">
-          <span class="text-muted">Check-in</span>
-          <span id="check-in"></span>
+        <div id="alert-box" style="display: none;"></div>
+
+        <div id="loading" style="padding: 20px 0;">
+          <p class="px-muted">Loading booking…</p>
         </div>
-        <div style="display: flex; justify-content: space-between;">
-          <span class="text-muted">Check-out</span>
-          <span id="check-out"></span>
+
+        <div id="payment-panel" style="display: none;">
+          <div class="px-book-summary" style="gap: 20px;">
+            <div class="px-book-row">
+              <span class="px-muted">Service</span>
+              <strong id="booking-service">—</strong>
+            </div>
+            <div class="px-book-row">
+              <span class="px-muted">Check-in</span>
+              <strong id="booking-checkin">—</strong>
+            </div>
+            <div class="px-book-row">
+              <span class="px-muted">Check-out</span>
+              <strong id="booking-checkout">—</strong>
+            </div>
+            <div class="px-book-row">
+              <span class="px-muted">Guests</span>
+              <strong id="booking-guests">—</strong>
+            </div>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid var(--px-line); margin: 32px 0;">
+
+          <h3 style="margin-bottom: 20px;">Payment method</h3>
+
+          <div class="px-pay-methods" id="payment-methods">
+            <label class="px-pay-method">
+              <input type="radio" name="method" value="card" checked>
+              <span class="px-pay-method-icon">💳</span>
+              <span class="px-pay-method-label">Card</span>
+            </label>
+            <label class="px-pay-method">
+              <input type="radio" name="method" value="apple_pay">
+              <span class="px-pay-method-icon">🍎</span>
+              <span class="px-pay-method-label">Apple Pay</span>
+            </label>
+            <label class="px-pay-method">
+              <input type="radio" name="method" value="google_pay">
+              <span class="px-pay-method-icon">🌐</span>
+              <span class="px-pay-method-label">Google Pay</span>
+            </label>
+            <label class="px-pay-method">
+              <input type="radio" name="method" value="cash">
+              <span class="px-pay-method-icon">💵</span>
+              <span class="px-pay-method-label">Cash on arrival</span>
+            </label>
+          </div>
+
+          <button id="pay-button" class="px-btn px-btn-primary px-btn-block px-btn-lg" style="margin-top: 32px;">
+            Pay now
+          </button>
+
+          <p class="px-muted text-center" style="margin-top: 16px; font-size: 12px;">
+            🔒 Demo payment — no real charge.
+          </p>
         </div>
-        <div style="display: flex; justify-content: space-between;">
-          <span class="text-muted">Guests</span>
-          <span id="guests"></span>
+
+        <div id="success-panel" style="display: none; text-align: center; padding: 40px 0;">
+          <div style="font-size: 72px; color: var(--px-success); margin-bottom: 20px;">✓</div>
+          <h2 style="margin-bottom: 12px;">Booking confirmed</h2>
+          <p class="px-muted" style="margin-bottom: 32px;">Your payment was successful. A confirmation has been added to your account.</p>
+          <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <a href="/{{ tenant.slug }}/account" class="px-btn px-btn-primary">View my bookings</a>
+            <a href="/{{ tenant.slug }}/" class="px-btn px-btn-ghost">Back to {{ tenant.name }}</a>
+          </div>
         </div>
       </div>
 
-      <hr class="divider">
-
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
-        <span class="text-muted">Total</span>
-        <span id="total" class="text-gold" style="font-family: var(--font-serif); font-size: var(--text-2xl);"></span>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="method">Payment method</label>
-        <select class="form-select" id="method">
-          <option value="card">Card</option>
-          <option value="apple_pay">Apple Pay</option>
-          <option value="google_pay">Google Pay</option>
-          <option value="cash">Cash on arrival</option>
-        </select>
-      </div>
-
-      <button id="pay-button" class="btn btn-primary btn-lg" style="width: 100%;">
-        Pay now
-      </button>
-
-      <p class="text-center text-sm text-muted" style="margin-top: var(--space-4);">
-        Demo payment — no real charge.
-      </p>
-    </div>
-
-    <div id="success-panel" class="card" style="display: none; margin-top: var(--space-7); text-align: center;">
-      <div style="font-size: 56px; color: var(--success); margin-bottom: var(--space-4);">✓</div>
-      <h3 class="text-gold">Booking confirmed</h3>
-      <p class="text-muted">Your payment was successful and your booking is confirmed.</p>
-      <div style="margin-top: var(--space-6); display: flex; gap: var(--space-3); justify-content: center;">
-        <a href="/{{ tenant.slug }}/account" class="btn btn-primary">View my bookings</a>
-        <a href="/{{ tenant.slug }}/" class="btn btn-outline">Back to {{ tenant.name }}</a>
-      </div>
+      <!-- RIGHT: total -->
+      <aside class="px-book-side">
+        <div class="px-book-card">
+          <div class="px-book-card-title">Amount due</div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <span class="px-muted">Total</span>
+            <span class="px-book-total" id="summary-total">—</span>
+          </div>
+          <p class="px-muted" style="margin-top: 20px; font-size: 12px; line-height: 1.6;">
+            Secure checkout. Cancel up to 24 hours before check-in for a full refund.
+          </p>
+        </div>
+      </aside>
     </div>
   </div>
 </section>

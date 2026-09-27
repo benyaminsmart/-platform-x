@@ -7,11 +7,18 @@ PX.initPayment = function (slug, bookingId) {
   var loadingPanel = document.getElementById("loading");
   var paymentPanel = document.getElementById("payment-panel");
   var successPanel = document.getElementById("success-panel");
+  var summaryTotal = document.getElementById("summary-total");
 
   function showAlert(msg) {
     alertBox.className = "alert alert-error";
     alertBox.textContent = msg;
     alertBox.style.display = "block";
+    alertBox.style.padding = "12px 16px";
+    alertBox.style.borderRadius = "var(--px-radius)";
+    alertBox.style.background = "var(--px-error-soft)";
+    alertBox.style.color = "var(--px-error)";
+    alertBox.style.border = "1px solid rgba(229, 62, 62, 0.3)";
+    alertBox.style.marginBottom = "20px";
   }
 
   if (!bookingId) {
@@ -22,7 +29,6 @@ PX.initPayment = function (slug, bookingId) {
 
   var headers = PX.authHeaders(slug);
 
-  // 1. Fetch booking details
   fetch("/bookings/" + bookingId, { headers: headers })
     .then(function (res) {
       if (!res.ok) throw new Error("Cannot load booking");
@@ -31,11 +37,11 @@ PX.initPayment = function (slug, bookingId) {
     .then(function (b) {
       loadingPanel.style.display = "none";
       paymentPanel.style.display = "block";
-      document.getElementById("service-name").textContent = b.service_name;
-      document.getElementById("check-in").textContent = b.check_in;
-      document.getElementById("check-out").textContent = b.check_out || "—";
-      document.getElementById("guests").textContent = b.guests;
-      document.getElementById("total").textContent = b.total_amount + " " + b.currency;
+      document.getElementById("booking-service").textContent = b.service_name;
+      document.getElementById("booking-checkin").textContent = b.check_in;
+      document.getElementById("booking-checkout").textContent = b.check_out || "—";
+      document.getElementById("booking-guests").textContent = b.guests;
+      summaryTotal.textContent = b.total_amount + " " + b.currency;
 
       if (b.payment_status === "paid") {
         paymentPanel.style.display = "none";
@@ -53,7 +59,8 @@ PX.initPayment = function (slug, bookingId) {
     });
 
   async function doPay(booking) {
-    var method = document.getElementById("method").value;
+    var methodEl = document.querySelector('input[name="method"]:checked');
+    var method = methodEl ? methodEl.value : "card";
     var payBtn = document.getElementById("pay-button");
     payBtn.disabled = true;
     payBtn.textContent = "Processing…";
@@ -72,7 +79,6 @@ PX.initPayment = function (slug, bookingId) {
       var intent = await intentRes.json();
       if (!intentRes.ok) throw new Error(intent.detail || "Payment intent failed");
 
-      // Mock confirm: hit the redirect URL directly
       var confirmRes = await fetch(intent.redirect_url);
       if (!confirmRes.ok) throw new Error("Mock confirm failed");
 
