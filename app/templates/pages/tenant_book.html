@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<section class="px-book">
+<section class="px-book" data-tenant-type="{{ tenant.config.type|default('hotel') }}">
   <div class="px-container">
     <div class="px-breadcrumb" style="justify-content: flex-start; margin-bottom: 24px;">
       <a href="/">Home</a>

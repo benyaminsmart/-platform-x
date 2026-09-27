@@ -135,12 +135,36 @@ def mark_success(
             booking.payment_status = "paid"
             if booking.status == "pending":
                 booking.status = "confirmed"
+            # Award points: 1 point per 10 currency units (min 5 points)
+            from app.services import reward_service
+            points = max(5, int(float(booking.total_amount) / 10))
+            reward_service.add_points(
+                db,
+                tenant_id=payment.tenant_id,
+                user_id=payment.user_id,
+                points=points,
+                reward_type="earn",
+                description=f"Booking: {booking.service_name}",
+                reference_id=booking.id,
+            )
     if payment.order_id:
         order = db.execute(
             select(Order).where(Order.id == payment.order_id)
         ).scalar_one_or_none()
         if order is not None:
             order.payment_status = "paid"
+            # Award points for orders too
+            from app.services import reward_service
+            points = max(3, int(float(order.amount) / 10))
+            reward_service.add_points(
+                db,
+                tenant_id=payment.tenant_id,
+                user_id=payment.user_id,
+                points=points,
+                reward_type="earn",
+                description=f"Order: {order.service_name}",
+                reference_id=order.id,
+            )
 
     db.commit()
     db.refresh(payment)

@@ -14,6 +14,20 @@ PX.authHeaders = function (slug) {
   return h;
 };
 
+
+
+PX.bookingTypeFor = function (slug) {
+  /* Map tenant config type to booking_type API value.
+     Reads a data attribute set by the tenant template. */
+  var el = document.querySelector('[data-tenant-type]');
+  var t = el ? (el.getAttribute('data-tenant-type') || '').toLowerCase() : '';
+  if (t === 'hotel') return 'room';
+  if (t === 'restaurant') return 'table';
+  if (t === 'travel_agency') return 'package';
+  if (t === 'entertainment') return 'event';
+  return 'room';
+};
+
 PX.initBooking = function (slug) {
   var form = document.getElementById("booking-form");
   if (!form) return;
@@ -65,7 +79,7 @@ PX.initBooking = function (slug) {
     }
 
     var payload = {
-      booking_type: "room",
+      booking_type: PX.bookingTypeFor(slug),
       service_id: opt.value,
       service_name: opt.getAttribute("data-name"),
       check_in: form.check_in.value,
