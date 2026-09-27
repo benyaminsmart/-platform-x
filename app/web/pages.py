@@ -138,7 +138,16 @@ def home(request: Request, db: DBSession = Depends(get_db)) -> HTMLResponse:
 
 @router.get("/businesses", response_class=HTMLResponse)
 def businesses(request: Request, db: DBSession = Depends(get_db)) -> HTMLResponse:
-    """List of businesses on the platform."""
+    """List of businesses (kept for legacy links).
+
+    Logged-in users coming from /login or /register are redirected to /account.
+    """
+    from fastapi.responses import RedirectResponse
+
+    referer = request.headers.get("referer", "")
+    if "/login" in referer or "/register" in referer:
+        return RedirectResponse(url="/account", status_code=302)
+
     return templates.TemplateResponse(
         request,
         "pages/businesses.html",
