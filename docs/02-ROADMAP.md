@@ -299,6 +299,26 @@ Throughout all phases:
 
 ---
 
+
+
+### v0.3.0-polish — Phase 4 Complete
+- Light Hospitality theme (cream white + navy + gold accent)
+- 4 categories with dedicated pages (hotels, restaurants, travel, entertainment)
+- Platform-X Own Design (Plus Jakarta Sans + Inter)
+- 21 businesses seeded with Unsplash images
+- Home: Hero + Search + Why + Categories + 4 Featured sections + Steps + CTA
+- Business detail page: Hero + Info bar + Gallery + Services
+- Booking flow: form + live summary sidebar
+- Payment: method picker + summary
+- Account dashboard: stats + tabs (Bookings/Orders/Rewards/Referrals)
+- Auth: split layout with image
+- 404 page
+- Micro-interactions + responsive + a11y polish
+- 154 tests passing
+- Live at: https://larger-stable-are-southwest.trycloudflare.com
+
+**Phase 4 closed.**
+
 **Last updated:** September 2026
 **Current phase:** Phase 4 — Next (TBD)
 
