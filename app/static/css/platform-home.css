@@ -1427,3 +1427,98 @@
   font-weight: 600;
   color: var(--px-text);
 }
+
+
+/* ---------- Micro-interactions ---------- */
+
+html { scroll-behavior: smooth; }
+
+@keyframes px-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.px-biz-card,
+.px-cat-card,
+.px-feature,
+.px-svc-card {
+  animation: px-fade-up 0.5s var(--px-ease) both;
+}
+
+.px-biz-card:nth-child(2),
+.px-cat-card:nth-child(2),
+.px-feature:nth-child(2),
+.px-svc-card:nth-child(2) { animation-delay: 0.06s; }
+.px-biz-card:nth-child(3),
+.px-cat-card:nth-child(3),
+.px-feature:nth-child(3),
+.px-svc-card:nth-child(3) { animation-delay: 0.12s; }
+.px-biz-card:nth-child(4),
+.px-cat-card:nth-child(4),
+.px-feature:nth-child(4),
+.px-svc-card:nth-child(4) { animation-delay: 0.18s; }
+.px-biz-card:nth-child(5),
+.px-cat-card:nth-child(5) { animation-delay: 0.24s; }
+.px-biz-card:nth-child(6),
+.px-cat-card:nth-child(6) { animation-delay: 0.30s; }
+
+@keyframes px-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.px-hero-title,
+.px-hero-sub,
+.px-search {
+  animation: px-fade-in 0.8s var(--px-ease) both;
+}
+
+.px-hero-sub { animation-delay: 0.15s; }
+.px-search { animation-delay: 0.3s; }
+
+.px-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.px-field input,
+.px-field select,
+.px-field textarea {
+  transition: all 0.2s var(--px-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .px-biz-card,
+  .px-cat-card,
+  .px-feature,
+  .px-svc-card,
+  .px-hero-title,
+  .px-hero-sub,
+  .px-search {
+    animation: none;
+  }
+  html { scroll-behavior: auto; }
+}
+
+.px-btn:focus-visible,
+.px-tab:focus-visible,
+.px-field input:focus-visible,
+.px-pay-method:focus-within {
+  outline: 2px solid var(--px-brand);
+  outline-offset: 2px;
+}
+
+.px-tab {
+  transition: color 0.15s var(--px-ease), border-color 0.15s var(--px-ease);
+}
+
+.px-biz-thumb,
+.px-svc-thumb,
+.px-gallery-item,
+.px-cat-card-bg {
+  background-color: var(--px-surface-3);
+}
+
+.px-body ::selection {
+  background: rgba(15, 61, 92, 0.2);
+  color: var(--px-text);
+}

@@ -341,3 +341,17 @@ def tenant_home(
             "services": services,
         },
     )
+
+
+# ---------- 404 (must stay last) ----------
+
+
+@router.get("/{any_path:path}", response_class=HTMLResponse)
+def not_found_page(any_path: str, request: Request) -> HTMLResponse:
+    """Fallback 404 page for any unmatched web route."""
+    return templates.TemplateResponse(
+        request,
+        "pages/404.html",
+        {"tenant": None},
+        status_code=404,
+    )

@@ -58,12 +58,7 @@ app.include_router(services_router.router)
 app.include_router(tenants_router.router)
 
 
-# ---------- Web (HTML pages) ----------
-
-app.include_router(web_pages.router)
-
-
-# ---------- Health ----------
+# ---------- Health (before web catch-all) ----------
 
 
 @app.get("/health", tags=["system"])
@@ -75,3 +70,8 @@ def health_check() -> dict[str, str]:
         "version": settings.APP_VERSION,
         "env": settings.APP_ENV,
     }
+
+
+# ---------- Web (HTML pages, catch-all 404 stays last) ----------
+
+app.include_router(web_pages.router)
