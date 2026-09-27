@@ -1,31 +1,50 @@
 <footer class="px-footer">
-  <div class="px-container px-footer-inner">
-    <div>
-      <div class="px-logo" style="font-size: 18px; margin-bottom: 8px;">
-        <span class="px-logo-mark" style="width: 24px; height: 24px; font-size: 12px;">X</span>
-        <span>Platform-X</span>
-      </div>
-      <div>&copy; {{ now_year }} Platform-X. All rights reserved.</div>
-    </div>
-
-    <div style="display: flex; gap: 32px; flex-wrap: wrap;">
+  <div class="px-container">
+    <div class="px-footer-inner">
       <div>
-        <div style="color: var(--px-text); font-weight: 600; margin-bottom: 8px;">Discover</div>
-        <div style="display: grid; gap: 4px;">
+        <div class="px-logo" style="margin-bottom: 16px;">
+          <span class="px-logo-mark">X</span>
+          <span>Platform-X</span>
+        </div>
+        <p style="color: var(--px-muted); margin: 0 0 12px; max-width: 340px; line-height: 1.6;">
+          One platform for hotels, restaurants, travel, and entertainment. Book, earn rewards, and discover — all in one place.
+        </p>
+      </div>
+
+      <div>
+        <div class="px-footer-col-title">Discover</div>
+        <div class="px-footer-links">
           <a href="/hotels">Hotels</a>
           <a href="/restaurants">Restaurants</a>
           <a href="/travel">Travel</a>
           <a href="/entertainment">Entertainment</a>
         </div>
       </div>
+
       <div>
-        <div style="color: var(--px-text); font-weight: 600; margin-bottom: 8px;">Platform</div>
-        <div style="display: grid; gap: 4px;">
-          <a href="/about">About</a>
-          <a href="/contact">Contact</a>
-          <a href="/businesses">Businesses</a>
+        <div class="px-footer-col-title">For business</div>
+        <div class="px-footer-links">
+          <a href="/contact">List your property</a>
+          <a href="/about">How it works</a>
+          <a href="/contact">Pricing</a>
+          <a href="/login">Partner login</a>
         </div>
       </div>
+
+      <div>
+        <div class="px-footer-col-title">Company</div>
+        <div class="px-footer-links">
+          <a href="/about">About</a>
+          <a href="/contact">Contact</a>
+          <a href="#">Terms</a>
+          <a href="#">Privacy</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-footer-bottom">
+      <div>&copy; {{ now_year }} Platform-X. All rights reserved.</div>
+      <div>Made with care for hospitality.</div>
     </div>
   </div>
 </footer>
