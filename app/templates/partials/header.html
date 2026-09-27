@@ -1,0 +1,16 @@
+<header class="site-header">
+  <div class="container site-header-inner">
+    <a href="/" class="site-logo">
+      Platform<span>·</span>X
+    </a>
+    <nav class="site-nav">
+      <a href="/businesses">Businesses</a>
+      {% if tenant %}
+        <a href="{{ tenant_path(request, '') }}">{{ tenant.name }}</a>
+      {% endif %}
+      {% block nav_extra %}{% endblock %}
+      <a href="/auth/login" class="btn btn-outline">Login</a>
+      <a href="/auth/register" class="btn btn-primary">Sign Up</a>
+    </nav>
+  </div>
+</header>

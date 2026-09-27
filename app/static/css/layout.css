@@ -1,0 +1,119 @@
+/* Platform-X — Layout: header, footer, page structure */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(8, 9, 11, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+}
+
+.site-logo {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  color: var(--cream);
+  letter-spacing: 0.02em;
+}
+
+.site-logo span {
+  color: var(--gold);
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.site-nav a {
+  color: var(--cream-soft);
+  font-size: var(--text-base);
+  font-weight: 400;
+}
+
+.site-nav a:hover {
+  color: var(--gold);
+}
+
+@media (max-width: 720px) {
+  .site-nav { gap: var(--space-3); }
+  .site-nav a { font-size: var(--text-sm); }
+  .site-nav .btn { padding: var(--space-2) var(--space-4); font-size: var(--text-sm); }
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  padding: var(--space-10) 0 var(--space-9);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(201, 166, 107, 0.08), transparent 60%);
+  pointer-events: none;
+}
+
+.hero h1 {
+  position: relative;
+  font-size: var(--text-4xl);
+  line-height: 1.05;
+  margin-bottom: var(--space-5);
+  background: linear-gradient(180deg, var(--cream), var(--gold-soft));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-sub {
+  position: relative;
+  max-width: 640px;
+  margin: 0 auto var(--space-7);
+  font-size: var(--text-lg);
+  color: var(--cream-soft);
+  line-height: 1.5;
+}
+
+@media (max-width: 720px) {
+  .hero { padding: var(--space-8) 0 var(--space-7); }
+  .hero h1 { font-size: var(--text-3xl); }
+  .hero-sub { font-size: var(--text-md); }
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+  border-top: 1px solid var(--line);
+  padding: var(--space-8) 0 var(--space-6);
+  margin-top: var(--space-10);
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.site-footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.site-footer a {
+  color: var(--muted);
+}
+
+.site-footer a:hover {
+  color: var(--gold);
+}

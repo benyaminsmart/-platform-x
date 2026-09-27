@@ -1,0 +1,35 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Businesses — Platform-X{% endblock %}
+
+{% block content %}
+
+<section class="section-sm">
+  <div class="container">
+    <div class="eyebrow">Discover</div>
+    <h1>Businesses on Platform-X</h1>
+    <p class="hero-sub" style="margin: var(--space-4) 0 var(--space-7); max-width: none;">
+      Every venue is independently run, with its own brand and identity — all powered by the same platform.
+    </p>
+
+    <div class="grid grid-3">
+      {% for business in businesses %}
+        <a href="/{{ business.slug }}/" class="card" style="text-decoration: none; color: inherit;">
+          <div class="eyebrow">{{ business.config.type|default('business')|replace('_', ' ')|title }}</div>
+          <h3>{{ business.name }}</h3>
+          <p class="text-sm text-muted">{{ business.config.tagline|default('') }}</p>
+          <div style="margin-top: var(--space-4); display: flex; gap: var(--space-2); align-items: center;">
+            <span class="badge">{{ business.tier }}</span>
+            <span class="text-gold text-sm" style="margin-left: auto;">Open &rarr;</span>
+          </div>
+        </a>
+      {% else %}
+        <div class="card-flat" style="grid-column: 1 / -1; text-align: center;">
+          <p class="text-muted">No businesses yet.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

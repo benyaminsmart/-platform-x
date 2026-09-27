@@ -1,0 +1,18 @@
+/* Platform-X — Typography utilities */
+
+.font-serif { font-family: var(--font-serif); }
+.font-sans  { font-family: var(--font-sans); }
+.font-mono  { font-family: var(--font-mono); }
+
+.weight-light    { font-weight: 300; }
+.weight-regular  { font-weight: 400; }
+.weight-medium   { font-weight: 500; }
+.weight-semibold { font-weight: 600; }
+
+.tracking-wide  { letter-spacing: 0.05em; }
+.tracking-wider { letter-spacing: 0.15em; }
+.uppercase      { text-transform: uppercase; }
+
+.leading-tight { line-height: 1.15; }
+.leading-snug  { line-height: 1.35; }
+.leading-loose { line-height: 1.8; }

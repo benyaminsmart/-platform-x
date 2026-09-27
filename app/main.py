@@ -1,7 +1,12 @@
 """Platform-X FastAPI application entrypoint."""
 
-from fastapi import FastAPI
+from datetime import datetime, timezone
+from pathlib import Path
+
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 from app.api import analytics as analytics_router
 from app.api import auth as auth_router
@@ -15,6 +20,9 @@ from app.api import rewards as rewards_router
 from app.api import services as services_router
 from app.api import tenants as tenants_router
 from app.core.config import settings
+from app.web import pages as web_pages
+
+BASE_DIR = Path(__file__).resolve().parent
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -32,17 +40,52 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth_router.router)
+# Static files
+app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+
+# Templates
+templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+
+
+def _tenant_path(request: Request, suffix: str = "") -> str:
+    """Build a path scoped to the current tenant slug in the URL (if present)."""
+    # Reserved prefixes that are NOT tenant slugs
+    reserved = {"docs", "redoc", "openapi.json", "static", "health",
+                "auth", "tenants", "services", "bookings", "orders",
+                "payments", "rewards", "referrals", "notifications",
+                "analytics", "platform", "businesses", "about", "contact"}
+    parts = [p for p in request.url.path.split("/") if p]
+    tenant_slug = parts[0] if parts and parts[0] not in reserved else None
+    base = f"/{tenant_slug}" if tenant_slug else ""
+    suffix = suffix.lstrip("/")
+    return f"{base}/{suffix}" if suffix else (base or "/")
+
+
+templates.env.globals["now_year"] = datetime.now(timezone.utc).year
+templates.env.globals["tenant_path"] = _tenant_path
+
+
+# ---------- API routers ----------
+
 app.include_router(analytics_router.router)
-app.include_router(tenants_router.router)
+app.include_router(auth_router.router)
 app.include_router(bookings_router.router)
-app.include_router(services_router.router)
-app.include_router(orders_router.router)
 app.include_router(notifications_router.router)
+app.include_router(orders_router.router)
 app.include_router(payments_router.router)
 app.include_router(platform_admin_router.router)
-app.include_router(rewards_router.router)
 app.include_router(referrals_router.router)
+app.include_router(rewards_router.router)
+app.include_router(services_router.router)
+app.include_router(tenants_router.router)
+
+
+# ---------- Web (HTML pages) ----------
+
+app.include_router(web_pages.router)
+
+
+# ---------- Health ----------
 
 
 @app.get("/health", tags=["system"])

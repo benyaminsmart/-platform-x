@@ -1,0 +1,85 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Platform-X — One platform for hotels, restaurants, travel & entertainment{% endblock %}
+{% block description %}Book stays, tables, tours, and tickets. Loyalty, referrals, and analytics built in.{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <div class="container">
+    <div class="eyebrow">Hospitality. Dining. Travel. Play.</div>
+    <h1>Everything your guests need,<br>on one elegant platform.</h1>
+    <p class="hero-sub">
+      Platform-X brings hotels, restaurants, travel agencies, and entertainment
+      venues together — with bookings, payments, rewards, and referrals in a single place.
+    </p>
+    <div style="display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap;">
+      <a href="/businesses" class="btn btn-primary btn-lg">Explore Businesses</a>
+      <a href="/auth/register" class="btn btn-outline btn-lg">Create Account</a>
+    </div>
+  </div>
+</section>
+
+<hr class="divider-gold container">
+
+<section class="section-sm">
+  <div class="container">
+    <div class="text-center">
+      <div class="eyebrow">Trusted by</div>
+      <h2>{{ businesses|length }} businesses live</h2>
+    </div>
+
+    <div class="grid grid-3" style="margin-top: var(--space-7);">
+      {% for business in businesses %}
+        <a href="/{{ business.slug }}/" class="card" style="text-decoration: none; color: inherit;">
+          <div class="eyebrow">{{ business.config.type|default('business')|replace('_', ' ')|title }}</div>
+          <h3 style="margin-bottom: var(--space-3);">{{ business.name }}</h3>
+          <p style="color: var(--muted); font-size: var(--text-sm);">
+            {{ business.config.tagline|default('') }}
+          </p>
+          <div style="margin-top: var(--space-4);">
+            <span class="text-gold text-sm">Visit &rarr;</span>
+          </div>
+        </a>
+      {% else %}
+        <div class="card-flat" style="grid-column: 1 / -1; text-align: center;">
+          <p class="text-muted">No businesses yet.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<hr class="divider-gold container">
+
+<section class="section-sm">
+  <div class="container">
+    <div class="text-center" style="margin-bottom: var(--space-7);">
+      <div class="eyebrow">Built for scale</div>
+      <h2>One account. Every business.</h2>
+    </div>
+
+    <div class="grid grid-3">
+      <div class="card">
+        <h4 class="text-gold">Bookings</h4>
+        <p class="text-sm text-muted">
+          Rooms, tables, tours, tickets — one booking flow for every business type.
+        </p>
+      </div>
+      <div class="card">
+        <h4 class="text-gold">Rewards</h4>
+        <p class="text-sm text-muted">
+          Five membership tiers. Points earned across all businesses on the platform.
+        </p>
+      </div>
+      <div class="card">
+        <h4 class="text-gold">Referrals</h4>
+        <p class="text-sm text-muted">
+          Share a code. Earn points. Both sides win, automatically.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
