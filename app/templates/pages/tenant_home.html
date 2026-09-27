@@ -66,9 +66,16 @@ k{% extends "layouts/platform_base.html" %}
 <!-- SERVICES -->
 <section class="px-section">
   <div class="px-container">
-    <div class="px-section-head">
-      <h2>Our Services</h2>
-      <p class="px-section-sub">Book instantly with our unified booking flow.</p>
+    <div class="px-section-head" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <h2 style="margin-bottom: 6px;">{% if tenant.config.type == 'restaurant' %}Our menu{% else %}Our services{% endif %}</h2>
+        <p class="px-section-sub" style="margin: 0;">
+          {% if tenant.config.type == 'restaurant' %}Book a table or order food for delivery.{% else %}Book instantly with our unified booking flow.{% endif %}
+        </p>
+      </div>
+      {% if tenant.config.type == 'restaurant' %}
+        <a href="/{{ tenant.slug }}/order" class="px-btn px-btn-accent">Order food →</a>
+      {% endif %}
     </div>
 
     <div class="px-svc-grid">

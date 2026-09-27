@@ -341,6 +341,31 @@ def tenant_pay_page(
     )
 
 
+
+
+@router.get("/{tenant_slug}/order", response_class=HTMLResponse)
+def tenant_order_page(
+    tenant_slug: str,
+    request: Request,
+    db: DBSession = Depends(get_db),
+) -> HTMLResponse:
+    """Order food page (for restaurants and similar)."""
+    if tenant_slug in RESERVED_SLUGS:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    tenant = _get_tenant_by_slug(db, tenant_slug)
+    if tenant is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    services, _total = service_service.list_services(
+        db, tenant_id=tenant.id, status_filter="active", page=1, limit=100
+    )
+    return templates.TemplateResponse(
+        request,
+        "pages/tenant_order.html",
+        {"tenant": tenant, "services": services},
+    )
+
+
 @router.get("/{tenant_slug}/book", response_class=HTMLResponse)
 def tenant_book_page(
     tenant_slug: str,

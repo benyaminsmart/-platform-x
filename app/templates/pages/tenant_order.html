@@ -1,0 +1,94 @@
+{% extends "layouts/platform_base.html" %}
+
+{% block title %}Order — {{ tenant.name }}{% endblock %}
+
+{% block content %}
+
+<section class="px-order" data-tenant-id="{{ tenant.id }}" data-tenant-slug="{{ tenant.slug }}">
+  <div class="px-container">
+
+    <div class="px-breadcrumb" style="justify-content: flex-start; margin-bottom: 24px;">
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/{{ tenant.slug }}/">{{ tenant.name }}</a>
+      <span>/</span>
+      <span>Order</span>
+    </div>
+
+    <div class="px-order-head">
+      <div>
+        <div class="eyebrow">Order online</div>
+        <h1 style="margin: 0;">Menu — {{ tenant.name }}</h1>
+        <p class="px-muted" style="margin: 8px 0 0;">{{ services|length }} items available</p>
+      </div>
+      <a href="/{{ tenant.slug }}/book" class="px-btn px-btn-ghost">Reserve a table instead</a>
+    </div>
+
+    <div id="alert-box" style="display: none;"></div>
+
+    <div class="px-order-layout">
+      <div class="px-menu-grid">
+        {% for s in services %}
+          <div class="px-menu-card" data-service-id="{{ s.id }}" data-name="{{ s.name }}" data-price="{{ s.price }}" data-currency="{{ s.currency }}">
+            {% if s.image_urls and s.image_urls|length > 0 %}
+              <div class="px-menu-thumb" style="background-image: url('{{ s.image_urls[0] }}');"></div>
+            {% else %}
+              <div class="px-menu-thumb" style="background: linear-gradient(135deg, #0f3d5c, #1e5a7d);"></div>
+            {% endif %}
+            <div class="px-menu-body">
+              <h3 class="px-menu-name">{{ s.name }}</h3>
+              {% if s.attributes and s.attributes.category %}
+                <div class="px-menu-cat">{{ s.attributes.category|title }}</div>
+              {% endif %}
+              <div class="px-menu-foot">
+                <span class="px-menu-price">{{ s.price }} {{ s.currency }}</span>
+                <button type="button" class="px-btn px-btn-primary px-btn-sm px-add-to-cart" data-add="{{ s.id }}">
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <div class="px-empty" style="grid-column: 1 / -1;">
+            <h3>No items available</h3>
+            <p>Check back soon.</p>
+          </div>
+        {% endfor %}
+      </div>
+
+      <aside class="px-cart">
+        <div class="px-cart-inner">
+          <div class="px-cart-head">
+            <h3 style="margin: 0; font-size: 18px;">Your order</h3>
+            <span class="px-cart-count" id="cart-count">0</span>
+          </div>
+
+          <div id="cart-items" class="px-cart-items">
+            <p class="px-muted text-center" style="padding: 24px 0;">Your cart is empty.</p>
+          </div>
+
+          <div class="px-cart-total">
+            <span>Total</span>
+            <strong id="cart-total">0.00 AED</strong>
+          </div>
+
+          <button type="button" class="px-btn px-btn-primary px-btn-block px-btn-lg" id="checkout-btn" disabled>
+            Proceed to checkout
+          </button>
+
+          <p class="px-muted text-center" style="margin-top: 12px; font-size: 12px;">
+            Payment on next step. Cancel anytime before payment.
+          </p>
+        </div>
+      </aside>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/order.js"></script>
+<script>PX.initOrder("{{ tenant.slug }}");</script>
+{% endblock %}
