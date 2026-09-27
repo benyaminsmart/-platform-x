@@ -148,3 +148,49 @@ PX.initHeaderAuth = function () {
 document.addEventListener("DOMContentLoaded", function () {
   PX.initHeaderAuth();
 });
+
+/* Count-up animation for stats */
+PX.pxCountUp = function () {
+  var els = document.querySelectorAll("[data-count]");
+  if (!els.length) return;
+
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduced) return;
+
+  function animate(el) {
+    var target = parseInt(el.getAttribute("data-count"), 10);
+    if (isNaN(target) || target <= 0) return;
+    var start = 0;
+    var duration = 1200;
+    var startTime = null;
+
+    function step(ts) {
+      if (!startTime) startTime = ts;
+      var progress = Math.min((ts - startTime) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var value = Math.floor(start + (target - start) * eased);
+      el.textContent = value.toLocaleString();
+      if (progress < 1) requestAnimationFrame(step);
+      else el.textContent = target.toLocaleString();
+    }
+    requestAnimationFrame(step);
+  }
+
+  if ("IntersectionObserver" in window) {
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          animate(entry.target);
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    els.forEach(function (el) { obs.observe(el); });
+  } else {
+    els.forEach(animate);
+  }
+};
+
+document.addEventListener("DOMContentLoaded", function () {
+  PX.pxCountUp();
+});

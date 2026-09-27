@@ -1996,3 +1996,44 @@ html { scroll-behavior: smooth; }
   /* Avatar stays in header right (outside nav) */
   .px-auth-slot { gap: 8px; }
 }
+
+
+/* ---------- Stats Strip ---------- */
+
+.px-stats-strip {
+  padding: 48px 0;
+  background: linear-gradient(180deg, var(--px-bg-soft) 0%, var(--px-bg) 100%);
+  border-top: 1px solid var(--px-line);
+  border-bottom: 1px solid var(--px-line);
+}
+
+.px-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  text-align: center;
+}
+
+.px-stat-value {
+  font-family: var(--px-font-display);
+  font-size: 52px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--px-brand);
+  margin-bottom: 8px;
+}
+
+.px-stat-label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--px-muted);
+}
+
+@media (max-width: 720px) {
+  .px-stat-value { font-size: 36px; }
+  .px-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .px-stats-strip { padding: 32px 0; }
+}

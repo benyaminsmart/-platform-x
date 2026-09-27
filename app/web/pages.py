@@ -106,6 +106,23 @@ def home(request: Request, db: DBSession = Depends(get_db)) -> HTMLResponse:
         },
     ]
 
+    # Stats
+    from app.models.service import Service as _Service
+    total_services = db.query(_Service).filter(_Service.status == "active").count()
+    cities = set()
+    for t in tenants:
+        if isinstance(t.config, dict):
+            loc = t.config.get("location", "")
+            if loc:
+                cities.add(loc.split(",")[-1].strip())
+
+    stats = {
+        "businesses": len(tenants),
+        "services": total_services,
+        "categories": sum(1 for c in counts.values() if c > 0),
+        "cities": len(cities) if cities else 1,
+    }
+
     return templates.TemplateResponse(
         request,
         "pages/platform_home.html",
@@ -114,6 +131,7 @@ def home(request: Request, db: DBSession = Depends(get_db)) -> HTMLResponse:
             "businesses": tenants,
             "counts": counts,
             "featured": featured,
+            "stats": stats,
         },
     )
 

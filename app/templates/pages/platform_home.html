@@ -46,37 +46,25 @@
   </div>
 </section>
 
-<!-- ABOUT PLATFORM-X -->
-<section class="px-section">
+<!-- STATS STRIP -->
+<section class="px-stats-strip">
   <div class="px-container">
-    <div class="px-section-head-center">
-      <span class="px-section-eyebrow">Why Platform-X</span>
-      <h2>One platform for every kind of experience.</h2>
-      <p class="px-section-sub">
-        We bring together independent businesses on shared rails — bookings, payments, loyalty, and trust — so guests and partners both win.
-      </p>
-    </div>
-
-    <div class="px-features">
-      <div class="px-feature">
-        <div class="px-feature-icon">🔍</div>
-        <h4>Discover</h4>
-        <p>Thousands of curated experiences across four categories, all in one search.</p>
+    <div class="px-stats-grid">
+      <div class="px-stat">
+        <div class="px-stat-value" data-count="{{ stats.businesses }}">{{ stats.businesses }}</div>
+        <div class="px-stat-label">Businesses</div>
       </div>
-      <div class="px-feature">
-        <div class="px-feature-icon">⚡</div>
-        <h4>Book instantly</h4>
-        <p>One unified booking flow — no phone calls, no waiting, no friction.</p>
+      <div class="px-stat">
+        <div class="px-stat-value" data-count="{{ stats.services }}">{{ stats.services }}</div>
+        <div class="px-stat-label">Services</div>
       </div>
-      <div class="px-feature">
-        <div class="px-feature-icon">🎁</div>
-        <h4>Earn rewards</h4>
-        <p>Points carry across every business you visit. Redeem for free stays and meals.</p>
+      <div class="px-stat">
+        <div class="px-stat-value" data-count="{{ stats.categories }}">{{ stats.categories }}</div>
+        <div class="px-stat-label">Categories</div>
       </div>
-      <div class="px-feature">
-        <div class="px-feature-icon">🔒</div>
-        <h4>Book with trust</h4>
-        <p>Verified partners, secure payments, and a promise we back.</p>
+      <div class="px-stat">
+        <div class="px-stat-value" data-count="{{ stats.cities }}">{{ stats.cities }}</div>
+        <div class="px-stat-label">Locations</div>
       </div>
     </div>
   </div>
