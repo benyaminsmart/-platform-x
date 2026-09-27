@@ -4,44 +4,60 @@
 
 {% block content %}
 
-<section class="px-auth">
-  <div class="px-auth-card">
-    <div class="px-auth-head">
-      <h1>Create account</h1>
-      <p>Join Platform-X in seconds</p>
+<section class="px-auth-split">
+  <div class="px-auth-side" style="background-image: url('https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200&q=80&auto=format&fit=crop');">
+    <div class="px-auth-side-overlay"></div>
+    <div class="px-auth-side-content">
+      <div class="px-logo" style="color: white; margin-bottom: 24px;">
+        <span class="px-logo-mark" style="background: white; color: var(--px-brand);">X</span>
+        <span style="color: white;">Platform-X</span>
+      </div>
+      <h2 style="color: white; font-size: 36px; margin-bottom: 16px;">Start your journey.</h2>
+      <p style="color: rgba(255,255,255,0.85); font-size: 16px; max-width: 340px;">
+        One account. Access every hotel, restaurant, travel agency, and entertainment venue on the platform.
+      </p>
     </div>
+  </div>
 
-    <div id="alert-box" style="display: none;"></div>
+  <div class="px-auth-main">
+    <div class="px-auth-main-inner">
+      <div class="px-auth-head" style="text-align: left; margin-bottom: 28px;">
+        <h1 style="font-size: 32px; margin-bottom: 8px;">Create account</h1>
+        <p style="color: var(--px-muted); margin: 0;">It only takes a minute.</p>
+      </div>
 
-    <form id="register-form" class="px-auth-form">
-      <div class="px-field-row">
-        <div class="px-field">
-          <label for="first_name">First name</label>
-          <input type="text" id="first_name" name="first_name" required>
+      <div id="alert-box" style="display: none;"></div>
+
+      <form id="register-form" class="px-auth-form">
+        <div class="px-field-row">
+          <div class="px-field">
+            <label for="first_name">First name</label>
+            <input type="text" id="first_name" name="first_name" required>
+          </div>
+          <div class="px-field">
+            <label for="last_name">Last name</label>
+            <input type="text" id="last_name" name="last_name" required>
+          </div>
         </div>
+
         <div class="px-field">
-          <label for="last_name">Last name</label>
-          <input type="text" id="last_name" name="last_name" required>
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com">
         </div>
+
+        <div class="px-field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password" placeholder="At least 8 characters">
+        </div>
+
+        <button type="submit" class="px-btn px-btn-primary px-btn-block px-btn-lg">
+          Create account
+        </button>
+      </form>
+
+      <div class="px-auth-foot" style="text-align: left; margin-top: 20px;">
+        Already have an account? <a href="/login">Sign in</a>
       </div>
-
-      <div class="px-field">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com">
-      </div>
-
-      <div class="px-field">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password" placeholder="At least 8 characters">
-      </div>
-
-      <button type="submit" class="px-btn px-btn-primary px-btn-block px-btn-lg">
-        Create account
-      </button>
-    </form>
-
-    <div class="px-auth-foot">
-      Already have an account? <a href="/login">Sign in</a>
     </div>
   </div>
 </section>

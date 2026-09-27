@@ -1099,3 +1099,56 @@
   font-weight: 700;
   color: var(--px-brand);
 }
+
+/* ---------- Split Auth layout ---------- */
+
+.px-auth-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: calc(100vh - 76px);
+  background: var(--px-bg);
+}
+
+.px-auth-side {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  padding: 60px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.px-auth-side-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 61, 92, 0.35) 0%, rgba(8, 42, 66, 0.85) 100%);
+}
+
+.px-auth-side-content {
+  position: relative;
+  z-index: 1;
+  max-width: 420px;
+}
+
+.px-auth-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+}
+
+.px-auth-main-inner {
+  width: 100%;
+  max-width: 400px;
+}
+
+@media (max-width: 900px) {
+  .px-auth-split { grid-template-columns: 1fr; }
+  .px-auth-side {
+    min-height: 260px;
+    padding: 40px 24px;
+    align-items: flex-end;
+  }
+  .px-auth-side-content h2 { font-size: 26px !important; }
+  .px-auth-main { padding: 40px 24px; }
+}
