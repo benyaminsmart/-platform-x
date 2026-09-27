@@ -4,43 +4,56 @@
 
 {% block content %}
 
-<section class="px-hero px-hero-compact">
+<section class="px-hero-compact">
   <div class="px-container">
-    <div class="px-hero-content">
-      <div class="px-breadcrumb">
-        <a href="/">Home</a>
-        <span>/</span>
-        <span>{{ cat_label }}</span>
+    <div class="px-breadcrumb">
+      <a href="/">Home</a>
+      <span>/</span>
+      <span>{{ cat_label }}</span>
+    </div>
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 20px; margin-top: 12px;">
+      <div>
+        <h1 class="px-hero-title-sm">{{ cat_icon }} {{ cat_label }}</h1>
+        <p class="px-hero-sub-sm">{{ cat_description }}</p>
       </div>
-      <h1 class="px-hero-title-sm">
-        {{ cat_icon }} {{ cat_label }}
-      </h1>
-      <p class="px-hero-sub-sm">
-        {{ cat_description }}
-      </p>
+      <div style="font-size: 14px; color: var(--px-muted);">
+        <strong style="color: var(--px-text); font-size: 20px;">{{ businesses|length }}</strong>
+        {{ 'business' if businesses|length == 1 else 'businesses' }}
+      </div>
     </div>
   </div>
 </section>
 
-<section class="px-section">
+<section class="px-section-tight">
   <div class="px-container">
-    <div class="px-section-head">
-      <h2>{{ businesses|length }} {{ 'business' if businesses|length == 1 else 'businesses' }} available</h2>
-    </div>
-
     <div class="px-biz-grid">
       {% for b in businesses %}
         <a href="/{{ b.slug }}/" class="px-biz-card">
-          {% set branding = (b.config or {}).get('branding', {}) if b.config else {} %}
-          <div class="px-biz-thumb" style="background: linear-gradient(135deg, {{ branding.get('primary_color', '#6366f1') }}, {{ branding.get('secondary_color', '#818cf8') }});">
-            <span class="px-biz-thumb-initial">{{ b.name[0] }}</span>
-          </div>
+          {% if b.config.cover_image %}
+            <div class="px-biz-thumb" style="background-image: url('{{ b.config.cover_image }}');">
+              <div class="px-biz-thumb-overlay"></div>
+            </div>
+          {% else %}
+            <div class="px-biz-thumb" style="background: linear-gradient(135deg, #0f3d5c, #1e5a7d);">
+              <div class="px-biz-thumb-overlay"></div>
+            </div>
+          {% endif %}
           <div class="px-biz-body">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
               <span class="px-cat {{ cat_class }}">{{ cat_label }}</span>
+              {% if b.config.rating %}
+                <span style="font-size: 13px; color: var(--px-text); font-weight: 600;">⭐ {{ b.config.rating }}</span>
+              {% endif %}
             </div>
             <h3 class="px-biz-name">{{ b.name }}</h3>
             <p class="px-biz-tagline">{{ b.config.tagline|default('') }}</p>
+            <div class="px-biz-meta">
+              <div>
+                <span class="px-biz-price-from">From</span>
+                <span class="px-biz-price">{{ b.config.price_from }} {{ b.config.currency }}</span>
+              </div>
+              <span style="color: var(--px-muted); font-size: 12px;">📍 {{ b.config.location|default('') }}</span>
+            </div>
           </div>
         </a>
       {% else %}
