@@ -5,21 +5,23 @@
       <span>Platform-X</span>
     </a>
 
-    <button class="px-mobile-toggle" id="px-mobile-toggle" aria-label="Toggle menu" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
-
     <nav class="px-nav" id="px-nav" role="navigation" aria-label="Main">
       <a href="/hotels">Hotels</a>
       <a href="/restaurants">Restaurants</a>
       <a href="/travel">Travel</a>
       <a href="/entertainment">Entertainment</a>
+    </nav>
 
+    <div class="px-header-right">
       <span id="px-auth-slot" class="px-auth-slot">
-        <a href="/login" class="px-btn px-btn-ghost">Sign in</a>
+        <a href="/login" class="px-btn px-btn-ghost px-hide-mobile">Sign in</a>
         <a href="/register" class="px-btn px-btn-primary">Get started</a>
       </span>
-    </nav>
+
+      <button class="px-mobile-toggle" id="px-mobile-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </div>
 </header>
 

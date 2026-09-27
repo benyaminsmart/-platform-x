@@ -1945,3 +1945,54 @@ html { scroll-behavior: smooth; }
   font-weight: 600;
   text-align: right;
 }
+
+
+/* ---------- Header right (auth + toggle) ---------- */
+
+.px-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* On desktop, hide the hamburger; nav is inline */
+@media (min-width: 721px) {
+  .px-mobile-toggle { display: none; }
+}
+
+@media (max-width: 720px) {
+  /* On mobile, collapse the nav into a drawer */
+  .px-nav {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    background: var(--px-surface);
+    border-bottom: 1px solid var(--px-line);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 12px 0;
+    display: none;
+    box-shadow: var(--px-shadow-md);
+    z-index: 90;
+  }
+
+  .px-nav.is-open { display: flex; }
+
+  .px-nav a:not(.px-btn) {
+    display: block;
+    padding: 14px 24px;
+    font-size: 15px;
+    color: var(--px-text);
+  }
+
+  /* On mobile: hide inline nav items, show hamburger */
+  .px-mobile-toggle { display: flex; }
+
+  /* Sign in button hidden on mobile (kept in header only as "Get started") */
+  .px-hide-mobile { display: none !important; }
+
+  /* Avatar stays in header right (outside nav) */
+  .px-auth-slot { gap: 8px; }
+}
