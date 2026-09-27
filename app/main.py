@@ -79,6 +79,26 @@ class TrailingSlashRedirectMiddleware(BaseHTTPMiddleware):
 app.add_middleware(TrailingSlashRedirectMiddleware)
 
 
+
+
+class NoCacheHTMLMiddleware(BaseHTTPMiddleware):
+    """Ensure HTML pages are never cached; static files keep their cache."""
+
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        path = request.url.path
+        # Only apply to HTML-ish requests (not /static, not /docs, not API paths)
+        if not path.startswith("/static") and not path.startswith("/docs") and not path.startswith("/redoc"):
+            content_type = response.headers.get("content-type", "")
+            if "text/html" in content_type:
+                response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+                response.headers["Pragma"] = "no-cache"
+        return response
+
+
+app.add_middleware(NoCacheHTMLMiddleware)
+
+
 # ---------- API routers ----------
 
 app.include_router(analytics_router.router)
