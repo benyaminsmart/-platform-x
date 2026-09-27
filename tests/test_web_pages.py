@@ -60,8 +60,8 @@ def test_tenant_home_unknown_slug_404(client: TestClient) -> None:
 
 def test_tenant_home_reserved_slug_404(client: TestClient) -> None:
     """A reserved slug like /businesses/ should NOT be treated as a tenant."""
-    resp = client.get("/businesses/")
-    assert resp.status_code == 404
+    resp = client.get("/businesses/", follow_redirects=False)
+    assert resp.status_code == 307
 
 
 def test_tenant_home_only_active_services(

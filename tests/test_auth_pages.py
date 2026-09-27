@@ -45,5 +45,5 @@ def test_auth_js_served(client: TestClient) -> None:
 
 def test_login_and_register_not_tenant_slug(client: TestClient) -> None:
     """GET /login/ shouldn't be a tenant lookup."""
-    resp = client.get("/login/")
-    assert resp.status_code == 404
+    resp = client.get("/login/", follow_redirects=False)
+    assert resp.status_code == 307

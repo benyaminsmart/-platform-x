@@ -43,6 +43,41 @@ app.add_middleware(
 # Static files
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
+
+
+# ---------- Redirect trailing slashes on reserved paths ----------
+
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import RedirectResponse as StarletteRedirect
+
+
+class TrailingSlashRedirectMiddleware(BaseHTTPMiddleware):
+    """Redirect /foo/ to /foo for reserved (non-tenant) paths."""
+
+    RESERVED = {
+        "docs", "redoc", "openapi.json", "static", "health",
+        "auth", "tenants", "services", "bookings", "orders",
+        "payments", "rewards", "referrals", "notifications",
+        "analytics", "platform", "businesses", "about", "contact",
+        "login", "register", "hotels", "restaurants", "travel",
+        "entertainment", "favicon.ico",
+    }
+
+    async def dispatch(self, request, call_next):
+        path = request.url.path
+        if path.endswith("/") and len(path) > 1:
+            first = path.strip("/").split("/", 1)[0]
+            if first in self.RESERVED:
+                new_path = path.rstrip("/")
+                if request.url.query:
+                    new_path += "?" + request.url.query
+                return StarletteRedirect(url=new_path, status_code=307)
+        return await call_next(request)
+
+
+app.add_middleware(TrailingSlashRedirectMiddleware)
+
+
 # ---------- API routers ----------
 
 app.include_router(analytics_router.router)

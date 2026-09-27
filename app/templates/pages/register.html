@@ -32,11 +32,11 @@
         <div class="px-field-row">
           <div class="px-field">
             <label for="first_name">First name</label>
-            <input type="text" id="first_name" name="first_name" required>
+            <input type="text" id="first_name" name="first_name" required autocomplete="given-name">
           </div>
           <div class="px-field">
             <label for="last_name">Last name</label>
-            <input type="text" id="last_name" name="last_name" required>
+            <input type="text" id="last_name" name="last_name" required autocomplete="family-name">
           </div>
         </div>
 
@@ -46,8 +46,18 @@
         </div>
 
         <div class="px-field">
+          <label for="phone">Phone (optional)</label>
+          <input type="tel" id="phone" name="phone" autocomplete="tel" placeholder="+971 50 123 4567">
+        </div>
+
+        <div class="px-field">
           <label for="password">Password</label>
           <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password" placeholder="At least 8 characters">
+        </div>
+
+        <div class="px-field">
+          <label for="confirm_password">Confirm password</label>
+          <input type="password" id="confirm_password" name="confirm_password" required minlength="8" autocomplete="new-password" placeholder="Type password again">
         </div>
 
         <button type="submit" class="px-btn px-btn-primary px-btn-block px-btn-lg">

@@ -72,12 +72,23 @@ PX.initRegister = function () {
   form.addEventListener("submit", async function (ev) {
     ev.preventDefault();
     PX.hideAlert();
+
+    var password = form.password.value;
+    var confirm = form.confirm_password.value;
+
+    if (password !== confirm) {
+      PX.showAlert("Passwords do not match.");
+      return;
+    }
+
     var payload = {
       email: form.email.value.trim(),
-      password: form.password.value,
+      password: password,
       first_name: form.first_name.value.trim(),
       last_name: form.last_name.value.trim(),
+      phone: form.phone.value.trim() || null,
     };
+
     try {
       var res = await fetch("/auth/register", {
         method: "POST",

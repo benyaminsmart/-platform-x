@@ -52,8 +52,8 @@ def test_empty_category_shows_empty_state(client: TestClient) -> None:
 
 def test_category_not_treated_as_tenant(client: TestClient) -> None:
     """GET /hotels/ (trailing slash) should 404, not be a tenant."""
-    resp = client.get("/hotels/")
-    assert resp.status_code == 404
+    resp = client.get("/hotels/", follow_redirects=False)
+    assert resp.status_code == 307
 
 
 def test_category_shows_only_matching_types(client: TestClient, db) -> None:
