@@ -19,6 +19,7 @@ from app.schemas.common import (
     PaginatedResponse,
     TimestampedModel,
 )
+from app.schemas.service import ServiceCreate, ServicePublic, ServiceType, ServiceUpdate
 from app.schemas.tenant import TenantPublic
 
 __all__ = [
@@ -33,6 +34,10 @@ __all__ = [
     "PaginatedResponse",
     "PaymentStatus",
     "RegisterRequest",
+    "ServiceCreate",
+    "ServicePublic",
+    "ServiceType",
+    "ServiceUpdate",
     "TenantPublic",
     "TimestampedModel",
     "TokenResponse",

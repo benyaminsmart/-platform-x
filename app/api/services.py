@@ -1,0 +1,120 @@
+"""Service endpoints — public read, admin-only write."""
+
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
+from sqlalchemy.orm import Session as DBSession
+
+from app.api.deps import get_current_tenant
+from app.core.config import settings
+from app.db.session import get_db
+from app.models.tenant import Tenant
+from app.schemas.common import MessageResponse, PaginatedResponse
+from app.schemas.service import ServiceCreate, ServicePublic, ServiceUpdate
+from app.services import service_service
+
+router = APIRouter(prefix="/services", tags=["services"])
+
+
+def require_admin_key(
+    x_admin_key: Annotated[str | None, Header(alias="X-Admin-Key")] = None,
+) -> None:
+    """Temporary admin guard until Platform Admin auth is implemented."""
+    expected = getattr(settings, "ADMIN_API_KEY", None) or "dev-admin-key"
+    if x_admin_key != expected:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required",
+        )
+
+
+@router.get("", response_model=PaginatedResponse[ServicePublic])
+def list_services(
+    type_filter: Annotated[str | None, Query(alias="type")] = None,
+    page: Annotated[int, Query(ge=1)] = 1,
+    limit: Annotated[int, Query(ge=1, le=100)] = 50,
+    tenant: Tenant = Depends(get_current_tenant),
+    db: DBSession = Depends(get_db),
+) -> PaginatedResponse[ServicePublic]:
+    """List active services for the current tenant (public)."""
+    items, total = service_service.list_services(
+        db,
+        tenant_id=tenant.id,
+        type_filter=type_filter,
+        status_filter="active",
+        page=page,
+        limit=limit,
+    )
+    return PaginatedResponse[ServicePublic](
+        items=[ServicePublic.model_validate(s) for s in items],
+        total=total,
+        page=page,
+        page_size=limit,
+    )
+
+
+@router.get("/{service_id}", response_model=ServicePublic)
+def get_service(
+    service_id: str,
+    tenant: Tenant = Depends(get_current_tenant),
+    db: DBSession = Depends(get_db),
+) -> ServicePublic:
+    """Return a service by id (public)."""
+    svc = service_service.get_service(db, tenant_id=tenant.id, service_id=service_id)
+    if svc is None or svc.status != "active":
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
+    return ServicePublic.model_validate(svc)
+
+
+@router.post(
+    "",
+    response_model=ServicePublic,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_admin_key)],
+)
+def create_service(
+    payload: ServiceCreate,
+    tenant: Tenant = Depends(get_current_tenant),
+    db: DBSession = Depends(get_db),
+) -> ServicePublic:
+    """Create a new service (admin only)."""
+    svc = service_service.create_service(db, tenant_id=tenant.id, payload=payload)
+    return ServicePublic.model_validate(svc)
+
+
+@router.patch(
+    "/{service_id}",
+    response_model=ServicePublic,
+    dependencies=[Depends(require_admin_key)],
+)
+def update_service(
+    service_id: str,
+    payload: ServiceUpdate,
+    tenant: Tenant = Depends(get_current_tenant),
+    db: DBSession = Depends(get_db),
+) -> ServicePublic:
+    """Partially update a service (admin only)."""
+    svc = service_service.update_service(
+        db, tenant_id=tenant.id, service_id=service_id, payload=payload
+    )
+    if svc is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
+    return ServicePublic.model_validate(svc)
+
+
+@router.delete(
+    "/{service_id}",
+    response_model=MessageResponse,
+    dependencies=[Depends(require_admin_key)],
+)
+def delete_service(
+    service_id: str,
+    tenant: Tenant = Depends(get_current_tenant),
+    db: DBSession = Depends(get_db),
+) -> MessageResponse:
+    """Soft-delete a service (admin only)."""
+    ok = service_service.delete_service(db, tenant_id=tenant.id, service_id=service_id)
+    if not ok:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
+    return MessageResponse(message="Service deactivated")
+
