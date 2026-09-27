@@ -127,8 +127,8 @@ def test_me_with_invalid_token_401(
     assert resp.status_code == 401
 
 
-def test_token_tenant_isolation(client: TestClient, sample_tenant: Tenant, db) -> None:
-    """A token issued for tenant A must not authenticate on tenant B."""
+def test_token_works_across_tenants(client: TestClient, sample_tenant: Tenant, db) -> None:
+    """Users are platform-wide: a token issued on one tenant works on all."""
     from app.models.tenant import Tenant as T
 
     other = T(slug="other", name="Other Co", tier="starter", status="active", config={})
@@ -146,5 +146,5 @@ def test_token_tenant_isolation(client: TestClient, sample_tenant: Tenant, db) -
         "/auth/me",
         headers={"X-Tenant-Slug": "other", "Authorization": f"Bearer {token}"},
     )
-    assert resp.status_code == 401
-    assert "does not match tenant" in resp.json()["detail"]
+    assert resp.status_code == 200
+    assert resp.json()["email"] == "guest@example.com"

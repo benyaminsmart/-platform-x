@@ -155,6 +155,8 @@ def test_tenant_isolation(client: TestClient, sample_tenant: Tenant, db) -> None
         template="x", content="x",
     )
 
-    # Using token with different tenant header → 401 (tenant mismatch)
+    # Users are platform-wide: same token works on other tenant, sees that tenant's data
     resp = client.get("/notifications", headers={"X-Tenant-Slug": "other", "Authorization": h["Authorization"]})
-    assert resp.status_code == 401
+    assert resp.status_code == 200
+    # But this tenant has no notifications for this user yet
+    assert resp.json()["total"] == 0

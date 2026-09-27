@@ -36,10 +36,14 @@ def get_current_tenant(
 
 def get_current_user(
     authorization: str | None = Header(default=None),
-    tenant: Tenant = Depends(get_current_tenant),
     db: DBSession = Depends(get_db),
 ) -> User:
-    """Return the authenticated user from the Bearer token."""
+    """Return the authenticated user from the Bearer token.
+
+    Users are PLATFORM-WIDE: the same user can book across every tenant.
+    The token carries the user_id + their home tenant (for reference only);
+    the *active* tenant always comes from the X-Tenant-Slug header.
+    """
     if not authorization or not authorization.lower().startswith("bearer "):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -57,16 +61,15 @@ def get_current_user(
         ) from exc
 
     user_id = payload.get("sub")
-    token_tenant = payload.get("tenant_id")
-    if not user_id or token_tenant != tenant.id:
+    if not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token does not match tenant",
+            detail="Invalid token subject",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
     user = user_service.get_user_by_id(db, user_id)
-    if user is None or user.tenant_id != tenant.id:
+    if user is None or user.status != "active":
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User no longer active",
