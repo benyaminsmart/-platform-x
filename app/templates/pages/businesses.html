@@ -1,31 +1,57 @@
-{% extends "layouts/base.html" %}
+{% extends "layouts/platform_base.html" %}
 
 {% block title %}Businesses — Platform-X{% endblock %}
 
 {% block content %}
 
-<section class="section-sm">
-  <div class="container">
-    <div class="eyebrow">Discover</div>
-    <h1>Businesses on Platform-X</h1>
-    <p class="hero-sub" style="margin: var(--space-4) 0 var(--space-7); max-width: none;">
-      Every venue is independently run, with its own brand and identity — all powered by the same platform.
-    </p>
+<section class="px-hero px-hero-compact">
+  <div class="px-container">
+    <div class="px-hero-content">
+      <div class="px-breadcrumb">
+        <a href="/">Home</a>
+        <span>/</span>
+        <span>Businesses</span>
+      </div>
+      <h1 class="px-hero-title-sm">All businesses</h1>
+      <p class="px-hero-sub-sm">
+        Every venue on Platform-X, across all categories.
+      </p>
+    </div>
+  </div>
+</section>
 
-    <div class="grid grid-3">
-      {% for business in businesses %}
-        <a href="/{{ business.slug }}/" class="card" style="text-decoration: none; color: inherit;">
-          <div class="eyebrow">{{ business.config.type|default('business')|replace('_', ' ')|title }}</div>
-          <h3>{{ business.name }}</h3>
-          <p class="text-sm text-muted">{{ business.config.tagline|default('') }}</p>
-          <div style="margin-top: var(--space-4); display: flex; gap: var(--space-2); align-items: center;">
-            <span class="badge">{{ business.tier }}</span>
-            <span class="text-gold text-sm" style="margin-left: auto;">Open &rarr;</span>
+<section class="px-section">
+  <div class="px-container">
+    <div class="px-section-head">
+      <h2>{{ businesses|length }} {{ 'business' if businesses|length == 1 else 'businesses' }}</h2>
+    </div>
+
+    <div class="px-biz-grid">
+      {% for b in businesses %}
+        {% set btype = (b.config.type if b.config else 'business')|lower %}
+        {% set cat_class = 'px-cat-hotels' if 'hotel' in btype else
+                           'px-cat-restaurants' if 'restaurant' in btype else
+                           'px-cat-travel' if 'travel' in btype or 'agency' in btype else
+                           'px-cat-entertainment' %}
+        {% set branding = (b.config or {}).get('branding', {}) if b.config else {} %}
+        <a href="/{{ b.slug }}/" class="px-biz-card">
+          <div class="px-biz-thumb" style="background: linear-gradient(135deg, {{ branding.get('primary_color', '#6366f1') }}, {{ branding.get('secondary_color', '#818cf8') }});">
+            <span class="px-biz-thumb-initial">{{ b.name[0] }}</span>
+          </div>
+          <div class="px-biz-body">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span class="px-cat {{ cat_class }}">{{ b.config.type|default('Business')|replace('_',' ')|title }}</span>
+            </div>
+            <h3 class="px-biz-name">{{ b.name }}</h3>
+            <p class="px-biz-tagline">{{ b.config.tagline|default('') }}</p>
           </div>
         </a>
       {% else %}
-        <div class="card-flat" style="grid-column: 1 / -1; text-align: center;">
-          <p class="text-muted">No businesses yet.</p>
+        <div class="px-empty">
+          <div class="px-empty-icon">🏢</div>
+          <h3>No businesses yet</h3>
+          <p>Check back soon — partners are joining.</p>
+          <a href="/" class="px-btn px-btn-primary">Back to home</a>
         </div>
       {% endfor %}
     </div>

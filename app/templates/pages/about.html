@@ -1,36 +1,36 @@
-{% extends "layouts/base.html" %}
+{% extends "layouts/platform_base.html" %}
 
 {% block title %}About — Platform-X{% endblock %}
 
 {% block content %}
 
-<section class="section-sm">
-  <div class="container-narrow">
-    <div class="eyebrow">About</div>
-    <h1>One elegant platform for hospitality, dining, travel, and play.</h1>
+<section class="px-page">
+  <div class="px-container">
+    <div class="px-page-head">
+      <div class="eyebrow" style="color: var(--px-brand-soft);">About</div>
+      <h1>One platform for every kind of experience.</h1>
+      <p>Platform-X brings hotels, restaurants, travel agencies, and entertainment venues together — one booking flow, one account, one rewards program.</p>
+    </div>
 
-    <p class="text-muted" style="font-size: var(--text-lg); margin: var(--space-6) 0;">
-      Platform-X brings businesses together on shared rails: bookings, payments,
-      loyalty, referrals, and analytics. Each business keeps its own brand, own
-      identity, and own guest relationships — but benefits from one platform
-      that runs underneath.
-    </p>
+    <div class="px-prose">
+      <h2>What we do</h2>
+      <p>We give independent businesses the tools to sell online — with booking, payments, loyalty, and analytics built in. No setup cost. No complexity. Just a beautiful storefront that works.</p>
 
-    <hr class="divider-gold">
+      <h2>What guests get</h2>
+      <ul>
+        <li>Discover thousands of businesses across four categories</li>
+        <li>Book instantly with one unified account</li>
+        <li>Earn points that carry across every business you visit</li>
+        <li>Refer friends and both of you win</li>
+      </ul>
 
-    <div class="grid grid-3">
-      <div class="card">
-        <h4 class="text-gold">For businesses</h4>
-        <p class="text-sm text-muted">Launch fast. Manage bookings, services, and guests from one place.</p>
-      </div>
-      <div class="card">
-        <h4 class="text-gold">For guests</h4>
-        <p class="text-sm text-muted">One account. Rewards that carry across every business on the network.</p>
-      </div>
-      <div class="card">
-        <h4 class="text-gold">For partners</h4>
-        <p class="text-sm text-muted">APIs, webhooks, and analytics built for scale from day one.</p>
-      </div>
+      <h2>What partners get</h2>
+      <ul>
+        <li>Full booking and payment system, ready to use</li>
+        <li>Customer rewards that bring guests back</li>
+        <li>Analytics to understand what works</li>
+        <li>Zero development work</li>
+      </ul>
     </div>
   </div>
 </section>

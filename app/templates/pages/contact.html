@@ -1,19 +1,39 @@
-{% extends "layouts/base.html" %}
+{% extends "layouts/platform_base.html" %}
 
 {% block title %}Contact — Platform-X{% endblock %}
 
 {% block content %}
 
-<section class="section-sm">
-  <div class="container-narrow">
-    <div class="eyebrow">Contact</div>
-    <h1>Get in touch.</h1>
-    <p class="text-muted">We'd love to hear from you.</p>
+<section class="px-page">
+  <div class="px-container">
+    <div class="px-page-head">
+      <div class="eyebrow" style="color: var(--px-brand-soft);">Contact</div>
+      <h1>Get in touch.</h1>
+      <p>We'd love to hear from you — partners, guests, or anyone curious.</p>
+    </div>
 
-    <div class="card" style="margin-top: var(--space-7);">
-      <p><strong class="text-gold">Email:</strong> hello@platform-x.example</p>
-      <p><strong class="text-gold">Phone:</strong> +971-4-000-0000</p>
-      <p><strong class="text-gold">Address:</strong> Dubai, UAE</p>
+    <div class="px-contact-card">
+      <div class="px-contact-item">
+        <div class="px-contact-icon">✉️</div>
+        <div>
+          <strong>Email</strong>
+          <span>hello@platform-x.example</span>
+        </div>
+      </div>
+      <div class="px-contact-item">
+        <div class="px-contact-icon">📞</div>
+        <div>
+          <strong>Phone</strong>
+          <span>+971-4-000-0000</span>
+        </div>
+      </div>
+      <div class="px-contact-item">
+        <div class="px-contact-icon">📍</div>
+        <div>
+          <strong>Address</strong>
+          <span>Dubai, United Arab Emirates</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>

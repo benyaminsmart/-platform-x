@@ -30,7 +30,7 @@ def test_businesses_page_empty(client: TestClient) -> None:
 def test_about_page(client: TestClient) -> None:
     resp = client.get("/about")
     assert resp.status_code == 200
-    assert "One elegant platform" in resp.text
+    assert "One platform for every kind" in resp.text
 
 
 def test_contact_page(client: TestClient) -> None:

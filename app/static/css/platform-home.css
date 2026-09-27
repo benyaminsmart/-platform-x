@@ -436,3 +436,218 @@
   color: var(--px-muted);
   margin-bottom: 24px;
 }
+
+/* ---------- Auth pages (Login / Register) ---------- */
+
+.px-auth {
+  padding: 60px 0 80px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: calc(100vh - 72px - 200px);
+}
+
+.px-auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--px-surface);
+  border: 1px solid var(--px-line);
+  border-radius: var(--px-radius-xl);
+  padding: 40px;
+  box-shadow: var(--px-shadow-lg);
+}
+
+.px-auth-head {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.px-auth-head h1 {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.px-auth-head p {
+  color: var(--px-muted);
+  margin: 0;
+  font-size: 14px;
+}
+
+.px-auth-form {
+  display: grid;
+  gap: 20px;
+}
+
+.px-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.px-field label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--px-text-soft);
+  text-transform: uppercase;
+}
+
+.px-field input,
+.px-field select,
+.px-field textarea {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--px-navy-soft);
+  border: 1px solid var(--px-line);
+  border-radius: var(--px-radius);
+  color: var(--px-text);
+  font-family: var(--px-font-body);
+  font-size: 15px;
+  transition: all var(--px-fast) var(--px-ease);
+  outline: none;
+}
+
+.px-field input::placeholder,
+.px-field textarea::placeholder {
+  color: var(--px-muted-deep);
+}
+
+.px-field input:focus,
+.px-field select:focus,
+.px-field textarea:focus {
+  border-color: var(--px-brand);
+  background: var(--px-surface-2);
+  box-shadow: 0 0 0 3px var(--px-brand-glow);
+}
+
+.px-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 520px) {
+  .px-field-row { grid-template-columns: 1fr; }
+}
+
+.px-auth-foot {
+  text-align: center;
+  margin-top: 24px;
+  color: var(--px-muted);
+  font-size: 14px;
+}
+
+.px-auth-foot a {
+  color: var(--px-brand-soft);
+  font-weight: 600;
+}
+
+.px-auth-foot a:hover {
+  color: var(--px-brand);
+}
+
+.px-auth .alert {
+  padding: 12px 16px;
+  border-radius: var(--px-radius);
+  margin-bottom: 20px;
+  font-size: 14px;
+  border: 1px solid;
+}
+
+.px-auth .alert-error {
+  background: rgba(248, 113, 113, 0.1);
+  border-color: rgba(248, 113, 113, 0.3);
+  color: var(--px-error);
+}
+
+.px-auth .alert-success {
+  background: rgba(52, 211, 153, 0.1);
+  border-color: rgba(52, 211, 153, 0.3);
+  color: var(--px-success);
+}
+
+/* ---------- About / Contact (platform) ---------- */
+
+.px-page {
+  padding: 60px 0 80px;
+}
+
+.px-page-head {
+  margin-bottom: 40px;
+  max-width: 720px;
+}
+
+.px-page-head h1 {
+  font-size: 44px;
+  margin-bottom: 12px;
+}
+
+.px-page-head p {
+  font-size: 17px;
+  color: var(--px-text-soft);
+  margin: 0;
+}
+
+.px-prose {
+  max-width: 720px;
+}
+
+.px-prose h2 {
+  font-size: 26px;
+  margin-top: 40px;
+}
+
+.px-prose p {
+  color: var(--px-text-soft);
+  line-height: 1.7;
+}
+
+.px-prose ul {
+  color: var(--px-text-soft);
+  padding-left: 20px;
+}
+
+.px-prose li {
+  margin-bottom: 8px;
+}
+
+.px-contact-card {
+  background: var(--px-surface);
+  border: 1px solid var(--px-line);
+  border-radius: var(--px-radius-lg);
+  padding: 32px;
+  display: grid;
+  gap: 20px;
+  max-width: 520px;
+}
+
+.px-contact-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.px-contact-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--px-radius);
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.px-contact-item strong {
+  display: block;
+  color: var(--px-text);
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.px-contact-item span {
+  color: var(--px-muted);
+  font-size: 14px;
+}
