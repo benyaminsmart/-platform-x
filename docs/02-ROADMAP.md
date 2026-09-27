@@ -9,9 +9,9 @@
 
 | Phase | Title | Status |
 |-------|-------|--------|
-| 1 | Trianon Royal Live | In Progress |
+| 1 | First Tenant Live | In Progress |
 | 2 | Platform-X Core Architecture | Not Started |
-| 3 | Migrate Trianon to Platform-X | Not Started |
+| 3 | First Tenant Migration | Not Started |
 | 4 | Second Hotel Onboarding | Not Started |
 | 5 | Expand Categories (Restaurants, Entertainment, Agencies) | Not Started |
 | 6 | Flights & Travel Packages | Not Started |
@@ -20,9 +20,9 @@
 
 ---
 
-## Phase 1 — Trianon Royal Live
+## Phase 1 — First Tenant Live
 
-**Goal:** Get Trianon Royal Hotel website fully live with real bookings and payments.
+**Goal:** Get First Tenant website fully live with real bookings and payments.
 
 **Timeline:** 2-3 weeks
 
@@ -77,17 +77,17 @@
 
 ---
 
-## Phase 3 — Migrate Trianon to Platform-X
+## Phase 3 — First Tenant Migration
 
-**Goal:** Move Trianon Royal onto the multi-tenant platform.
+**Goal:** Move First Tenant onto the multi-tenant platform.
 
 **Timeline:** 2-3 weeks
 
 **Deliverables:**
 
-- [ ] Migrate Trianon data (users, bookings, payments)
-- [ ] Adapt Trianon frontend to platform APIs
-- [ ] Configure Trianon as a tenant
+- [ ] Migrate first tenant data (users, bookings, payments)
+- [ ] Adapt first tenant frontend to platform APIs
+- [ ] Configure first tenant
 - [ ] Redirect trianon.com to platform
 - [ ] Verify all features work
 - [ ] Run both versions in parallel (2 weeks)
@@ -96,7 +96,7 @@
 
 **Success Criteria:**
 
-- Trianon runs on Platform-X
+- First tenant runs on Platform-X
 - All existing bookings preserved
 - Users experience zero downtime
 - Performance equal or better than before

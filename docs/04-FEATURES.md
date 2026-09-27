@@ -10,7 +10,7 @@
 Features are organized by:
 
 - **User Type:** Guest, Tenant Staff, Tenant Admin, Platform Admin
-- **Phase:** 1 (Trianon live), 2 (Platform core), 3-8 (expansion)
+- **Phase:** 1 (First tenant live), 2 (Platform core), 3-8 (expansion)
 - **Priority:** Critical, Important, Nice-to-have
 
 ---
@@ -324,7 +324,7 @@ Features are organized by:
 ## 9. Feature Prioritization Summary
 
 ### Phase 1 (Critical only)
-Focus: Get Trianon live with core features.
+Focus: Get First tenant live with core features.
 
 **Must-have:**
 - Auth (register, login)

@@ -258,7 +258,7 @@ If automated (Phase 4+) → minimal.
 ## 12. Growth Strategy
 
 ### Phase 1-3 (Months 1-6)
-- Focus: Perfect one tenant (Trianon)
+- Focus: Perfect one tenant
 - Prove concept works
 - Document everything
 
@@ -319,7 +319,7 @@ To be decided with business partners:
 - Final subscription pricing
 - Final commission rates
 - Payment provider choice
-- Revenue share with Trianon (if any)
+- Revenue share with first tenant (if any)
 - Investment needs
 - Team structure & salaries
 - Marketing budget

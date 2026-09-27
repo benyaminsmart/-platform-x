@@ -75,9 +75,9 @@ Platform-X development is organized into **phases**. Each phase has:
 
 ---
 
-## Phase 1 — Trianon Royal Live (NEXT)
+## Phase 1 — First Tenant Live (NEXT)
 
-**Goal:** Get the first tenant (Trianon Royal) live on a working prototype.
+**Goal:** Get the first tenant (First Tenant) live on a working prototype.
 
 **Status:** ⬜ NOT STARTED
 
@@ -108,7 +108,7 @@ Platform-X development is organized into **phases**. Each phase has:
 
 **Success Criteria:**
 
-- Trianon Royal Hotel accepts real bookings
+- First Tenant accepts real bookings
 - Real payments processed
 - Staff can manage bookings via dashboard
 - Zero critical bugs for 7 consecutive days
@@ -145,9 +145,9 @@ Platform-X development is organized into **phases**. Each phase has:
 
 ---
 
-## Phase 3 — Trianon Migration to Platform-X
+## Phase 3 — First Tenant Migration to Platform-X
 
-**Goal:** Move Trianon from standalone to platform.
+**Goal:** Move first tenant from standalone to platform.
 
 **Status:** ⬜ NOT STARTED
 
@@ -155,7 +155,7 @@ Platform-X development is organized into **phases**. Each phase has:
 
 - [ ] Data migration scripts
 - [ ] Frontend adaptation to platform APIs
-- [ ] Configure Trianon as tenant #1
+- [ ] Configure first tenant on platform
 - [ ] Parallel running (2 weeks)
 - [ ] Cutover
 - [ ] Post-migration monitoring
@@ -220,9 +220,9 @@ Platform-X development is organized into **phases**. Each phase has:
 |-------|-------|--------|----------|
 | 0 | Strategic Documents | ✅ DONE | Complete |
 | 0.5 | Executive Documents | 🟡 IN PROGRESS | 1-2 days |
-| 1 | Trianon Royal Live | ⬜ TODO | 4-8 weeks |
+| 1 | First Tenant Live | ⬜ TODO | 4-8 weeks |
 | 2 | Platform-X Core | ⬜ TODO | 4-6 weeks |
-| 3 | Trianon Migration | ⬜ TODO | 2-3 weeks |
+| 3 | First Tenant Migration | ⬜ TODO | 2-3 weeks |
 | 4 | Second Hotel | ⬜ TODO | 2-4 weeks |
 | 5 | Multi-Category | ⬜ TODO | 4-6 weeks |
 | 6 | Flights & Packages | ⬜ TODO | 6-8 weeks |

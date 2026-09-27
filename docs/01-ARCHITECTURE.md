@@ -42,7 +42,7 @@ Shared Data Layer (PostgreSQL)
   - Row-level isolation
         |
         v
-Tenants (Trianon | Hotel B | Restaurant | ...)
+Tenants (Tenant 1 | Tenant 2 | Tenant 3 | ...)
 
 ---
 

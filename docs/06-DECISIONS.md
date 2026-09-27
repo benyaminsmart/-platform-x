@@ -49,7 +49,7 @@ Use FastAPI.
 - Pydantic validation built-in
 - Async support (future-proof)
 - Great Python ecosystem
-- Already proven on Trianon
+- Proven on first tenant
 
 **Alternatives Considered:**
 - **Django:** Too heavy, not async-first
@@ -162,7 +162,7 @@ Frontend framework decision.
 Vanilla HTML/CSS/JS for Phase 1, migrate to React (or Next.js) in Phase 2.
 
 **Reasoning:**
-- Phase 1 focuses on getting Trianon live fast
+- Phase 1 focuses on getting First tenant live fast
 - Vanilla is simple, fast to deploy
 - Phase 2 adds complex dashboards → need component framework
 - Migration path: rewrite frontend, keep API
@@ -396,7 +396,7 @@ Every piece of code must meet excellence standards.
 
 ---
 
-## ADR-015: First Tenant is Trianon Royal
+## ADR-015: First Tenant is First Tenant
 
 **Date:** September 2026
 **Status:** Accepted
@@ -405,7 +405,7 @@ Every piece of code must meet excellence standards.
 Platform needs a proof of concept.
 
 **Decision:**  
-Trianon Royal Hotel is the first tenant.
+First Tenant is the first tenant.
 
 **Reasoning:**
 - Already in development (`~/trianon-hotel/`)
@@ -414,10 +414,10 @@ Trianon Royal Hotel is the first tenant.
 - Proves the model works
 
 **Consequences:**
-- Phase 1 = Trianon live
-- Phase 3 = Trianon migrates to platform
-- Trianon code informs platform architecture
-- Trianon becomes case study for other tenants
+- Phase 1 = First tenant live
+- Phase 4 = Platform expansion
+- First tenant requirements inform architecture
+- First tenant becomes case study
 
 ---
 
@@ -439,7 +439,7 @@ Trianon Royal Hotel is the first tenant.
 | 012 | Modular Monolith | Accepted | Sep 2026 |
 | 013 | Backup Before Change | Accepted | Sep 2026 |
 | 014 | Excellence Standard | Accepted | Sep 2026 |
-| 015 | Trianon First Tenant | Accepted | Sep 2026 |
+| 015 | First Tenant Onboarding | Accepted | Sep 2026 |
 
 ---
 
