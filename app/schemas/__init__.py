@@ -33,10 +33,13 @@ from app.schemas.payment import (
     PaymentPublic,
     PaymentStatus as PaymentStatusEnum,
 )
+from app.schemas.referral import ApplyReferralRequest, ReferralPublic, ReferralsMe
+from app.schemas.reward import RedeemRequest, RewardPublic, RewardsSummary
 from app.schemas.service import ServiceCreate, ServicePublic, ServiceType, ServiceUpdate
 from app.schemas.tenant import TenantPublic
 
 __all__ = [
+    "ApplyReferralRequest",
     "BookingCreate",
     "BookingPublic",
     "BookingStatus",
@@ -57,7 +60,12 @@ __all__ = [
     "PaymentPublic",
     "PaymentStatus",
     "PaymentStatusEnum",
+    "RedeemRequest",
+    "ReferralPublic",
+    "ReferralsMe",
     "RegisterRequest",
+    "RewardPublic",
+    "RewardsSummary",
     "ServiceCreate",
     "ServicePublic",
     "ServiceType",

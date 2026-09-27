@@ -5,6 +5,8 @@ from app.services import (
     order_service,
     payment_provider,
     payment_service,
+    referral_service,
+    reward_service,
     service_service,
     user_service,
 )
@@ -14,6 +16,8 @@ __all__ = [
     "order_service",
     "payment_provider",
     "payment_service",
+    "referral_service",
+    "reward_service",
     "service_service",
     "user_service",
 ]

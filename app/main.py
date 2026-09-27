@@ -7,6 +7,8 @@ from app.api import auth as auth_router
 from app.api import bookings as bookings_router
 from app.api import orders as orders_router
 from app.api import payments as payments_router
+from app.api import referrals as referrals_router
+from app.api import rewards as rewards_router
 from app.api import services as services_router
 from app.api import tenants as tenants_router
 from app.core.config import settings
@@ -33,6 +35,8 @@ app.include_router(bookings_router.router)
 app.include_router(services_router.router)
 app.include_router(orders_router.router)
 app.include_router(payments_router.router)
+app.include_router(rewards_router.router)
+app.include_router(referrals_router.router)
 
 
 @app.get("/health", tags=["system"])
