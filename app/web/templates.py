@@ -13,7 +13,7 @@ RESERVED_PREFIXES = {
     "auth", "tenants", "services", "bookings", "orders",
     "payments", "rewards", "referrals", "notifications",
     "analytics", "platform", "businesses", "about", "contact", "login", "register",
-    "hotels", "restaurants", "travel", "entertainment",
+    "hotels", "restaurants", "travel", "entertainment", "partners",
     "favicon.ico",
 }
 

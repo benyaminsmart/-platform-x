@@ -1,0 +1,410 @@
+{% extends "layouts/platform_base.html" %}
+
+{% block title %}List your business — Platform-X{% endblock %}
+{% block description %}Join Platform-X. One platform for hotels, restaurants, travel agencies, and entertainment venues.{% endblock %}
+
+{% block content %}
+
+<section class="px-partner-hero">
+  <div class="px-container">
+    <div class="px-partner-hero-inner">
+      <div class="eyebrow">For businesses</div>
+      <h1>List your business on Platform-X</h1>
+      <p class="px-hero-sub-sm" style="max-width: 620px;">
+        Join hotels, restaurants, travel agencies, and entertainment venues already using our platform.
+        Zero setup cost. Full booking, payments, and loyalty built in.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="px-section-tight">
+  <div class="px-container-narrow">
+
+    <div id="alert-box" style="display: none;"></div>
+
+    <form id="partner-form" class="px-partner-form">
+
+      <!-- STEP 1: TYPE -->
+      <div class="px-form-section">
+        <div class="px-form-section-title">
+          <span class="px-form-step">1</span>
+          <h2>What kind of business?</h2>
+        </div>
+
+        <div class="px-type-grid" id="type-selector">
+          <label class="px-type-card">
+            <input type="radio" name="tenant_type" value="hotel" required>
+            <div class="px-type-card-inner">
+              <span class="px-type-icon">🏨</span>
+              <strong>Hotel</strong>
+              <span>Rooms, suites, resorts</span>
+            </div>
+          </label>
+          <label class="px-type-card">
+            <input type="radio" name="tenant_type" value="restaurant" required>
+            <div class="px-type-card-inner">
+              <span class="px-type-icon">🍽</span>
+              <strong>Restaurant</strong>
+              <span>Dining, cafés, catering</span>
+            </div>
+          </label>
+          <label class="px-type-card">
+            <input type="radio" name="tenant_type" value="travel_agency" required>
+            <div class="px-type-card-inner">
+              <span class="px-type-icon">✈️</span>
+              <strong>Travel Agency</strong>
+              <span>Tours, flights, packages</span>
+            </div>
+          </label>
+          <label class="px-type-card">
+            <input type="radio" name="tenant_type" value="entertainment" required>
+            <div class="px-type-card-inner">
+              <span class="px-type-icon">🎢</span>
+              <strong>Entertainment</strong>
+              <span>Parks, activities, venues</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- STEP 2: CONTACT -->
+      <div class="px-form-section">
+        <div class="px-form-section-title">
+          <span class="px-form-step">2</span>
+          <h2>Contact person</h2>
+        </div>
+        <div class="px-field-row">
+          <div class="px-field">
+            <label for="contact_name">Full name *</label>
+            <input type="text" id="contact_name" name="contact_name" required>
+          </div>
+          <div class="px-field">
+            <label for="contact_role">Role *</label>
+            <select id="contact_role" name="contact_role" required>
+              <option value="">— Select —</option>
+              <option value="Owner">Owner</option>
+              <option value="Manager">Manager</option>
+              <option value="Marketing">Marketing</option>
+              <option value="Operations">Operations</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="px-field-row">
+          <div class="px-field">
+            <label for="email">Email *</label>
+            <input type="email" id="email" name="email" required>
+          </div>
+          <div class="px-field">
+            <label for="phone">Phone *</label>
+            <input type="tel" id="phone" name="phone" required>
+          </div>
+        </div>
+        <div class="px-field">
+          <label for="whatsapp">WhatsApp (optional)</label>
+          <input type="tel" id="whatsapp" name="whatsapp">
+        </div>
+      </div>
+
+      <!-- STEP 3: BUSINESS -->
+      <div class="px-form-section">
+        <div class="px-form-section-title">
+          <span class="px-form-step">3</span>
+          <h2>Business details</h2>
+        </div>
+        <div class="px-field-row">
+          <div class="px-field">
+            <label for="business_name">Business name *</label>
+            <input type="text" id="business_name" name="business_name" required>
+          </div>
+          <div class="px-field">
+            <label for="brand_name">Brand name (if different)</label>
+            <input type="text" id="brand_name" name="brand_name">
+          </div>
+        </div>
+        <div class="px-field-row">
+          <div class="px-field">
+            <label for="city">City *</label>
+            <input type="text" id="city" name="city" required placeholder="e.g. Dubai">
+          </div>
+          <div class="px-field">
+            <label for="founded_year">Founded year</label>
+            <input type="number" id="founded_year" name="founded_year" min="1900" max="2100" placeholder="2015">
+          </div>
+        </div>
+        <div class="px-field">
+          <label for="address">Full address *</label>
+          <input type="text" id="address" name="address" required>
+        </div>
+        <div class="px-field-row">
+          <div class="px-field">
+            <label for="website">Website</label>
+            <input type="url" id="website" name="website" placeholder="https://...">
+          </div>
+          <div class="px-field">
+            <label for="instagram">Instagram</label>
+            <input type="text" id="instagram" name="instagram" placeholder="@yourbusiness">
+          </div>
+        </div>
+        <div class="px-field">
+          <label for="staff_count">Team size</label>
+          <select id="staff_count" name="staff_count">
+            <option value="">— Select —</option>
+            <option value="1-5">1–5</option>
+            <option value="6-20">6–20</option>
+            <option value="21-50">21–50</option>
+            <option value="51-100">51–100</option>
+            <option value="100+">100+</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- STEP 4: TYPE-SPECIFIC -->
+      <div class="px-form-section" id="type-specific" style="display: none;">
+        <div class="px-form-section-title">
+          <span class="px-form-step">4</span>
+          <h2 id="type-specific-title">Specifics</h2>
+        </div>
+
+        <!-- HOTEL -->
+        <div class="px-type-fields" data-type="hotel" style="display: none;">
+          <div class="px-field-row">
+            <div class="px-field">
+              <label>Number of rooms</label>
+              <input type="number" name="details_rooms" min="1" max="2000">
+            </div>
+            <div class="px-field">
+              <label>Number of suites</label>
+              <input type="number" name="details_suites" min="0" max="500">
+            </div>
+          </div>
+          <div class="px-field-row">
+            <div class="px-field">
+              <label>Star rating</label>
+              <select name="details_stars">
+                <option value="">— Select —</option>
+                <option value="1">1 ★</option>
+                <option value="2">2 ★★</option>
+                <option value="3">3 ★★★</option>
+                <option value="4">4 ★★★★</option>
+                <option value="5">5 ★★★★★</option>
+              </select>
+            </div>
+            <div class="px-field">
+              <label>Price range per night</label>
+              <input type="text" name="details_price_range" placeholder="e.g. 300–1200 AED">
+            </div>
+          </div>
+          <div class="px-field">
+            <label>Amenities</label>
+            <div class="px-checkbox-grid">
+              <label><input type="checkbox" name="details_amenities" value="Pool"> Pool</label>
+              <label><input type="checkbox" name="details_amenities" value="Spa"> Spa</label>
+              <label><input type="checkbox" name="details_amenities" value="Gym"> Gym</label>
+              <label><input type="checkbox" name="details_amenities" value="Restaurant"> Restaurant</label>
+              <label><input type="checkbox" name="details_amenities" value="Bar"> Bar</label>
+              <label><input type="checkbox" name="details_amenities" value="WiFi"> Free WiFi</label>
+              <label><input type="checkbox" name="details_amenities" value="Parking"> Parking</label>
+              <label><input type="checkbox" name="details_amenities" value="Airport Shuttle"> Airport Shuttle</label>
+              <label><input type="checkbox" name="details_amenities" value="Room Service"> Room Service</label>
+              <label><input type="checkbox" name="details_amenities" value="Kids Club"> Kids Club</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- RESTAURANT -->
+        <div class="px-type-fields" data-type="restaurant" style="display: none;">
+          <div class="px-field-row">
+            <div class="px-field">
+              <label>Cuisine type</label>
+              <select name="details_cuisine">
+                <option value="">— Select —</option>
+                <option value="Arabic">Arabic</option>
+                <option value="Italian">Italian</option>
+                <option value="Japanese">Japanese</option>
+                <option value="Indian">Indian</option>
+                <option value="Chinese">Chinese</option>
+                <option value="Mediterranean">Mediterranean</option>
+                <option value="French">French</option>
+                <option value="Fusion">Fusion</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="px-field">
+              <label>Seats</label>
+              <input type="number" name="details_seats" min="1" max="5000">
+            </div>
+          </div>
+          <div class="px-field-row">
+            <div class="px-field">
+              <label>Opening hours</label>
+              <input type="text" name="details_hours" placeholder="e.g. 12:00 – 23:00">
+            </div>
+            <div class="px-field">
+              <label>Average price per person</label>
+              <input type="text" name="details_price_range" placeholder="e.g. 80–200 AED">
+            </div>
+          </div>
+          <div class="px-field">
+            <label>Features</label>
+            <div class="px-checkbox-grid">
+              <label><input type="checkbox" name="details_features" value="Delivery"> Delivery</label>
+              <label><input type="checkbox" name="details_features" value="Reservations"> Reservations</label>
+              <label><input type="checkbox" name="details_features" value="Outdoor"> Outdoor seating</label>
+              <label><input type="checkbox" name="details_features" value="Vegetarian"> Vegetarian menu</label>
+              <label><input type="checkbox" name="details_features" value="Vegan"> Vegan menu</label>
+              <label><input type="checkbox" name="details_features" value="Halal"> Halal</label>
+              <label><input type="checkbox" name="details_features" value="Online Order"> Want online orders</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRAVEL AGENCY -->
+        <div class="px-type-fields" data-type="travel_agency" style="display: none;">
+          <div class="px-field-row">
+            <div class="px-field">
+              <label>Specialty</label>
+              <select name="details_specialty">
+                <option value="">— Select —</option>
+                <option value="Tours">Tours</option>
+                <option value="Flights">Flights</option>
+                <option value="Packages">Packages</option>
+                <option value="Umrah">Umrah</option>
+                <option value="Corporate">Corporate</option>
+                <option value="Mixed">Mixed</option>
+              </select>
+            </div>
+            <div class="px-field">
+              <label>Years of experience</label>
+              <input type="number" name="details_years" min="0" max="100">
+            </div>
+          </div>
+          <div class="px-field">
+            <label>Main destinations</label>
+            <textarea name="details_destinations" rows="2" placeholder="e.g. Maldives, Europe, Turkey"></textarea>
+          </div>
+          <div class="px-field">
+            <label>Approximate customers per year</label>
+            <input type="text" name="details_customers" placeholder="e.g. 500–2000">
+          </div>
+          <div class="px-field">
+            <label>Features</label>
+            <div class="px-checkbox-grid">
+              <label><input type="checkbox" name="details_features" value="Flight API"> Need flight API</label>
+              <label><input type="checkbox" name="details_features" value="Visa Help"> Visa assistance</label>
+              <label><input type="checkbox" name="details_features" value="Insurance"> Travel insurance</label>
+              <label><input type="checkbox" name="details_features" value="24/7 Support"> 24/7 support</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTERTAINMENT -->
+        <div class="px-type-fields" data-type="entertainment" style="display: none;">
+          <div class="px-field-row">
+            <div class="px-field">
+              <label>Activity type</label>
+              <select name="details_activity">
+                <option value="">— Select —</option>
+                <option value="Theme Park">Theme Park</option>
+                <option value="Aquarium">Aquarium</option>
+                <option value="VR">VR / Gaming</option>
+                <option value="Bowling">Bowling</option>
+                <option value="Cinema">Cinema</option>
+                <option value="Kids Zone">Kids Zone</option>
+                <option value="Museum">Museum</option>
+                <option value="Water Park">Water Park</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="px-field">
+              <label>Daily capacity</label>
+              <input type="number" name="details_capacity" min="1" max="100000">
+            </div>
+          </div>
+          <div class="px-field-row">
+            <div class="px-field">
+              <label>Opening hours</label>
+              <input type="text" name="details_hours" placeholder="e.g. 10:00 – 22:00">
+            </div>
+            <div class="px-field">
+              <label>Age range</label>
+              <select name="details_age">
+                <option value="">— Select —</option>
+                <option value="Kids">Kids</option>
+                <option value="Teens">Teens</option>
+                <option value="Adults">Adults</option>
+                <option value="All">All ages</option>
+              </select>
+            </div>
+          </div>
+          <div class="px-field">
+            <label>Features</label>
+            <div class="px-checkbox-grid">
+              <label><input type="checkbox" name="details_features" value="Ticketing"> Need online ticketing</label>
+              <label><input type="checkbox" name="details_features" value="Groups"> Group bookings</label>
+              <label><input type="checkbox" name="details_features" value="Cabanas"> Private areas</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5: PLAN -->
+      <div class="px-form-section">
+        <div class="px-form-section-title">
+          <span class="px-form-step">5</span>
+          <h2>Plan interest</h2>
+        </div>
+        <div class="px-field">
+          <label>Tier</label>
+          <select name="tier_interest">
+            <option value="starter">Starter</option>
+            <option value="professional" selected>Professional</option>
+            <option value="enterprise">Enterprise</option>
+          </select>
+        </div>
+        <div class="px-field">
+          <label>Languages you need</label>
+          <div class="px-checkbox-grid">
+            <label><input type="checkbox" name="languages" value="en" checked> English</label>
+            <label><input type="checkbox" name="languages" value="ar"> العربية</label>
+            <label><input type="checkbox" name="languages" value="fil"> Filipino</label>
+            <label><input type="checkbox" name="languages" value="hi"> हिन्दी</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 6: ABOUT -->
+      <div class="px-form-section">
+        <div class="px-form-section-title">
+          <span class="px-form-step">6</span>
+          <h2>Tell us more</h2>
+        </div>
+        <div class="px-field">
+          <label for="about">About your business</label>
+          <textarea id="about" name="about" rows="4" placeholder="A short description of what you do."></textarea>
+        </div>
+        <div class="px-field">
+          <label for="motivation">Why Platform-X?</label>
+          <textarea id="motivation" name="motivation" rows="3" placeholder="What are you hoping to achieve?"></textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="px-btn px-btn-primary px-btn-block px-btn-lg" style="margin-top: 24px;">
+        Submit application
+      </button>
+
+      <p class="px-muted text-center" style="margin-top: 16px; font-size: 13px;">
+        We'll reply within 2 business days.
+      </p>
+    </form>
+
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/partners.js"></script>
+<script>PX.initPartners();</script>
+{% endblock %}

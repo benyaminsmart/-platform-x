@@ -17,7 +17,7 @@ RESERVED_SLUGS = {
     "auth", "tenants", "login", "register", "services", "bookings", "orders",
     "payments", "rewards", "referrals", "notifications",
     "analytics", "platform", "businesses", "about", "contact",
-    "hotels", "restaurants", "travel", "entertainment",
+    "hotels", "restaurants", "travel", "entertainment", "partners",
     "favicon.ico",
 }
 
@@ -257,6 +257,28 @@ def account_page_platform(
     return templates.TemplateResponse(
         request,
         "pages/tenant_account.html",
+        {"tenant": None},
+    )
+
+
+
+
+@router.get("/partners/apply", response_class=HTMLResponse)
+def partners_apply_page(request: Request) -> HTMLResponse:
+    """Public partner onboarding form."""
+    return templates.TemplateResponse(
+        request,
+        "pages/partners_apply.html",
+        {"tenant": None},
+    )
+
+
+@router.get("/partners/thanks", response_class=HTMLResponse)
+def partners_thanks_page(request: Request) -> HTMLResponse:
+    """Thank-you page after partner application submission."""
+    return templates.TemplateResponse(
+        request,
+        "pages/partners_thanks.html",
         {"tenant": None},
     )
 

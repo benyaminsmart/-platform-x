@@ -5,6 +5,7 @@ from app.models.audit_log import AuditLog
 from app.models.booking import Booking
 from app.models.notification import Notification
 from app.models.order import Order
+from app.models.partner_application import PartnerApplication
 from app.models.payment import Payment
 from app.models.platform_admin import PlatformAdmin
 from app.models.referral import Referral
@@ -21,6 +22,7 @@ __all__ = [
     "Booking",
     "Notification",
     "Order",
+    "PartnerApplication",
     "Payment",
     "PlatformAdmin",
     "Referral",

@@ -1,0 +1,23 @@
+{% extends "layouts/platform_base.html" %}
+
+{% block title %}Application received — Platform-X{% endblock %}
+
+{% block content %}
+
+<section class="px-page" style="min-height: 60vh; display: flex; align-items: center;">
+  <div class="px-container-narrow" style="text-align: center; padding: 40px 0;">
+    <div style="font-size: 88px; margin-bottom: 24px;">🎉</div>
+    <div class="eyebrow">Application received</div>
+    <h1 style="font-size: 44px; margin-bottom: 16px;">Thank you.</h1>
+    <p style="font-size: 17px; color: var(--px-text-soft); max-width: 520px; margin: 0 auto 32px; line-height: 1.6;">
+      We've received your application. Our team will review it and get back to you
+      within <strong>2 business days</strong>.
+    </p>
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      <a href="/" class="px-btn px-btn-primary">Back to home</a>
+      <a href="/businesses" class="px-btn px-btn-ghost">Explore businesses</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
