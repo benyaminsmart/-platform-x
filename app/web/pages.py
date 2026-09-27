@@ -96,6 +96,29 @@ def contact(request: Request) -> HTMLResponse:
 # These come last so a slug can never shadow a system route.
 
 
+@router.get("/{tenant_slug}/pay", response_class=HTMLResponse)
+def tenant_pay_page(
+    tenant_slug: str,
+    request: Request,
+    booking: str | None = None,
+    db: DBSession = Depends(get_db),
+) -> HTMLResponse:
+    """Payment page for a booking."""
+    if tenant_slug in RESERVED_SLUGS:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    tenant = _get_tenant_by_slug(db, tenant_slug)
+    if tenant is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return templates.TemplateResponse(
+        request,
+        "pages/tenant_pay.html",
+        {
+            "tenant": tenant,
+            "booking_id": booking or "",
+        },
+    )
+
+
 @router.get("/{tenant_slug}/book", response_class=HTMLResponse)
 def tenant_book_page(
     tenant_slug: str,

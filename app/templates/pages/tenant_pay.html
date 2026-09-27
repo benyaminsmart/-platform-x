@@ -1,0 +1,79 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Payment — {{ tenant.name }}{% endblock %}
+
+{% block content %}
+
+<section class="section-sm">
+  <div class="container-narrow" style="max-width: 560px;">
+    <div class="eyebrow">{{ tenant.name }}</div>
+    <h1>Complete payment</h1>
+
+    <div id="alert-box" style="display: none;"></div>
+
+    <div id="loading" class="card-flat" style="margin-top: var(--space-7);">
+      <p class="text-muted">Loading booking…</p>
+    </div>
+
+    <div id="payment-panel" class="card" style="display: none; margin-top: var(--space-7);">
+      <h3 id="service-name" style="margin-bottom: var(--space-4);"></h3>
+
+      <div style="display: grid; gap: var(--space-3); margin-bottom: var(--space-5);">
+        <div style="display: flex; justify-content: space-between;">
+          <span class="text-muted">Check-in</span>
+          <span id="check-in"></span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span class="text-muted">Check-out</span>
+          <span id="check-out"></span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span class="text-muted">Guests</span>
+          <span id="guests"></span>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+        <span class="text-muted">Total</span>
+        <span id="total" class="text-gold" style="font-family: var(--font-serif); font-size: var(--text-2xl);"></span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="method">Payment method</label>
+        <select class="form-select" id="method">
+          <option value="card">Card</option>
+          <option value="apple_pay">Apple Pay</option>
+          <option value="google_pay">Google Pay</option>
+          <option value="cash">Cash on arrival</option>
+        </select>
+      </div>
+
+      <button id="pay-button" class="btn btn-primary btn-lg" style="width: 100%;">
+        Pay now
+      </button>
+
+      <p class="text-center text-sm text-muted" style="margin-top: var(--space-4);">
+        Demo payment — no real charge.
+      </p>
+    </div>
+
+    <div id="success-panel" class="card" style="display: none; margin-top: var(--space-7); text-align: center;">
+      <div style="font-size: 56px; color: var(--success); margin-bottom: var(--space-4);">✓</div>
+      <h3 class="text-gold">Booking confirmed</h3>
+      <p class="text-muted">Your payment was successful and your booking is confirmed.</p>
+      <div style="margin-top: var(--space-6); display: flex; gap: var(--space-3); justify-content: center;">
+        <a href="/{{ tenant.slug }}/account" class="btn btn-primary">View my bookings</a>
+        <a href="/{{ tenant.slug }}/" class="btn btn-outline">Back to {{ tenant.name }}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/payment.js"></script>
+<script>PX.initPayment("{{ tenant.slug }}", "{{ booking_id }}");</script>
+{% endblock %}
