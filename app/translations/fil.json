@@ -187,7 +187,10 @@
     "no_referrals": "Wala pang referral. Ibahagi ang iyong code sa mga kaibigan — pareho kayong kikita ng puntos.",
     "no_bookings": "Wala pang booking.",
     "no_orders": "Wala pang order.",
-    "no_rewards": "Wala pang rewards. Mag-book ng isang bagay upang kumita ng puntos!"
+    "no_rewards": "Wala pang rewards. Mag-book ng isang bagay upang kumita ng puntos!",
+    "tab_notifications": "Mga Notification",
+    "no_notifications": "Wala pang notification.",
+    "mark_read": "Markahan bilang nabasa"
   },
   "footer": {
     "tagline": "Isang platform para sa mga hotel, restawran, paglalakbay, at libangan. Mag-book, kumita ng rewards, at tumuklas — lahat sa isang lugar.",

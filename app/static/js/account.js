@@ -234,4 +234,55 @@ PX.initAccount = function (slug) {
       list.innerHTML = html;
     })
     .catch(function () {});
+
+
+  // Notifications
+  fetch("/notifications?limit=30", { headers: headers })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      var list = document.getElementById("notifications-list");
+      if (!list) return;
+
+      // Update badge
+      var unread = (d.items || []).filter(function(n){ return !n.read_at; }).length;
+      var badge = document.getElementById("notif-badge");
+      if (badge) {
+        if (unread > 0) {
+          badge.textContent = unread;
+          badge.style.display = "inline-block";
+        } else {
+          badge.style.display = "none";
+        }
+      }
+
+      if (!d.items || !d.items.length) {
+        list.innerHTML = '<p class="px-muted">' + (window.PX_I18N ? PX_I18N.no_notifications : 'No notifications yet.') + '</p>';
+        return;
+      }
+      var html = "";
+      d.items.forEach(function (n) {
+        var when = n.created_at ? new Date(n.created_at).toLocaleString() : "";
+        var unreadStyle = !n.read_at ? 'border-left: 3px solid var(--px-brand);' : '';
+        html += '<div class="px-list-item" style="' + unreadStyle + '">' +
+          '<div class="px-list-item-main">' +
+          '<div class="px-list-item-title">' + PX.esc(n.subject || n.template) + '</div>' +
+          '<div class="px-list-item-sub">' + PX.esc(n.content) + '</div>' +
+          '<div class="px-list-item-sub" style="margin-top: 4px; font-size: 11px;">' + PX.esc(when) + '</div>' +
+          '</div>' +
+          (n.read_at ? '' : '<div class="px-list-item-side"><button class="px-btn px-btn-ghost px-btn-sm" data-mark="' + n.id + '">Mark read</button></div>') +
+          '</div>';
+      });
+      list.innerHTML = html;
+
+      list.querySelectorAll("[data-mark]").forEach(function(btn){
+        btn.addEventListener("click", async function(){
+          var id = btn.getAttribute("data-mark");
+          try {
+            await fetch("/notifications/" + id + "/read", { method: "POST", headers: headers });
+            window.location.reload();
+          } catch(e) {}
+        });
+      });
+    })
+    .catch(function () {});
 };

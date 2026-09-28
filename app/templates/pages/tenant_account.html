@@ -127,6 +127,7 @@
         <button class="px-tab" data-tab="orders">{{ t('account.tab_orders', current_lang) }}</button>
         <button class="px-tab" data-tab="rewards">{{ t('account.tab_rewards', current_lang) }}</button>
         <button class="px-tab" data-tab="referrals">{{ t('account.tab_referrals', current_lang) }}</button>
+        <button class="px-tab" data-tab="notifications">{{ t('account.tab_notifications', current_lang) }}<span id="notif-badge" style="display:none; background: var(--px-error); color: white; border-radius: 999px; font-size: 10px; padding: 2px 6px; margin-left: 6px;">0</span></button>
       </div>
 
       <div id="tab-bookings" class="px-tab-panel">
@@ -140,6 +141,9 @@
       </div>
       <div id="tab-referrals" class="px-tab-panel" style="display: none;">
         <div id="referrals-list"><p class="px-muted">Loading…</p></div>
+      </div>
+      <div id="tab-notifications" class="px-tab-panel" style="display: none;">
+        <div id="notifications-list"><p class="px-muted">Loading…</p></div>
       </div>
     </div>
   </div>

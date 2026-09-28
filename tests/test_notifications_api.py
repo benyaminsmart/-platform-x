@@ -5,6 +5,14 @@ from fastapi.testclient import TestClient
 from app.models.tenant import Tenant
 from app.services import notification_service
 
+def _clear_notifications(db):
+    """Remove any notifications created by auto-hooks."""
+    from app.models.notification import Notification
+    db.query(Notification).delete()
+    db.commit()
+
+
+
 
 def _register(client: TestClient, tenant: Tenant, email: str) -> dict:
     r = client.post(
@@ -24,15 +32,22 @@ def _register(client: TestClient, tenant: Tenant, email: str) -> dict:
     }
 
 
-def test_list_empty(client: TestClient, sample_tenant: Tenant) -> None:
-    h = _register(client, sample_tenant, "n1@example.com")
+def _register_clean(client, tenant, email, db):
+    """Register and clear auto-hook notifications so tests start clean."""
+    h = _register(client, tenant, email)
+    _clear_notifications(db)
+    return h
+
+
+def test_list_empty(client: TestClient, sample_tenant: Tenant, db) -> None:
+    h = _register_clean(client, sample_tenant, "n1@example.com", db)
     resp = client.get("/notifications", headers=h)
     assert resp.status_code == 200
     assert resp.json()["total"] == 0
 
 
-def test_unread_count_empty(client: TestClient, sample_tenant: Tenant) -> None:
-    h = _register(client, sample_tenant, "n2@example.com")
+def test_unread_count_empty(client: TestClient, sample_tenant: Tenant, db) -> None:
+    h = _register_clean(client, sample_tenant, "n2@example.com", db)
     resp = client.get("/notifications/unread-count", headers=h)
     assert resp.status_code == 200
     assert resp.json()["unread"] == 0
@@ -41,7 +56,7 @@ def test_unread_count_empty(client: TestClient, sample_tenant: Tenant) -> None:
 def test_create_and_list(
     client: TestClient, sample_tenant: Tenant, db
 ) -> None:
-    h = _register(client, sample_tenant, "n3@example.com")
+    h = _register_clean(client, sample_tenant, "n3@example.com", db)
     uid = client.get("/auth/me", headers=h).json()["id"]
 
     notification_service.create(
@@ -73,7 +88,7 @@ def test_create_and_list(
 def test_mark_read_and_unread_count(
     client: TestClient, sample_tenant: Tenant, db
 ) -> None:
-    h = _register(client, sample_tenant, "n4@example.com")
+    h = _register_clean(client, sample_tenant, "n4@example.com", db)
     uid = client.get("/auth/me", headers=h).json()["id"]
     n = notification_service.create(
         db,
@@ -97,7 +112,7 @@ def test_mark_read_and_unread_count(
 def test_mark_read_idempotent(
     client: TestClient, sample_tenant: Tenant, db
 ) -> None:
-    h = _register(client, sample_tenant, "n5@example.com")
+    h = _register_clean(client, sample_tenant, "n5@example.com", db)
     uid = client.get("/auth/me", headers=h).json()["id"]
     n = notification_service.create(
         db,
@@ -115,9 +130,9 @@ def test_mark_read_idempotent(
 
 
 def test_mark_read_unknown_404(
-    client: TestClient, sample_tenant: Tenant
+    client: TestClient, sample_tenant: Tenant, db
 ) -> None:
-    h = _register(client, sample_tenant, "n6@example.com")
+    h = _register_clean(client, sample_tenant, "n6@example.com", db)
     resp = client.post("/notifications/nope/read", headers=h)
     assert resp.status_code == 404
 
@@ -125,7 +140,7 @@ def test_mark_read_unknown_404(
 def test_filter_unread_only(
     client: TestClient, sample_tenant: Tenant, db
 ) -> None:
-    h = _register(client, sample_tenant, "n7@example.com")
+    h = _register_clean(client, sample_tenant, "n7@example.com", db)
     uid = client.get("/auth/me", headers=h).json()["id"]
     n1 = notification_service.create(
         db, tenant_id=sample_tenant.id, user_id=uid, channel="in_app",
@@ -148,7 +163,7 @@ def test_tenant_isolation(client: TestClient, sample_tenant: Tenant, db) -> None
     db.add(other)
     db.commit()
 
-    h = _register(client, sample_tenant, "n8@example.com")
+    h = _register_clean(client, sample_tenant, "n8@example.com", db)
     uid = client.get("/auth/me", headers=h).json()["id"]
     notification_service.create(
         db, tenant_id=sample_tenant.id, user_id=uid, channel="in_app",

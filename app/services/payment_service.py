@@ -148,7 +148,7 @@ def mark_success(
                 reference_id=booking.id,
             )
 
-            # Send confirmation email (non-blocking; no-op if disabled)
+            # Record booking notification + send email (both non-blocking)
             try:
                 from app.models.tenant import Tenant as _T
                 from app.models.user import User as _U
@@ -156,6 +156,15 @@ def mark_success(
                 _user = db.query(_U).filter(_U.id == payment.user_id).one_or_none()
                 _tenant = db.query(_T).filter(_T.id == payment.tenant_id).one_or_none()
                 if _user and _tenant:
+                    notification_service.create(
+                        db,
+                        tenant_id=payment.tenant_id,
+                        user_id=payment.user_id,
+                        channel="in_app",
+                        template="booking_confirmed",
+                        subject=f"Booking confirmed — {_tenant.name}",
+                        content=f"Your booking for {booking.service_name} at {_tenant.name} is confirmed.",
+                    )
                     notification_service.send_booking_confirmed_email(
                         to_email=_user.email,
                         user_name=_user.first_name,

@@ -114,20 +114,11 @@ def test_full_demo_journey(client: TestClient, sample_tenant: Tenant, db) -> Non
     assert bk2.json()["status"] == "confirmed"
     assert bk2.json()["payment_status"] == "paid"
 
-    # 10. Notification triggered manually (no auto-hook yet)
-    from app.services import notification_service
-
-    user_id = bk2.json()["user_id"]
-    n = notification_service.create(
-        db,
-        tenant_id=sample_tenant.id,
-        user_id=user_id,
-        channel="in_app",
-        template="booking_confirmed",
-        content="Your booking is confirmed",
-    )
+    # 10. Notifications are now created automatically (welcome + booking)
     notifs = client.get("/notifications", headers=user_h)
-    assert notifs.json()["total"] == 1
+    assert notifs.json()["total"] >= 1
+    templates = [n["template"] for n in notifs.json()["items"]]
+    assert "booking_confirmed" in templates
 
     # 11. Analytics summary shows the tracked event
     summary = client.get("/analytics/summary", headers=admin_h)

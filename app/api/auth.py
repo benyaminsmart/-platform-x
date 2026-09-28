@@ -70,10 +70,20 @@ def register(
         user_agent=request.headers.get("user-agent"),
     )
 
-    # Send welcome email (non-blocking; no-op if disabled)
+    # Record welcome notification + send email (both non-blocking)
     try:
         from app.services import notification_service
         base_url = str(request.base_url).rstrip("/")
+
+        notification_service.create(
+            db,
+            tenant_id=tenant.id,
+            user_id=user.id,
+            channel="in_app",
+            template="welcome",
+            subject="Welcome to Platform-X",
+            content=f"Welcome {user.first_name}! Your account is ready.",
+        )
         notification_service.send_welcome_email(
             to_email=user.email,
             user_name=user.first_name,
@@ -120,10 +130,20 @@ def login(
         user_agent=request.headers.get("user-agent"),
     )
 
-    # Send welcome email (non-blocking; no-op if disabled)
+    # Record welcome notification + send email (both non-blocking)
     try:
         from app.services import notification_service
         base_url = str(request.base_url).rstrip("/")
+
+        notification_service.create(
+            db,
+            tenant_id=tenant.id,
+            user_id=user.id,
+            channel="in_app",
+            template="welcome",
+            subject="Welcome to Platform-X",
+            content=f"Welcome {user.first_name}! Your account is ready.",
+        )
         notification_service.send_welcome_email(
             to_email=user.email,
             user_name=user.first_name,
@@ -278,4 +298,20 @@ def reset_password(
         )
 
     user_service.update_password(db, user_id=user_id, new_password=payload.new_password)
+
+    # Record notification
+    try:
+        from app.services import notification_service
+        notification_service.create(
+            db,
+            tenant_id=tenant.id,
+            user_id=user_id,
+            channel="in_app",
+            template="password_changed",
+            subject="Your password was changed",
+            content="Your Platform-X password was successfully changed.",
+        )
+    except Exception:
+        pass
+
     return MessageResponse(message="Password updated. You can now sign in.")
