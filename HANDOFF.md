@@ -626,4 +626,172 @@ User's style:
 **END OF v2 ROADMAP SECTIONS**
 
 
+
+
+### Phase 18 — AI Foundation
+- LLM provider integration (OpenAI GPT-4o-mini OR Google Gemini)
+- AI service layer (prompt management, safety)
+- Rate limiting per user
+- Cost tracking + budget caps
+- Context injection (tenant data, user data)
+- Fallback + error handling
+- AI audit log
+Estimated: 6-8 steps
+
+### Phase 19 — AI Guest Assistant
+- Floating chat widget on public site
+- AI Travel Planner (multi-business itinerary)
+- AI Concierge (during trip)
+- AI Booking Agent (can actually book)
+- AI Negotiation (auto-offers from businesses)
+- Chat history + context memory
+- Multi-language AI
+Estimated: 6-8 steps
+
+### Phase 20 — Business Owner Panel
+- Separate panel: /business/*
+- Dashboard (bookings, revenue, occupancy)
+- Services management (rooms, menu, packages)
+- Bookings inbox + status
+- Customer list + history
+- Analytics (views, bookings, conversion)
+- Staff accounts (Owner / Manager / Staff roles)
+- Business notifications
+Estimated: 10-12 steps
+
+### Phase 21 — AI Business Assistant (Pricing Coach)
+- AI competitor price intelligence (confidential)
+- AI pricing suggestions
+- AI demand forecasting
+- AI competitor benchmark
+- AI market insights
+Estimated: 8-10 steps
+
+### Phase 22 — Dynamic Pricing Rules
+- Rule builder for owners
+- Auto price adjustment (weekends, seasons, urgency)
+- Capacity-based pricing
+- Last-minute discounts
+- AI learning from historical data
+Estimated: 6-8 steps
+
+### Phase 23 — AI Content Writer + Onboarding
+- AI auto-generate service descriptions (4 languages)
+- AI-suggested images
+- AI Onboarding (URL → extract business info)
+- AI menu/room importer
+Estimated: 6-8 steps
+
+### Phase 24 — Cross-Business Rewards Enhancement
+- Spend points across categories
+- Tier benefits (real perks)
+- Redeem catalog
+- Birthday rewards
+- Milestone bonuses
+Estimated: 4-6 steps
+
+### Phase 25 — AI Marketing Copilot
+- AI campaign suggestions
+- Auto email/SMS to past customers
+- AI discount suggestions based on trends
+- Personalized offers per user segment
+Estimated: 5-7 steps
+
+### Phase 26 — Real-Time Occupancy + Analytics
+- Live occupancy dashboard
+- Predictive capacity
+- Revenue forecasting
+- Booking heatmaps
+Estimated: 5-6 steps
+
+### Phase 27 — Competitor Insights
+- Aggregate market data (anonymized)
+- Industry benchmarks
+- Anonymous peer comparison
+- Region/category insights
+Estimated: 5-7 steps
+
+### Phase 28 — AI Review Writer + Responder
+- AI writes reviews from guest input
+- Business AI auto-responds to reviews
+- Multi-language reviews
+- Sentiment analysis
+Estimated: 4-5 steps
+
+### Phase 29 — Business Leaderboard + AI Scoring ⭐
+- Monthly AI scoring (5 criteria):
+  - Customer Satisfaction (30%)
+  - Service Quality (25%)
+  - Pricing Competitiveness (20%)
+  - Engagement (15%)
+  - Platform Loyalty (10%)
+- Per-category Leaderboard (Hotels, Restaurants, Travel, Entertainment)
+- Auto-rewards:
+  - Rank 1: Hero Featured + Sponsored Promotion + Gold Badge + Email to users + 0% commission next month
+  - Rank 2: Category Featured + Silver Badge + 50% commission discount
+  - Rank 3: Bronze Badge + Featured in search
+- Public /leaderboard page
+- Business Panel: My Score + AI tips
+- Badges on cards
+- AI suggestions for improvement
+Estimated: 6-8 steps
+
+### Phase 30 — Mobile App
+- Framework: React Native or Flutter
+- Guest app (iOS + Android)
+- Business staff app
+- Push notifications
+- Store submission
+Estimated: weeks/months
+
+---
+
+## Strategic Differentiation (from partner meeting 2026-09-28)
+
+### For Guests (vs Agoda/Booking.com):
+1. AI Travel Planner (itinerary in one click)
+2. Multi-Business Cart (hotel + restaurant + tour in one booking)
+3. Universal Rewards (cross-category earn and spend)
+4. AI Negotiation (auto-offer discounts)
+5. AI Concierge (24/7 in-trip assistant)
+6. Group Booking simplified by AI
+7. Referral Cash Rewards (real money, not just points)
+8. AI Review Writer
+9. 5-Tier Loyalty (Welcome/Silver/Gold/Platinum/Royal)
+10. AI Trip Memory (hyper-personalization)
+
+### For Business Owners:
+1. Business Panel with AI assistant
+2. AI Pricing Coach (market comparison)
+3. Dynamic Pricing Rules
+4. AI Content Writer (4 languages)
+5. AI Onboarding (URL extraction, no forms)
+6. AI Booking Manager
+7. AI Marketing Copilot
+8. Real-Time Occupancy Dashboard
+9. AI Competitor Insights
+10. AI Review Responder
+11. Zero setup cost + AI-driven
+12. Multi-Staff with role-based access
+
+### Unique vs Agoda/Booking.com:
+- AI everywhere (booking, pricing, content, marketing)
+- Multi-business cart (they only have hotel)
+- Cross-category rewards
+- Confidential price intelligence
+- AI-powered leaderboard with auto-rewards
+- Real cash referral rewards
+
+### Business-First Strategy:
+- Prioritize Business Panel + AI Pricing Coach
+- Then AI Guest Assistant
+- Reason: businesses pay; users use
+
+### Platform Commission:
+- Rank 1 (monthly): 0% next month
+- Rank 2 (monthly): 50% off
+- Rank 3 (monthly): standard
+- Standard rate: TBD (decision pending)
+
+
 END OF HANDOFF
