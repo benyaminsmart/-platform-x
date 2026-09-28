@@ -147,3 +147,90 @@ def account_ai_chat(
     db.commit()
 
     return ChatResponse(**result)
+
+
+class PlanRequest(BaseModel):
+    """Request a multi-day travel plan."""
+    destination: str = Field(min_length=2, max_length=100)
+    days: int = Field(ge=1, le=14)
+    budget: float | None = Field(default=None, ge=0)
+    currency: str = Field(default="AED", max_length=10)
+    preferences: str | None = Field(default=None, max_length=500)
+
+
+class PlanResponse(BaseModel):
+    plan: str
+    provider: str
+    model: str | None = None
+    tokens_used: int = 0
+    suggestions: list[dict] = []
+
+
+@router.post("/plan", response_model=PlanResponse)
+@limiter.limit("10/minute")
+def account_ai_plan(
+    request: Request,
+    payload: PlanRequest,
+    tenant: Tenant = Depends(get_current_tenant),
+    user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+) -> PlanResponse:
+    """Generate a multi-day travel itinerary."""
+    if not settings.AI_ENABLED:
+        raise HTTPException(status_code=503, detail="AI disabled")
+
+    # Gather available businesses as context
+    from app.models.service import Service
+    services = (
+        db.query(Service)
+        .filter(Service.tenant_id == tenant.id, Service.status == "active")
+        .limit(20)
+        .all()
+    )
+    services_text = "\n".join(
+        f"- {s.type}: {s.name} ({s.price} {s.currency})" for s in services
+    )
+
+    prompt = f"""Create a {payload.days}-day travel plan for {payload.destination}.
+Budget: {payload.budget or 'flexible'} {payload.currency}.
+User preferences: {payload.preferences or 'none specified'}.
+
+Available on Platform-X (for reference only — suggest similar):
+{services_text or 'No services listed'}
+
+Format the plan clearly with:
+- Day 1, Day 2, etc.
+- Hotel suggestion for the stay
+- Morning / Afternoon / Evening activities
+- Restaurant suggestions
+- Estimated total cost
+
+Keep it concise. 4-6 lines per day."""
+
+    result = ai_service.chat(prompt)
+
+    # Save to history
+    db.add(AIChatMessage(
+        tenant_id=tenant.id,
+        user_id=user.id,
+        layer="user",
+        role="user",
+        content=f"[Travel Plan Request] {payload.days} days in {payload.destination}",
+    ))
+    db.add(AIChatMessage(
+        tenant_id=tenant.id,
+        user_id=user.id,
+        layer="user",
+        role="assistant",
+        content=result["content"],
+        provider=result.get("provider"),
+        tokens_used=result.get("tokens_used", 0),
+    ))
+    db.commit()
+
+    return PlanResponse(
+        plan=result["content"],
+        provider=result["provider"],
+        model=result.get("model"),
+        tokens_used=result.get("tokens_used", 0),
+    )
