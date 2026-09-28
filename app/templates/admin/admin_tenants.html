@@ -1,0 +1,47 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Tenants — Platform-X Admin{% endblock %}
+
+{% block content %}
+
+<div class="admin-card">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 4px;">
+    <div>
+      <h2>All tenants</h2>
+      <p class="admin-card-sub" style="margin-bottom: 0;">All businesses on the platform.</p>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <select class="admin-input" id="filter-status" style="width: auto;">
+        <option value="">All statuses</option>
+        <option value="active">Active</option>
+        <option value="suspended">Suspended</option>
+        <option value="deleted">Deleted</option>
+      </select>
+    </div>
+  </div>
+
+  <div style="overflow-x: auto;">
+    <table class="admin-table" style="margin-top: 20px;">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Slug</th>
+          <th>Type</th>
+          <th>Tier</th>
+          <th>Status</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody id="tenants-tbody">
+        <tr><td colspan="6" style="text-align: center; color: var(--adm-muted); padding: 40px;">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/admin.js"></script>
+<script>PX.initAdminTenants();</script>
+{% endblock %}

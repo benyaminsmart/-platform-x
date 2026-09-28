@@ -153,3 +153,53 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+/* ---------- Tenants List ---------- */
+
+PX.initAdminTenants = async function () {
+  if (!PX.requireAdmin()) return;
+
+  var tbody = document.getElementById("tenants-tbody");
+  var filter = document.getElementById("filter-status");
+  var allTenants = [];
+
+  function render() {
+    var selected = filter ? filter.value : "";
+    var rows = allTenants.filter(function (t) { return !selected || t.status === selected; });
+
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--adm-muted); padding: 40px;">No tenants match the filter.</td></tr>';
+      return;
+    }
+
+    var html = "";
+    rows.forEach(function (t) {
+      var badgeCls = t.status === "active" ? "admin-badge-success"
+        : t.status === "suspended" ? "admin-badge-warning"
+        : "admin-badge-error";
+      var btype = (t.config && t.config.type) || "—";
+      var created = t.created_at ? new Date(t.created_at).toLocaleDateString() : "—";
+      html += '<tr style="cursor: pointer;" onclick="window.location.href=\'/admin/tenants/' + t.id + '\'">' +
+        '<td><strong style="color: var(--adm-text);">' + PX.esc(t.name) + '</strong></td>' +
+        '<td><span style="font-family: var(--adm-font-mono); font-size: 12px;">' + PX.esc(t.slug) + '</span></td>' +
+        '<td>' + PX.esc(btype) + '</td>' +
+        '<td>' + PX.esc(t.tier) + '</td>' +
+        '<td><span class="admin-badge ' + badgeCls + '">' + PX.esc(t.status) + '</span></td>' +
+        '<td>' + PX.esc(created) + '</td>' +
+        '</tr>';
+    });
+    tbody.innerHTML = html;
+  }
+
+  if (filter) filter.addEventListener("change", render);
+
+  try {
+    var res = await PX.adminFetch("/platform/tenants");
+    if (res && res.ok) {
+      allTenants = await res.json();
+      render();
+    }
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--adm-error); padding: 40px;">Failed to load tenants.</td></tr>';
+  }
+};
