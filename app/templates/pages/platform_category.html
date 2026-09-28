@@ -7,7 +7,7 @@
 <section class="px-hero-compact">
   <div class="px-container">
     <div class="px-breadcrumb">
-      <a href="/">Home</a>
+      <a href="/">{{ t('common.back_home', current_lang) }}</a>
       <span>/</span>
       <span>{{ cat_label }}</span>
     </div>
@@ -18,7 +18,7 @@
       </div>
       <div style="font-size: 14px; color: var(--px-muted);">
         <strong style="color: var(--px-text); font-size: 20px;">{{ businesses|length }}</strong>
-        {{ 'business' if businesses|length == 1 else 'businesses' }}
+        {{ t('home.stats_businesses', current_lang) }}
       </div>
     </div>
   </div>
@@ -49,7 +49,7 @@
             <p class="px-biz-tagline">{{ b.config.tagline|default('') }}</p>
             <div class="px-biz-meta">
               <div>
-                <span class="px-biz-price-from">From</span>
+                <span class="px-biz-price-from">{{ t('common.from', current_lang) }}</span>
                 <span class="px-biz-price">{{ b.config.price_from }} {{ b.config.currency }}</span>
               </div>
               <span style="color: var(--px-muted); font-size: 12px;">📍 {{ b.config.location|default('') }}</span>
@@ -59,9 +59,9 @@
       {% else %}
         <div class="px-empty">
           <div class="px-empty-icon">{{ cat_icon }}</div>
-          <h3>No {{ cat_label|lower }} yet</h3>
-          <p>Check back soon — new partners are joining.</p>
-          <a href="/" class="px-btn px-btn-primary">Back to home</a>
+          <h3>{{ t('categories.no_businesses', current_lang) }}</h3>
+          <p>{{ t('categories.no_businesses_sub', current_lang) }}</p>
+          <a href="/" class="px-btn px-btn-primary">{{ t('common.back_home', current_lang) }}</a>
         </div>
       {% endfor %}
     </div>

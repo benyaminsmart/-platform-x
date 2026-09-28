@@ -222,6 +222,7 @@ def _businesses_by_types(db: DBSession, types: list[str]) -> list[Tenant]:
 def _render_category(
     request: Request, db: DBSession, slug: str
 ) -> HTMLResponse:
+    _lang = resolve_language(request)
     meta = CATEGORIES[slug]
     businesses = _businesses_by_types(db, meta["types"])
     return templates.TemplateResponse(
@@ -229,10 +230,10 @@ def _render_category(
         "pages/platform_category.html",
         {
             "tenant": None,
-            "cat_label": meta["label"],
+            "cat_label": translate(f"categories.{slug}_title", _lang),
             "cat_icon": meta["icon"],
             "cat_class": meta["class"],
-            "cat_description": meta["description"],
+            "cat_description": translate(f"categories.{slug}_sub", _lang),
             "businesses": businesses,
         },
     )

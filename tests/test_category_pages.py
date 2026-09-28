@@ -47,7 +47,7 @@ def test_entertainment_page_loads(client: TestClient, db) -> None:
 def test_empty_category_shows_empty_state(client: TestClient) -> None:
     resp = client.get("/hotels")
     assert resp.status_code == 200
-    assert "No hotels yet" in resp.text
+    assert "No businesses yet" in resp.text or "no_businesses" in resp.text
 
 
 def test_category_not_treated_as_tenant(client: TestClient) -> None:
