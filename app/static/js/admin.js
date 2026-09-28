@@ -70,6 +70,76 @@ PX.initAdminDashboard = async function () {
       document.getElementById("stat-bookings").textContent = data.bookings.total;
     }
   } catch (e) {}
+
+  // Recent tenants
+  try {
+    var res3 = await PX.adminFetch("/platform/tenants");
+    if (res3 && res3.ok) {
+      var tenants = await res3.json();
+      var recent = tenants.slice(0, 5);
+      var html = "";
+      if (!recent.length) {
+        html = '<p style="color: var(--adm-muted);">No tenants yet.</p>';
+      } else {
+        recent.forEach(function (t) {
+          var badgeCls = t.status === "active" ? "admin-badge-success" : "admin-badge-warning";
+          html += '<div class="admin-list-item">' +
+            '<div class="admin-list-item-main">' +
+            '<div class="admin-list-item-title">' + PX.esc(t.name) + '</div>' +
+            '<div class="admin-list-item-sub">' + PX.esc(t.slug) + " · " + PX.esc(t.tier) + '</div></div>' +
+            '<div class="admin-list-item-side"><span class="admin-badge ' + badgeCls + '">' + PX.esc(t.status) + '</span></div>' +
+            '</div>';
+        });
+      }
+      document.getElementById("recent-tenants").innerHTML = html;
+    }
+  } catch (e) {}
+
+  // Recent applications
+  try {
+    var res4 = await PX.adminFetch("/platform/applications?limit=5");
+    if (res4 && res4.ok) {
+      var apps = await res4.json();
+      var items = apps.items || [];
+      var html = "";
+      if (!items.length) {
+        html = '<p style="color: var(--adm-muted);">No applications yet.</p>';
+      } else {
+        items.forEach(function (a) {
+          html += '<div class="admin-list-item">' +
+            '<div class="admin-list-item-main">' +
+            '<div class="admin-list-item-title">' + PX.esc(a.business_name) + '</div>' +
+            '<div class="admin-list-item-sub">' + PX.esc(a.tenant_type) + " · " + PX.esc(a.city) + '</div></div>' +
+            '<div class="admin-list-item-side"><span class="admin-badge admin-badge-info">' + PX.esc(a.status) + '</span></div>' +
+            '</div>';
+        });
+      }
+      document.getElementById("recent-applications").innerHTML = html;
+    }
+  } catch (e) {}
+
+  // Recent audit
+  try {
+    var res5 = await PX.adminFetch("/platform/audit-logs?limit=5");
+    if (res5 && res5.ok) {
+      var logs = await res5.json();
+      var items = logs.items || [];
+      var html = "";
+      if (!items.length) {
+        html = '<p style="color: var(--adm-muted);">No audit entries yet.</p>';
+      } else {
+        items.forEach(function (l) {
+          html += '<div class="admin-list-item">' +
+            '<div class="admin-list-item-main">' +
+            '<div class="admin-list-item-title">' + PX.esc(l.action) + '</div>' +
+            '<div class="admin-list-item-sub">' + PX.esc(l.actor_type) + '</div></div>' +
+            '<div class="admin-list-item-side">' + new Date(l.created_at).toLocaleString() + '</div>' +
+            '</div>';
+        });
+      }
+      document.getElementById("recent-audit").innerHTML = html;
+    }
+  } catch (e) {}
 };
 
 /* Sidebar logout for any page */

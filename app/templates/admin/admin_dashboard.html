@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<div class="admin-stats" id="admin-stats">
+<div class="admin-stats">
   <div class="admin-stat">
     <div class="admin-stat-label">Total Tenants</div>
     <div class="admin-stat-value" id="stat-tenants">—</div>
@@ -14,7 +14,7 @@
     <div class="admin-stat-value" id="stat-active">—</div>
   </div>
   <div class="admin-stat">
-    <div class="admin-stat-label">Total Users</div>
+    <div class="admin-stat-label">Users</div>
     <div class="admin-stat-value" id="stat-users">—</div>
   </div>
   <div class="admin-stat">
@@ -23,12 +23,33 @@
   </div>
 </div>
 
-<div class="admin-card">
-  <h2>Welcome back</h2>
-  <p class="admin-card-sub">Platform overview — live data from the API.</p>
-  <p style="color: var(--adm-text-soft); margin: 0;">
-    Use the sidebar to manage tenants, review applications, and inspect audit logs.
-  </p>
+<div class="admin-grid-2">
+  <div class="admin-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+      <h2>Recent tenants</h2>
+      <a href="/admin/tenants" style="font-size: 13px; color: var(--adm-brand);">View all →</a>
+    </div>
+    <p class="admin-card-sub">Latest businesses on the platform.</p>
+    <div id="recent-tenants"><p style="color: var(--adm-muted);">Loading…</p></div>
+  </div>
+
+  <div class="admin-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+      <h2>Recent applications</h2>
+      <a href="/admin/applications" style="font-size: 13px; color: var(--adm-brand);">View all →</a>
+    </div>
+    <p class="admin-card-sub">New partner applications.</p>
+    <div id="recent-applications"><p style="color: var(--adm-muted);">Loading…</p></div>
+  </div>
+</div>
+
+<div class="admin-card" style="margin-top: 24px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+    <h2>Recent activity</h2>
+    <a href="/admin/audit-logs" style="font-size: 13px; color: var(--adm-brand);">View all →</a>
+  </div>
+  <p class="admin-card-sub">Latest actions across the platform.</p>
+  <div id="recent-audit"><p style="color: var(--adm-muted);">Loading…</p></div>
 </div>
 
 {% endblock %}
