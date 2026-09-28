@@ -50,7 +50,7 @@ def chat(
 
     messages.append(AIMessage(role="user", content=message))
 
-    response = provider.chat(messages, system=SYSTEM_PROMPT)
+    response = provider.chat_simple(messages, system=SYSTEM_PROMPT)
 
     return {
         "content": response.content,

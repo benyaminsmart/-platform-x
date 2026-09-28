@@ -1,9 +1,6 @@
-"""Google Gemini provider — via Interactions API (REST).
+"""Google Gemini provider — via Interactions API (REST) with tools support."""
 
-Uses the new Interactions endpoint (v1beta/interactions).
-Activate by setting AI_PROVIDER=gemini and GEMINI_API_KEY=xxx.
-"""
-
+import json
 import requests
 
 from app.core.config import settings
@@ -11,7 +8,7 @@ from app.services.ai.provider import AIProvider, AIMessage, AIResponse
 
 
 class GeminiProvider(AIProvider):
-    """Google Gemini API adapter (Interactions API)."""
+    """Google Gemini API adapter (Interactions API + function calling)."""
 
     name = "gemini"
     BASE_URL = "https://generativelanguage.googleapis.com/v1beta/interactions"
@@ -30,14 +27,16 @@ class GeminiProvider(AIProvider):
         system: str | None = None,
         temperature: float = 0.7,
         max_tokens: int = 1024,
-    ) -> AIResponse:
-        """Send a chat request to Gemini via Interactions API."""
+        tools: list[dict] | None = None,
+    ) -> dict:
+        """Send a chat request. Returns raw response dict.
+
+        If tools is provided, the response may contain function_call steps.
+        Caller is responsible for handling them.
+        """
         if not self.is_available():
             raise RuntimeError("Gemini API key not configured")
 
-        # Build input as a list of content blocks
-        # The Interactions API takes either a single text input, or a list of user_input messages.
-        # For simplicity, we send the last user message as input and prefix system + history as text.
         history_text = ""
         last_user_text = ""
         for m in messages:
@@ -46,31 +45,22 @@ class GeminiProvider(AIProvider):
             elif m.role == "assistant":
                 history_text += f"Assistant: {m.content}\n"
 
-        if history_text:
-            full_input = f"Conversation so far:\n{history_text}\nUser: {last_user_text}"
-        else:
-            full_input = last_user_text
-
+        full_input = (
+            f"Conversation so far:\n{history_text}\nUser: {last_user_text}"
+            if history_text
+            else last_user_text
+        )
         if system:
             full_input = f"[System instructions: {system}]\n\n{full_input}"
 
-        payload = {
-            "model": self.model,
-            "input": full_input,
-        }
+        payload = {"model": self.model, "input": full_input}
+        if tools:
+            payload["tools"] = tools
 
-        headers = {
-            "x-goog-api-key": self.api_key,
-            "Content-Type": "application/json",
-        }
+        headers = {"x-goog-api-key": self.api_key, "Content-Type": "application/json"}
 
         try:
-            resp = requests.post(
-                self.BASE_URL,
-                json=payload,
-                headers=headers,
-                timeout=30,
-            )
+            resp = requests.post(self.BASE_URL, json=payload, headers=headers, timeout=30)
             resp.raise_for_status()
             data = resp.json()
         except requests.RequestException as exc:
@@ -82,25 +72,30 @@ class GeminiProvider(AIProvider):
                     pass
             raise RuntimeError(f"Gemini request failed: {exc} | {body}") from exc
 
-        content = self._extract_text(data)
-        usage = data.get("usage", {})
-        tokens = usage.get("total_tokens", 0)
+        return data
 
+    def chat_simple(
+        self,
+        messages: list[AIMessage],
+        *,
+        system: str | None = None,
+        temperature: float = 0.7,
+        max_tokens: int = 1024,
+    ) -> AIResponse:
+        """Simple chat (returns AIResponse, no tools)."""
+        data = self.chat(messages, system=system, temperature=temperature, max_tokens=max_tokens)
         return AIResponse(
-            content=content,
+            content=self._extract_text(data),
             provider="gemini",
             model=self.model,
-            tokens_used=tokens,
+            tokens_used=data.get("usage", {}).get("total_tokens", 0),
         )
 
     @staticmethod
     def _extract_text(data: dict) -> str:
-        """Extract the assistant text from the Interactions response."""
-        # Preferred: use output_text if present
+        """Extract assistant text from response."""
         if isinstance(data.get("output_text"), str):
             return data["output_text"]
-
-        # Otherwise, walk steps
         parts = []
         for step in data.get("steps", []):
             if step.get("type") == "model_output":
@@ -108,3 +103,56 @@ class GeminiProvider(AIProvider):
                     if block.get("type") == "text":
                         parts.append(block.get("text", ""))
         return "".join(parts) or "(no response)"
+
+    @staticmethod
+    def extract_function_calls(data: dict) -> list[dict]:
+        """Extract all function_call steps from a response."""
+        calls = []
+        for step in data.get("steps", []):
+            if step.get("type") == "function_call":
+                calls.append({
+                    "id": step.get("id"),
+                    "name": step.get("name"),
+                    "arguments": step.get("arguments", {}),
+                })
+        return calls
+
+    def continue_with_function_result(
+        self,
+        *,
+        previous_interaction_id: str,
+        call_id: str,
+        name: str,
+        result: dict,
+        tools: list[dict],
+        system: str | None = None,
+    ) -> dict:
+        """Send a function result back to Gemini for final answer."""
+        # According to Gemini docs, we need to pass previous_interaction_id
+        # and input with the function_result.
+        payload = {
+            "model": self.model,
+            "previous_interaction_id": previous_interaction_id,
+            "input": [
+                {
+                    "type": "function_result",
+                    "name": name,
+                    "call_id": call_id,
+                    "result": [{"type": "text", "text": json.dumps(result)}],
+                }
+            ],
+            "tools": tools,
+        }
+        headers = {"x-goog-api-key": self.api_key, "Content-Type": "application/json"}
+        try:
+            resp = requests.post(self.BASE_URL, json=payload, headers=headers, timeout=30)
+            resp.raise_for_status()
+            return resp.json()
+        except requests.RequestException as exc:
+            body = ""
+            if hasattr(exc, "response") and exc.response is not None:
+                try:
+                    body = exc.response.text[:300]
+                except Exception:
+                    pass
+            raise RuntimeError(f"Gemini continue failed: {exc} | {body}") from exc

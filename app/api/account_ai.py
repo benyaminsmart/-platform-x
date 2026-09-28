@@ -9,6 +9,7 @@ from app.core.config import settings
 from app.core.rate_limit import limiter
 from app.db.session import get_db
 from app.models.ai_chat import AIChatMessage
+from app.models.service import Service
 from app.models.tenant import Tenant
 from app.models.user import User
 from app.services.ai import service as ai_service
@@ -180,7 +181,6 @@ def account_ai_plan(
         raise HTTPException(status_code=503, detail="AI disabled")
 
     # Gather available businesses as context
-    from app.models.service import Service
     services = (
         db.query(Service)
         .filter(Service.tenant_id == tenant.id, Service.status == "active")
@@ -233,4 +233,120 @@ Keep it concise. 4-6 lines per day."""
         provider=result["provider"],
         model=result.get("model"),
         tokens_used=result.get("tokens_used", 0),
+    )
+
+
+class BookRequest(BaseModel):
+    """Request to book via AI."""
+    message: str = Field(min_length=2, max_length=2000)
+
+
+class BookResponse(BaseModel):
+    content: str
+    provider: str
+    booking_id: str | None = None
+    booking_created: bool = False
+    tokens_used: int = 0
+
+
+@router.post("/book", response_model=BookResponse)
+@limiter.limit("10/minute")
+def account_ai_book(
+    request: Request,
+    payload: BookRequest,
+    tenant: Tenant = Depends(get_current_tenant),
+    user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+) -> BookResponse:
+    """AI Booking Agent — natural language → real booking.
+
+    Flow:
+    1. Send user's message to Gemini with the book_service tool.
+    2. If Gemini calls the tool → execute booking.
+    3. Send result back to Gemini for final reply.
+    """
+    if not settings.AI_ENABLED:
+        raise HTTPException(status_code=503, detail="AI disabled")
+
+    from app.core.config import settings as _s
+    if _s.AI_PROVIDER != "gemini":
+        raise HTTPException(status_code=503, detail="Booking agent requires Gemini provider")
+
+    from app.services.ai.booking_tool import BOOKING_TOOL, BookingToolError, execute_book_service
+    from app.services.ai.factory import get_ai_provider
+    from app.services.ai.provider import AIMessage
+
+    provider = get_ai_provider()
+    system = (
+        "You are Platform-X Booking Agent. When the user asks to book a service, "
+        "collect the service name, check-in date (YYYY-MM-DD), check-out date if applicable, "
+        "and number of guests. Only call the book_service tool once you have these details. "
+        "If some details are missing, ask for them first. "
+        "Available service names for this tenant: " +
+        ", ".join([s.name for s in db.query(Service).filter(Service.tenant_id == tenant.id).limit(10)])
+    )
+
+    messages = [AIMessage(role="user", content=payload.message)]
+
+    try:
+        # First call — may return function_call
+        data = provider.chat(messages, system=system, tools=[BOOKING_TOOL])
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"AI error: {exc}") from exc
+
+    interaction_id = data.get("id")
+    function_calls = provider.extract_function_calls(data)
+
+    if not function_calls:
+        # No tool call — just return the text (AI is asking for more info)
+        return BookResponse(
+            content=provider._extract_text(data),
+            provider="gemini",
+            tokens_used=data.get("usage", {}).get("total_tokens", 0),
+        )
+
+    # Execute the (first) tool call
+    call = function_calls[0]
+    try:
+        result = execute_book_service(db, tenant_id=tenant.id, user=user, args=call["arguments"])
+    except BookingToolError as exc:
+        result = {"ok": False, "error": str(exc)}
+
+    # Send result back to Gemini for final reply
+    try:
+        final_data = provider.continue_with_function_result(
+            previous_interaction_id=interaction_id,
+            call_id=call["id"],
+            name=call["name"],
+            result=result,
+            tools=[BOOKING_TOOL],
+            system=system,
+        )
+        final_text = provider._extract_text(final_data)
+        tokens = final_data.get("usage", {}).get("total_tokens", 0)
+    except Exception as exc:
+        final_text = (
+            f"Booking created. ID: {result.get('booking_id')}. "
+            f"Total: {result.get('total')} {result.get('currency')}. "
+            "Please proceed to payment."
+        ) if result.get("ok") else f"Could not book: {result.get('error')}"
+        tokens = 0
+
+    # Save to history
+    db.add(AIChatMessage(
+        tenant_id=tenant.id, user_id=user.id, layer="user",
+        role="user", content=payload.message,
+    ))
+    db.add(AIChatMessage(
+        tenant_id=tenant.id, user_id=user.id, layer="user",
+        role="assistant", content=final_text, provider="gemini", tokens_used=tokens,
+    ))
+    db.commit()
+
+    return BookResponse(
+        content=final_text,
+        provider="gemini",
+        booking_id=result.get("booking_id") if result.get("ok") else None,
+        booking_created=bool(result.get("ok")),
+        tokens_used=tokens,
     )
