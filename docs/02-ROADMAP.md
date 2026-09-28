@@ -422,6 +422,23 @@ Throughout all phases:
 
 **Phase 20 closed.**
 
+
+
+### v0.10.0-ai-foundation — Phase 18 Complete
+- Provider abstraction layer (app/services/ai/)
+- MockProvider (default, keyword-based smart responses)
+- GeminiProvider + OpenAIProvider stubs (ready when API key configured)
+- Factory with safe fallback to mock
+- Public AI Chat: POST /ai/chat (20/min)
+- Business AI Chat: POST /business/api/ai/chat (30/min)
+- Health: GET /ai/health
+- Floating AI FAB on all pages with chat panel
+- Business AI Assistant page (/business/ai)
+- Provider-agnostic: change via AI_PROVIDER env var
+- 154 tests passing
+
+**Phase 18 closed.**
+
 **Last updated:** September 2026
 **Current phase:** TBD (Phase 8 waiting for plan; Phase 10-16 available)
 
