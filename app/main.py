@@ -23,6 +23,7 @@ from app.api import services as services_router
 from app.api import tenants as tenants_router
 from app.core.config import settings
 from app.core.rate_limit import limiter
+from app.core.security_headers import SecurityHeadersMiddleware
 from app.web import pages as web_pages
 from app.web.templates import templates  # noqa: F401  (kept for future direct use)
 
@@ -118,6 +119,9 @@ class NoCacheHTMLMiddleware(BaseHTTPMiddleware):
 
 
 app.add_middleware(NoCacheHTMLMiddleware)
+
+
+app.add_middleware(SecurityHeadersMiddleware)
 
 
 # ---------- API routers ----------
