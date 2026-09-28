@@ -389,3 +389,105 @@ PX.initAdminAuditLogs = async function () {
 
   await load(1);
 };
+
+/* ---------- Subscriptions ---------- */
+
+PX.initAdminSubscriptions = async function () {
+  if (!PX.requireAdmin()) return;
+
+  var tbody = document.getElementById("subs-tbody");
+  var form = document.getElementById("new-sub-form");
+  var btnNew = document.getElementById("btn-new-sub");
+  var btnCancel = document.getElementById("btn-cancel-sub");
+  var btnCreate = document.getElementById("btn-create-sub");
+  var tenantSelect = document.getElementById("sub-tenant");
+  var alertBox = document.getElementById("sub-alert");
+  var tenantsById = {};
+
+  btnNew.addEventListener("click", function () {
+    form.style.display = "block";
+    btnNew.disabled = true;
+  });
+  btnCancel.addEventListener("click", function () {
+    form.style.display = "none";
+    alertBox.style.display = "none";
+    btnNew.disabled = false;
+  });
+
+  async function loadTenants() {
+    try {
+      var res = await PX.adminFetch("/platform/tenants");
+      if (res && res.ok) {
+        var tenants = await res.json();
+        tenants.forEach(function (t) { tenantsById[t.id] = t.name; });
+        tenantSelect.innerHTML = tenants
+          .filter(function (t) { return t.status === "active"; })
+          .map(function (t) { return '<option value="' + t.id + '">' + PX.esc(t.name) + '</option>'; })
+          .join("");
+      }
+    } catch (e) {}
+  }
+
+  async function load() {
+    try {
+      var res = await PX.adminFetch("/platform/subscriptions");
+      if (res && res.ok) {
+        var subs = await res.json();
+        if (!subs.length) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--adm-muted); padding: 40px;">No subscriptions yet.</td></tr>';
+          return;
+        }
+        var html = "";
+        subs.forEach(function (s) {
+          var badgeCls = s.status === "active" ? "admin-badge-success" : "admin-badge-warning";
+          var period = s.current_period_start && s.current_period_end
+            ? new Date(s.current_period_start).toLocaleDateString() + " → " + new Date(s.current_period_end).toLocaleDateString()
+            : "—";
+          var tenantName = tenantsById[s.tenant_id] || s.tenant_id.slice(0, 8) + "…";
+          html += '<tr>' +
+            '<td><strong style="color: var(--adm-text);">' + PX.esc(tenantName) + '</strong></td>' +
+            '<td>' + PX.esc(s.plan) + '</td>' +
+            '<td><span class="admin-badge ' + badgeCls + '">' + PX.esc(s.status) + '</span></td>' +
+            '<td>' + PX.esc(s.price) + " " + PX.esc(s.currency) + '</td>' +
+            '<td>' + PX.esc(s.billing_cycle) + '</td>' +
+            '<td style="font-size: 12px;">' + PX.esc(period) + '</td>' +
+            '</tr>';
+        });
+        tbody.innerHTML = html;
+      }
+    } catch (e) {}
+  }
+
+  btnCreate.addEventListener("click", async function () {
+    alertBox.style.display = "none";
+    var payload = {
+      tenant_id: tenantSelect.value,
+      plan: document.getElementById("sub-plan").value,
+      price: document.getElementById("sub-price").value,
+      currency: "AED",
+      billing_cycle: document.getElementById("sub-cycle").value,
+    };
+    try {
+      var res = await fetch("/platform/subscriptions", {
+        method: "POST",
+        headers: PX.adminHeaders(),
+        body: JSON.stringify(payload),
+      });
+      var data = await res.json();
+      if (!res.ok) {
+        alertBox.textContent = data.detail || "Failed to create";
+        alertBox.style.display = "block";
+        return;
+      }
+      form.style.display = "none";
+      btnNew.disabled = false;
+      await load();
+    } catch (e) {
+      alertBox.textContent = "Network error";
+      alertBox.style.display = "block";
+    }
+  });
+
+  await loadTenants();
+  await load();
+};

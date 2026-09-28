@@ -1,0 +1,83 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Subscriptions — Platform-X Admin{% endblock %}
+
+{% block content %}
+
+<div class="admin-card">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <h2>Subscriptions</h2>
+      <p class="admin-card-sub" style="margin-bottom: 0;">Tenant subscriptions to platform plans.</p>
+    </div>
+    <button class="admin-btn" id="btn-new-sub">+ New subscription</button>
+  </div>
+</div>
+
+<div id="new-sub-form" class="admin-card" style="margin-top: 24px; display: none;">
+  <h2>New subscription</h2>
+  <p class="admin-card-sub">Create a subscription for a tenant.</p>
+
+  <div id="sub-alert" class="admin-alert admin-alert-error" style="display: none;"></div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+    <div class="admin-field">
+      <label class="admin-label">Tenant</label>
+      <select class="admin-input" id="sub-tenant"></select>
+    </div>
+    <div class="admin-field">
+      <label class="admin-label">Plan</label>
+      <select class="admin-input" id="sub-plan">
+        <option value="starter">Starter</option>
+        <option value="professional" selected>Professional</option>
+        <option value="enterprise">Enterprise</option>
+      </select>
+    </div>
+    <div class="admin-field">
+      <label class="admin-label">Price (AED)</label>
+      <input class="admin-input" type="number" id="sub-price" value="500" min="0" step="0.01">
+    </div>
+    <div class="admin-field">
+      <label class="admin-label">Billing cycle</label>
+      <select class="admin-input" id="sub-cycle">
+        <option value="monthly" selected>Monthly</option>
+        <option value="yearly">Yearly</option>
+      </select>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 12px; margin-top: 12px;">
+    <button class="admin-btn" id="btn-create-sub">Create subscription</button>
+    <button class="admin-btn" style="background: transparent; border: 1px solid var(--adm-line-2);" id="btn-cancel-sub">Cancel</button>
+  </div>
+</div>
+
+<div class="admin-card" style="margin-top: 24px;">
+  <h2>All subscriptions</h2>
+  <p class="admin-card-sub">Active and past subscriptions.</p>
+
+  <div style="overflow-x: auto; margin-top: 20px;">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Tenant ID</th>
+          <th>Plan</th>
+          <th>Status</th>
+          <th>Price</th>
+          <th>Cycle</th>
+          <th>Period</th>
+        </tr>
+      </thead>
+      <tbody id="subs-tbody">
+        <tr><td colspan="6" style="text-align: center; color: var(--adm-muted); padding: 40px;">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/admin.js"></script>
+<script>PX.initAdminSubscriptions();</script>
+{% endblock %}

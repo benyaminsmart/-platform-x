@@ -390,6 +390,18 @@ def admin_audit_logs_page(request: Request) -> HTMLResponse:
     )
 
 
+
+
+@router.get("/admin/subscriptions", response_class=HTMLResponse)
+def admin_subscriptions_page(request: Request) -> HTMLResponse:
+    """Admin subscriptions management."""
+    return templates.TemplateResponse(
+        request,
+        "admin/admin_subscriptions.html",
+        {"admin": True, "active_nav": "subscriptions"},
+    )
+
+
 @router.get("/about", response_class=HTMLResponse)
 def about(request: Request) -> HTMLResponse:
     """About page."""
