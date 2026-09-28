@@ -403,6 +403,25 @@ Throughout all phases:
 
 **Phase 11 closed.**
 
+
+
+### v0.9.0-business — Phase 20 Complete
+- Business Owner Panel (separate from Admin Panel)
+- Business auth: /business/login (URL-based tenant)
+- Business Dashboard: bookings, confirmed, services, revenue
+- Services Management: create, list, activate/deactivate
+- Bookings Inbox: view all, change status
+- Customer List: distinct customers with booking counts
+- Analytics (placeholder for AI insights)
+- Staff Accounts: owner/manager/staff roles, owner-only management
+- Business Notifications: new booking alerts
+- Reserved slug: business
+- API prefix: /business/api (avoid collision with HTML)
+- 154 tests passing
+- Live URL: https://always-avoiding-bull-psychiatry.trycloudflare.com
+
+**Phase 20 closed.**
+
 **Last updated:** September 2026
 **Current phase:** TBD (Phase 8 waiting for plan; Phase 10-16 available)
 

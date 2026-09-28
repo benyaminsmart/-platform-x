@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-09-28 (evening)
 
-## Current Phase: 20 (Business Owner Panel) — NEXT
+## Current Phase: 13 (Business Onboarding Tools) — NEXT (after Phase 12 for subdomains)
 
 ### Done:
 - Step 1: Resend SDK installed

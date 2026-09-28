@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.8.0-notifications (Phases 0-7, 9, 11 complete)
+> Version: v0.9.0-business (Phases 0-7, 9, 11, 20 complete)
 
 Last updated: 2026-09-28
 
