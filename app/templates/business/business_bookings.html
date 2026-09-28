@@ -1,0 +1,90 @@
+{% extends "business/business_base.html" %}
+{% block title %}Bookings — Business Panel{% endblock %}
+{% block content %}
+
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+    <div>
+      <h2>Bookings Inbox</h2>
+      <p class="admin-card-sub" style="margin-bottom: 0;">All reservations received by your business.</p>
+    </div>
+    <select class="admin-input" id="filter-status" style="width: auto;">
+      <option value="">All statuses</option>
+      <option value="pending">Pending</option>
+      <option value="confirmed">Confirmed</option>
+      <option value="checked_in">Checked in</option>
+      <option value="checked_out">Checked out</option>
+      <option value="cancelled">Cancelled</option>
+    </select>
+  </div>
+</div>
+
+<div class="admin-card">
+  <div id="bookings-list">Loading…</div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){
+  var token = null; try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login?tenant=trianon-hotel"; return; }
+  var lo = document.getElementById("business-logout");
+  if (lo) lo.addEventListener("click", function(){ try{localStorage.removeItem("px_business_token");}catch(e){}; window.location.href = "/business/login?tenant=trianon-hotel"; });
+  var headers = {"Authorization": "Bearer " + token, "X-Tenant-Slug": "trianon-hotel", "Content-Type": "application/json"};
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+
+  async function load() {
+    var statusFilter = document.getElementById("filter-status").value;
+    var url = "/business/api/bookings" + (statusFilter ? "?status=" + statusFilter : "");
+    try {
+      var res = await fetch(url, {headers: headers});
+      if (res.status === 401) { window.location.href = "/business/login?tenant=trianon-hotel"; return; }
+      var data = await res.json();
+      render(data.items || []);
+    } catch(e) {}
+  }
+
+  function render(items) {
+    var el = document.getElementById("bookings-list");
+    if (!items.length) { el.innerHTML = '<p class="admin-card-sub">No bookings yet.</p>'; return; }
+    var html = '<table class="admin-table"><thead><tr><th>Customer</th><th>Service</th><th>Dates</th><th>Guests</th><th>Amount</th><th>Payment</th><th>Status</th><th></th></tr></thead><tbody>';
+    items.forEach(function(b){
+      var badge = b.status === "confirmed" ? "admin-badge-success"
+        : b.status === "cancelled" ? "admin-badge-error"
+        : b.status === "pending" ? "admin-badge-warning"
+        : "admin-badge-info";
+      var payBadge = b.payment_status === "paid" ? "admin-badge-success" : "admin-badge-warning";
+      var dates = b.check_in + (b.check_out ? " → " + b.check_out : "");
+      html += "<tr>" +
+        "<td><div style='font-weight:600;'>" + esc(b.customer_name || "—") + "</div><div style='font-size:11px; color:var(--adm-muted);'>" + esc(b.customer_email || "") + "</div></td>" +
+        "<td>" + esc(b.service_name) + "</td>" +
+        "<td style='font-size:12px;'>" + esc(dates) + "</td>" +
+        "<td>" + b.guests + "</td>" +
+        "<td>" + esc(b.total_amount) + " " + esc(b.currency) + "</td>" +
+        "<td><span class='admin-badge " + payBadge + "'>" + esc(b.payment_status) + "</span></td>" +
+        "<td><span class='admin-badge " + badge + "'>" + esc(b.status) + "</span></td>" +
+        "<td><select class='admin-input' style='padding:6px; font-size:12px;' data-bid='" + b.id + "'>" +
+        ["pending","confirmed","checked_in","checked_out","cancelled"].map(function(s){
+          return "<option value='" + s + "'" + (s === b.status ? " selected" : "") + ">" + s + "</option>";
+        }).join("") +
+        "</select></td></tr>";
+    });
+    html += "</tbody></table>";
+    el.innerHTML = html;
+
+    el.querySelectorAll("[data-bid]").forEach(function(sel){
+      sel.addEventListener("change", async function(){
+        var id = sel.getAttribute("data-bid");
+        var status = sel.value;
+        await fetch("/business/api/bookings/" + id + "/status", {method: "PATCH", headers: headers, body: JSON.stringify({status: status})});
+        load();
+      });
+    });
+  }
+
+  document.getElementById("filter-status").addEventListener("change", load);
+  load();
+})();
+</script>
+{% endblock %}

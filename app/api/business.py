@@ -255,3 +255,117 @@ def delete_business_service(
     svc.status = "inactive"
     db.commit()
     return {"id": svc.id, "message": "Service deactivated"}
+
+
+# ---------- Bookings Inbox ----------
+
+
+@router.get("/bookings")
+def list_business_bookings(
+    status_filter: str | None = None,
+    page: int = 1,
+    limit: int = 50,
+    user: User = Depends(get_current_business_user),
+    tenant: Tenant = Depends(get_business_tenant),
+    db: DBSession = Depends(get_db),
+) -> dict:
+    """List all bookings received by this business."""
+    from sqlalchemy import desc
+    q = db.query(Booking).filter(Booking.tenant_id == tenant.id)
+    if status_filter:
+        q = q.filter(Booking.status == status_filter)
+    total = q.count()
+    rows = q.order_by(desc(Booking.created_at)).offset((page - 1) * limit).limit(limit).all()
+
+    # Get user emails
+    user_ids = list({b.user_id for b in rows})
+    users = {u.id: u for u in db.query(User).filter(User.id.in_(user_ids)).all()} if user_ids else {}
+
+    return {
+        "total": total,
+        "items": [
+            {
+                "id": b.id,
+                "service_name": b.service_name,
+                "booking_type": b.booking_type,
+                "check_in": str(b.check_in),
+                "check_out": str(b.check_out) if b.check_out else None,
+                "guests": b.guests,
+                "total_amount": str(b.total_amount),
+                "currency": b.currency,
+                "status": b.status,
+                "payment_status": b.payment_status,
+                "created_at": b.created_at.isoformat() if b.created_at else None,
+                "customer_email": (users.get(b.user_id).email if users.get(b.user_id) else None),
+                "customer_name": (
+                    (users[b.user_id].first_name + " " + users[b.user_id].last_name)
+                    if b.user_id in users else None
+                ),
+            }
+            for b in rows
+        ],
+    }
+
+
+@router.patch("/bookings/{booking_id}/status")
+def update_booking_status(
+    booking_id: str,
+    payload: dict,
+    user: User = Depends(get_current_business_user),
+    tenant: Tenant = Depends(get_business_tenant),
+    db: DBSession = Depends(get_db),
+) -> dict:
+    """Change status of a booking (e.g. confirmed, checked_in, checked_out, cancelled)."""
+    new_status = (payload.get("status") or "").strip()
+    allowed = {"pending", "confirmed", "checked_in", "checked_out", "cancelled"}
+    if new_status not in allowed:
+        raise HTTPException(status_code=400, detail=f"Invalid status. Use one of: {', '.join(allowed)}")
+    b = db.query(Booking).filter(
+        Booking.id == booking_id,
+        Booking.tenant_id == tenant.id,
+    ).one_or_none()
+    if b is None:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    b.status = new_status
+    db.commit()
+    return {"id": b.id, "status": b.status}
+
+
+# ---------- Customers ----------
+
+
+@router.get("/customers")
+def list_business_customers(
+    user: User = Depends(get_current_business_user),
+    tenant: Tenant = Depends(get_business_tenant),
+    db: DBSession = Depends(get_db),
+) -> list[dict]:
+    """List distinct customers who have booked with this business."""
+    from sqlalchemy import func
+    # Get user_ids with booking counts
+    rows = (
+        db.query(Booking.user_id, func.count(Booking.id).label("cnt"))
+        .filter(Booking.tenant_id == tenant.id)
+        .group_by(Booking.user_id)
+        .order_by(func.count(Booking.id).desc())
+        .all()
+    )
+    if not rows:
+        return []
+    user_ids = [r[0] for r in rows]
+    users = {u.id: u for u in db.query(User).filter(User.id.in_(user_ids)).all()}
+    counts = {r[0]: r[1] for r in rows}
+    return [
+        {
+            "id": uid,
+            "email": users[uid].email if uid in users else None,
+            "name": (users[uid].first_name + " " + users[uid].last_name) if uid in users else None,
+            "phone": users[uid].phone if uid in users else None,
+            "language": users[uid].language if uid in users else None,
+            "points": users[uid].points if uid in users else 0,
+            "tier": users[uid].tier if uid in users else None,
+            "bookings_count": counts.get(uid, 0),
+        }
+        for uid in user_ids
+        if uid in users
+    ]

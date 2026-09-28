@@ -1,0 +1,49 @@
+{% extends "business/business_base.html" %}
+{% block title %}Customers — Business Panel{% endblock %}
+{% block content %}
+
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h2>Customers</h2>
+  <p class="admin-card-sub" style="margin-bottom: 0;">All guests who have booked with your business.</p>
+</div>
+
+<div class="admin-card">
+  <div id="customers-list">Loading…</div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){
+  var token = null; try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login?tenant=trianon-hotel"; return; }
+  var lo = document.getElementById("business-logout");
+  if (lo) lo.addEventListener("click", function(){ try{localStorage.removeItem("px_business_token");}catch(e){}; window.location.href = "/business/login?tenant=trianon-hotel"; });
+  var headers = {"Authorization": "Bearer " + token, "X-Tenant-Slug": "trianon-hotel", "Content-Type": "application/json"};
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+
+  fetch("/business/api/customers", {headers: headers})
+    .then(function(r){ if (r.status === 401) { window.location.href = "/business/login?tenant=trianon-hotel"; return null; } return r.json(); })
+    .then(function(items){
+      if (!items) return;
+      var el = document.getElementById("customers-list");
+      if (!items.length) { el.innerHTML = '<p class="admin-card-sub">No customers yet.</p>'; return; }
+      var html = '<table class="admin-table"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Language</th><th>Tier</th><th>Points</th><th>Bookings</th></tr></thead><tbody>';
+      items.forEach(function(c){
+        html += "<tr>" +
+          "<td><strong>" + esc(c.name || "—") + "</strong></td>" +
+          "<td>" + esc(c.email || "—") + "</td>" +
+          "<td>" + esc(c.phone || "—") + "</td>" +
+          "<td>" + esc(c.language || "—") + "</td>" +
+          "<td><span class='admin-badge admin-badge-info'>" + esc(c.tier || "—") + "</span></td>" +
+          "<td>" + (c.points || 0) + "</td>" +
+          "<td><strong>" + (c.bookings_count || 0) + "</strong></td>" +
+          "</tr>";
+      });
+      html += "</tbody></table>";
+      el.innerHTML = html;
+    })
+    .catch(function(){});
+})();
+</script>
+{% endblock %}

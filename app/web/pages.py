@@ -484,6 +484,53 @@ def business_services_page(request: Request) -> HTMLResponse:
     )
 
 
+
+
+@router.get("/business/bookings", response_class=HTMLResponse)
+def business_bookings_page(request: Request) -> HTMLResponse:
+    """Business bookings inbox."""
+    return templates.TemplateResponse(
+        request,
+        "business/business_bookings.html",
+        {
+            "business_user": {"first_name": "Owner", "last_name": ""},
+            "tenant_name": "Business",
+            "tenant_slug": "trianon-hotel",
+            "active_nav": "bookings",
+        },
+    )
+
+
+@router.get("/business/customers", response_class=HTMLResponse)
+def business_customers_page(request: Request) -> HTMLResponse:
+    """Business customers list."""
+    return templates.TemplateResponse(
+        request,
+        "business/business_customers.html",
+        {
+            "business_user": {"first_name": "Owner", "last_name": ""},
+            "tenant_name": "Business",
+            "tenant_slug": "trianon-hotel",
+            "active_nav": "customers",
+        },
+    )
+
+
+@router.get("/business/analytics", response_class=HTMLResponse)
+def business_analytics_page(request: Request) -> HTMLResponse:
+    """Business analytics page."""
+    return templates.TemplateResponse(
+        request,
+        "business/business_analytics.html",
+        {
+            "business_user": {"first_name": "Owner", "last_name": ""},
+            "tenant_name": "Business",
+            "tenant_slug": "trianon-hotel",
+            "active_nav": "analytics",
+        },
+    )
+
+
 @router.get("/about", response_class=HTMLResponse)
 def about(request: Request) -> HTMLResponse:
     """About page."""
