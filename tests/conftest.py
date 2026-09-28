@@ -7,6 +7,7 @@ import tempfile
 # Use minimal bcrypt rounds in tests (default 12 is ~10x slower).
 os.environ.setdefault("BCRYPT_ROUNDS", "4")
 os.environ.setdefault("SECRET_KEY", "test-secret-key")
+os.environ["RATE_LIMIT_ENABLED"] = "false"
 
 _tmp_db_fd, _tmp_db_path = tempfile.mkstemp(suffix=".db", prefix="platform_x_test_")
 os.close(_tmp_db_fd)

@@ -10,10 +10,11 @@ Admin:
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session as DBSession
 
 from app.api.deps_admin import get_current_admin, require_role
+from app.core.rate_limit import LIMITS, limiter
 from app.db.session import get_db
 from app.models.platform_admin import PlatformAdmin
 from app.schemas.common import PaginatedResponse
@@ -35,7 +36,9 @@ router = APIRouter(tags=["partners"])
     response_model=PartnerApplicationReceived,
     status_code=status.HTTP_201_CREATED,
 )
+@limiter.limit(LIMITS["partner_apply"])
 def submit_application(
+    request: Request,
     payload: PartnerApplicationCreate,
     db: DBSession = Depends(get_db),
 ) -> PartnerApplicationReceived:

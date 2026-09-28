@@ -4,6 +4,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import FastAPI, Request
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -20,6 +22,7 @@ from app.api import rewards as rewards_router
 from app.api import services as services_router
 from app.api import tenants as tenants_router
 from app.core.config import settings
+from app.core.rate_limit import limiter
 from app.web import pages as web_pages
 from app.web.templates import templates  # noqa: F401  (kept for future direct use)
 
@@ -32,6 +35,24 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
 )
+
+app.state.limiter = limiter
+app.add_middleware(SlowAPIMiddleware)
+
+
+@app.exception_handler(RateLimitExceeded)
+async def _rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    """Return a clean 429 response when rate limit is exceeded."""
+    from fastapi.responses import JSONResponse
+    return JSONResponse(
+        status_code=429,
+        content={
+            "detail": "Too many requests. Please slow down and try again shortly.",
+            "retry_after": getattr(exc, "retry_after", None),
+        },
+        headers={"Retry-After": str(getattr(exc, "retry_after", 60))},
+    )
+
 
 app.add_middleware(
     CORSMiddleware,

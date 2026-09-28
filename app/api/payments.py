@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session as DBSession
 
 from app.api.deps import get_current_tenant, get_current_user
 from app.core.config import settings
+from app.core.rate_limit import LIMITS, limiter
 from app.db.session import get_db
 from app.models.tenant import Tenant
 from app.models.user import User
@@ -26,7 +27,9 @@ router = APIRouter(prefix="/payments", tags=["payments"])
     response_model=PaymentIntentResponse,
     status_code=status.HTTP_201_CREATED,
 )
+@limiter.limit(LIMITS["payment_intent"])
 def create_intent(
+    request: Request,
     payload: PaymentIntentRequest,
     tenant: Tenant = Depends(get_current_tenant),
     user: User = Depends(get_current_user),

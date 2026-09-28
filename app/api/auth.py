@@ -1,10 +1,11 @@
 """Authentication endpoints."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session as DBSession
 
 from app.api.deps import get_current_tenant, get_current_user
 from app.core.config import settings
+from app.core.rate_limit import LIMITS, limiter
 from app.core.security import create_access_token
 from app.db.session import get_db
 from app.models.tenant import Tenant
@@ -25,7 +26,9 @@ router = APIRouter(prefix="/auth", tags=["auth"])
     response_model=TokenResponse,
     status_code=status.HTTP_201_CREATED,
 )
+@limiter.limit(LIMITS["auth_register"])
 def register(
+    request: Request,
     payload: RegisterRequest,
     tenant: Tenant = Depends(get_current_tenant),
     db: DBSession = Depends(get_db),
@@ -60,7 +63,9 @@ def register(
 
 
 @router.post("/login", response_model=TokenResponse)
+@limiter.limit(LIMITS["auth_login"])
 def login(
+    request: Request,
     payload: LoginRequest,
     tenant: Tenant = Depends(get_current_tenant),
     db: DBSession = Depends(get_db),
@@ -80,7 +85,8 @@ def login(
 
 
 @router.get("/me", response_model=CurrentUserResponse)
-def me(current_user: User = Depends(get_current_user)) -> CurrentUserResponse:
+@limiter.limit(LIMITS["auth_me"])
+def me(request: Request, current_user: User = Depends(get_current_user)) -> CurrentUserResponse:
     """Return the authenticated user's profile."""
     return CurrentUserResponse(
         id=current_user.id,
