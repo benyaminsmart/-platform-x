@@ -327,3 +327,65 @@ PX.initAdminApplications = async function () {
     tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--adm-error); padding: 40px;">Failed to load applications.</td></tr>';
   }
 };
+
+/* ---------- Audit Logs ---------- */
+
+PX.initAdminAuditLogs = async function () {
+  if (!PX.requireAdmin()) return;
+  var tbody = document.getElementById("audit-tbody");
+  var pag = document.getElementById("audit-pagination");
+  var currentPage = 1;
+  var limit = 50;
+  var total = 0;
+
+  async function load(page) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--adm-muted); padding: 40px;">Loading…</td></tr>';
+    try {
+      var res = await PX.adminFetch("/platform/audit-logs?page=" + page + "&limit=" + limit);
+      if (res && res.ok) {
+        var data = await res.json();
+        total = data.total;
+        render(data.items || []);
+        renderPagination();
+      }
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--adm-error); padding: 40px;">Failed to load.</td></tr>';
+    }
+  }
+
+  function render(items) {
+    if (!items.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--adm-muted); padding: 40px;">No entries.</td></tr>';
+      return;
+    }
+    var html = "";
+    items.forEach(function (l) {
+      var when = l.created_at ? new Date(l.created_at).toLocaleString() : "—";
+      var target = l.target_table ? l.target_table + (l.target_id ? " (" + l.target_id.slice(0, 8) + "…)" : "") : "—";
+      var changes = l.changes ? JSON.stringify(l.changes).slice(0, 80) : "—";
+      html += '<tr>' +
+        '<td style="font-size: 12px; color: var(--adm-muted);">' + PX.esc(when) + '</td>' +
+        '<td><span class="admin-badge admin-badge-info">' + PX.esc(l.actor_type) + '</span></td>' +
+        '<td><strong style="color: var(--adm-text);">' + PX.esc(l.action) + '</strong></td>' +
+        '<td style="font-family: var(--adm-font-mono); font-size: 12px;">' + PX.esc(target) + '</td>' +
+        '<td style="font-family: var(--adm-font-mono); font-size: 11px; color: var(--adm-muted);">' + PX.esc(changes) + '</td>' +
+        '</tr>';
+    });
+    tbody.innerHTML = html;
+  }
+
+  function renderPagination() {
+    var totalPages = Math.ceil(total / limit);
+    if (totalPages <= 1) { pag.innerHTML = ""; return; }
+    pag.innerHTML =
+      '<button class="admin-btn" ' + (currentPage === 1 ? "disabled" : "") + ' id="pg-prev">← Prev</button>' +
+      '<span style="align-self: center; color: var(--adm-muted); font-size: 13px;">Page ' + currentPage + " of " + totalPages + '</span>' +
+      '<button class="admin-btn" ' + (currentPage >= totalPages ? "disabled" : "") + ' id="pg-next">Next →</button>';
+    var pv = document.getElementById("pg-prev");
+    var nx = document.getElementById("pg-next");
+    if (pv) pv.addEventListener("click", function () { currentPage--; load(currentPage); });
+    if (nx) nx.addEventListener("click", function () { currentPage++; load(currentPage); });
+  }
+
+  await load(1);
+};

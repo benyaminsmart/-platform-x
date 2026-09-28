@@ -1,0 +1,36 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Audit Logs — Platform-X Admin{% endblock %}
+
+{% block content %}
+
+<div class="admin-card">
+  <h2>Audit logs</h2>
+  <p class="admin-card-sub">All recorded actions across the platform.</p>
+
+  <div style="overflow-x: auto; margin-top: 20px;">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>When</th>
+          <th>Actor</th>
+          <th>Action</th>
+          <th>Target</th>
+          <th>Changes</th>
+        </tr>
+      </thead>
+      <tbody id="audit-tbody">
+        <tr><td colspan="5" style="text-align: center; color: var(--adm-muted); padding: 40px;">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="audit-pagination" style="margin-top: 20px; display: flex; justify-content: center; gap: 12px;"></div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/admin.js"></script>
+<script>PX.initAdminAuditLogs();</script>
+{% endblock %}
