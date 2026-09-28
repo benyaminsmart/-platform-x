@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session as DBSession
 
+from app.core.i18n import resolve_language, translate
 from app.db.session import get_db
 from app.models.tenant import Tenant
 from app.services import service_service
@@ -64,41 +65,42 @@ def _top_by_type(tenants: list[Tenant], ttype: str, n: int = 3) -> list[Tenant]:
 @router.get("/", response_class=HTMLResponse)
 def home(request: Request, db: DBSession = Depends(get_db)) -> HTMLResponse:
     """Platform-X landing page."""
+    _lang = resolve_language(request)
     tenants = _active_tenants(db)
     counts = _counts_by_type(tenants)
 
     featured = [
         {
-            "eyebrow": "Hotels",
-            "title": "Places to stay",
-            "label": "Hotel",
+            "eyebrow": translate("nav.hotels", _lang),
+            "title": translate("home.featured_hotels", _lang),
+            "label": translate("categories.hotels_title", _lang),
             "pill": "px-cat-hotels",
             "href": "/hotels",
             "count": counts.get("hotel", 0),
             "items": _top_by_type(tenants, "hotel", 3),
         },
         {
-            "eyebrow": "Restaurants",
-            "title": "Where to eat",
-            "label": "Restaurant",
+            "eyebrow": translate("nav.restaurants", _lang),
+            "title": translate("home.featured_restaurants", _lang),
+            "label": translate("categories.restaurants_title", _lang),
             "pill": "px-cat-restaurants",
             "href": "/restaurants",
             "count": counts.get("restaurant", 0),
             "items": _top_by_type(tenants, "restaurant", 3),
         },
         {
-            "eyebrow": "Travel",
-            "title": "Plan your journey",
-            "label": "Travel",
+            "eyebrow": translate("nav.travel", _lang),
+            "title": translate("home.featured_travel", _lang),
+            "label": translate("categories.travel_title", _lang),
             "pill": "px-cat-travel",
             "href": "/travel",
             "count": counts.get("travel_agency", 0),
             "items": _top_by_type(tenants, "travel_agency", 3),
         },
         {
-            "eyebrow": "Entertainment",
-            "title": "Things to do",
-            "label": "Fun",
+            "eyebrow": translate("nav.entertainment", _lang),
+            "title": translate("home.featured_entertainment", _lang),
+            "label": translate("categories.entertainment_title", _lang),
             "pill": "px-cat-entertainment",
             "href": "/entertainment",
             "count": counts.get("entertainment", 0),

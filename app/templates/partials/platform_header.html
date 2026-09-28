@@ -6,16 +6,40 @@
     </a>
 
     <nav class="px-nav" id="px-nav" role="navigation" aria-label="Main">
-      <a href="/hotels">Hotels</a>
-      <a href="/restaurants">Restaurants</a>
-      <a href="/travel">Travel</a>
-      <a href="/entertainment">Entertainment</a>
+      <a href="/hotels">{{ t('nav.hotels', current_lang) }}</a>
+      <a href="/restaurants">{{ t('nav.restaurants', current_lang) }}</a>
+      <a href="/travel">{{ t('nav.travel', current_lang) }}</a>
+      <a href="/entertainment">{{ t('nav.entertainment', current_lang) }}</a>
     </nav>
 
     <div class="px-header-right">
+      <div class="px-lang-switcher" id="px-lang-switcher">
+        <button class="px-lang-btn" id="px-lang-toggle" aria-haspopup="true" aria-expanded="false" title="Change language">
+          <span class="px-lang-globe">🌍</span>
+        </button>
+        <div class="px-lang-menu" id="px-lang-menu">
+          <a href="?lang=en" class="px-lang-option" data-lang="en">
+            <span class="px-lang-flag">🇬🇧</span>
+            <span>English</span>
+          </a>
+          <a href="?lang=ar" class="px-lang-option" data-lang="ar">
+            <span class="px-lang-flag">🇦🇪</span>
+            <span>العربية</span>
+          </a>
+          <a href="?lang=fil" class="px-lang-option" data-lang="fil">
+            <span class="px-lang-flag">🇵🇭</span>
+            <span>Filipino</span>
+          </a>
+          <a href="?lang=hi" class="px-lang-option" data-lang="hi">
+            <span class="px-lang-flag">🇮🇳</span>
+            <span>हिन्दी</span>
+          </a>
+        </div>
+      </div>
+
       <span id="px-auth-slot" class="px-auth-slot">
-        <a href="/login" class="px-btn px-btn-ghost px-hide-mobile">Sign in</a>
-        <a href="/register" class="px-btn px-btn-primary">Get started</a>
+        <a href="/login" class="px-btn px-btn-ghost px-hide-mobile">{{ t('nav.sign_in', current_lang) }}</a>
+        <a href="/register" class="px-btn px-btn-primary">{{ t('nav.get_started', current_lang) }}</a>
       </span>
 
       <button class="px-mobile-toggle" id="px-mobile-toggle" aria-label="Toggle menu" aria-expanded="false">

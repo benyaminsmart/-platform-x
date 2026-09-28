@@ -9,37 +9,34 @@
     <div class="px-hero-content">
       <div class="px-hero-eyebrow">
         <span class="px-hero-eyebrow-dot"></span>
-        <span>{{ businesses|length }} businesses live · Always growing</span>
+        <span>{{ t('home.hero_eyebrow', current_lang, count=businesses|length) }}</span>
       </div>
 
       <h1 class="px-hero-title">
-        Discover and book<br>
-        <span class="px-hero-gradient">extraordinary experiences</span>
+        {{ t('home.hero_title', current_lang) }}<br>
+        <span class="px-hero-gradient">{{ t('home.hero_title_accent', current_lang) }}</span>
       </h1>
 
-      <p class="px-hero-sub">
-        Hotels, restaurants, travel agencies, and entertainment venues — all in one place.
-        One account, one rewards program, thousands of possibilities.
-      </p>
+      <p class="px-hero-sub">{{ t('home.hero_sub', current_lang) }}</p>
 
       <form class="px-search" action="/businesses" method="get">
         <div class="px-search-field">
-          <label>Where</label>
-          <input type="text" name="q" placeholder="City, hotel, or service">
+          <label>{{ t('common.where', current_lang) }}</label>
+          <input type="text" name="q" placeholder="{{ t('home.search_placeholder', current_lang) }}">
         </div>
         <div class="px-search-divider"></div>
         <div class="px-search-field">
-          <label>Category</label>
+          <label>{{ t('common.category', current_lang) }}</label>
           <select name="category">
-            <option value="">Any</option>
-            <option value="hotel">Hotels</option>
-            <option value="restaurant">Restaurants</option>
-            <option value="travel_agency">Travel</option>
-            <option value="entertainment">Entertainment</option>
+            <option value="">{{ t('common.any', current_lang) }}</option>
+            <option value="hotel">{{ t('nav.hotels', current_lang) }}</option>
+            <option value="restaurant">{{ t('nav.restaurants', current_lang) }}</option>
+            <option value="travel_agency">{{ t('nav.travel', current_lang) }}</option>
+            <option value="entertainment">{{ t('nav.entertainment', current_lang) }}</option>
           </select>
         </div>
         <button type="submit" class="px-btn px-btn-primary px-search-submit">
-          Search
+          {{ t('common.search', current_lang) }}
         </button>
       </form>
     </div>
@@ -52,19 +49,19 @@
     <div class="px-stats-grid">
       <div class="px-stat">
         <div class="px-stat-value" data-count="{{ stats.businesses }}">{{ stats.businesses }}</div>
-        <div class="px-stat-label">Businesses</div>
+        <div class="px-stat-label">{{ t('home.stats_businesses', current_lang) }}</div>
       </div>
       <div class="px-stat">
         <div class="px-stat-value" data-count="{{ stats.services }}">{{ stats.services }}</div>
-        <div class="px-stat-label">Services</div>
+        <div class="px-stat-label">{{ t('home.stats_services', current_lang) }}</div>
       </div>
       <div class="px-stat">
         <div class="px-stat-value" data-count="{{ stats.categories }}">{{ stats.categories }}</div>
-        <div class="px-stat-label">Categories</div>
+        <div class="px-stat-label">{{ t('home.stats_categories', current_lang) }}</div>
       </div>
       <div class="px-stat">
         <div class="px-stat-value" data-count="{{ stats.cities }}">{{ stats.cities }}</div>
-        <div class="px-stat-label">Locations</div>
+        <div class="px-stat-label">{{ t('home.stats_locations', current_lang) }}</div>
       </div>
     </div>
   </div>
@@ -74,9 +71,9 @@
 <section class="px-section" style="background: var(--px-bg-soft); padding: 80px 0;">
   <div class="px-container">
     <div class="px-section-head-center">
-      <span class="px-section-eyebrow">Browse</span>
-      <h2>Four categories. Endless possibilities.</h2>
-      <p class="px-section-sub">Pick your kind of experience.</p>
+      <span class="px-section-eyebrow">{{ t('home.browse_eyebrow', current_lang) }}</span>
+      <h2>{{ t('home.browse_title', current_lang) }}</h2>
+      <p class="px-section-sub">{{ t('home.browse_sub', current_lang) }}</p>
     </div>
 
     <div class="px-cat-grid">
@@ -84,32 +81,32 @@
         <div class="px-cat-card-bg" style="background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80&auto=format&fit=crop');"></div>
         <div class="px-cat-card-icon">🏨</div>
         <div class="px-cat-card-content">
-          <h3>Hotels</h3>
-          <p>{{ counts.hotel }} properties</p>
+          <h3>{{ t('categories.hotels_title', current_lang) }}</h3>
+          <p>{{ counts.hotel }} {{ t('home.stats_businesses', current_lang) }}</p>
         </div>
       </a>
       <a href="/restaurants" class="px-cat-card">
         <div class="px-cat-card-bg" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80&auto=format&fit=crop');"></div>
         <div class="px-cat-card-icon">🍽</div>
         <div class="px-cat-card-content">
-          <h3>Restaurants</h3>
-          <p>{{ counts.restaurant }} venues</p>
+          <h3>{{ t('categories.restaurants_title', current_lang) }}</h3>
+          <p>{{ counts.restaurant }} {{ t('home.stats_businesses', current_lang) }}</p>
         </div>
       </a>
       <a href="/travel" class="px-cat-card">
         <div class="px-cat-card-bg" style="background-image: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=80&auto=format&fit=crop');"></div>
         <div class="px-cat-card-icon">✈️</div>
         <div class="px-cat-card-content">
-          <h3>Travel</h3>
-          <p>{{ counts.travel_agency }} agencies</p>
+          <h3>{{ t('categories.travel_title', current_lang) }}</h3>
+          <p>{{ counts.travel_agency }} {{ t('home.stats_businesses', current_lang) }}</p>
         </div>
       </a>
       <a href="/entertainment" class="px-cat-card">
         <div class="px-cat-card-bg" style="background-image: url('https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?w=800&q=80&auto=format&fit=crop');"></div>
         <div class="px-cat-card-icon">🎢</div>
         <div class="px-cat-card-content">
-          <h3>Entertainment</h3>
-          <p>{{ counts.entertainment }} attractions</p>
+          <h3>{{ t('categories.entertainment_title', current_lang) }}</h3>
+          <p>{{ counts.entertainment }} {{ t('home.stats_businesses', current_lang) }}</p>
         </div>
       </a>
     </div>
@@ -122,25 +119,25 @@
 <section class="px-section">
   <div class="px-container">
     <div class="px-section-head-center">
-      <span class="px-section-eyebrow">How it works</span>
-      <h2>From discovery to confirmation in minutes.</h2>
+      <span class="px-section-eyebrow">{{ t('home.how_eyebrow', current_lang) }}</span>
+      <h2>{{ t('home.how_title', current_lang) }}</h2>
     </div>
 
     <div class="px-steps">
       <div class="px-step">
         <div class="px-step-num">1</div>
-        <h4>Discover</h4>
-        <p>Browse thousands of businesses across four categories — filter by location, price, rating.</p>
+        <h4>{{ t('home.how_step1_title', current_lang) }}</h4>
+        <p>{{ t('home.how_step1_sub', current_lang) }}</p>
       </div>
       <div class="px-step">
         <div class="px-step-num">2</div>
-        <h4>Book</h4>
-        <p>Reserve instantly with our unified booking flow. Confirmation arrives immediately.</p>
+        <h4>{{ t('home.how_step2_title', current_lang) }}</h4>
+        <p>{{ t('home.how_step2_sub', current_lang) }}</p>
       </div>
       <div class="px-step">
         <div class="px-step-num">3</div>
-        <h4>Earn</h4>
-        <p>Points are awarded on every booking. Redeem across the entire platform.</p>
+        <h4>{{ t('home.how_step3_title', current_lang) }}</h4>
+        <p>{{ t('home.how_step3_sub', current_lang) }}</p>
       </div>
     </div>
   </div>
@@ -151,9 +148,9 @@
   <div class="px-container">
     <div class="px-cta">
       <div class="px-cta-content">
-        <h2>List your business on Platform-X</h2>
-        <p>Join hotels, restaurants, travel agencies, and entertainment venues already using our platform. Zero setup cost.</p>
-        <a href="/partners/apply" class="px-btn px-btn-accent px-btn-lg">Get in touch</a>
+        <h2>{{ t('home.cta_title', current_lang) }}</h2>
+        <p>{{ t('home.cta_sub', current_lang) }}</p>
+        <a href="/partners/apply" class="px-btn px-btn-accent px-btn-lg">{{ t('home.cta_button', current_lang) }}</a>
       </div>
     </div>
   </div>

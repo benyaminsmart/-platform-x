@@ -7,44 +7,44 @@
           <span>Platform-X</span>
         </div>
         <p style="color: var(--px-muted); margin: 0 0 12px; max-width: 340px; line-height: 1.6;">
-          One platform for hotels, restaurants, travel, and entertainment. Book, earn rewards, and discover — all in one place.
+          {{ t('footer.tagline', current_lang) }}
         </p>
       </div>
 
       <div>
-        <div class="px-footer-col-title">Discover</div>
+        <div class="px-footer-col-title">{{ t('footer.discover', current_lang) }}</div>
         <div class="px-footer-links">
-          <a href="/hotels">Hotels</a>
-          <a href="/restaurants">Restaurants</a>
-          <a href="/travel">Travel</a>
-          <a href="/entertainment">Entertainment</a>
+          <a href="/hotels">{{ t('nav.hotels', current_lang) }}</a>
+          <a href="/restaurants">{{ t('nav.restaurants', current_lang) }}</a>
+          <a href="/travel">{{ t('nav.travel', current_lang) }}</a>
+          <a href="/entertainment">{{ t('nav.entertainment', current_lang) }}</a>
         </div>
       </div>
 
       <div>
-        <div class="px-footer-col-title">For business</div>
+        <div class="px-footer-col-title">{{ t('footer.business', current_lang) }}</div>
         <div class="px-footer-links">
-          <a href="/contact">List your property</a>
-          <a href="/about">How it works</a>
-          <a href="/contact">Pricing</a>
-          <a href="/login">Partner login</a>
+          <a href="/partners/apply">{{ t('footer.list_property', current_lang) }}</a>
+          <a href="/about">{{ t('footer.how_it_works', current_lang) }}</a>
+          <a href="/partners/apply">{{ t('footer.pricing', current_lang) }}</a>
+          <a href="/admin/login">{{ t('footer.partner_login', current_lang) }}</a>
         </div>
       </div>
 
       <div>
-        <div class="px-footer-col-title">Company</div>
+        <div class="px-footer-col-title">{{ t('footer.company', current_lang) }}</div>
         <div class="px-footer-links">
-          <a href="/about">About</a>
-          <a href="/contact">Contact</a>
-          <a href="#">Terms</a>
-          <a href="#">Privacy</a>
+          <a href="/about">{{ t('footer.about', current_lang) }}</a>
+          <a href="/contact">{{ t('footer.contact', current_lang) }}</a>
+          <a href="#">{{ t('footer.terms', current_lang) }}</a>
+          <a href="#">{{ t('footer.privacy', current_lang) }}</a>
         </div>
       </div>
     </div>
 
     <div class="px-footer-bottom">
-      <div>&copy; {{ now_year }} Platform-X. All rights reserved.</div>
-      <div>Made with care for hospitality.</div>
+      <div>&copy; {{ now_year }} {{ t('footer.copyright', current_lang) }}</div>
+      <div>{{ t('footer.made_with', current_lang) }}</div>
     </div>
   </div>
 </footer>

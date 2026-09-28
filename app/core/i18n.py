@@ -48,22 +48,25 @@ def _lookup(dictionary: dict, dotted_key: str) -> str | None:
     return node if isinstance(node, str) else None
 
 
-def translate(key: str, lang: str = DEFAULT_LANGUAGE) -> str:
-    """Return the translation for a key, falling back to English, then key."""
+def translate(key: str, lang: str = DEFAULT_LANGUAGE, **kwargs) -> str:
+    """Return the translation for a key, falling back to English, then key.
+
+    Supports named placeholders: t("home.hero_eyebrow", count=21).
+    """
     lang_translations = load_translations(lang)
     result = _lookup(lang_translations, key)
-    if result is not None:
-        return result
-
-    # Fallback to English
-    if lang != DEFAULT_LANGUAGE:
+    if result is None and lang != DEFAULT_LANGUAGE:
         en_translations = load_translations(DEFAULT_LANGUAGE)
         result = _lookup(en_translations, key)
-        if result is not None:
-            return result
+    if result is None:
+        result = key
 
-    # Return key as last resort
-    return key
+    if kwargs:
+        try:
+            return result.format(**kwargs)
+        except (KeyError, ValueError):
+            return result
+    return result
 
 
 def resolve_language(request: Request) -> str:

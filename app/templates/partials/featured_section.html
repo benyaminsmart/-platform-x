@@ -8,7 +8,7 @@
               <span class="px-section-eyebrow">{{ cat.eyebrow }}</span>
               <h2 style="margin-bottom: 0;">{{ cat.title }}</h2>
             </div>
-            <a href="{{ cat.href }}" class="px-btn px-btn-ghost">View all {{ cat.count }} →</a>
+            <a href="{{ cat.href }}" class="px-btn px-btn-ghost">{{ t('common.view_all', current_lang) }} {{ cat.count }} →</a>
           </div>
         </div>
 
@@ -27,7 +27,7 @@
                 <p class="px-biz-tagline">{{ b.config.tagline|default('') }}</p>
                 <div class="px-biz-meta">
                   <div>
-                    <span class="px-biz-price-from">From</span>
+                    <span class="px-biz-price-from">{{ t('common.from', current_lang) }}</span>
                     <span class="px-biz-price">{{ b.config.price_from }} {{ b.config.currency }}</span>
                   </div>
                   <span style="color: var(--px-muted); font-size: 12px;">📍 {{ b.config.location|default('') }}</span>
