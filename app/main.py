@@ -12,6 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from app.api import analytics as analytics_router
 from app.api import auth as auth_router
 from app.api import bookings as bookings_router
+from app.api import business as business_router
 from app.api import notifications as notifications_router
 from app.api import orders as orders_router
 from app.api import partners as partners_router
@@ -131,6 +132,7 @@ app.add_middleware(HTTPSRedirectMiddleware)
 app.include_router(analytics_router.router)
 app.include_router(auth_router.router)
 app.include_router(bookings_router.router)
+app.include_router(business_router.router)
 app.include_router(notifications_router.router)
 app.include_router(orders_router.router)
 app.include_router(partners_router.router)

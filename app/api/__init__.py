@@ -2,6 +2,7 @@
 
 from app.api import (
     analytics,
+    business,
     auth,
     bookings,
     deps,
@@ -17,6 +18,7 @@ from app.api import (
 
 __all__ = [
     "analytics",
+    "business",
     "auth",
     "bookings",
     "deps",

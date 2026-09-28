@@ -34,6 +34,7 @@ class User(UUIDMixin, TimestampMixin, Base):
     phone_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     points: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     tier: Mapped[str] = mapped_column(String(50), default="welcome", nullable=False)
+    business_role: Mapped[str | None] = mapped_column(String(30), nullable=True)  # owner / manager / staff (null = guest)
     referral_code: Mapped[str] = mapped_column(String(50), index=True, nullable=False)
     referred_by: Mapped[str | None] = mapped_column(String(36), ForeignKey("users.id"), nullable=True)
     room_number: Mapped[str | None] = mapped_column(String(20), nullable=True)

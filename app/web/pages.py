@@ -18,7 +18,7 @@ RESERVED_SLUGS = {
     "auth", "tenants", "login", "register", "services", "bookings", "orders",
     "payments", "rewards", "referrals", "notifications",
     "analytics", "platform", "businesses", "about", "contact",
-    "hotels", "restaurants", "travel", "entertainment", "partners", "docs", "admin", "roadmap", "forgot-password", "reset-password",
+    "hotels", "restaurants", "travel", "entertainment", "partners", "docs", "admin", "roadmap", "forgot-password", "reset-password", "business",
     "favicon.ico",
 }
 
@@ -433,6 +433,37 @@ def reset_password_page(request: Request) -> HTMLResponse:
     """Reset password page (with ?token=...)."""
     return templates.TemplateResponse(
         request, "pages/reset_password.html", {"tenant": None}
+    )
+
+
+
+
+# ---------- Business Panel (HTML) ----------
+
+
+@router.get("/business/login", response_class=HTMLResponse)
+def business_login_page(request: Request) -> HTMLResponse:
+    """Business owner login page."""
+    return templates.TemplateResponse(
+        request,
+        "business/business_login.html",
+        {"business_user": None},
+    )
+
+
+@router.get("/business/dashboard", response_class=HTMLResponse)
+def business_dashboard_page(request: Request) -> HTMLResponse:
+    """Business owner dashboard (data loaded via JS)."""
+    # The token will be checked by JS; we just render shell.
+    return templates.TemplateResponse(
+        request,
+        "business/business_dashboard.html",
+        {
+            "business_user": {"first_name": "Owner", "last_name": ""},  # JS validates
+            "tenant_name": "Business",
+            "tenant_slug": "trianon-hotel",  # JS will fetch actual
+            "active_nav": "dashboard",
+        },
     )
 
 

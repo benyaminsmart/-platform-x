@@ -89,3 +89,23 @@ class ResetPasswordRequest(BaseModel):
         if not any(c.isupper() for c in v):
             raise ValueError("Password must contain at least one uppercase letter")
         return v
+
+
+class BusinessLoginRequest(BaseModel):
+    """Business owner login payload."""
+
+    email: EmailStr
+    password: str = Field(min_length=1, max_length=72)
+
+
+class BusinessMeResponse(BaseModel):
+    """Current business user profile."""
+
+    id: str
+    email: str
+    first_name: str
+    last_name: str
+    tenant_id: str
+    tenant_name: str
+    tenant_slug: str
+    business_role: str

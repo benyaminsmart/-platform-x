@@ -1,0 +1,7 @@
+<header class="admin-topbar">
+  <div class="admin-topbar-title">{% block page_title %}Business Panel{% endblock %}</div>
+  <div class="admin-topbar-right">
+    <span class="admin-user" id="business-user">{{ business_user.first_name }} {{ business_user.last_name }}</span>
+    <button type="button" class="admin-logout" id="business-logout" title="Log out">Log out</button>
+  </div>
+</header>
