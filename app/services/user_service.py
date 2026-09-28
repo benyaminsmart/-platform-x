@@ -123,3 +123,75 @@ def authenticate(
         user.locked_until = None
         db.commit()
     return user, None
+
+
+# ---------- Password Reset ----------
+
+
+def _hash_reset_token(token: str) -> str:
+    """SHA-256 hash of a password reset token."""
+    import hashlib
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def create_password_reset(
+    db: DBSession, *, user_id: str
+) -> str:
+    """Create a reset token (returns plaintext token)."""
+    import secrets
+    from datetime import datetime, timedelta, timezone
+
+    from app.models.password_reset import PasswordReset
+
+    token = secrets.token_urlsafe(32)
+    reset = PasswordReset(
+        user_id=user_id,
+        token_hash=_hash_reset_token(token),
+        expires_at=datetime.now(timezone.utc) + timedelta(hours=1),
+    )
+    db.add(reset)
+    db.commit()
+    return token
+
+
+def consume_password_reset(
+    db: DBSession, *, token: str
+) -> str | None:
+    """Validate + consume a reset token. Returns user_id or None."""
+    from datetime import datetime, timezone
+
+    from app.models.password_reset import PasswordReset
+
+    token_hash = _hash_reset_token(token)
+    reset = db.execute(
+        select(PasswordReset).where(PasswordReset.token_hash == token_hash)
+    ).scalar_one_or_none()
+
+    if reset is None:
+        return None
+    if reset.used_at is not None:
+        return None
+
+    expires_at = reset.expires_at
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    if expires_at < datetime.now(timezone.utc):
+        return None
+
+    reset.used_at = datetime.now(timezone.utc)
+    db.commit()
+    return reset.user_id
+
+
+def update_password(db: DBSession, *, user_id: str, new_password: str) -> bool:
+    """Update user's password. Also unlocks the account."""
+    from app.core.security import hash_password
+
+    user = get_user_by_id(db, user_id)
+    if user is None:
+        return False
+    user.password_hash = hash_password(new_password)
+    user.failed_login_attempts = 0
+    user.locked_until = None
+    db.commit()
+    return True

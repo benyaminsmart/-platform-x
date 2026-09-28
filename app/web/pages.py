@@ -18,7 +18,7 @@ RESERVED_SLUGS = {
     "auth", "tenants", "login", "register", "services", "bookings", "orders",
     "payments", "rewards", "referrals", "notifications",
     "analytics", "platform", "businesses", "about", "contact",
-    "hotels", "restaurants", "travel", "entertainment", "partners", "docs", "admin", "roadmap",
+    "hotels", "restaurants", "travel", "entertainment", "partners", "docs", "admin", "roadmap", "forgot-password", "reset-password",
     "favicon.ico",
 }
 
@@ -415,6 +415,24 @@ def roadmap_page(request: Request) -> HTMLResponse:
         request,
         "pages/roadmap.html",
         {"tenant": None},
+    )
+
+
+
+
+@router.get("/forgot-password", response_class=HTMLResponse)
+def forgot_password_page(request: Request) -> HTMLResponse:
+    """Forgot password page."""
+    return templates.TemplateResponse(
+        request, "pages/forgot_password.html", {"tenant": None}
+    )
+
+
+@router.get("/reset-password", response_class=HTMLResponse)
+def reset_password_page(request: Request) -> HTMLResponse:
+    """Reset password page (with ?token=...)."""
+    return templates.TemplateResponse(
+        request, "pages/reset_password.html", {"tenant": None}
     )
 
 

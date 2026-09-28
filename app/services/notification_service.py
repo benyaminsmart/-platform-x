@@ -178,3 +178,20 @@ def send_booking_confirmed_email(
         subject=f"Booking confirmed — {tenant_name}",
         html=html,
     )
+
+
+def send_password_reset_email(
+    *, to_email: str, user_name: str, reset_url: str
+) -> bool:
+    """Send password reset email."""
+    from app.services import email_service
+
+    html = _render_email(
+        "password_reset.html",
+        {"user_name": user_name, "reset_url": reset_url},
+    )
+    return email_service.send_email(
+        to=to_email,
+        subject="Reset your Platform-X password",
+        html=html,
+    )

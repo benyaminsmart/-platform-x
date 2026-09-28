@@ -13,7 +13,9 @@ from app.models.user import User
 from app.schemas.common import MessageResponse
 from app.schemas.auth import (
     CurrentUserResponse,
+    ForgotPasswordRequest,
     RefreshRequest,
+    ResetPasswordRequest,
     LoginRequest,
     RegisterRequest,
     TokenResponse,
@@ -221,3 +223,59 @@ def logout(
     """Revoke the session associated with the given refresh token."""
     session_service.revoke_by_token(db, payload.refresh_token)
     return MessageResponse(message="Logged out")
+
+
+@router.post("/forgot-password", response_model=MessageResponse)
+@limiter.limit("3/minute")
+def forgot_password(
+    request: Request,
+    payload: ForgotPasswordRequest,
+    tenant: Tenant = Depends(get_current_tenant),
+    db: DBSession = Depends(get_db),
+) -> MessageResponse:
+    """Start password reset flow. Always returns success (no email enumeration)."""
+    user = user_service.get_user_by_email(db, tenant.id, payload.email)
+    if user is not None:
+        try:
+            token = user_service.create_password_reset(db, user_id=user.id)
+            base_url = str(request.base_url).rstrip("/")
+            reset_url = f"{base_url}/reset-password?token={token}"
+            from app.services import notification_service
+            notification_service.send_password_reset_email(
+                to_email=user.email,
+                user_name=user.first_name,
+                reset_url=reset_url,
+            )
+        except Exception:
+            pass
+
+    return MessageResponse(
+        message="If this email is registered, a reset link has been sent."
+    )
+
+
+@router.post("/reset-password", response_model=MessageResponse)
+@limiter.limit("5/minute")
+def reset_password(
+    request: Request,
+    payload: ResetPasswordRequest,
+    tenant: Tenant = Depends(get_current_tenant),
+    db: DBSession = Depends(get_db),
+) -> MessageResponse:
+    """Complete password reset with token + new password."""
+    user_id = user_service.consume_password_reset(db, token=payload.token)
+    if user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset token",
+        )
+
+    user = user_service.get_user_by_id(db, user_id)
+    if user is None or user.tenant_id != tenant.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User not found for this tenant",
+        )
+
+    user_service.update_password(db, user_id=user_id, new_password=payload.new_password)
+    return MessageResponse(message="Password updated. You can now sign in.")

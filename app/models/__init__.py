@@ -7,6 +7,7 @@ from app.models.notification import Notification
 from app.models.order import Order
 from app.models.partner_application import PartnerApplication
 from app.models.payment import Payment
+from app.models.password_reset import PasswordReset
 from app.models.platform_admin import PlatformAdmin
 from app.models.referral import Referral
 from app.models.reward import Reward
@@ -24,6 +25,7 @@ __all__ = [
     "Order",
     "PartnerApplication",
     "Payment",
+    "PasswordReset",
     "PlatformAdmin",
     "Referral",
     "Reward",
