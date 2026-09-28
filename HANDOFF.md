@@ -848,4 +848,114 @@ Estimated: weeks/months
 - Same service layer (app/services/ai/service.py)
 
 
+
+
+---
+
+## AI Context — Why We Are Where We Are
+
+This section explains the strategic decisions that led to the current
+state. Any new AI session MUST read this before suggesting next steps.
+
+### Why Phase 1 (First Tenant Live) was SKIPPED
+
+**Roadmap v1 order:** Phase 1 = First Tenant Live (real hotel on platform)
+
+**Reality when starting work:**
+- The platform backend did not exist yet
+- Frontend did not exist yet
+- Trianon Hotel (real first tenant) had its own separate site
+- User's goal changed mid-project: "build a professional Demo first"
+
+**Decision (made by Tech Lead, approved by user):**
+- Skip Phase 1 for now
+- Build Phase 2 (Core Architecture) first — get the platform ready
+- Then Phase 3 (Frontend), 4 (UI Polish), 5 (Full Flow)
+- Migrate Trianon later (Phase 15)
+
+**Consequence:** Phase 1 (real first tenant) will happen after the Demo
+is complete and VPS deployment is done. This is intentional.
+
+### Why Phase 8 (Rewards + Referral) is WAITING
+
+**Reason:** This phase requires a **business plan from the user** for
+reward tiers, redeem options, milestones, and referral bonuses.
+
+**Without that plan, we cannot build it correctly.** Any AI attempting
+to build it would be guessing.
+
+**When the user provides the plan, this phase becomes available.**
+
+### Why phases are not in numeric order
+
+The user's goal after partner meetings (2026-09-28) was:
+
+**"Business-First Strategy"** — prioritize value for business owners
+before guests. Reason: businesses pay; users use.
+
+**Business-First Order:**
+1. Phase 20 (Business Panel) — COMPLETE
+2. Phase 18 (AI Foundation) — COMPLETE
+3. Phase 21 (AI Business Assistant) — NEXT
+4. Phase 22 (Dynamic Pricing Rules) — SOON
+5. Phase 29 (Leaderboard + AI Scoring) — SOON
+6. Phase 19 (User AI) — COMPLETE (was done early because foundation was ready)
+7. Phase 23 (AI Content Writer)
+8. Phase 24 (Cross-Business Rewards)
+9. Phase 10 (Payment Production)
+10. Phase 25-28 (AI Marketing, Occupancy, Competitor Insights, Review Responder)
+11. Phase 12 (VPS + Domain + Named Tunnel) — requires purchase
+12. Phase 13 (Business Onboarding Tools) — needs Phase 12 for subdomains
+13. Phase 14 (API + Webhooks + SDK)
+14. Phase 15 (Trianon Migration) — after VPS
+15. Phase 16 (Mobile App) — last
+
+### What has been done and why
+
+- **Phases 2, 3, 4, 5** — Foundation (backend, frontend, UI, full flow)
+- **Phase 6** — Security (before any real user touches the platform)
+- **Phase 7** — Admin Panel (for platform admins to manage)
+- **Phase 9** — i18n (4 languages: EN, AR, FIL, HI) — required by Design System
+- **Phase 11** — Notifications (Resend email, Password Reset, Notification Center)
+- **Phase 18** — AI Foundation (provider abstraction, Gemini active)
+- **Phase 19** — User AI (Chat, Travel Planner, Booking Agent with Gemini)
+- **Phase 20** — Business Owner Panel (dashboard, services, bookings, staff)
+
+### What is specifically NOT done yet
+
+- **Phase 8** — needs user business plan
+- **Phase 10** — needs Business Account for Telr/Stripe
+- **Phase 12** — needs VPS + domain purchase
+- **Phase 13** — needs Phase 12 for subdomains
+- **Phase 14** — API/Webhooks (later)
+- **Phase 15** — Trianon migration (after VPS)
+- **Phase 16** — Mobile App (last)
+- **Phase 17** — AI Assistant (merged into 18/19)
+- **Phase 21** — AI Business Assistant (NEXT)
+- **Phase 22** — Dynamic Pricing (soon)
+- **Phase 23-28** — AI features (soon)
+- **Phase 29** — Leaderboard + AI Scoring
+- **Phase 30** — Mobile Native App
+
+### Key Rules for Future Sessions
+
+1. **Do NOT jump phases** — follow Business-First order
+2. **Do NOT start Phase 8** without explicit user business plan
+3. **Do NOT start Phase 10/12/13** without user providing account/purchase
+4. **Provider-agnostic AI** — never hardcode a specific provider
+5. **Preserve the 3-layer AI architecture** (FAB, User AI, Business AI)
+6. **ALWAYS backup + test + commit after each change**
+7. **Follow EXCELLENCE quality** — no shortcuts
+8. **NEVER ask user technical questions** — decide as Tech Lead
+9. **All responses in Persian (Farsi)** — direct, no fluff
+
+### Live URL and Services
+
+- Live URL: check `~/platform-x/logs/tunnel.url` (changes on restart)
+- Restart command: `cd ~/platform-x && sv up platform-x-api && sv up platform-x-tunnel && sleep 20 && bash start-platform.sh`
+- Test suite: `cd ~/platform-x && source venv/bin/activate && pytest tests/`
+- HANDOFF: `cat ~/platform-x/HANDOFF.md`
+
+
+
 END OF HANDOFF
