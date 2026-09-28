@@ -9,6 +9,8 @@ Token strategy:
 from datetime import datetime, timedelta, timezone
 from typing import Any, Literal
 
+import uuid
+
 import bcrypt
 from jose import JWTError, jwt
 
@@ -53,6 +55,7 @@ def _create_token(
     payload: dict[str, Any] = {
         "sub": subject,
         "type": token_type,
+        "jti": uuid.uuid4().hex,
         "iat": int(now.timestamp()),
         "exp": int(expire.timestamp()),
     }

@@ -10,6 +10,7 @@ from app.core.security import create_access_token, create_refresh_token, decode_
 from app.db.session import get_db
 from app.models.tenant import Tenant
 from app.models.user import User
+from app.schemas.common import MessageResponse
 from app.schemas.auth import (
     CurrentUserResponse,
     RefreshRequest,
@@ -17,7 +18,7 @@ from app.schemas.auth import (
     RegisterRequest,
     TokenResponse,
 )
-from app.services import user_service
+from app.services import session_service, user_service
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -58,6 +59,14 @@ def register(
     )
     access = create_access_token(user.id, tenant_id=tenant.id)
     refresh = create_refresh_token(user.id, tenant_id=tenant.id)
+    session_service.create_session(
+        db,
+        tenant_id=tenant.id,
+        user_id=user.id,
+        refresh_token=refresh,
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent"),
+    )
     return TokenResponse(
         access_token=access,
         refresh_token=refresh,
@@ -87,6 +96,14 @@ def login(
         )
     access = create_access_token(user.id, tenant_id=tenant.id)
     refresh = create_refresh_token(user.id, tenant_id=tenant.id)
+    session_service.create_session(
+        db,
+        tenant_id=tenant.id,
+        user_id=user.id,
+        refresh_token=refresh,
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent"),
+    )
     return TokenResponse(
         access_token=access,
         refresh_token=refresh,
@@ -144,10 +161,37 @@ def refresh_token(
             detail="User no longer active",
         )
 
+    # Check session is not revoked
+    if not session_service.is_valid(db, payload.refresh_token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Session has been revoked",
+        )
+
+    # Revoke the old session and create a new one (rotation)
+    session_service.revoke_by_token(db, payload.refresh_token)
     new_access = create_access_token(user.id, tenant_id=user.tenant_id)
     new_refresh = create_refresh_token(user.id, tenant_id=user.tenant_id)
+    session_service.create_session(
+        db,
+        tenant_id=user.tenant_id,
+        user_id=user.id,
+        refresh_token=new_refresh,
+    )
     return TokenResponse(
         access_token=new_access,
         refresh_token=new_refresh,
         expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
+
+
+@router.post("/logout", response_model=MessageResponse)
+@limiter.limit("30/minute")
+def logout(
+    request: Request,
+    payload: RefreshRequest,
+    db: DBSession = Depends(get_db),
+) -> MessageResponse:
+    """Revoke the session associated with the given refresh token."""
+    session_service.revoke_by_token(db, payload.refresh_token)
+    return MessageResponse(message="Logged out")

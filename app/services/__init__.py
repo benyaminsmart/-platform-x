@@ -12,6 +12,7 @@ from app.services import (
     referral_service,
     reward_service,
     service_service,
+    session_service,
     user_service,
 )
 
@@ -27,5 +28,6 @@ __all__ = [
     "referral_service",
     "reward_service",
     "service_service",
+    "session_service",
     "user_service",
 ]
