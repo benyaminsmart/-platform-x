@@ -177,6 +177,26 @@ def mark_success(
                         currency=booking.currency,
                         account_url=f"/{_tenant.slug}/account",
                     )
+
+                    # Notify business owners/staff
+                    try:
+                        staff_users = db.query(_U).filter(
+                            _U.tenant_id == payment.tenant_id,
+                            _U.business_role.isnot(None),
+                            _U.status == "active",
+                        ).all()
+                        for staff in staff_users:
+                            notification_service.create(
+                                db,
+                                tenant_id=payment.tenant_id,
+                                user_id=staff.id,
+                                channel="in_app",
+                                template="new_booking",
+                                subject=f"New booking: {booking.service_name}",
+                                content=f"{_user.first_name} {_user.last_name} booked {booking.service_name} for {booking.check_in}.",
+                            )
+                    except Exception:
+                        pass
             except Exception:
                 pass
     if payment.order_id:
