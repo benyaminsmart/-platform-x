@@ -32,7 +32,7 @@ limiter = Limiter(
 
 
 LIMITS = {
-    "auth_login": "10/minute",
+    "auth_login": "20/minute",
     "auth_register": "5/minute",
     "auth_me": "100/minute",
     "partner_apply": "3/5minutes",

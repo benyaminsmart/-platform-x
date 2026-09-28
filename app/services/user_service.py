@@ -1,7 +1,11 @@
 """User service — DB operations for users."""
 
 import secrets
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+
+# Account lockout
+MAX_LOGIN_ATTEMPTS = 5
+LOCKOUT_DURATION_MINUTES = 15
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session as DBSession
@@ -77,12 +81,45 @@ def create_user(
     return user
 
 
-def authenticate(db: DBSession, tenant_id: str, email: str, password: str) -> User | None:
-    """Return user if credentials valid, else None."""
+def authenticate(
+    db: DBSession, tenant_id: str, email: str, password: str
+) -> tuple[User | None, str | None]:
+    """Authenticate a user with lockout protection.
+
+    Returns (user, error):
+      - (user, None) on success
+      - (None, "invalid") on wrong credentials
+      - (None, "locked") if account is currently locked
+    """
     user = get_user_by_email(db, tenant_id, email.lower().strip())
     if user is None:
-        return None
+        return None, "invalid"
+
+    now = datetime.now(timezone.utc)
+
+    # Check lockout
+    if user.locked_until is not None:
+        locked_until = user.locked_until
+        # SQLite returns naive datetimes; assume UTC if naive
+        if locked_until.tzinfo is None:
+            locked_until = locked_until.replace(tzinfo=timezone.utc)
+        if locked_until > now:
+            return None, "locked"
+
+    # Verify password
     if not verify_password(password, user.password_hash):
-        return None
-    # Update last login via updated_at is automatic; no dedicated field yet.
-    return user
+        user.failed_login_attempts = (user.failed_login_attempts or 0) + 1
+        if user.failed_login_attempts >= MAX_LOGIN_ATTEMPTS:
+            user.locked_until = now + timedelta(minutes=LOCKOUT_DURATION_MINUTES)
+            user.failed_login_attempts = 0
+            db.commit()
+            return None, "locked"
+        db.commit()
+        return None, "invalid"
+
+    # Success — reset counters
+    if user.failed_login_attempts or user.locked_until:
+        user.failed_login_attempts = 0
+        user.locked_until = None
+        db.commit()
+    return user, None

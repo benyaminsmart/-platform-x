@@ -74,8 +74,13 @@ def login(
     db: DBSession = Depends(get_db),
 ) -> TokenResponse:
     """Authenticate and return a JWT."""
-    user = user_service.authenticate(db, tenant.id, payload.email, payload.password)
+    user, error = user_service.authenticate(db, tenant.id, payload.email, payload.password)
     if user is None:
+        if error == "locked":
+            raise HTTPException(
+                status_code=status.HTTP_423_LOCKED,
+                detail="Account temporarily locked due to too many failed attempts. Try again in 15 minutes.",
+            )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
