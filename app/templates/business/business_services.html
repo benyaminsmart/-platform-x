@@ -1,0 +1,156 @@
+{% extends "business/business_base.html" %}
+
+{% block title %}Services — Business Panel{% endblock %}
+
+{% block content %}
+
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+    <div>
+      <h2>Your services</h2>
+      <p class="admin-card-sub" style="margin-bottom: 0;">Manage rooms, dishes, packages, tickets — everything you offer.</p>
+    </div>
+    <button class="admin-btn" id="btn-new-service">+ New service</button>
+  </div>
+</div>
+
+<div id="new-service-form" class="admin-card" style="margin-bottom: 24px; display: none;">
+  <h2>New service</h2>
+  <div id="new-alert" class="admin-alert admin-alert-error" style="display: none;"></div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+    <div class="admin-field">
+      <label class="admin-label">Type</label>
+      <select class="admin-input" id="new-type">
+        <option value="room">Room</option>
+        <option value="dish">Dish</option>
+        <option value="package">Package</option>
+        <option value="ticket">Ticket</option>
+        <option value="tour">Tour</option>
+      </select>
+    </div>
+    <div class="admin-field">
+      <label class="admin-label">Name</label>
+      <input class="admin-input" id="new-name" type="text" placeholder="e.g. Deluxe Suite">
+    </div>
+    <div class="admin-field">
+      <label class="admin-label">Price</label>
+      <input class="admin-input" id="new-price" type="number" min="0" step="0.01" placeholder="500">
+    </div>
+    <div class="admin-field">
+      <label class="admin-label">Currency</label>
+      <input class="admin-input" id="new-currency" type="text" value="AED">
+    </div>
+  </div>
+  <div class="admin-field">
+    <label class="admin-label">Description</label>
+    <input class="admin-input" id="new-description" type="text" placeholder="Optional">
+  </div>
+  <div style="display: flex; gap: 12px; margin-top: 12px;">
+    <button class="admin-btn" id="btn-create-service">Create service</button>
+    <button class="admin-btn" style="background: transparent; border: 1px solid var(--adm-line-2);" id="btn-cancel-service">Cancel</button>
+  </div>
+</div>
+
+<div class="admin-card">
+  <div id="services-list">Loading…</div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login?tenant=trianon-hotel"; return; }
+
+  var lo = document.getElementById("business-logout");
+  if (lo) lo.addEventListener("click", function(){ try{localStorage.removeItem("px_business_token");}catch(e){}; window.location.href = "/business/login?tenant=trianon-hotel"; });
+
+  var headers = {"Authorization": "Bearer " + token, "X-Tenant-Slug": "trianon-hotel", "Content-Type": "application/json"};
+
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+
+  function renderServices(items) {
+    var el = document.getElementById("services-list");
+    if (!items.length) {
+      el.innerHTML = '<p class="admin-card-sub">No services yet. Click + New service.</p>';
+      return;
+    }
+    var html = '<table class="admin-table"><thead><tr><th>Type</th><th>Name</th><th>Price</th><th>Status</th><th></th></tr></thead><tbody>';
+    items.forEach(function(s){
+      var badge = s.status === "active" ? "admin-badge-success" : "admin-badge-warning";
+      html += "<tr>" +
+        '<td><span class="admin-badge admin-badge-info">' + esc(s.type) + "</span></td>" +
+        "<td><strong>" + esc(s.name) + "</strong></td>" +
+        "<td>" + esc(s.price) + " " + esc(s.currency) + "</td>" +
+        '<td><span class="admin-badge ' + badge + '">' + esc(s.status) + "</span></td>" +
+        '<td><button class="admin-btn" style="padding: 6px 12px; font-size: 12px;" data-toggle="' + s.id + '" data-status="' + s.status + '">' + (s.status === "active" ? "Deactivate" : "Activate") + "</button></td>" +
+        "</tr>";
+    });
+    html += "</tbody></table>";
+    el.innerHTML = html;
+
+    el.querySelectorAll("[data-toggle]").forEach(function(btn){
+      btn.addEventListener("click", async function(){
+        var id = btn.getAttribute("data-toggle");
+        var cur = btn.getAttribute("data-status");
+        var newStatus = cur === "active" ? "inactive" : "active";
+        var res = await fetch("/business/api/services/" + id, {method: "PATCH", headers: headers, body: JSON.stringify({status: newStatus})});
+        if (res.ok) loadServices();
+      });
+    });
+  }
+
+  async function loadServices() {
+    try {
+      var res = await fetch("/business/api/services", {headers: headers});
+      if (res.status === 401) { window.location.href = "/business/login?tenant=trianon-hotel"; return; }
+      var items = await res.json();
+      renderServices(items || []);
+    } catch(e) {}
+  }
+
+  var btnNew = document.getElementById("btn-new-service");
+  var form = document.getElementById("new-service-form");
+  var btnCancel = document.getElementById("btn-cancel-service");
+  var btnCreate = document.getElementById("btn-create-service");
+  var alertBox = document.getElementById("new-alert");
+
+  btnNew.addEventListener("click", function(){ form.style.display = "block"; btnNew.disabled = true; });
+  btnCancel.addEventListener("click", function(){ form.style.display = "none"; btnNew.disabled = false; });
+
+  btnCreate.addEventListener("click", async function(){
+    alertBox.style.display = "none";
+    var payload = {
+      type: document.getElementById("new-type").value,
+      name: document.getElementById("new-name").value.trim(),
+      description: document.getElementById("new-description").value.trim() || null,
+      price: parseFloat(document.getElementById("new-price").value),
+      currency: document.getElementById("new-currency").value.trim() || "AED",
+    };
+    if (!payload.name || !payload.price) {
+      alertBox.textContent = "Name and price required";
+      alertBox.style.display = "block";
+      return;
+    }
+    var res = await fetch("/business/api/services", {method: "POST", headers: headers, body: JSON.stringify(payload)});
+    var data = await res.json();
+    if (!res.ok) {
+      alertBox.textContent = data.detail || "Failed";
+      alertBox.style.display = "block";
+      return;
+    }
+    form.style.display = "none";
+    btnNew.disabled = false;
+    document.getElementById("new-name").value = "";
+    document.getElementById("new-price").value = "";
+    document.getElementById("new-description").value = "";
+    loadServices();
+  });
+
+  loadServices();
+})();
+</script>
+{% endblock %}

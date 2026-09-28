@@ -122,3 +122,136 @@ def business_dashboard(
             "revenue_aed": round(revenue, 2),
         },
     }
+
+
+# ---------- Services (Business-scoped) ----------
+
+
+from pydantic import BaseModel, Field  # noqa: E402
+from typing import Any  # noqa: E402
+
+
+class BusinessServiceCreate(BaseModel):
+    type: str = Field(min_length=1, max_length=50)
+    name: str = Field(min_length=1, max_length=200)
+    description: str | None = None
+    price: float = Field(ge=0)
+    currency: str = Field(default="AED", max_length=10)
+    capacity: int | None = Field(default=None, ge=0)
+    attributes: dict[str, Any] = Field(default_factory=dict)
+    image_urls: list[str] = Field(default_factory=list)
+    status: str = Field(default="active", max_length=50)
+    display_order: int = Field(default=0, ge=0)
+
+
+class BusinessServiceUpdate(BaseModel):
+    type: str | None = None
+    name: str | None = None
+    description: str | None = None
+    price: float | None = Field(default=None, ge=0)
+    currency: str | None = None
+    capacity: int | None = Field(default=None, ge=0)
+    attributes: dict[str, Any] | None = None
+    image_urls: list[str] | None = None
+    status: str | None = None
+    display_order: int | None = None
+
+
+@router.get("/services")
+def list_business_services(
+    user: User = Depends(get_current_business_user),
+    tenant: Tenant = Depends(get_business_tenant),
+    db: DBSession = Depends(get_db),
+) -> list[dict]:
+    """List all services for the current business (including inactive)."""
+    rows = db.query(Service).filter(Service.tenant_id == tenant.id).order_by(Service.display_order, Service.name).all()
+    return [
+        {
+            "id": s.id,
+            "type": s.type,
+            "name": s.name,
+            "description": s.description,
+            "price": str(s.price),
+            "currency": s.currency,
+            "capacity": s.capacity,
+            "attributes": s.attributes,
+            "image_urls": s.image_urls,
+            "status": s.status,
+            "display_order": s.display_order,
+        }
+        for s in rows
+    ]
+
+
+@router.post("/services", status_code=201)
+def create_business_service(
+    payload: BusinessServiceCreate,
+    user: User = Depends(get_current_business_user),
+    tenant: Tenant = Depends(get_business_tenant),
+    db: DBSession = Depends(get_db),
+) -> dict:
+    """Create a new service for this business."""
+    from decimal import Decimal
+    svc = Service(
+        tenant_id=tenant.id,
+        type=payload.type,
+        name=payload.name,
+        description=payload.description,
+        price=Decimal(str(payload.price)),
+        currency=payload.currency,
+        capacity=payload.capacity,
+        attributes=payload.attributes,
+        image_urls=payload.image_urls,
+        status=payload.status,
+        display_order=payload.display_order,
+    )
+    db.add(svc)
+    db.commit()
+    db.refresh(svc)
+    return {"id": svc.id, "message": "Service created"}
+
+
+@router.patch("/services/{service_id}")
+def update_business_service(
+    service_id: str,
+    payload: BusinessServiceUpdate,
+    user: User = Depends(get_current_business_user),
+    tenant: Tenant = Depends(get_business_tenant),
+    db: DBSession = Depends(get_db),
+) -> dict:
+    """Update a service (only this tenant's services)."""
+    from decimal import Decimal
+    svc = db.query(Service).filter(
+        Service.id == service_id,
+        Service.tenant_id == tenant.id,
+    ).one_or_none()
+    if svc is None:
+        raise HTTPException(status_code=404, detail="Service not found")
+
+    updates = payload.model_dump(exclude_unset=True)
+    for k, v in updates.items():
+        if k == "price" and v is not None:
+            svc.price = Decimal(str(v))
+        else:
+            setattr(svc, k, v)
+    db.commit()
+    return {"id": svc.id, "message": "Service updated"}
+
+
+@router.delete("/services/{service_id}")
+def delete_business_service(
+    service_id: str,
+    user: User = Depends(get_current_business_user),
+    tenant: Tenant = Depends(get_business_tenant),
+    db: DBSession = Depends(get_db),
+) -> dict:
+    """Soft-delete a service (set status=inactive)."""
+    svc = db.query(Service).filter(
+        Service.id == service_id,
+        Service.tenant_id == tenant.id,
+    ).one_or_none()
+    if svc is None:
+        raise HTTPException(status_code=404, detail="Service not found")
+    svc.status = "inactive"
+    db.commit()
+    return {"id": svc.id, "message": "Service deactivated"}

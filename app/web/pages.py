@@ -467,6 +467,23 @@ def business_dashboard_page(request: Request) -> HTMLResponse:
     )
 
 
+
+
+@router.get("/business/services", response_class=HTMLResponse)
+def business_services_page(request: Request) -> HTMLResponse:
+    """Business services management page."""
+    return templates.TemplateResponse(
+        request,
+        "business/business_services.html",
+        {
+            "business_user": {"first_name": "Owner", "last_name": ""},
+            "tenant_name": "Business",
+            "tenant_slug": "trianon-hotel",
+            "active_nav": "services",
+        },
+    )
+
+
 @router.get("/about", response_class=HTMLResponse)
 def about(request: Request) -> HTMLResponse:
     """About page."""
