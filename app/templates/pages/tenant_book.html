@@ -7,28 +7,28 @@
 <section class="px-book" data-tenant-type="{{ tenant.config.type|default('hotel') }}">
   <div class="px-container">
     <div class="px-breadcrumb" style="justify-content: flex-start; margin-bottom: 24px;">
-      <a href="/">Home</a>
+      <a href="/">{{ t('common.back_home', current_lang) }}</a>
       <span>/</span>
       <a href="/{{ tenant.slug }}/">{{ tenant.name }}</a>
       <span>/</span>
-      <span>Book</span>
+      <span>{{ t('book.breadcrumb', current_lang) }}</span>
     </div>
 
     <div class="px-book-grid">
       <div class="px-book-form">
         <h1 style="margin-bottom: 8px;">
-          {% if tenant.config.type == 'hotel' %}Reserve a room
-          {% elif tenant.config.type == 'restaurant' %}Reserve a table
-          {% elif tenant.config.type == 'travel_agency' %}Book a package
-          {% elif tenant.config.type == 'entertainment' %}Book tickets
-          {% else %}Make a booking{% endif %}
+          {% if tenant.config.type == 'hotel' %}{{ t('book.title_hotel', current_lang) }}
+          {% elif tenant.config.type == 'restaurant' %}{{ t('book.title_restaurant', current_lang) }}
+          {% elif tenant.config.type == 'travel_agency' %}{{ t('book.title_travel', current_lang) }}
+          {% elif tenant.config.type == 'entertainment' %}{{ t('book.title_entertainment', current_lang) }}
+          {% else %}{{ t('book.title_default', current_lang) }}{% endif %}
         </h1>
         <p class="px-muted" style="margin-bottom: 32px;">
-          {% if tenant.config.type == 'hotel' %}Choose your room and dates. Instant confirmation.
-          {% elif tenant.config.type == 'restaurant' %}Pick your date, time and party size.
-          {% elif tenant.config.type == 'travel_agency' %}Select a package and departure date.
-          {% elif tenant.config.type == 'entertainment' %}Choose your date and number of tickets.
-          {% else %}Choose your service and dates. Instant confirmation.{% endif %}
+          {% if tenant.config.type == 'hotel' %}{{ t('book.sub_hotel', current_lang) }}
+          {% elif tenant.config.type == 'restaurant' %}{{ t('book.sub_restaurant', current_lang) }}
+          {% elif tenant.config.type == 'travel_agency' %}{{ t('book.sub_travel', current_lang) }}
+          {% elif tenant.config.type == 'entertainment' %}{{ t('book.sub_entertainment', current_lang) }}
+          {% else %}{{ t('book.sub_default', current_lang) }}{% endif %}
         </p>
 
         <div id="alert-box" style="display: none;"></div>
@@ -36,10 +36,10 @@
         <form id="booking-form">
           <div class="px-field" style="margin-bottom: 20px;">
             <label for="service_id">
-              {% if tenant.config.type == 'restaurant' %}Menu
-              {% elif tenant.config.type == 'travel_agency' %}Package
-              {% elif tenant.config.type == 'entertainment' %}Ticket type
-              {% else %}Service{% endif %}
+              {% if tenant.config.type == 'restaurant' %}{{ t('book.service_label', current_lang) }}
+              {% elif tenant.config.type == 'travel_agency' %}{{ t('book.package_label', current_lang) }}
+              {% elif tenant.config.type == 'entertainment' %}{{ t('book.ticket_label', current_lang) }}
+              {% else %}{{ t('book.service_label', current_lang) }}{% endif %}
             </label>
             <select id="service_id" name="service_id" required>
               <option value="">— Select —</option>
@@ -60,65 +60,65 @@
           {% if tenant.config.type == 'hotel' %}
             <div class="px-field-row" style="margin-bottom: 20px;">
               <div class="px-field">
-                <label for="check_in">Check-in</label>
+                <label for="check_in">{{ t('book.check_in', current_lang) }}</label>
                 <input type="date" id="check_in" name="check_in" required>
               </div>
               <div class="px-field">
-                <label for="check_out">Check-out</label>
+                <label for="check_out">{{ t('book.check_out', current_lang) }}</label>
                 <input type="date" id="check_out" name="check_out" required>
               </div>
             </div>
             <div class="px-field" style="margin-bottom: 20px;">
-              <label for="guests">Guests</label>
+              <label for="guests">{{ t('book.guests', current_lang) }}</label>
               <input type="number" id="guests" name="guests" value="2" min="1" max="20" required>
             </div>
 
           {% elif tenant.config.type == 'restaurant' %}
             <div class="px-field-row" style="margin-bottom: 20px;">
               <div class="px-field">
-                <label for="check_in">Date</label>
+                <label for="check_in">{{ t('book.date', current_lang) }}</label>
                 <input type="date" id="check_in" name="check_in" required>
               </div>
               <div class="px-field">
-                <label for="booking_time">Time</label>
+                <label for="booking_time">{{ t('book.time', current_lang) }}</label>
                 <input type="time" id="booking_time" name="booking_time" value="19:00" required>
               </div>
             </div>
             <div class="px-field" style="margin-bottom: 20px;">
-              <label for="guests">Number of guests</label>
+              <label for="guests">{{ t('book.guests', current_lang) }}</label>
               <input type="number" id="guests" name="guests" value="2" min="1" max="20" required>
             </div>
 
           {% elif tenant.config.type == 'travel_agency' %}
             <div class="px-field" style="margin-bottom: 20px;">
-              <label for="check_in">Departure date</label>
+              <label for="check_in">{{ t('book.departure', current_lang) }}</label>
               <input type="date" id="check_in" name="check_in" required>
             </div>
             <div class="px-field" style="margin-bottom: 20px;">
-              <label for="guests">Passengers</label>
+              <label for="guests">{{ t('book.passengers', current_lang) }}</label>
               <input type="number" id="guests" name="guests" value="2" min="1" max="30" required>
             </div>
 
           {% elif tenant.config.type == 'entertainment' %}
             <div class="px-field-row" style="margin-bottom: 20px;">
               <div class="px-field">
-                <label for="check_in">Visit date</label>
+                <label for="check_in">{{ t('book.visit_date', current_lang) }}</label>
                 <input type="date" id="check_in" name="check_in" required>
               </div>
               <div class="px-field">
-                <label for="booking_time">Time slot</label>
+                <label for="booking_time">{{ t('book.time_slot', current_lang) }}</label>
                 <input type="time" id="booking_time" name="booking_time" value="14:00" required>
               </div>
             </div>
             <div class="px-field" style="margin-bottom: 20px;">
-              <label for="guests">Number of tickets</label>
+              <label for="guests">{{ t('book.tickets', current_lang) }}</label>
               <input type="number" id="guests" name="guests" value="2" min="1" max="50" required>
             </div>
 
           {% else %}
             <div class="px-field-row" style="margin-bottom: 20px;">
               <div class="px-field">
-                <label for="check_in">Date</label>
+                <label for="check_in">{{ t('book.date', current_lang) }}</label>
                 <input type="date" id="check_in" name="check_in" required>
               </div>
               <div class="px-field">
@@ -127,51 +127,49 @@
               </div>
             </div>
             <div class="px-field" style="margin-bottom: 20px;">
-              <label for="guests">Guests</label>
+              <label for="guests">{{ t('book.guests', current_lang) }}</label>
               <input type="number" id="guests" name="guests" value="1" min="1" max="20" required>
             </div>
           {% endif %}
 
           <div class="px-field" style="margin-bottom: 24px;">
-            <label for="notes">Notes (optional)</label>
-            <textarea id="notes" name="notes" rows="3" placeholder="Any special requests?"></textarea>
+            <label for="notes">{{ t('book.notes', current_lang) }}</label>
+            <textarea id="notes" name="notes" rows="3" placeholder="{{ t('book.notes_placeholder', current_lang) }}"></textarea>
           </div>
 
           <button type="submit" class="px-btn px-btn-primary px-btn-block px-btn-lg">
-            {% if tenant.config.type == 'hotel' %}Reserve room
-            {% elif tenant.config.type == 'restaurant' %}Reserve table
-            {% elif tenant.config.type == 'travel_agency' %}Book package
-            {% elif tenant.config.type == 'entertainment' %}Get tickets
-            {% else %}Confirm booking{% endif %}
+            {% if tenant.config.type == 'hotel' %}{{ t('book.submit_hotel', current_lang) }}
+            {% elif tenant.config.type == 'restaurant' %}{{ t('book.submit_restaurant', current_lang) }}
+            {% elif tenant.config.type == 'travel_agency' %}{{ t('book.submit_travel', current_lang) }}
+            {% elif tenant.config.type == 'entertainment' %}{{ t('book.submit_entertainment', current_lang) }}
+            {% else %}{{ t('book.submit_default', current_lang) }}{% endif %}
           </button>
         </form>
       </div>
 
       <aside class="px-book-side">
         <div class="px-book-card">
-          <div class="px-book-card-title">Summary</div>
+          <div class="px-book-card-title">{{ t('book.summary', current_lang) }}</div>
           <div class="px-book-summary">
             <div class="px-book-row">
-              <span class="px-muted">Selected</span>
+              <span class="px-muted">{{ t('book.selected', current_lang) }}</span>
               <strong id="summary-service">—</strong>
             </div>
             <div class="px-book-row">
-              <span class="px-muted" id="summary-guests-label">Guests</span>
+              <span class="px-muted" id="summary-guests-label">{{ t('book.guests', current_lang) }}</span>
               <strong id="summary-guests">1</strong>
             </div>
             <div class="px-book-row">
-              <span class="px-muted" id="summary-dates-label">Dates</span>
+              <span class="px-muted" id="summary-dates-label">{{ t('book.date', current_lang) }}</span>
               <strong id="summary-dates">—</strong>
             </div>
           </div>
           <hr style="border: none; border-top: 1px solid var(--px-line); margin: 20px 0;">
           <div style="display: flex; justify-content: space-between; align-items: baseline;">
-            <span class="px-muted">Total</span>
+            <span class="px-muted">{{ t('book.total', current_lang) }}</span>
             <span class="px-book-total" id="summary-total">—</span>
           </div>
-          <p class="px-muted" style="margin-top: 16px; font-size: 12px;">
-            No charge yet. Payment on next step.
-          </p>
+          <p class="px-muted" style="margin-top: 16px; font-size: 12px;">{{ t('book.no_charge', current_lang) }}</p>
         </div>
       </aside>
     </div>

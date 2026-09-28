@@ -7,23 +7,23 @@
 <section class="px-book">
   <div class="px-container">
     <div class="px-breadcrumb" style="justify-content: flex-start; margin-bottom: 24px;">
-      <a href="/">Home</a>
+      <a href="/">{{ t('common.back_home', current_lang) }}</a>
       <span>/</span>
       <a href="/{{ tenant.slug }}/">{{ tenant.name }}</a>
       <span>/</span>
-      <span>Payment</span>
+      <span>{{ t('pay.title', current_lang) }}</span>
     </div>
 
     <div class="px-book-grid">
       <!-- LEFT: info -->
       <div class="px-book-form">
-        <h1 style="margin-bottom: 8px;">Complete payment</h1>
-        <p class="px-muted" style="margin-bottom: 32px;">Your booking is held for 15 minutes.</p>
+        <h1 style="margin-bottom: 8px;">{{ t('pay.title', current_lang) }}</h1>
+        <p class="px-muted" style="margin-bottom: 32px;">{{ t('pay.sub', current_lang) }}</p>
 
         <div id="alert-box" style="display: none;"></div>
 
         <div id="loading" style="padding: 20px 0;">
-          <p class="px-muted">Loading booking…</p>
+          <p class="px-muted">{{ t('pay.loading', current_lang) }}</p>
         </div>
 
         <div id="payment-panel" style="display: none;">
@@ -48,65 +48,61 @@
 
           <hr style="border: none; border-top: 1px solid var(--px-line); margin: 32px 0;">
 
-          <h3 style="margin-bottom: 20px;">Your details</h3>
+          <h3 style="margin-bottom: 20px;">{{ t('pay.your_details', current_lang) }}</h3>
           <div class="px-user-details">
             <div class="px-user-detail">
-              <span class="px-muted">Name</span>
+              <span class="px-muted">{{ t('pay.name', current_lang) }}</span>
               <strong id="user-name">—</strong>
             </div>
             <div class="px-user-detail">
-              <span class="px-muted">Email</span>
+              <span class="px-muted">{{ t('pay.email', current_lang) }}</span>
               <strong id="user-email">—</strong>
             </div>
             <div class="px-user-detail">
-              <span class="px-muted">Phone</span>
+              <span class="px-muted">{{ t('pay.phone', current_lang) }}</span>
               <strong id="user-phone">—</strong>
             </div>
           </div>
 
           <hr style="border: none; border-top: 1px solid var(--px-line); margin: 32px 0;">
 
-          <h3 style="margin-bottom: 20px;">Payment method</h3>
+          <h3 style="margin-bottom: 20px;">{{ t('pay.payment_method', current_lang) }}</h3>
 
           <div class="px-pay-methods" id="payment-methods">
             <label class="px-pay-method">
               <input type="radio" name="method" value="card" checked>
               <span class="px-pay-method-icon">💳</span>
-              <span class="px-pay-method-label">Card</span>
+              <span class="px-pay-method-label">{{ t('pay.card', current_lang) }}</span>
             </label>
             <label class="px-pay-method">
               <input type="radio" name="method" value="apple_pay">
               <span class="px-pay-method-icon">🍎</span>
-              <span class="px-pay-method-label">Apple Pay</span>
+              <span class="px-pay-method-label">{{ t('pay.apple_pay', current_lang) }}</span>
             </label>
             <label class="px-pay-method">
               <input type="radio" name="method" value="google_pay">
               <span class="px-pay-method-icon">🌐</span>
-              <span class="px-pay-method-label">Google Pay</span>
+              <span class="px-pay-method-label">{{ t('pay.google_pay', current_lang) }}</span>
             </label>
             <label class="px-pay-method">
               <input type="radio" name="method" value="cash">
               <span class="px-pay-method-icon">💵</span>
-              <span class="px-pay-method-label">Cash on arrival</span>
+              <span class="px-pay-method-label">{{ t('pay.cash', current_lang) }}</span>
             </label>
           </div>
 
-          <button id="pay-button" class="px-btn px-btn-primary px-btn-block px-btn-lg" style="margin-top: 32px;">
-            Pay now
-          </button>
+          <button id="pay-button" class="px-btn px-btn-primary px-btn-block px-btn-lg" style="margin-top: 32px;">{{ t('pay.pay_now', current_lang) }}</button>
 
-          <p class="px-muted text-center" style="margin-top: 16px; font-size: 12px;">
-            🔒 Demo payment — no real charge.
-          </p>
+          <p class="px-muted text-center" style="margin-top: 16px; font-size: 12px;">{{ t('pay.demo_note', current_lang) }}</p>
         </div>
 
         <div id="success-panel" style="display: none; text-align: center; padding: 40px 0;">
           <div style="font-size: 72px; color: var(--px-success); margin-bottom: 20px;">✓</div>
-          <h2 style="margin-bottom: 12px;">Booking confirmed</h2>
+          <h2 style="margin-bottom: 12px;">{{ t('pay.success_title', current_lang) }}</h2>
           <p class="px-muted" style="margin-bottom: 32px;">Your payment was successful. A confirmation has been added to your account.</p>
           <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-            <a href="/{{ tenant.slug }}/account" class="px-btn px-btn-primary">View my bookings</a>
-            <a href="/{{ tenant.slug }}/" class="px-btn px-btn-ghost">Back to {{ tenant.name }}</a>
+            <a href="/{{ tenant.slug }}/account" class="px-btn px-btn-primary">{{ t('pay.view_bookings', current_lang) }}</a>
+            <a href="/{{ tenant.slug }}/" class="px-btn px-btn-ghost">{{ t('pay.back_to', current_lang, name=tenant.name) }}</a>
           </div>
         </div>
       </div>
@@ -114,9 +110,9 @@
       <!-- RIGHT: total -->
       <aside class="px-book-side">
         <div class="px-book-card">
-          <div class="px-book-card-title">Amount due</div>
+          <div class="px-book-card-title">{{ t('book.total', current_lang) }}</div>
           <div style="display: flex; justify-content: space-between; align-items: baseline;">
-            <span class="px-muted">Total</span>
+            <span class="px-muted">{{ t('book.total', current_lang) }}</span>
             <span class="px-book-total" id="summary-total">—</span>
           </div>
           <p class="px-muted" style="margin-top: 20px; font-size: 12px; line-height: 1.6;">

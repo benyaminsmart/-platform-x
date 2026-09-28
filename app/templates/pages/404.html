@@ -9,13 +9,11 @@
     <div style="font-size: 120px; font-family: var(--px-font-display); font-weight: 800; color: var(--px-brand); line-height: 1;">
       404
     </div>
-    <h1 style="margin-top: 20px; font-size: 32px;">Page not found</h1>
-    <p class="px-muted" style="margin-bottom: 32px; max-width: 460px; margin-left: auto; margin-right: auto;">
-      The page you're looking for doesn't exist or has been moved.
-    </p>
+    <h1 style="margin-top: 20px; font-size: 32px;">{{ t('common.not_found', current_lang) }}</h1>
+    <p class="px-muted" style="margin-bottom: 32px; max-width: 460px; margin-left: auto; margin-right: auto;">{{ t('common.not_found_sub', current_lang) }}</p>
     <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-      <a href="/" class="px-btn px-btn-primary">Back home</a>
-      <a href="/businesses" class="px-btn px-btn-ghost">Browse businesses</a>
+      <a href="/" class="px-btn px-btn-primary">{{ t('common.back_home', current_lang) }}</a>
+      <a href="/businesses" class="px-btn px-btn-ghost">{{ t('common.browse_businesses', current_lang) }}</a>
     </div>
   </div>
 </section>

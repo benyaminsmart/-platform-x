@@ -53,7 +53,7 @@ k{% extends "layouts/platform_base.html" %}
 {% if tenant.config.gallery %}
 <section class="px-section-tight">
   <div class="px-container">
-    <h2>Gallery</h2>
+    <h2>{{ t('tenant.gallery', current_lang) }}</h2>
     <div class="px-gallery">
       {% for img in tenant.config.gallery %}
         <div class="px-gallery-item" style="background-image: url('{{ img }}');"></div>
@@ -68,13 +68,11 @@ k{% extends "layouts/platform_base.html" %}
   <div class="px-container">
     <div class="px-section-head" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
       <div>
-        <h2 style="margin-bottom: 6px;">{% if tenant.config.type == 'restaurant' %}Our menu{% else %}Our services{% endif %}</h2>
-        <p class="px-section-sub" style="margin: 0;">
-          {% if tenant.config.type == 'restaurant' %}Book a table or order food for delivery.{% else %}Book instantly with our unified booking flow.{% endif %}
-        </p>
+        <h2 style="margin-bottom: 6px;">{% if tenant.config.type == 'restaurant' %}{{ t('tenant.our_menu', current_lang) }}{% else %}{{ t('tenant.our_services', current_lang) }}{% endif %}</h2>
+        <p class="px-section-sub" style="margin: 0;">{% if tenant.config.type == 'restaurant' %}{{ t('tenant.menu_sub', current_lang) }}{% else %}{{ t('tenant.services_sub', current_lang) }}{% endif %}</p>
       </div>
       {% if tenant.config.type == 'restaurant' %}
-        <a href="/{{ tenant.slug }}/order" class="px-btn px-btn-accent">Order food →</a>
+        <a href="/{{ tenant.slug }}/order" class="px-btn px-btn-accent">{{ t('tenant.order_food', current_lang) }} →</a>
       {% endif %}
     </div>
 
