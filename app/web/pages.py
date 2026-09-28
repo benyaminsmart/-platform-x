@@ -366,6 +366,18 @@ def admin_tenant_detail_page(tenant_id: str, request: Request) -> HTMLResponse:
     )
 
 
+
+
+@router.get("/admin/applications", response_class=HTMLResponse)
+def admin_applications_page(request: Request) -> HTMLResponse:
+    """Admin applications list."""
+    return templates.TemplateResponse(
+        request,
+        "admin/admin_applications.html",
+        {"admin": True, "active_nav": "applications"},
+    )
+
+
 @router.get("/about", response_class=HTMLResponse)
 def about(request: Request) -> HTMLResponse:
     """About page."""

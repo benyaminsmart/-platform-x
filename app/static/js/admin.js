@@ -279,3 +279,51 @@ PX.initAdminTenantDetail = async function (tenantId) {
     el.innerHTML = '<div class="admin-card"><h2>Error</h2><p>Failed to load tenant.</p></div>';
   }
 };
+
+/* ---------- Applications ---------- */
+
+PX.initAdminApplications = async function () {
+  if (!PX.requireAdmin()) return;
+  var tbody = document.getElementById("apps-tbody");
+  var filter = document.getElementById("filter-status");
+  var all = [];
+
+  function render() {
+    var sel = filter ? filter.value : "";
+    var rows = all.filter(function (a) { return !sel || a.status === sel; });
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--adm-muted); padding: 40px;">No applications found.</td></tr>';
+      return;
+    }
+    var html = "";
+    rows.forEach(function (a) {
+      var badgeCls = a.status === "new" ? "admin-badge-info"
+        : a.status === "approved" ? "admin-badge-success"
+        : a.status === "rejected" ? "admin-badge-error"
+        : "admin-badge-warning";
+      var date = a.created_at ? new Date(a.created_at).toLocaleDateString() : "—";
+      html += '<tr>' +
+        '<td><strong style="color: var(--adm-text);">' + PX.esc(a.business_name) + '</strong></td>' +
+        '<td>' + PX.esc(a.tenant_type) + '</td>' +
+        '<td>' + PX.esc(a.contact_name) + '<br><span style="color: var(--adm-muted); font-size: 12px;">' + PX.esc(a.email) + '</span></td>' +
+        '<td>' + PX.esc(a.city) + '</td>' +
+        '<td><span class="admin-badge ' + badgeCls + '">' + PX.esc(a.status) + '</span></td>' +
+        '<td>' + PX.esc(date) + '</td>' +
+        '</tr>';
+    });
+    tbody.innerHTML = html;
+  }
+
+  if (filter) filter.addEventListener("change", render);
+
+  try {
+    var res = await PX.adminFetch("/platform/applications?limit=200");
+    if (res && res.ok) {
+      var data = await res.json();
+      all = data.items || [];
+      render();
+    }
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--adm-error); padding: 40px;">Failed to load applications.</td></tr>';
+  }
+};
