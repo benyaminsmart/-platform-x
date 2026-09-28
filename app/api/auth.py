@@ -6,12 +6,13 @@ from sqlalchemy.orm import Session as DBSession
 from app.api.deps import get_current_tenant, get_current_user
 from app.core.config import settings
 from app.core.rate_limit import LIMITS, limiter
-from app.core.security import create_access_token
+from app.core.security import create_access_token, create_refresh_token, decode_refresh_token
 from app.db.session import get_db
 from app.models.tenant import Tenant
 from app.models.user import User
 from app.schemas.auth import (
     CurrentUserResponse,
+    RefreshRequest,
     LoginRequest,
     RegisterRequest,
     TokenResponse,
@@ -55,9 +56,11 @@ def register(
         language=payload.language,
         preferred_currency=payload.preferred_currency,
     )
-    token = create_access_token(user.id, tenant_id=tenant.id)
+    access = create_access_token(user.id, tenant_id=tenant.id)
+    refresh = create_refresh_token(user.id, tenant_id=tenant.id)
     return TokenResponse(
-        access_token=token,
+        access_token=access,
+        refresh_token=refresh,
         expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
 
@@ -77,9 +80,11 @@ def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
         )
-    token = create_access_token(user.id, tenant_id=tenant.id)
+    access = create_access_token(user.id, tenant_id=tenant.id)
+    refresh = create_refresh_token(user.id, tenant_id=tenant.id)
     return TokenResponse(
-        access_token=token,
+        access_token=access,
+        refresh_token=refresh,
         expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
 
@@ -99,4 +104,45 @@ def me(request: Request, current_user: User = Depends(get_current_user)) -> Curr
         preferred_currency=current_user.preferred_currency,
         points=current_user.points,
         tier=current_user.tier,
+    )
+
+
+@router.post("/refresh", response_model=TokenResponse)
+@limiter.limit("30/minute")
+def refresh_token(
+    request: Request,
+    payload: RefreshRequest,
+    db: DBSession = Depends(get_db),
+) -> TokenResponse:
+    """Exchange a refresh token for a new access token pair."""
+    from jose import JWTError
+
+    try:
+        data = decode_refresh_token(payload.refresh_token)
+    except JWTError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token",
+        ) from exc
+
+    user_id = data.get("sub")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token payload",
+        )
+
+    user = user_service.get_user_by_id(db, user_id)
+    if user is None or user.status != "active":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User no longer active",
+        )
+
+    new_access = create_access_token(user.id, tenant_id=user.tenant_id)
+    new_refresh = create_refresh_token(user.id, tenant_id=user.tenant_id)
+    return TokenResponse(
+        access_token=new_access,
+        refresh_token=new_refresh,
+        expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )

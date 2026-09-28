@@ -32,11 +32,18 @@ class LoginRequest(BaseModel):
 
 
 class TokenResponse(BaseModel):
-    """JWT token response."""
+    """JWT token response (access + refresh)."""
 
     access_token: str
+    refresh_token: str
     token_type: str = "bearer"
     expires_in: int
+
+
+class RefreshRequest(BaseModel):
+    """Request to exchange a refresh token for a new access token."""
+
+    refresh_token: str = Field(min_length=10)
 
 
 class CurrentUserResponse(BaseModel):

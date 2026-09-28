@@ -38,7 +38,8 @@ class Settings(BaseSettings):
 
     # Security
     SECRET_KEY: str = _DEV_SECRET
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30  # 30 minutes
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 30  # 30 days
     ALGORITHM: str = "HS256"
     BCRYPT_ROUNDS: int = 12
 
