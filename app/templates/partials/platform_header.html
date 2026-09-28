@@ -13,32 +13,6 @@
     </nav>
 
     <div class="px-header-right">
-      {% if show_lang_switcher %}
-      <div class="px-lang-switcher" id="px-lang-switcher">
-        <button class="px-lang-btn" id="px-lang-toggle" aria-haspopup="true" aria-expanded="false" title="Change language">
-          <span class="px-lang-globe">🌍</span>
-        </button>
-        <div class="px-lang-menu" id="px-lang-menu">
-          <a href="?lang=en" class="px-lang-option" data-lang="en">
-            <span class="px-lang-flag">🇬🇧</span>
-            <span>English</span>
-          </a>
-          <a href="?lang=ar" class="px-lang-option" data-lang="ar">
-            <span class="px-lang-flag">🇦🇪</span>
-            <span>العربية</span>
-          </a>
-          <a href="?lang=fil" class="px-lang-option" data-lang="fil">
-            <span class="px-lang-flag">🇵🇭</span>
-            <span>Filipino</span>
-          </a>
-          <a href="?lang=hi" class="px-lang-option" data-lang="hi">
-            <span class="px-lang-flag">🇮🇳</span>
-            <span>हिन्दी</span>
-          </a>
-        </div>
-      </div>
-      {% endif %}
-
       <span id="px-auth-slot" class="px-auth-slot">
         <a href="/login" class="px-btn px-btn-ghost px-hide-mobile">Sign in</a>
         <a href="/register" class="px-btn px-btn-primary">Get started</a>

@@ -2668,3 +2668,58 @@ html { scroll-behavior: smooth; }
     min-width: auto;
   }
 }
+
+
+/* ---------- Fix: Platform-X logo on mobile ---------- */
+
+.px-logo {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.px-logo span:last-child {
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .px-logo {
+    font-size: 15px;
+  }
+  .px-logo-mark {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 12px !important;
+  }
+  .px-header-inner {
+    gap: 6px;
+    padding: 0 4px;
+  }
+  .px-header-right {
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .px-nav {
+    gap: 4px;
+  }
+  .px-auth-slot {
+    gap: 6px;
+  }
+  .px-btn {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  .px-nav .px-btn {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  .px-mobile-toggle {
+    padding: 6px;
+  }
+}
+
+@media (max-width: 400px) {
+  /* On very small screens: hide "Get started" text, keep only X + hamburger */
+  .px-nav #px-auth-slot .px-btn-primary {
+    display: none;
+  }
+}
