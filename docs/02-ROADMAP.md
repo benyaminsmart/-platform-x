@@ -357,6 +357,23 @@ Throughout all phases:
 
 **Phase 6 closed.**
 
+
+
+### v0.6.0-admin — Phase 7 Complete
+- Admin Login page (/admin/login) with separate auth flow
+- Admin Dashboard: stats + recent tenants + recent applications + recent audit
+- Tenants List: table with status filter
+- Tenant Detail: info + status change (activate/suspend/delete)
+- Applications Review: table with status filter
+- Audit Logs Viewer: paginated table
+- Subscriptions Management: list + inline create form
+- Admin panel: dark navy theme, dedicated sidebar + topbar
+- Admin token stored separately (px_admin_token)
+- 154 tests passing
+- Live at: https://goes-nevada-endorsement-labor.trycloudflare.com/admin
+
+**Phase 7 closed.**
+
 **Last updated:** September 2026
-**Current phase:** Phase 7 — Admin Panel UI (next)
+**Current phase:** Phase 8 — Rewards + Referral Complete (next)
 
