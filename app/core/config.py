@@ -49,6 +49,18 @@ class Settings(BaseSettings):
     # Multi-tenancy
     DEFAULT_TENANT_SLUG: str = "demo"
 
+    # Email (Resend)
+    RESEND_API_KEY: str = ""
+    EMAIL_FROM: str = "onboarding@resend.dev"
+    EMAIL_FROM_NAME: str = "Platform-X"
+    EMAIL_ENABLED: bool = False
+
+    # SMS (Twilio — Phase 11 later)
+    TWILIO_ACCOUNT_SID: str = ""
+    TWILIO_AUTH_TOKEN: str = ""
+    TWILIO_FROM_NUMBER: str = ""
+    SMS_ENABLED: bool = False
+
     # Feature flags
     ENABLE_MOCK_PAYMENTS: bool = True
 

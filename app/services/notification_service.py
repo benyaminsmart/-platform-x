@@ -108,3 +108,73 @@ def unread_count(db: DBSession, *, tenant_id: str, user_id: str) -> int:
             Notification.read_at.is_(None),
         )
     ).scalar_one()
+
+# ---------- Email-specific notification helpers ----------
+
+
+def _render_email(template_name: str, context: dict) -> str:
+    """Render an email template to HTML."""
+    from datetime import datetime, timezone
+    from pathlib import Path as _Path
+    from jinja2 import Environment, FileSystemLoader, select_autoescape
+
+    base_dir = _Path(__file__).resolve().parent.parent
+    env = Environment(
+        loader=FileSystemLoader(str(base_dir / "templates")),
+        autoescape=select_autoescape(["html", "xml"]),
+    )
+    tmpl = env.get_template(f"emails/{template_name}")
+    context = {**context, "year": datetime.now(timezone.utc).year}
+    return tmpl.render(**context)
+
+
+def send_welcome_email(*, to_email: str, user_name: str, home_url: str) -> bool:
+    """Send a welcome email after registration."""
+    from app.services import email_service
+
+    html = _render_email(
+        "welcome.html",
+        {"user_name": user_name, "home_url": home_url},
+    )
+    return email_service.send_email(
+        to=to_email,
+        subject="Welcome to Platform-X",
+        html=html,
+    )
+
+
+def send_booking_confirmed_email(
+    *,
+    to_email: str,
+    user_name: str,
+    tenant_name: str,
+    service_name: str,
+    check_in: str,
+    check_out: str | None,
+    guests: int,
+    total: str,
+    currency: str,
+    account_url: str,
+) -> bool:
+    """Send a booking confirmation email."""
+    from app.services import email_service
+
+    html = _render_email(
+        "booking_confirmed.html",
+        {
+            "user_name": user_name,
+            "tenant_name": tenant_name,
+            "service_name": service_name,
+            "check_in": check_in,
+            "check_out": check_out,
+            "guests": guests,
+            "total": total,
+            "currency": currency,
+            "account_url": account_url,
+        },
+    )
+    return email_service.send_email(
+        to=to_email,
+        subject=f"Booking confirmed — {tenant_name}",
+        html=html,
+    )

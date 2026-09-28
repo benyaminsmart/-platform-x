@@ -147,6 +147,29 @@ def mark_success(
                 description=f"Booking: {booking.service_name}",
                 reference_id=booking.id,
             )
+
+            # Send confirmation email (non-blocking; no-op if disabled)
+            try:
+                from app.models.tenant import Tenant as _T
+                from app.models.user import User as _U
+                from app.services import notification_service
+                _user = db.query(_U).filter(_U.id == payment.user_id).one_or_none()
+                _tenant = db.query(_T).filter(_T.id == payment.tenant_id).one_or_none()
+                if _user and _tenant:
+                    notification_service.send_booking_confirmed_email(
+                        to_email=_user.email,
+                        user_name=_user.first_name,
+                        tenant_name=_tenant.name,
+                        service_name=booking.service_name,
+                        check_in=str(booking.check_in),
+                        check_out=str(booking.check_out) if booking.check_out else None,
+                        guests=booking.guests,
+                        total=str(booking.total_amount),
+                        currency=booking.currency,
+                        account_url=f"/{_tenant.slug}/account",
+                    )
+            except Exception:
+                pass
     if payment.order_id:
         order = db.execute(
             select(Order).where(Order.id == payment.order_id)

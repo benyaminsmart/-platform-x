@@ -67,6 +67,19 @@ def register(
         ip_address=request.client.host if request.client else None,
         user_agent=request.headers.get("user-agent"),
     )
+
+    # Send welcome email (non-blocking; no-op if disabled)
+    try:
+        from app.services import notification_service
+        base_url = str(request.base_url).rstrip("/")
+        notification_service.send_welcome_email(
+            to_email=user.email,
+            user_name=user.first_name,
+            home_url=base_url,
+        )
+    except Exception:
+        pass
+
     return TokenResponse(
         access_token=access,
         refresh_token=refresh,
@@ -104,6 +117,19 @@ def login(
         ip_address=request.client.host if request.client else None,
         user_agent=request.headers.get("user-agent"),
     )
+
+    # Send welcome email (non-blocking; no-op if disabled)
+    try:
+        from app.services import notification_service
+        base_url = str(request.base_url).rstrip("/")
+        notification_service.send_welcome_email(
+            to_email=user.email,
+            user_name=user.first_name,
+            home_url=base_url,
+        )
+    except Exception:
+        pass
+
     return TokenResponse(
         access_token=access,
         refresh_token=refresh,
