@@ -17,7 +17,7 @@ RESERVED_SLUGS = {
     "auth", "tenants", "login", "register", "services", "bookings", "orders",
     "payments", "rewards", "referrals", "notifications",
     "analytics", "platform", "businesses", "about", "contact",
-    "hotels", "restaurants", "travel", "entertainment", "partners", "docs",
+    "hotels", "restaurants", "travel", "entertainment", "partners", "docs", "admin",
     "favicon.ico",
 }
 
@@ -314,6 +314,31 @@ def docs_page(doc_name: str, request: Request) -> HTMLResponse:
         request,
         meta["template"],
         {"tenant": None},
+    )
+
+
+
+
+# ---------- Admin Panel (HTML) ----------
+
+
+@router.get("/admin/login", response_class=HTMLResponse)
+def admin_login_page(request: Request) -> HTMLResponse:
+    """Admin login page (no layout sidebar)."""
+    return templates.TemplateResponse(
+        request,
+        "admin/admin_login.html",
+        {"admin": None},
+    )
+
+
+@router.get("/admin", response_class=HTMLResponse)
+def admin_dashboard_page(request: Request) -> HTMLResponse:
+    """Admin dashboard (placeholder; JS loads real data)."""
+    return templates.TemplateResponse(
+        request,
+        "admin/admin_dashboard.html",
+        {"admin": True, "active_nav": "dashboard"},
     )
 
 

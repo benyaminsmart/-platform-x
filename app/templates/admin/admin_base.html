@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Admin — Platform-X{% endblock %}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/static/css/platform.css?v={{ asset_version }}">
+  <link rel="stylesheet" href="/static/css/admin.css?v={{ asset_version }}">
+
+  {% block head %}{% endblock %}
+</head>
+<body class="admin-body">
+
+  {% if admin %}
+    {% include "admin/partials/admin_sidebar.html" %}
+    <div class="admin-main">
+      {% include "admin/partials/admin_topbar.html" %}
+      <main class="admin-content">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  {% else %}
+    <main class="admin-auth-main">
+      {% block auth_content %}{% endblock %}
+    </main>
+  {% endif %}
+
+  <script src="/static/js/px-core.js?v={{ asset_version }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

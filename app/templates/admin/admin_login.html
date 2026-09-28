@@ -1,0 +1,73 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Admin Sign in — Platform-X{% endblock %}
+
+{% block auth_content %}
+
+<div class="admin-auth-card">
+  <div class="admin-auth-logo">
+    <div class="admin-logo-mark">X</div>
+    <div class="admin-logo" style="font-size: 16px;">Platform-X Admin</div>
+  </div>
+
+  <h1 class="admin-auth-title">Sign in</h1>
+  <p class="admin-auth-sub">Platform administrator access only.</p>
+
+  <div id="admin-alert" class="admin-alert admin-alert-error" style="display: none;"></div>
+
+  <form id="admin-login-form">
+    <div class="admin-field">
+      <label class="admin-label" for="email">Email</label>
+      <input class="admin-input" type="email" id="email" name="email" required autocomplete="email" placeholder="admin@platformx.com">
+    </div>
+
+    <div class="admin-field">
+      <label class="admin-label" for="password">Password</label>
+      <input class="admin-input" type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+    </div>
+
+    <button type="submit" class="admin-btn admin-btn-block">Sign in</button>
+  </form>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  var form = document.getElementById("admin-login-form");
+  var alertBox = document.getElementById("admin-alert");
+  if (!form) return;
+
+  function showError(msg) {
+    alertBox.textContent = msg;
+    alertBox.style.display = "block";
+  }
+
+  form.addEventListener("submit", async function (ev) {
+    ev.preventDefault();
+    alertBox.style.display = "none";
+
+    var email = form.email.value.trim();
+    var password = form.password.value;
+
+    try {
+      var res = await fetch("/platform/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email, password: password }),
+      });
+      var data = await res.json();
+      if (!res.ok) {
+        showError(data.detail || "Login failed");
+        return;
+      }
+      try { localStorage.setItem("px_admin_token", data.access_token); } catch (e) {}
+      window.location.href = "/admin";
+    } catch (err) {
+      showError("Network error. Try again.");
+    }
+  });
+})();
+</script>
+{% endblock %}

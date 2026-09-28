@@ -1,0 +1,39 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Dashboard — Platform-X Admin{% endblock %}
+
+{% block content %}
+
+<div class="admin-stats" id="admin-stats">
+  <div class="admin-stat">
+    <div class="admin-stat-label">Total Tenants</div>
+    <div class="admin-stat-value" id="stat-tenants">—</div>
+  </div>
+  <div class="admin-stat">
+    <div class="admin-stat-label">Active Tenants</div>
+    <div class="admin-stat-value" id="stat-active">—</div>
+  </div>
+  <div class="admin-stat">
+    <div class="admin-stat-label">Total Users</div>
+    <div class="admin-stat-value" id="stat-users">—</div>
+  </div>
+  <div class="admin-stat">
+    <div class="admin-stat-label">Bookings</div>
+    <div class="admin-stat-value" id="stat-bookings">—</div>
+  </div>
+</div>
+
+<div class="admin-card">
+  <h2>Welcome back</h2>
+  <p class="admin-card-sub">Platform overview — live data from the API.</p>
+  <p style="color: var(--adm-text-soft); margin: 0;">
+    Use the sidebar to manage tenants, review applications, and inspect audit logs.
+  </p>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/admin.js"></script>
+<script>PX.initAdminDashboard();</script>
+{% endblock %}
