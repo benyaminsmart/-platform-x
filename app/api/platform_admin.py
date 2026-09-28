@@ -26,7 +26,7 @@ from app.schemas.platform_admin import (
 )
 from app.schemas.subscription import SubscriptionCreate, SubscriptionPublic
 from app.schemas.tenant import TenantPublic
-from app.services import admin_service
+from app.services import admin_service, audit_service
 
 router = APIRouter(prefix="/platform", tags=["platform-admin"])
 
@@ -49,6 +49,14 @@ def admin_login(
     token = create_access_token(
         admin.id,
         extra_claims={"actor": "platform_admin", "role": admin.role},
+    )
+    audit_service.log(
+        db,
+        actor_id=admin.id,
+        actor_type="platform_admin",
+        action="login",
+        ip_address=None,
+        user_agent=None,
     )
     return AdminTokenResponse(
         access_token=token,
@@ -90,11 +98,22 @@ def update_tenant_status(
     tenant = db.execute(select(Tenant).where(Tenant.id == tenant_id)).scalar_one_or_none()
     if tenant is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tenant not found")
+    old_status = tenant.status
     tenant.status = new_status
     if new_status == "deleted":
         tenant.deleted_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(tenant)
+    audit_service.log(
+        db,
+        actor_id=admin.id,
+        actor_type="platform_admin",
+        action="tenant.status.update",
+        tenant_id=tenant.id,
+        target_table="tenants",
+        target_id=tenant.id,
+        changes={"old_status": old_status, "new_status": new_status},
+    )
     return TenantPublic.model_validate(tenant)
 
 
@@ -169,6 +188,16 @@ def create_subscription(
     db.add(sub)
     db.commit()
     db.refresh(sub)
+    audit_service.log(
+        db,
+        actor_id=admin.id,
+        actor_type="platform_admin",
+        action="subscription.create",
+        tenant_id=sub.tenant_id,
+        target_table="subscriptions",
+        target_id=sub.id,
+        changes={"plan": sub.plan, "price": str(sub.price)},
+    )
     return SubscriptionPublic.model_validate(sub)
 
 

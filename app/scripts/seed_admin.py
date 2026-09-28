@@ -12,7 +12,7 @@ from app.db.session import SessionLocal
 from app.models.platform_admin import PlatformAdmin
 from app.services import admin_service
 
-DEFAULT_EMAIL = "admin@platform-x.local"
+DEFAULT_EMAIL = "admin@platformx.com"
 DEFAULT_PASSWORD = "ChangeMe123!"
 
 

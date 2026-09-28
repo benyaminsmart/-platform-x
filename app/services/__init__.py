@@ -2,6 +2,7 @@
 
 from app.services import (
     admin_service,
+    audit_service,
     analytics_service,
     booking_service,
     notification_service,
@@ -18,6 +19,7 @@ from app.services import (
 
 __all__ = [
     "admin_service",
+    "audit_service",
     "analytics_service",
     "booking_service",
     "notification_service",
