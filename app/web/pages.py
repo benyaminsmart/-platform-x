@@ -18,7 +18,7 @@ RESERVED_SLUGS = {
     "auth", "tenants", "login", "register", "services", "bookings", "orders",
     "payments", "rewards", "referrals", "notifications",
     "analytics", "platform", "businesses", "about", "contact",
-    "hotels", "restaurants", "travel", "entertainment", "partners", "docs", "admin",
+    "hotels", "restaurants", "travel", "entertainment", "partners", "docs", "admin", "roadmap",
     "favicon.ico",
 }
 
@@ -403,6 +403,18 @@ def admin_subscriptions_page(request: Request) -> HTMLResponse:
         request,
         "admin/admin_subscriptions.html",
         {"admin": True, "active_nav": "subscriptions"},
+    )
+
+
+
+
+@router.get("/roadmap", response_class=HTMLResponse)
+def roadmap_page(request: Request) -> HTMLResponse:
+    """Visual project roadmap for partners."""
+    return templates.TemplateResponse(
+        request,
+        "pages/roadmap.html",
+        {"tenant": None},
     )
 
 

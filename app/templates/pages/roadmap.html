@@ -1,0 +1,216 @@
+{% extends "layouts/platform_base.html" %}
+
+{% block title %}Roadmap — Platform-X{% endblock %}
+
+{% block content %}
+
+<style>
+  .rm-hero { background: linear-gradient(135deg, #0f3d5c 0%, #082a42 100%); color: white; padding: 60px 0 40px; }
+  .rm-hero h1 { color: white; font-size: 42px; margin-bottom: 12px; letter-spacing: -0.03em; }
+  .rm-hero p { color: rgba(255,255,255,0.85); font-size: 17px; max-width: 620px; margin: 0; }
+  .rm-timeline { padding: 60px 0 100px; position: relative; }
+  .rm-line { position: absolute; left: 50%; top: 60px; bottom: 100px; width: 2px; background: var(--px-line); transform: translateX(-50%); }
+  .rm-item { display: grid; grid-template-columns: 1fr 80px 1fr; gap: 0; margin-bottom: 40px; position: relative; }
+  .rm-content { background: var(--px-surface); border: 1px solid var(--px-line); border-radius: var(--px-radius-lg); padding: 24px; position: relative; }
+  .rm-content h3 { font-family: var(--px-font-display); font-size: 18px; margin: 0 0 6px; }
+  .rm-content p { margin: 0; font-size: 14px; color: var(--px-muted); line-height: 1.5; }
+  .rm-badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .rm-done { background: rgba(52,211,153,0.15); color: #34d399; }
+  .rm-progress { background: rgba(99,102,241,0.15); color: #6366f1; }
+  .rm-next { background: rgba(251,191,36,0.15); color: #fbbf24; }
+  .rm-soon { background: rgba(136,144,163,0.15); color: #8890a3; }
+  .rm-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--px-surface); border: 3px solid var(--px-brand); margin: 0 auto; z-index: 2; position: relative; align-self: start; margin-top: 24px; }
+  .rm-dot.done { background: #34d399; border-color: #34d399; }
+  .rm-dot.next { background: #fbbf24; border-color: #fbbf24; }
+  .rm-dot.progress { background: #6366f1; border-color: #6366f1; animation: rm-pulse 2s infinite; }
+  @keyframes rm-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.5); } 50% { box-shadow: 0 0 0 10px rgba(99,102,241,0); } }
+  .rm-item:nth-child(odd) .rm-content { grid-column: 1; text-align: right; }
+  .rm-item:nth-child(even) .rm-content { grid-column: 3; text-align: left; }
+  .rm-item .rm-dot { grid-column: 2; }
+  @media (max-width: 720px) {
+    .rm-item { grid-template-columns: 40px 1fr; gap: 16px; }
+    .rm-line { left: 20px; }
+    .rm-dot { margin: 0; }
+    .rm-item:nth-child(odd) .rm-content, .rm-item:nth-child(even) .rm-content { grid-column: 2; text-align: left; }
+  }
+  .rm-summary { background: var(--px-surface); border: 1px solid var(--px-line); border-radius: var(--px-radius-lg); padding: 32px; margin-bottom: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; text-align: center; }
+  .rm-summary-num { font-family: var(--px-font-display); font-size: 42px; font-weight: 800; color: var(--px-brand); letter-spacing: -0.03em; line-height: 1; margin-bottom: 6px; }
+  .rm-summary-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--px-muted); }
+  @media (max-width: 600px) { .rm-summary { grid-template-columns: 1fr; } }
+</style>
+
+<section class="rm-hero">
+  <div class="px-container">
+    <div class="eyebrow" style="color: #c9a961;">Project Timeline</div>
+    <h1>Platform-X Roadmap</h1>
+    <p>From concept to production — every phase, step by step.</p>
+  </div>
+</section>
+
+<section class="rm-timeline">
+  <div class="px-container">
+    <div class="rm-summary">
+      <div>
+        <div class="rm-summary-num">9</div>
+        <div class="rm-summary-label">Phases Complete</div>
+      </div>
+      <div>
+        <div class="rm-summary-num">7</div>
+        <div class="rm-summary-label">Releases Tagged</div>
+      </div>
+      <div>
+        <div class="rm-summary-num">154</div>
+        <div class="rm-summary-label">Automated Tests</div>
+      </div>
+    </div>
+
+    <div class="rm-line"></div>
+
+    <div class="rm-item">
+      <div class="rm-dot done"></div>
+      <div class="rm-content">
+        <span class="rm-badge rm-done">✓ Done</span>
+        <h3>Foundation &amp; Strategy</h3>
+        <p>Strategic docs, architecture, decisions, roadmap.</p>
+      </div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot done"></div>
+      <div class="rm-content">
+        <span class="rm-badge rm-done">✓ Done</span>
+        <h3>Core Backend (v0.1.0)</h3>
+        <p>16 database models, 65+ API endpoints, authentication, bookings, payments, rewards, referrals, admin auth, analytics, audit logs.</p>
+      </div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot done"></div>
+      <div class="rm-content">
+        <span class="rm-badge rm-done">✓ Done</span>
+        <h3>Frontend Foundation (v0.2.0)</h3>
+        <p>Jinja2 templates, design system, first user flows (login, booking, payment).</p>
+      </div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot done"></div>
+      <div class="rm-content">
+        <span class="rm-badge rm-done">✓ Done</span>
+        <h3>UI Redesign &amp; Demo Data (v0.3.0)</h3>
+        <p>Light Hospitality theme, 21 demo businesses with photos, category pages, business detail, 4 languages.</p>
+      </div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot done"></div>
+      <div class="rm-content">
+        <span class="rm-badge rm-done">✓ Done</span>
+        <h3>Complete User Flow (v0.4.0)</h3>
+        <p>Platform-wide auth, cross-tenant bookings, dynamic forms per business type, restaurant menu + order cart, partner onboarding form.</p>
+      </div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot done"></div>
+      <div class="rm-content">
+        <span class="rm-badge rm-done">✓ Done</span>
+        <h3>Security Hardening (v0.5.0)</h3>
+        <p>Rate limiting, security headers, JWT refresh tokens, password policy, account lockout, session revocation, XSS/SQL audits.</p>
+      </div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot done"></div>
+      <div class="rm-content">
+        <span class="rm-badge rm-done">✓ Done</span>
+        <h3>Admin Panel (v0.6.0)</h3>
+        <p>Admin login, dashboard with live stats, tenants management, applications review, subscriptions, audit logs viewer.</p>
+      </div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot done"></div>
+      <div class="rm-content">
+        <span class="rm-badge rm-done">✓ Done</span>
+        <h3>Multilingual (v0.7.0)</h3>
+        <p>English, Arabic (RTL), Filipino, Hindi. Language switcher, translated UI, localized content.</p>
+      </div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot progress"></div>
+      <div class="rm-content">
+        <span class="rm-badge rm-progress">⏳ In Progress</span>
+        <h3>Notifications</h3>
+        <p>Real email via Resend (welcome, booking confirmation), SMS, WhatsApp, notification center, password reset.</p>
+      </div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot next"></div>
+      <div class="rm-content">
+        <span class="rm-badge rm-next">→ Next</span>
+        <h3>Real Payment Gateway</h3>
+        <p>Telr / Stripe integration. Real card processing, refunds, invoices, multi-currency.</p>
+      </div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot"></div>
+      <div class="rm-content">
+        <span class="rm-badge rm-soon">Coming</span>
+        <h3>Business Onboarding Tools</h3>
+        <p>Subdomain per business, custom domains, tenant self-service setup, staff accounts, billing.</p>
+      </div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot"></div>
+      <div class="rm-content">
+        <span class="rm-badge rm-soon">Coming</span>
+        <h3>API &amp; Webhooks</h3>
+        <p>Public API keys, outbound webhooks, SDKs, third-party integrations.</p>
+      </div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot"></div>
+      <div class="rm-content">
+        <span class="rm-badge rm-soon">Coming</span>
+        <h3>AI Assistant</h3>
+        <p>Floating chat on the site — helps guests discover and book with natural language.</p>
+      </div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot"></div>
+      <div class="rm-content">
+        <span class="rm-badge rm-soon">Coming</span>
+        <h3>Enhanced Rewards</h3>
+        <p>Redeem catalog, tier benefits, referral milestones, birthday rewards, promo codes.</p>
+      </div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot"></div>
+      <div class="rm-content">
+        <span class="rm-badge rm-soon">Coming</span>
+        <h3>Cloud Deployment</h3>
+        <p>Dedicated VPS, custom domain, PostgreSQL, SSL, monitoring, automatic backups.</p>
+      </div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot"></div>
+      <div class="rm-content">
+        <span class="rm-badge rm-soon">Coming</span>
+        <h3>Mobile App</h3>
+        <p>Native iOS and Android apps for guests and business staff.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
