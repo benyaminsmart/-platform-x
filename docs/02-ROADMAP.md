@@ -338,6 +338,25 @@ Throughout all phases:
 
 **Phase 5 closed.**
 
+
+
+### v0.5.0-security — Phase 6 Complete
+- Rate Limiting (slowapi): login 20/min, register 5/min, partner 3/5min, payment 20/min
+- Security Headers (CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)
+- JWT Refresh Tokens (access 30min, refresh 30 days, /auth/refresh)
+- Password Policy (min 8 + lower + upper + digit)
+- Account Lockout (5 failed attempts → 15 min)
+- Session Revocation (/auth/logout revokes, JWT jti unique)
+- XSS Audit — all clear (Jinja autoescape + PX.esc everywhere)
+- SQL Injection Audit — all clear (SQLAlchemy Core/ORM only)
+- HTTPS Enforcement (production only)
+- Audit Log Coverage (admin login, tenant status, subscription create)
+- SECRETS.md + DEPLOYMENT.md + auto_backup.sh
+- 154 tests passing
+- Live at: https://goes-nevada-endorsement-labor.trycloudflare.com
+
+**Phase 6 closed.**
+
 **Last updated:** September 2026
-**Current phase:** Phase 4 — Next (TBD)
+**Current phase:** Phase 7 — Admin Panel UI (next)
 
