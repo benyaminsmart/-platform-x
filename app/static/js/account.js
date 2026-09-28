@@ -51,7 +51,7 @@ PX.initAccount = function (slug) {
       .sort(function (a, b) { return new Date(b.time) - new Date(a.time); })
       .slice(0, 5);
     if (!recent.length) {
-      list.innerHTML = '<p class="px-muted">No activity yet. Book something to see it here.</p>';
+      list.innerHTML = '<p class="px-muted">' + (window.PX_I18N ? PX_I18N.no_activity : 'No activity yet.') + '</p>';
       return;
     }
     var html = "";
@@ -95,7 +95,7 @@ PX.initAccount = function (slug) {
         document.getElementById("rewards-next-points").textContent = d.points_to_next_tier + " pts to go";
         document.getElementById("rewards-progress-bar").style.width = d.progress_percent + "%";
       } else {
-        document.getElementById("rewards-next-label").textContent = "Top tier reached 🎉";
+        document.getElementById("rewards-next-label").textContent = (window.PX_I18N && PX_I18N.top_tier) || "Top tier reached 🎉";
         document.getElementById("rewards-next-points").textContent = "";
         document.getElementById("rewards-progress-bar").style.width = "100%";
       }
@@ -128,7 +128,7 @@ PX.initAccount = function (slug) {
 
       var list = document.getElementById("referrals-list");
       if (!d.referrals || !d.referrals.length) {
-        list.innerHTML = '<p class="px-muted">No referrals yet. Share your code with friends — you both earn points.</p>';
+        list.innerHTML = '<p class="px-muted">' + (window.PX_I18N ? PX_I18N.no_referrals : 'No referrals yet.') + '</p>';
         return;
       }
       var html = "";
@@ -160,7 +160,7 @@ PX.initAccount = function (slug) {
       });
       var list = document.getElementById("bookings-list");
       if (!d.items.length) {
-        list.innerHTML = '<p class="px-muted">No bookings yet.</p>';
+        list.innerHTML = '<p class="px-muted">' + (window.PX_I18N ? PX_I18N.no_bookings : 'No bookings yet.') + '</p>';
       } else {
         var html = "";
         d.items.forEach(function (b) {
@@ -196,7 +196,7 @@ PX.initAccount = function (slug) {
       });
       var list = document.getElementById("orders-list");
       if (!d.items.length) {
-        list.innerHTML = '<p class="px-muted">No orders yet.</p>';
+        list.innerHTML = '<p class="px-muted">' + (window.PX_I18N ? PX_I18N.no_orders : 'No orders yet.') + '</p>';
       } else {
         var html = "";
         d.items.forEach(function (o) {
@@ -219,7 +219,7 @@ PX.initAccount = function (slug) {
     .then(function (d) {
       var list = document.getElementById("rewards-list");
       if (!d.items.length) {
-        list.innerHTML = '<p class="px-muted">No rewards yet. Book something to earn points!</p>';
+        list.innerHTML = '<p class="px-muted">' + (window.PX_I18N ? PX_I18N.no_rewards : 'No rewards yet.') + '</p>';
         return;
       }
       var html = "";
