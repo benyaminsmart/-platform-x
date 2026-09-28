@@ -115,7 +115,16 @@
 
       <!-- RECENT ACTIVITY -->
       <div class="px-recent">
-        <h3 style="margin-bottom: 16px; font-size: 18px;">{{ t('account.recent_activity', current_lang) }}</h3>
+        <div style="margin-bottom: 24px; padding: 20px; background: linear-gradient(135deg, #0f3d5c 0%, #1e5a7d 100%); border-radius: 16px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #c9a961; margin-bottom: 6px;">✨ New</div>
+          <div style="font-family: var(--px-font-display); font-size: 20px; font-weight: 700;">AI Travel Assistant</div>
+          <div style="font-size: 14px; opacity: 0.85; margin-top: 4px;">Plan trips, get recommendations, book in one chat.</div>
+        </div>
+        <a href="/account/ai" class="px-btn px-btn-accent px-btn-lg">Open AI →</a>
+      </div>
+
+      <h3 style="margin-bottom: 16px; font-size: 18px;">{{ t('account.recent_activity', current_lang) }}</h3>
         <div id="recent-list">
           <p class="px-muted">Loading…</p>
         </div>

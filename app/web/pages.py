@@ -580,6 +580,18 @@ def business_ai_page(request: Request) -> HTMLResponse:
     )
 
 
+
+
+@router.get("/account/ai", response_class=HTMLResponse)
+def account_ai_page(request: Request) -> HTMLResponse:
+    """User AI Assistant full page."""
+    return templates.TemplateResponse(
+        request,
+        "pages/account_ai.html",
+        {"tenant": None},
+    )
+
+
 @router.get("/about", response_class=HTMLResponse)
 def about(request: Request) -> HTMLResponse:
     """About page."""

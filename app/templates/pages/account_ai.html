@@ -1,0 +1,195 @@
+{% extends "layouts/platform_base.html" %}
+
+{% block title %}AI Assistant — Platform-X{% endblock %}
+
+{% block content %}
+
+<section class="px-dash" style="padding: 40px 0 60px;">
+  <div class="px-container">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+      <div>
+        <div class="eyebrow">AI Assistant</div>
+        <h1 style="margin: 0;">Your personal travel assistant</h1>
+        <p class="px-muted" style="margin: 8px 0 0;">Ask about trips, bookings, rewards, or anything on the platform.</p>
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <a href="/account" class="px-btn px-btn-ghost">← Back to account</a>
+        <button type="button" class="px-btn px-btn-ghost" id="clear-history-btn">Clear history</button>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr; gap: 16px; max-width: 900px; margin: 0 auto;">
+      <div id="ai-chat-body" class="px-ai-full-body">
+        <div class="px-ai-full-msg px-ai-full-msg-assistant">
+          Hi! I'm your personal assistant. I can help you:
+          • Plan a multi-day trip
+          • Recommend hotels and restaurants
+          • Check your bookings and rewards
+          • Suggest what to do next
+          
+          What would you like?
+        </div>
+      </div>
+
+      <form id="ai-chat-form" class="px-ai-full-form">
+        <input type="text" id="ai-chat-input" placeholder="Ask me anything..." autocomplete="off" maxlength="4000">
+        <button type="submit" id="ai-chat-send">Send</button>
+      </form>
+
+      <div id="ai-alert" class="alert alert-error" style="display: none;"></div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<style>
+  .px-ai-full-body {
+    min-height: 420px;
+    max-height: 600px;
+    overflow-y: auto;
+    padding: 20px;
+    background: #faf8f5;
+    border: 1px solid var(--px-line);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .px-ai-full-msg {
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 80%;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  .px-ai-full-msg-assistant {
+    background: white;
+    color: var(--px-text);
+    border: 1px solid var(--px-line);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+  .px-ai-full-msg-user {
+    background: #0f3d5c;
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+  .px-ai-full-form {
+    display: flex;
+    gap: 12px;
+    background: white;
+    padding: 12px;
+    border: 1px solid var(--px-line);
+    border-radius: 16px;
+  }
+  .px-ai-full-form input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid var(--px-line);
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+    font-family: inherit;
+  }
+  .px-ai-full-form input:focus { border-color: var(--px-brand); }
+  .px-ai-full-form button {
+    padding: 12px 24px;
+    background: #0f3d5c;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .px-ai-full-form button:hover { background: #082a42; }
+  .px-ai-full-form button:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>
+
+<script>
+(function(){
+  var token = PX.getToken();
+  if (!token) { window.location.href = "/login"; return; }
+
+  var body = document.getElementById("ai-chat-body");
+  var form = document.getElementById("ai-chat-form");
+  var input = document.getElementById("ai-chat-input");
+  var sendBtn = document.getElementById("ai-chat-send");
+
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+
+  function append(role, text) {
+    var div = document.createElement("div");
+    div.className = "px-ai-full-msg px-ai-full-msg-" + role;
+    div.textContent = text;
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function appendTyping() {
+    var div = document.createElement("div");
+    div.id = "ai-typing";
+    div.className = "px-ai-full-msg px-ai-full-msg-assistant";
+    div.style.opacity = "0.6";
+    div.textContent = "…";
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
+  }
+  function removeTyping() { var t = document.getElementById("ai-typing"); if (t) t.remove(); }
+
+  // Load history
+  fetch("/account/api/ai/history?limit=50", { headers: PX.authHeaders(PX.getTenantSlug() || "trianon-hotel") })
+    .then(function(r){ return r.ok ? r.json() : []; })
+    .then(function(items){
+      if (!items.length) return;
+      body.innerHTML = "";
+      items.forEach(function(m){
+        append(m.role, m.content);
+      });
+    })
+    .catch(function(){});
+
+  // Clear history
+  document.getElementById("clear-history-btn").addEventListener("click", async function(){
+    if (!confirm("Clear all chat history?")) return;
+    await fetch("/account/api/ai/history", { method: "DELETE", headers: PX.authHeaders(PX.getTenantSlug() || "trianon-hotel") });
+    body.innerHTML = "";
+    append("assistant", "History cleared. What would you like to explore?");
+  });
+
+  form.addEventListener("submit", async function(ev){
+    ev.preventDefault();
+    var msg = input.value.trim();
+    if (!msg) return;
+    append("user", msg);
+    input.value = "";
+    sendBtn.disabled = true;
+    appendTyping();
+
+    try {
+      var headers = PX.authHeaders(PX.getTenantSlug() || "trianon-hotel");
+      headers["Content-Type"] = "application/json";
+      var res = await fetch("/account/api/ai/chat", {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify({message: msg, use_history: true}),
+      });
+      var data = await res.json();
+      removeTyping();
+      sendBtn.disabled = false;
+      if (!res.ok) { append("assistant", data.detail || "Sorry, please try again."); return; }
+      append("assistant", data.content);
+    } catch(e) {
+      removeTyping();
+      sendBtn.disabled = false;
+      append("assistant", "Network error.");
+    }
+  });
+})();
+</script>
+{% endblock %}
