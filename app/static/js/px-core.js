@@ -200,18 +200,10 @@ document.addEventListener("DOMContentLoaded", function () {
 PX.initLangSwitcher = function () {
   var toggle = document.getElementById("px-lang-toggle");
   var menu = document.getElementById("px-lang-menu");
-  var flag = document.getElementById("px-lang-flag");
-  var code = document.getElementById("px-lang-code");
 
   if (!toggle || !menu) return;
 
-  var FLAGS = { en: "🇬🇧", ar: "🇦🇪", fil: "🇵🇭", hi: "🇮🇳" };
-  var CODES = { en: "EN", ar: "AR", fil: "FIL", hi: "HI" };
-
-  // Set current language indicator from html lang attribute
   var currentLang = document.documentElement.getAttribute("lang") || "en";
-  if (flag) flag.textContent = FLAGS[currentLang] || "🇬🇧";
-  if (code) code.textContent = CODES[currentLang] || "EN";
 
   // Mark active option
   menu.querySelectorAll(".px-lang-option").forEach(function (opt) {

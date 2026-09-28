@@ -13,11 +13,10 @@
     </nav>
 
     <div class="px-header-right">
+      {% if show_lang_switcher %}
       <div class="px-lang-switcher" id="px-lang-switcher">
         <button class="px-lang-btn" id="px-lang-toggle" aria-haspopup="true" aria-expanded="false" title="Change language">
-          <span class="px-lang-flag" id="px-lang-flag">🇬🇧</span>
-          <span class="px-lang-code" id="px-lang-code">EN</span>
-          <span class="px-lang-chevron">▾</span>
+          <span class="px-lang-globe">🌍</span>
         </button>
         <div class="px-lang-menu" id="px-lang-menu">
           <a href="?lang=en" class="px-lang-option" data-lang="en">
@@ -38,6 +37,7 @@
           </a>
         </div>
       </div>
+      {% endif %}
 
       <span id="px-auth-slot" class="px-auth-slot">
         <a href="/login" class="px-btn px-btn-ghost px-hide-mobile">Sign in</a>

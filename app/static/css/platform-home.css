@@ -2573,3 +2573,98 @@ html { scroll-behavior: smooth; }
     min-width: auto;
   }
 }
+
+
+/* ---------- Language Switcher (globe) ---------- */
+
+.px-lang-switcher {
+  position: relative;
+}
+
+.px-lang-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background: transparent;
+  border: 1px solid var(--px-line-2);
+  border-radius: var(--px-radius-full);
+  cursor: pointer;
+  transition: all var(--px-fast) var(--px-ease);
+  padding: 0;
+}
+
+.px-lang-btn:hover {
+  background: var(--px-surface);
+  border-color: var(--px-text-soft);
+  transform: scale(1.05);
+}
+
+.px-lang-globe {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.px-lang-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 180px;
+  background: var(--px-surface);
+  border: 1px solid var(--px-line);
+  border-radius: var(--px-radius-lg);
+  padding: 6px;
+  box-shadow: var(--px-shadow-lg);
+  display: none;
+  z-index: 200;
+}
+
+.px-lang-menu.is-open {
+  display: block;
+}
+
+.px-lang-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  color: var(--px-text-soft);
+  font-size: 14px;
+  text-decoration: none;
+  border-radius: var(--px-radius-sm);
+  transition: background var(--px-fast) var(--px-ease);
+}
+
+.px-lang-option:hover {
+  background: var(--px-surface-2);
+  color: var(--px-text);
+}
+
+.px-lang-option.is-active {
+  background: rgba(15, 61, 92, 0.08);
+  color: var(--px-brand);
+  font-weight: 600;
+}
+
+.px-lang-flag {
+  font-size: 16px;
+  line-height: 1;
+}
+
+@media (max-width: 720px) {
+  .px-lang-btn {
+    width: 38px;
+    height: 38px;
+  }
+  .px-lang-globe {
+    font-size: 18px;
+  }
+  .px-lang-menu {
+    position: fixed;
+    top: 70px;
+    right: 16px;
+    left: 16px;
+    min-width: auto;
+  }
+}

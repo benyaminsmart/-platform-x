@@ -132,6 +132,7 @@ def home(request: Request, db: DBSession = Depends(get_db)) -> HTMLResponse:
             "counts": counts,
             "featured": featured,
             "stats": stats,
+            "show_lang_switcher": True,
         },
     )
 
