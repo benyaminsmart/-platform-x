@@ -194,3 +194,57 @@ PX.pxCountUp = function () {
 document.addEventListener("DOMContentLoaded", function () {
   PX.pxCountUp();
 });
+
+/* ---------- Language Switcher ---------- */
+
+PX.initLangSwitcher = function () {
+  var toggle = document.getElementById("px-lang-toggle");
+  var menu = document.getElementById("px-lang-menu");
+  var flag = document.getElementById("px-lang-flag");
+  var code = document.getElementById("px-lang-code");
+
+  if (!toggle || !menu) return;
+
+  var FLAGS = { en: "🇬🇧", ar: "🇦🇪", fil: "🇵🇭", hi: "🇮🇳" };
+  var CODES = { en: "EN", ar: "AR", fil: "FIL", hi: "HI" };
+
+  // Set current language indicator from html lang attribute
+  var currentLang = document.documentElement.getAttribute("lang") || "en";
+  if (flag) flag.textContent = FLAGS[currentLang] || "🇬🇧";
+  if (code) code.textContent = CODES[currentLang] || "EN";
+
+  // Mark active option
+  menu.querySelectorAll(".px-lang-option").forEach(function (opt) {
+    if (opt.getAttribute("data-lang") === currentLang) {
+      opt.classList.add("is-active");
+    }
+  });
+
+  toggle.addEventListener("click", function (e) {
+    e.stopPropagation();
+    var open = menu.classList.toggle("is-open");
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+
+  document.addEventListener("click", function () {
+    menu.classList.remove("is-open");
+    toggle.setAttribute("aria-expanded", "false");
+  });
+
+  // When user clicks a language, persist to cookie + reload
+  menu.querySelectorAll(".px-lang-option").forEach(function (opt) {
+    opt.addEventListener("click", function (e) {
+      e.preventDefault();
+      var lang = opt.getAttribute("data-lang");
+      // Set cookie for 1 year
+      document.cookie = "px_lang=" + lang + "; max-age=31536000; path=/; SameSite=Lax";
+      // Reload without ?lang query (cookie will be used)
+      var url = window.location.pathname;
+      window.location.href = url;
+    });
+  });
+};
+
+document.addEventListener("DOMContentLoaded", function () {
+  PX.initLangSwitcher();
+});

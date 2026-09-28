@@ -1,0 +1,43 @@
+{
+  "nav": {
+    "hotels": "होटल",
+    "restaurants": "रेस्टोरेंट",
+    "travel": "यात्रा",
+    "entertainment": "मनोरंजन",
+    "sign_in": "साइन इन करें",
+    "get_started": "शुरू करें",
+    "my_account": "मेरा खाता",
+    "log_out": "लॉग आउट"
+  },
+  "home": {
+    "hero_title": "असाधारण अनुभव खोजें और बुक करें",
+    "hero_sub": "होटल, रेस्टोरेंट, यात्रा एजेंसियां और मनोरंजन स्थल — सब एक जगह।",
+    "search": "खोजें",
+    "where": "कहां",
+    "category": "श्रेणी",
+    "browse": "ब्राउज़ करें",
+    "browse_sub": "चार श्रेणियां। अनंत संभावनाएं।",
+    "featured_hotels": "ठहरने की जगह",
+    "featured_restaurants": "कहां खाएं",
+    "featured_travel": "अपनी यात्रा की योजना बनाएं",
+    "featured_entertainment": "करने के लिए चीजें",
+    "view_all": "सभी देखें",
+    "from": "से",
+    "stats_businesses": "व्यवसाय",
+    "stats_services": "सेवाएं",
+    "stats_categories": "श्रेणियां",
+    "stats_locations": "स्थान",
+    "cta_title": "अपना व्यवसाय Platform-X पर सूचीबद्ध करें",
+    "cta_sub": "उन होटल, रेस्टोरेंट, यात्रा एजेंसियों और मनोरंजन स्थलों से जुड़ें जो पहले से हमारे प्लेटफ़ॉर्म का उपयोग कर रहे हैं।",
+    "cta_button": "संपर्क करें"
+  },
+  "footer": {
+    "discover": "खोजें",
+    "business": "व्यवसाय के लिए",
+    "company": "कंपनी",
+    "about": "हमारे बारे में",
+    "contact": "संपर्क",
+    "terms": "शर्तें",
+    "privacy": "गोपनीयता"
+  }
+}

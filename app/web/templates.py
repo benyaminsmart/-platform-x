@@ -6,6 +6,14 @@ from pathlib import Path
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
+from app.core.i18n import (
+    DEFAULT_LANGUAGE,
+    SUPPORTED_LANGUAGES,
+    is_rtl as i18n_is_rtl,
+    resolve_language,
+    translate,
+)
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 RESERVED_PREFIXES = {
@@ -33,4 +41,12 @@ def _tenant_path(request: Request, suffix: str = "") -> str:
 
 templates.env.globals["now_year"] = datetime.now(timezone.utc).year
 templates.env.globals["asset_version"] = "v6"
+
+# Register i18n helpers as Jinja globals
+templates.env.globals["t"] = translate
+templates.env.globals["SUPPORTED_LANGUAGES"] = SUPPORTED_LANGUAGES
+templates.env.globals["DEFAULT_LANGUAGE"] = DEFAULT_LANGUAGE
+templates.env.globals["is_rtl"] = i18n_is_rtl
+templates.env.globals["resolve_language"] = resolve_language
+
 templates.env.globals["tenant_path"] = _tenant_path

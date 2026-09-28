@@ -1,0 +1,43 @@
+{
+  "nav": {
+    "hotels": "Mga Hotel",
+    "restaurants": "Mga Restawran",
+    "travel": "Paglalakbay",
+    "entertainment": "Libangan",
+    "sign_in": "Mag-sign in",
+    "get_started": "Magsimula",
+    "my_account": "Aking Account",
+    "log_out": "Mag-log out"
+  },
+  "home": {
+    "hero_title": "Tuklasin at mag-book ng mga pambihirang karanasan",
+    "hero_sub": "Mga hotel, restawran, ahensya ng paglalakbay, at mga lugar ng libangan — lahat sa isang lugar.",
+    "search": "Maghanap",
+    "where": "Saan",
+    "category": "Kategorya",
+    "browse": "Tumingin",
+    "browse_sub": "Apat na kategorya. Walang katapusang posibilidad.",
+    "featured_hotels": "Mga matutuluyan",
+    "featured_restaurants": "Saan kakain",
+    "featured_travel": "Planuhin ang iyong paglalakbay",
+    "featured_entertainment": "Mga bagay na magagawa",
+    "view_all": "Tingnan lahat",
+    "from": "Mula sa",
+    "stats_businesses": "Mga Negosyo",
+    "stats_services": "Mga Serbisyo",
+    "stats_categories": "Mga Kategorya",
+    "stats_locations": "Mga Lokasyon",
+    "cta_title": "Ilista ang iyong negosyo sa Platform-X",
+    "cta_sub": "Sumali sa mga hotel, restawran, ahensya ng paglalakbay, at mga lugar ng libangan na gumagamit na ng aming platform.",
+    "cta_button": "Makipag-ugnayan"
+  },
+  "footer": {
+    "discover": "Tuklasin",
+    "business": "Para sa negosyo",
+    "company": "Kumpanya",
+    "about": "Tungkol",
+    "contact": "Makipag-ugnayan",
+    "terms": "Mga Tuntunin",
+    "privacy": "Privacy"
+  }
+}

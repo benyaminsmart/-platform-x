@@ -1,0 +1,43 @@
+{
+  "nav": {
+    "hotels": "Hotels",
+    "restaurants": "Restaurants",
+    "travel": "Travel",
+    "entertainment": "Entertainment",
+    "sign_in": "Sign in",
+    "get_started": "Get started",
+    "my_account": "My Account",
+    "log_out": "Log out"
+  },
+  "home": {
+    "hero_title": "Discover and book extraordinary experiences",
+    "hero_sub": "Hotels, restaurants, travel agencies, and entertainment venues — all in one place.",
+    "search": "Search",
+    "where": "Where",
+    "category": "Category",
+    "browse": "Browse",
+    "browse_sub": "Four categories. Endless possibilities.",
+    "featured_hotels": "Places to stay",
+    "featured_restaurants": "Where to eat",
+    "featured_travel": "Plan your journey",
+    "featured_entertainment": "Things to do",
+    "view_all": "View all",
+    "from": "From",
+    "stats_businesses": "Businesses",
+    "stats_services": "Services",
+    "stats_categories": "Categories",
+    "stats_locations": "Locations",
+    "cta_title": "List your business on Platform-X",
+    "cta_sub": "Join hotels, restaurants, travel agencies, and entertainment venues already using our platform.",
+    "cta_button": "Get in touch"
+  },
+  "footer": {
+    "discover": "Discover",
+    "business": "For business",
+    "company": "Company",
+    "about": "About",
+    "contact": "Contact",
+    "terms": "Terms",
+    "privacy": "Privacy"
+  }
+}

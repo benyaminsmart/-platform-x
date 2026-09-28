@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="{{ lang|default('en') }}" dir="{{ 'rtl' if lang in ['ar'] else 'ltr' }}">
+{% set current_lang = resolve_language(request) if request else 'en' %}
+<html lang="{{ current_lang }}" dir="{{ 'rtl' if is_rtl(current_lang) else 'ltr' }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

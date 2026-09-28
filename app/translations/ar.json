@@ -1,0 +1,43 @@
+{
+  "nav": {
+    "hotels": "الفنادق",
+    "restaurants": "المطاعم",
+    "travel": "السفر",
+    "entertainment": "الترفيه",
+    "sign_in": "تسجيل الدخول",
+    "get_started": "ابدأ الآن",
+    "my_account": "حسابي",
+    "log_out": "تسجيل الخروج"
+  },
+  "home": {
+    "hero_title": "اكتشف واحجز تجارب استثنائية",
+    "hero_sub": "الفنادق والمطاعم ووكالات السفر وأماكن الترفيه — كل ذلك في مكان واحد.",
+    "search": "بحث",
+    "where": "أين",
+    "category": "الفئة",
+    "browse": "تصفح",
+    "browse_sub": "أربع فئات. إمكانيات لا نهائية.",
+    "featured_hotels": "أماكن الإقامة",
+    "featured_restaurants": "أين تأكل",
+    "featured_travel": "خطط لرحلتك",
+    "featured_entertainment": "أشياء لتفعلها",
+    "view_all": "عرض الكل",
+    "from": "من",
+    "stats_businesses": "الأعمال",
+    "stats_services": "الخدمات",
+    "stats_categories": "الفئات",
+    "stats_locations": "المواقع",
+    "cta_title": "أضف عملك إلى Platform-X",
+    "cta_sub": "انضم إلى الفنادق والمطاعم ووكالات السفر وأماكن الترفيه التي تستخدم منصتنا بالفعل.",
+    "cta_button": "تواصل معنا"
+  },
+  "footer": {
+    "discover": "اكتشف",
+    "business": "للأعمال",
+    "company": "الشركة",
+    "about": "حول",
+    "contact": "اتصل بنا",
+    "terms": "الشروط",
+    "privacy": "الخصوصية"
+  }
+}
