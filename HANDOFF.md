@@ -311,7 +311,25 @@ All idempotent.
 - Backup Strategy (daily + off-site)
 Estimate: 10-12 steps
 
-### Phase 7 — Admin Panel UI: NEXT
+### Phase 7 — Admin Panel UI: COMPLETE
+Tag: v0.6.0-admin
+
+### Phase 9 — i18n (4 languages): COMPLETE
+Tag: v0.7.0-i18n
+- EN, AR (RTL), FIL, HI — 186 keys each
+- Language switcher (🌍 globe) in header
+- All public pages + JS strings translated
+- 154 tests passing
+
+### Phase 8 — Rewards + Referral: WAITING (user plan pending)
+### Phase 10 — Payment Production (Telr): AVAILABLE
+### Phase 11 — Notifications: AVAILABLE
+### Phase 12 — VPS Deploy + Domain + Named Tunnel: AVAILABLE
+### Phase 13 — Business Onboarding Tools: AVAILABLE
+### Phase 14 — API + Webhooks + SDK: AVAILABLE
+### Phase 15 — Trianon Migration: AVAILABLE
+### Phase 16 — Mobile App: AVAILABLE
+### Phase 17 — AI Assistant: AVAILABLE
 - Platform Admin Login
 - Dashboard (analytics overview)
 - Tenants list/detail, approve/suspend

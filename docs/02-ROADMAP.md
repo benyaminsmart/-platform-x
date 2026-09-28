@@ -374,6 +374,20 @@ Throughout all phases:
 
 **Phase 7 closed.**
 
+
+
+### v0.7.0-i18n — Phase 9 Complete
+- i18n foundation (app/core/i18n.py)
+- 4 translation files: en, ar (RTL), fil, hi (186 keys each)
+- Language resolution: ?lang → cookie → Accept-Language → default
+- Language switcher (🌍 globe) in header
+- All public pages translated: Home, Category, Business Detail, Book, Pay, Account, Login, Register, Partners, 404
+- JS strings via window.PX_I18N
+- RTL layout for Arabic
+- 154 tests passing
+
+**Phase 9 closed.**
+
 **Last updated:** September 2026
-**Current phase:** Phase 8 — Rewards + Referral Complete (next)
+**Current phase:** TBD (Phase 8 waiting for plan; Phase 10-16 available)
 
