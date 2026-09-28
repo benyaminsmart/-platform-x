@@ -563,6 +563,23 @@ def business_settings_page(request: Request) -> HTMLResponse:
     )
 
 
+
+
+@router.get("/business/ai", response_class=HTMLResponse)
+def business_ai_page(request: Request) -> HTMLResponse:
+    """Business AI assistant page."""
+    return templates.TemplateResponse(
+        request,
+        "business/business_ai.html",
+        {
+            "business_user": {"first_name": "Owner", "last_name": ""},
+            "tenant_name": "Business",
+            "tenant_slug": "trianon-hotel",
+            "active_nav": "ai",
+        },
+    )
+
+
 @router.get("/about", response_class=HTMLResponse)
 def about(request: Request) -> HTMLResponse:
     """About page."""

@@ -1,3 +1,4 @@
+from app.services.ai import factory as ai_factory
 """Business logic services for Platform-X."""
 
 from app.services import (
@@ -19,6 +20,7 @@ from app.services import (
 
 __all__ = [
     "admin_service",
+    "ai_factory",
     "audit_service",
     "analytics_service",
     "booking_service",

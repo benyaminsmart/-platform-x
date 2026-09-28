@@ -9,6 +9,7 @@ from slowapi.middleware import SlowAPIMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from app.api import ai as ai_router
 from app.api import analytics as analytics_router
 from app.api import auth as auth_router
 from app.api import bookings as bookings_router
@@ -129,6 +130,8 @@ app.add_middleware(HTTPSRedirectMiddleware)
 
 # ---------- API routers ----------
 
+app.include_router(ai_router.router)
+app.include_router(ai_router.business_router)
 app.include_router(analytics_router.router)
 app.include_router(auth_router.router)
 app.include_router(bookings_router.router)

@@ -1,6 +1,7 @@
 """API routers for Platform-X."""
 
 from app.api import (
+    ai,
     analytics,
     business,
     auth,
@@ -17,6 +18,7 @@ from app.api import (
 )
 
 __all__ = [
+    "ai",
     "analytics",
     "business",
     "auth",

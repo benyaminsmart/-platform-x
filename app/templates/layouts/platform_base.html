@@ -41,7 +41,35 @@
       no_notifications: "{{ t('account.no_notifications', current_lang) }}"
     };
   </script>
+
+  <!-- AI Assistant (floating) -->
+  {% if ai_enabled|default(true) %}
+  <div class="px-ai-fab" id="px-ai-fab" title="Ask AI">
+    <span class="px-ai-fab-icon">✨</span>
+  </div>
+
+  <div class="px-ai-panel" id="px-ai-panel">
+    <div class="px-ai-panel-head">
+      <div class="px-ai-panel-title">
+        <span style="font-size: 20px;">✨</span>
+        <span>Platform-X Assistant</span>
+      </div>
+      <button class="px-ai-panel-close" id="px-ai-panel-close" aria-label="Close">✕</button>
+    </div>
+    <div class="px-ai-panel-body" id="px-ai-body">
+      <div class="px--ai-msg px-ai-msg-assistant">
+        Hi! I'm your Platform-X assistant. Ask me anything about hotels, restaurants, travel, entertainment, or your account.
+      </div>
+    </div>
+    <form class="px-ai-panel-foot" id="px-ai-form">
+      <input type="text" id="px-ai-input" placeholder="Ask me anything..." autocomplete="off">
+      <button type="submit" id="px-ai-send">Send</button>
+    </form>
+  </div>
+  {% endif %}
+
   <script src="/static/js/px-core.js?v={{ asset_version }}"></script>
+  <script src="/static/js/ai-chat.js?v={{ asset_version }}"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

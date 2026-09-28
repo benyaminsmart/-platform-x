@@ -61,6 +61,14 @@ class Settings(BaseSettings):
     TWILIO_FROM_NUMBER: str = ""
     SMS_ENABLED: bool = False
 
+    # AI
+    AI_PROVIDER: str = "mock"  # mock | gemini | openai
+    AI_ENABLED: bool = True
+    GEMINI_API_KEY: str = ""
+    OPENAI_API_KEY: str = ""
+    AI_MAX_TOKENS_PER_MESSAGE: int = 1024
+    AI_RATE_LIMIT_PER_MINUTE: int = 20
+
     # Feature flags
     ENABLE_MOCK_PAYMENTS: bool = True
 
