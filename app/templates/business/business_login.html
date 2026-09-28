@@ -44,9 +44,16 @@
     var email = form.email.value.trim();
     var password = form.password.value;
     try {
+      // Tenant from URL (?tenant=xxx) or default
+      var params = new URLSearchParams(window.location.search);
+      var slug = params.get("tenant") || "trianon-hotel";
+
       var res = await fetch("/business/api/auth/login", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "X-Tenant-Slug": slug,
+        },
         body: JSON.stringify({email: email, password: password}),
       });
       var data = await res.json();
