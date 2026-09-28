@@ -531,6 +531,38 @@ def business_analytics_page(request: Request) -> HTMLResponse:
     )
 
 
+
+
+@router.get("/business/staff", response_class=HTMLResponse)
+def business_staff_page(request: Request) -> HTMLResponse:
+    """Business staff management."""
+    return templates.TemplateResponse(
+        request,
+        "business/business_staff.html",
+        {
+            "business_user": {"first_name": "Owner", "last_name": ""},
+            "tenant_name": "Business",
+            "tenant_slug": "trianon-hotel",
+            "active_nav": "staff",
+        },
+    )
+
+
+@router.get("/business/settings", response_class=HTMLResponse)
+def business_settings_page(request: Request) -> HTMLResponse:
+    """Business settings (placeholder)."""
+    return templates.TemplateResponse(
+        request,
+        "business/business_settings.html",
+        {
+            "business_user": {"first_name": "Owner", "last_name": ""},
+            "tenant_name": "Business",
+            "tenant_slug": "trianon-hotel",
+            "active_nav": "settings",
+        },
+    )
+
+
 @router.get("/about", response_class=HTMLResponse)
 def about(request: Request) -> HTMLResponse:
     """About page."""

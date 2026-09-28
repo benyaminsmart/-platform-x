@@ -369,3 +369,106 @@ def list_business_customers(
         for uid in user_ids
         if uid in users
     ]
+
+
+# ---------- Staff Management ----------
+
+
+import secrets as _secrets  # noqa: E402
+
+
+@router.get("/staff")
+def list_business_staff(
+    user: User = Depends(get_current_business_user),
+    tenant: Tenant = Depends(get_business_tenant),
+    db: DBSession = Depends(get_db),
+) -> list[dict]:
+    """List staff members (business_role set) of this tenant."""
+    rows = db.query(User).filter(
+        User.tenant_id == tenant.id,
+        User.business_role.isnot(None),
+    ).order_by(User.created_at).all()
+    return [
+        {
+            "id": u.id,
+            "email": u.email,
+            "first_name": u.first_name,
+            "last_name": u.last_name,
+            "business_role": u.business_role,
+            "status": u.status,
+            "created_at": u.created_at.isoformat() if u.created_at else None,
+        }
+        for u in rows
+    ]
+
+
+@router.post("/staff", status_code=201)
+def create_business_staff(
+    payload: dict,
+    user: User = Depends(get_current_business_user),
+    tenant: Tenant = Depends(get_business_tenant),
+    db: DBSession = Depends(get_db),
+) -> dict:
+    """Create a new staff account under this business (owner only)."""
+    from app.core.security import hash_password
+
+    if user.business_role != "owner":
+        raise HTTPException(status_code=403, detail="Only owners can add staff")
+
+    email = (payload.get("email") or "").lower().strip()
+    password = payload.get("password") or ""
+    first_name = (payload.get("first_name") or "").strip()
+    last_name = (payload.get("last_name") or "").strip()
+    role = (payload.get("business_role") or "staff").strip()
+
+    if not email or not password or not first_name or not last_name:
+        raise HTTPException(status_code=400, detail="email, password, first_name, last_name required")
+    if role not in {"manager", "staff"}:
+        raise HTTPException(status_code=400, detail="business_role must be manager or staff")
+    if len(password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+
+    existing = db.query(User).filter(
+        User.tenant_id == tenant.id,
+        User.email == email,
+    ).one_or_none()
+    if existing:
+        raise HTTPException(status_code=409, detail="Email already registered for this business")
+
+    new_user = User(
+        tenant_id=tenant.id,
+        email=email,
+        password_hash=hash_password(password),
+        first_name=first_name,
+        last_name=last_name,
+        business_role=role,
+        referral_code=_secrets.token_urlsafe(8).replace("-", "").replace("_", "")[:10].upper(),
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return {"id": new_user.id, "message": "Staff account created"}
+
+
+@router.delete("/staff/{staff_id}")
+def delete_business_staff(
+    staff_id: str,
+    user: User = Depends(get_current_business_user),
+    tenant: Tenant = Depends(get_business_tenant),
+    db: DBSession = Depends(get_db),
+) -> dict:
+    """Deactivate a staff account (owner only). Cannot deactivate self."""
+    if user.business_role != "owner":
+        raise HTTPException(status_code=403, detail="Only owners can manage staff")
+    if staff_id == user.id:
+        raise HTTPException(status_code=400, detail="Cannot deactivate yourself")
+    target = db.query(User).filter(
+        User.id == staff_id,
+        User.tenant_id == tenant.id,
+        User.business_role.isnot(None),
+    ).one_or_none()
+    if target is None:
+        raise HTTPException(status_code=404, detail="Staff not found")
+    target.status = "suspended"
+    db.commit()
+    return {"id": target.id, "message": "Staff deactivated"}

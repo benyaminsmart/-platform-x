@@ -1,0 +1,18 @@
+{% extends "business/business_base.html" %}
+{% block title %}Settings — Business Panel{% endblock %}
+{% block content %}
+<div class="admin-card">
+  <h2>Business Settings</h2>
+  <p class="admin-card-sub" style="margin-bottom: 0;">Coming soon — branding, hours, contact info, and more.</p>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){
+  var token = null; try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login?tenant=trianon-hotel"; return; }
+  var lo = document.getElementById("business-logout");
+  if (lo) lo.addEventListener("click", function(){ try{localStorage.removeItem("px_business_token");}catch(e){}; window.location.href = "/business/login?tenant=trianon-hotel"; });
+})();
+</script>
+{% endblock %}

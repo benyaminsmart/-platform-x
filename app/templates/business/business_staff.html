@@ -1,0 +1,121 @@
+{% extends "business/business_base.html" %}
+{% block title %}Staff — Business Panel{% endblock %}
+{% block content %}
+
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+    <div>
+      <h2>Staff accounts</h2>
+      <p class="admin-card-sub" style="margin-bottom: 0;">Add managers and staff members to your business.</p>
+    </div>
+    <button class="admin-btn" id="btn-new-staff">+ New staff</button>
+  </div>
+</div>
+
+<div id="new-staff-form" class="admin-card" style="margin-bottom: 24px; display: none;">
+  <h2>New staff member</h2>
+  <div id="staff-alert" class="admin-alert admin-alert-error" style="display: none;"></div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+    <div class="admin-field"><label class="admin-label">First name</label><input class="admin-input" id="s-first" type="text"></div>
+    <div class="admin-field"><label class="admin-label">Last name</label><input class="admin-input" id="s-last" type="text"></div>
+    <div class="admin-field"><label class="admin-label">Email</label><input class="admin-input" id="s-email" type="email"></div>
+    <div class="admin-field"><label class="admin-label">Password (min 8)</label><input class="admin-input" id="s-pass" type="text" placeholder="TempPassword123"></div>
+    <div class="admin-field"><label class="admin-label">Role</label><select class="admin-input" id="s-role"><option value="staff">Staff</option><option value="manager">Manager</option></select></div>
+  </div>
+  <div style="display: flex; gap: 12px; margin-top: 12px;">
+    <button class="admin-btn" id="btn-create-staff">Create</button>
+    <button class="admin-btn" style="background: transparent; border: 1px solid var(--adm-line-2);" id="btn-cancel-staff">Cancel</button>
+  </div>
+</div>
+
+<div class="admin-card">
+  <div id="staff-list">Loading…</div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){
+  var token = null; try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login?tenant=trianon-hotel"; return; }
+  var lo = document.getElementById("business-logout");
+  if (lo) lo.addEventListener("click", function(){ try{localStorage.removeItem("px_business_token");}catch(e){}; window.location.href = "/business/login?tenant=trianon-hotel"; });
+  var headers = {"Authorization": "Bearer " + token, "X-Tenant-Slug": "trianon-hotel", "Content-Type": "application/json"};
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+
+  async function load() {
+    try {
+      var res = await fetch("/business/api/staff", {headers: headers});
+      if (res.status === 401) { window.location.href = "/business/login?tenant=trianon-hotel"; return; }
+      var items = await res.json();
+      render(items || []);
+    } catch(e) {}
+  }
+
+  function render(items) {
+    var el = document.getElementById("staff-list");
+    if (!items.length) { el.innerHTML = '<p class="admin-card-sub">No staff yet.</p>'; return; }
+    var html = '<table class="admin-table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th></th></tr></thead><tbody>';
+    items.forEach(function(s){
+      var roleBadge = s.business_role === "owner" ? "admin-badge-success" : s.business_role === "manager" ? "admin-badge-info" : "admin-badge-warning";
+      var statBadge = s.status === "active" ? "admin-badge-success" : "admin-badge-error";
+      html += "<tr>" +
+        "<td><strong>" + esc(s.first_name + " " + s.last_name) + "</strong></td>" +
+        "<td>" + esc(s.email) + "</td>" +
+        "<td><span class='admin-badge " + roleBadge + "'>" + esc(s.business_role) + "</span></td>" +
+        "<td><span class='admin-badge " + statBadge + "'>" + esc(s.status) + "</span></td>" +
+        "<td>" + (s.business_role !== "owner" && s.status === "active" ? "<button class='admin-btn' style='padding:6px 12px; font-size:12px;' data-del='" + s.id + "'>Deactivate</button>" : "") + "</td>" +
+        "</tr>";
+    });
+    html += "</tbody></table>";
+    el.innerHTML = html;
+
+    el.querySelectorAll("[data-del]").forEach(function(btn){
+      btn.addEventListener("click", async function(){
+        var id = btn.getAttribute("data-del");
+        if (!confirm("Deactivate this staff member?")) return;
+        await fetch("/business/api/staff/" + id, {method: "DELETE", headers: headers});
+        load();
+      });
+    });
+  }
+
+  var form = document.getElementById("new-staff-form");
+  var btnNew = document.getElementById("btn-new-staff");
+  var btnCancel = document.getElementById("btn-cancel-staff");
+  var btnCreate = document.getElementById("btn-create-staff");
+  var alertBox = document.getElementById("staff-alert");
+
+  btnNew.addEventListener("click", function(){ form.style.display = "block"; btnNew.disabled = true; });
+  btnCancel.addEventListener("click", function(){ form.style.display = "none"; btnNew.disabled = false; });
+
+  btnCreate.addEventListener("click", async function(){
+    alertBox.style.display = "none";
+    var payload = {
+      first_name: document.getElementById("s-first").value.trim(),
+      last_name: document.getElementById("s-last").value.trim(),
+      email: document.getElementById("s-email").value.trim(),
+      password: document.getElementById("s-pass").value,
+      business_role: document.getElementById("s-role").value,
+    };
+    var res = await fetch("/business/api/staff", {method: "POST", headers: headers, body: JSON.stringify(payload)});
+    var data = await res.json();
+    if (!res.ok) {
+      alertBox.textContent = data.detail || "Failed";
+      alertBox.style.display = "block";
+      return;
+    }
+    form.style.display = "none";
+    btnNew.disabled = false;
+    document.getElementById("s-first").value = "";
+    document.getElementById("s-last").value = "";
+    document.getElementById("s-email").value = "";
+    document.getElementById("s-pass").value = "";
+    load();
+  });
+
+  load();
+})();
+</script>
+{% endblock %}
