@@ -109,8 +109,8 @@ Tag: v0.3.0-polish
 - **NEW: 404 page**
 - **NEW: Micro-interactions**
 
-### Phase 5 — Full Feature Verification + Partner Onboarding: IN PROGRESS
-Tag: (will be v0.4.0-...)
+### Phase 5 — Full Feature Verification + Partner Onboarding: COMPLETE
+Tag: v0.4.0-full-flow
 - Platform-wide auth: users book across ALL tenants (major architecture change)
 - Cross-tenant Bookings/Orders in account
 - Rewards auto-award on payment
@@ -280,157 +280,21 @@ All idempotent.
 
 ---
 
-## 11. Remaining Work in Phase 5
+## 11. Remaining Work
 
-1. **Order UI for Restaurants** (NOT DONE)
-   - Menu display with images
-   - Add-to-cart
-   - Checkout → Order → Pay
-   - Decision pending: A) Restaurant both Booking + Order, B) only Order
-
-2. **Milestone Close Phase 5**
-   - Final test, tag v0.4.0
-
----
-
-## 12. Future Phases (Planned)
-
-### Phase 6 — Rewards + Referral Complete
-- User to provide detailed plan
-- Likely: tiers page, redeem catalog, referral dashboard, milestones
-
-### Phase 7 — Admin Panel UI
-- Platform Admin dashboard HTML
-- Tenants list/approve/suspend
+**Phase 7 — Admin Panel UI (NEXT)**
+- Admin Login page
+- Admin Dashboard (analytics)
+- Tenants list/detail + status change
 - Applications review
-- Analytics dashboard
-- Audit logs UI
+- Subscriptions management
+- Audit Logs viewer
+- 2FA for Platform Admin
+- Milestone Close (v0.6.0-admin)
 
-### Phase 8 — i18n (4 languages)
-- EN, AR (RTL), FIL, HI
-- Foundation + content
+## 12. Future Phases (v2 Roadmap)
 
-### Phase 9 — Real Payment (Telr)
-- Replace MockPaymentProvider with Telr
-- Production webhook with signature verification
-
-### Phase 10 — VPS Deploy
-- Ubuntu 22.04 + Nginx + PostgreSQL
-- Named Cloudflare Tunnel with custom domain
-- SSL
-
-### Phase 11 — Trianon Migration
-- Move real Trianon hotel onto Platform-X
-- Domain: trianon.com → platform
-
----
-
-## 13. Commands Cheat Sheet
-
-Run dev server:
-  cd ~/platform-x && source venv/bin/activate && uvicorn app.main:app --reload --port 8000
-
-Run tests:
-  pytest
-
-Apply migrations:
-  alembic upgrade head
-
-Create migration:
-  alembic revision --autogenerate -m "description"
-
-Seed demo data:
-  python -m app.scripts.seed_all
-
-Check services:
-  sv status platform-x-api platform-x-tunnel
-
-Restart Platform-X:
-  sv restart platform-x-api
-
-Get current tunnel URL:
-  cat ~/platform-x/logs/tunnel.url
-
----
-
-## 14. Test Count: 154 tests, all passing
-
-Test files:
-- test_health.py
-- test_security.py (11)
-- test_schemas.py (7)
-- test_auth_api.py (11)
-- test_tenants_api.py (5)
-- test_bookings_api.py (11)
-- test_services_api.py (12)
-- test_orders_api.py (11)
-- test_payments_api.py (11)
-- test_rewards_referrals_api.py (12)
-- test_notifications_api.py (8)
-- test_analytics_api.py (6)
-- test_production_hardening.py (7)
-- test_demo_flow.py (2)
-- test_web_pages.py (10)
-- test_auth_pages.py (7)
-- test_booking_page.py (5)
-- test_payment_page.py (5)
-- test_account_page.py (6)
-- test_category_pages.py (7)
-
-Speed: BCRYPT_ROUNDS=4 in tests, schema created once per session.
-
----
-
-## 15. Key Files
-
-- app/core/config.py — Settings (production hardening)
-- app/core/security.py — bcrypt hash, JWT
-- app/api/deps.py — get_current_tenant, get_current_user
-- app/api/deps_admin.py — get_current_admin, require_role
-- app/web/pages.py — HTML routes + CATEGORIES registry
-- app/web/templates.py — shared Jinja2 env + globals (tenant_path, now_year)
-- app/static/css/platform.css — light theme tokens + components
-- app/static/css/platform-home.css — all page-specific styles (1500+ lines)
-- app/static/js/px-core.js — shared utilities (getToken, authHeaders, initHeaderAuth, logout, count-up)
-- app/templates/layouts/platform_base.html — main layout
-- app/templates/partials/platform_header.html — dynamic header with avatar
-
----
-
-## 16. How to Start a New Session
-
-1. Read this HANDOFF.md fully
-2. Read PROJECT-RULES.md
-3. Check current state:
-   cd ~/platform-x
-   git log --oneline -5
-   git tag -l
-   sv status platform-x-api platform-x-tunnel
-4. Ask user what to work on next
-5. Follow working rules: backup → change → test → commit → report
-
----
-
-## 17. Contact / User Preferences
-
-User's goal: Professional Demo online to show to business partners.
-
-User's style:
-- Persian only, direct
-- Does not want to be asked technical decisions
-- Wants excellence quality
-- Wants full phases completed (no skipping)
-- Does not want features outside roadmap
-
----
-
-
-
----
-
-## 18. Future Phases v2 (Full Roadmap)
-
-### Phase 6 — Security Hardening (NEXT)
+### Phase 6 — Security Hardening: COMPLETE (v0.5.0-security)
 - Rate Limiting (login, register, partners, APIs)
 - Security Headers (CSP, HSTS, X-Frame-Options, X-Content-Type-Options)
 - JWT Refresh Tokens (access + refresh pattern)
@@ -447,7 +311,7 @@ User's style:
 - Backup Strategy (daily + off-site)
 Estimate: 10-12 steps
 
-### Phase 7 — Admin Panel UI
+### Phase 7 — Admin Panel UI: NEXT
 - Platform Admin Login
 - Dashboard (analytics overview)
 - Tenants list/detail, approve/suspend
@@ -567,7 +431,110 @@ Estimate: weeks/months
 
 ---
 
-## 19. Security Checklist (Before Production)
+## 13. Commands Cheat Sheet
+
+Run dev server:
+  cd ~/platform-x && source venv/bin/activate && uvicorn app.main:app --reload --port 8000
+
+Run tests:
+  pytest
+
+Apply migrations:
+  alembic upgrade head
+
+Create migration:
+  alembic revision --autogenerate -m "description"
+
+Seed demo data:
+  python -m app.scripts.seed_all
+
+Check services:
+  sv status platform-x-api platform-x-tunnel
+
+Restart Platform-X:
+  sv restart platform-x-api
+
+Get current tunnel URL:
+  cat ~/platform-x/logs/tunnel.url
+
+---
+
+## 14. Test Count: 154 tests, all passing
+
+Test files:
+- test_health.py
+- test_security.py (11)
+- test_schemas.py (7)
+- test_auth_api.py (11)
+- test_tenants_api.py (5)
+- test_bookings_api.py (11)
+- test_services_api.py (12)
+- test_orders_api.py (11)
+- test_payments_api.py (11)
+- test_rewards_referrals_api.py (12)
+- test_notifications_api.py (8)
+- test_analytics_api.py (6)
+- test_production_hardening.py (7)
+- test_demo_flow.py (2)
+- test_web_pages.py (10)
+- test_auth_pages.py (7)
+- test_booking_page.py (5)
+- test_payment_page.py (5)
+- test_account_page.py (6)
+- test_category_pages.py (7)
+
+Speed: BCRYPT_ROUNDS=4 in tests, schema created once per session.
+
+---
+
+## 15. Key Files
+
+- app/core/config.py — Settings (production hardening)
+- app/core/security.py — bcrypt hash, JWT
+- app/api/deps.py — get_current_tenant, get_current_user
+- app/api/deps_admin.py — get_current_admin, require_role
+- app/web/pages.py — HTML routes + CATEGORIES registry
+- app/web/templates.py — shared Jinja2 env + globals (tenant_path, now_year)
+- app/static/css/platform.css — light theme tokens + components
+- app/static/css/platform-home.css — all page-specific styles (1500+ lines)
+- app/static/js/px-core.js — shared utilities (getToken, authHeaders, initHeaderAuth, logout, count-up)
+- app/templates/layouts/platform_base.html — main layout
+- app/templates/partials/platform_header.html — dynamic header with avatar
+
+---
+
+## 16. How to Start a New Session
+
+1. Read this HANDOFF.md fully
+2. Read PROJECT-RULES.md
+3. Check current state:
+   cd ~/platform-x
+   git log --oneline -5
+   git tag -l
+   sv status platform-x-api platform-x-tunnel
+4. Ask user what to work on next
+5. Follow working rules: backup → change → test → commit → report
+
+---
+
+## 17. Contact / User Preferences
+
+User's goal: Professional Demo online to show to business partners.
+
+User's style:
+- Persian only, direct
+- Does not want to be asked technical decisions
+- Wants excellence quality
+- Wants full phases completed (no skipping)
+- Does not want features outside roadmap
+
+---
+
+
+
+---
+
+## 18. Security Checklist (Before Production)
 
 - [ ] Rate Limiting enabled
 - [ ] Security headers configured
@@ -589,7 +556,7 @@ Estimate: weeks/months
 
 ---
 
-## 20. Production Deployment Checklist
+## 19. Production Deployment Checklist
 
 - [ ] VPS provisioned
 - [ ] PostgreSQL installed and migrated
@@ -608,7 +575,7 @@ Estimate: weeks/months
 
 ---
 
-## 21. Business Onboarding Checklist (per new tenant)
+## 20. Business Onboarding Checklist (per new tenant)
 
 - [ ] Partner application received
 - [ ] Application reviewed and approved
