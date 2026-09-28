@@ -1,7 +1,12 @@
 """AI provider factory — picks the provider based on config.
 
-Currently only mock is implemented. Real providers (Gemini, OpenAI)
-will be added here without changing the rest of the app.
+Supported providers:
+- mock   (default, no API key required)
+- gemini (needs GEMINI_API_KEY + google-generativeai installed)
+- openai (needs OPENAI_API_KEY + openai installed)
+
+If the requested provider isn't available, fall back to mock so the
+platform always responds gracefully.
 """
 
 from functools import lru_cache
@@ -13,14 +18,20 @@ from app.services.ai.provider import AIProvider
 
 @lru_cache(maxsize=4)
 def get_ai_provider(name: str | None = None) -> AIProvider:
-    """Return the configured AI provider."""
+    """Return the configured AI provider (with safe fallback to mock)."""
     chosen = (name or settings.AI_PROVIDER or "mock").lower()
 
-    if chosen == "mock":
-        return MockProvider()
-
-    # Fallback: future providers land here. Right now everything is mock.
-    # if chosen == "gemini": return GeminiProvider(api_key=settings.GEMINI_API_KEY)
-    # if chosen == "openai": return OpenAIProvider(api_key=settings.OPENAI_API_KEY)
+    if chosen == "gemini":
+        from app.services.ai.gemini_provider import GeminiProvider
+        p = GeminiProvider()
+        if p.is_available():
+            return p
+        # fall through to mock
+    if chosen == "openai":
+        from app.services.ai.openai_provider import OpenAIProvider
+        p = OpenAIProvider()
+        if p.is_available():
+            return p
+        # fall through to mock
 
     return MockProvider()
