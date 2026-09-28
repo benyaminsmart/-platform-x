@@ -804,4 +804,47 @@ Estimated: weeks/months
 - Standard rate: TBD (decision pending)
 
 
+
+
+---
+
+## AI Architecture (Three Layers)
+
+### Layer 1 — Floating AI Assistant (FAB)
+- **Location:** All public pages (bottom-right floating button)
+- **Users:** Everyone (guest or logged in)
+- **Purpose:** Quick questions, navigation, short help
+- **History:** Session-only (browser memory)
+- **Endpoints:** POST /ai/chat
+- **Rate:** 20/min
+- **Provider:** configurable (mock default)
+- **Status:** COMPLETE (Phase 18)
+
+### Layer 2 — User AI (Account Dashboard)
+- **Location:** /account/ai (new tab in account dashboard)
+- **Users:** Logged-in guests only
+- **Purpose:** AI Travel Planner, Booking Agent, Concierge, Personal recommendations
+- **Can ACTUALLY book** on behalf of user
+- **Has access to:** user's bookings, rewards, referrals, language, preferences
+- **History:** Persistent (DB)
+- **Endpoints:** POST /account/api/ai/chat, POST /account/api/ai/plan, POST /account/api/ai/book
+- **Rate:** 30/min
+- **Status:** NEXT (Phase 19)
+
+### Layer 3 — Business AI (Business Panel)
+- **Location:** /business/ai (Business Panel sidebar)
+- **Users:** Business owners, managers, staff
+- **Purpose:** Pricing Coach, Content Writer, Marketing Copilot, Competitor Insights
+- **Has access to:** tenant's services, bookings, revenue, customers
+- **History:** Persistent per user (DB)
+- **Endpoints:** POST /business/api/ai/chat (and future: /analyze, /write, /suggest)
+- **Rate:** 30/min
+- **Status:** PARTIAL (Phase 18 — chat works); full features in Phase 21
+
+**All three layers share the same AI Foundation (Phase 18):**
+- Same Provider Abstraction (mock / gemini / openai)
+- Same Factory
+- Same service layer (app/services/ai/service.py)
+
+
 END OF HANDOFF
