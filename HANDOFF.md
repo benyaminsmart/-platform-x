@@ -429,6 +429,19 @@ Estimate: 5-8 steps
 - App Store + Play Store
 Estimate: weeks/months
 
+
+### Phase 17 — AI Assistant
+- Floating chat button (FAB) on public site
+- Chat panel UI (sidebar/modal with messages)
+- Backend: POST /ai/chat endpoint
+- LLM integration (OpenAI GPT-4o-mini OR Google Gemini)
+- System prompt: knows Platform-X and can help with bookings
+- Rate limiting per user (5/min)
+- Chat history in localStorage
+- Fallback message when AI unavailable
+- Analytics: track chat usage
+Estimated: 6-8 steps
+
 ---
 
 ## 13. Commands Cheat Sheet
