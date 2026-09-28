@@ -203,3 +203,79 @@ PX.initAdminTenants = async function () {
     tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--adm-error); padding: 40px;">Failed to load tenants.</td></tr>';
   }
 };
+
+/* ---------- Tenant Detail ---------- */
+
+PX.initAdminTenantDetail = async function (tenantId) {
+  if (!PX.requireAdmin()) return;
+  var el = document.getElementById("tenant-detail");
+  if (!el) return;
+
+  try {
+    var res = await PX.adminFetch("/platform/tenants");
+    if (!res || !res.ok) throw new Error("load failed");
+    var tenants = await res.json();
+    var t = tenants.find(function (x) { return x.id === tenantId; });
+    if (!t) {
+      el.innerHTML = '<div class="admin-card"><h2>Tenant not found</h2></div>';
+      return;
+    }
+
+    var badgeCls = t.status === "active" ? "admin-badge-success" : "admin-badge-warning";
+    var btype = (t.config && t.config.type) || "—";
+    var created = t.created_at ? new Date(t.created_at).toLocaleString() : "—";
+
+    el.innerHTML =
+      '<div class="admin-card" style="margin-bottom: 24px;">' +
+      '<div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">' +
+      '<div>' +
+      '<div style="color: var(--adm-muted); font-size: 12px; margin-bottom: 6px;"><a href="/admin/tenants">← Back to tenants</a></div>' +
+      '<h2 style="font-size: 24px;">' + PX.esc(t.name) + '</h2>' +
+      '<p class="admin-card-sub">' + PX.esc(t.slug) + ' · ' + PX.esc(btype) + ' · ' + PX.esc(t.tier) + '</p>' +
+      '</div>' +
+      '<span class="admin-badge ' + badgeCls + '" style="font-size: 13px; padding: 8px 16px;">' + PX.esc(t.status) + '</span>' +
+      '</div>' +
+      '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px;">' +
+      '<div><div class="admin-stat-label">ID</div><div style="font-family: var(--adm-font-mono); font-size: 12px; color: var(--adm-text-soft); word-break: break-all;">' + PX.esc(t.id) + '</div></div>' +
+      '<div><div class="admin-stat-label">Created</div><div style="color: var(--adm-text-soft);">' + PX.esc(created) + '</div></div>' +
+      '</div>' +
+      '</div>' +
+
+      '<div class="admin-card">' +
+      '<h2>Actions</h2>' +
+      '<p class="admin-card-sub">Change tenant status. Use with caution.</p>' +
+      '<div style="display: flex; gap: 12px; flex-wrap: wrap;">' +
+      '<button class="admin-btn" id="btn-activate" ' + (t.status === "active" ? "disabled" : "") + '>Activate</button>' +
+      '<button class="admin-btn" id="btn-suspend" style="background: #f59e0b;" ' + (t.status === "suspended" ? "disabled" : "") + '>Suspend</button>' +
+      '<button class="admin-btn" id="btn-delete" style="background: #dc2626;">Soft Delete</button>' +
+      '</div>' +
+      '</div>';
+
+    function setStatus(newStatus) {
+      fetch("/platform/tenants/" + tenantId + "/status?new_status=" + newStatus, {
+        method: "PATCH",
+        headers: PX.adminHeaders(),
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d.status) {
+          window.location.reload();
+        } else {
+          alert(d.detail || "Update failed");
+        }
+      })
+      .catch(function () { alert("Network error"); });
+    }
+
+    var ba = document.getElementById("btn-activate");
+    var bs = document.getElementById("btn-suspend");
+    var bd = document.getElementById("btn-delete");
+    if (ba && !ba.disabled) ba.addEventListener("click", function () { setStatus("active"); });
+    if (bs && !bs.disabled) bs.addEventListener("click", function () { setStatus("suspended"); });
+    if (bd) bd.addEventListener("click", function () {
+      if (confirm("Soft delete this tenant? Users will no longer see it.")) setStatus("deleted");
+    });
+  } catch (e) {
+    el.innerHTML = '<div class="admin-card"><h2>Error</h2><p>Failed to load tenant.</p></div>';
+  }
+};

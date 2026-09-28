@@ -1,0 +1,16 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Tenant Detail — Platform-X Admin{% endblock %}
+
+{% block content %}
+
+<div id="tenant-detail">
+  <p style="color: var(--adm-muted);">Loading…</p>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/admin.js"></script>
+<script>PX.initAdminTenantDetail("{{ tenant_id }}");</script>
+{% endblock %}
