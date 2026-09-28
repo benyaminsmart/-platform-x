@@ -439,6 +439,28 @@ Throughout all phases:
 
 **Phase 18 closed.**
 
+
+
+### v0.11.0-user-ai — Phase 19 Complete (User AI, Layer 2)
+- /account/ai (full-size AI Assistant page)
+- Chat with real Gemini (provider=gemini, model=gemini-3.1-flash-lite)
+- Chat history persistent in DB (ai_chat_messages table)
+- AI Travel Planner: POST /account/api/ai/plan (destination, days, budget → itinerary)
+- AI Booking Agent: POST /account/api/ai/book with Gemini Function Calling
+  - Natural language → real booking → confirmation
+  - Auto-notification to business owners
+- AI Concierge: system prompt supports during-trip recommendations
+- FAB (all public pages) → "Open full assistant" link to /account/ai
+- Provider abstraction: mock/gemini/openai (fallback-safe)
+- Verified with real Gemini:
+  - Chat (343 tokens)
+  - Travel Plan: Istanbul 2-day, 1500 AED (586 tokens)
+  - Booking Agent: real booking created
+  - History: 6 messages persisted
+- 154 tests passing
+
+**Phase 19 closed.**
+
 **Last updated:** September 2026
-**Current phase:** TBD (Phase 8 waiting for plan; Phase 10-16 available)
+**Current phase:** Phase 21 (AI Business Assistant) — NEXT
 
