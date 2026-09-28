@@ -3,7 +3,7 @@
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
 > Version: v0.8.0-notifications (Phases 0-7, 9, 11 complete)
 
-Last updated: 2026-09-27
+Last updated: 2026-09-28
 
 ---
 
