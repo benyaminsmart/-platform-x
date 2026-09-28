@@ -388,6 +388,21 @@ Throughout all phases:
 
 **Phase 9 closed.**
 
+
+
+### v0.8.0-notifications — Phase 11 Complete
+- Email service via Resend (EMAIL_ENABLED flag)
+- 3 email templates: welcome, booking_confirmed, password_reset
+- Password Reset Flow (forgot + reset pages, SHA-256 hashed tokens, 1h expiry)
+- Auto-notifications: welcome, booking_confirmed, password_changed
+- Notification Center UI: tab in account, unread badge, mark-as-read
+- 4-language support for all notification UI
+- SMS/WhatsApp deferred (needs Twilio account)
+- 154 tests passing
+- Live URL: https://statement-lee-med-fraction.trycloudflare.com
+
+**Phase 11 closed.**
+
 **Last updated:** September 2026
 **Current phase:** TBD (Phase 8 waiting for plan; Phase 10-16 available)
 

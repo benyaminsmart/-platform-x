@@ -323,7 +323,16 @@ Tag: v0.7.0-i18n
 
 ### Phase 8 — Rewards + Referral: WAITING (user plan pending)
 ### Phase 10 — Payment Production (Telr): AVAILABLE
-### Phase 11 — Notifications: AVAILABLE
+### Phase 11 — Notifications: COMPLETE
+Tag: v0.8.0-notifications
+- Email service (Resend, EMAIL_ENABLED flag)
+- 3 templates: welcome, booking_confirmed, password_reset
+- Password Reset Flow (forgot + reset pages, hashed tokens)
+- Auto-notifications on register/payment/reset
+- Notification Center UI (account tab, badge, mark-as-read)
+- 4 languages for notification UI
+- SMS/WhatsApp deferred
+- 154 tests passing
 ### Phase 12 — VPS Deploy + Domain + Named Tunnel: AVAILABLE
 ### Phase 13 — Business Onboarding Tools: AVAILABLE
 ### Phase 14 — API + Webhooks + SDK: AVAILABLE
