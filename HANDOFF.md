@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.3.0-polish (Phase 5 in progress)
+> Version: v0.7.0-i18n (Phases 0-7, 9 complete)
 
 Last updated: 2026-09-27
 
