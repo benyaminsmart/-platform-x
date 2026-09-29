@@ -119,7 +119,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 33 Step 5b — Compare UI + button (2026-09-29 23:37)
+Last step: phase-33-fix-maxlen (2026-09-29 23:40)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -1012,7 +1012,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 805 tests, all passing
+## 14. Test Count: 843 tests, all passing
 
 Test files:
 - test_health.py
