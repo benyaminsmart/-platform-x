@@ -128,6 +128,24 @@ Tag: v0.4.0-full-flow
 
 ---
 
+### Phase 29 — Business Leaderboard + AI Scoring: COMPLETE
+Tag: v0.14.0-leaderboard
+- BusinessScore model + migration (17 columns, indexes for leaderboard)
+- Scoring Engine: 5 criteria computed deterministically from DB
+  (Customer Satisfaction 30%, Service Quality 25%, Pricing Competitiveness 20%,
+   Engagement 15%, Loyalty 10%)
+- Leaderboard service: recompute + ranks (overall + per category) +
+  rewards mapping (Gold/Silver/Bronze) + leaderboard query + tenant score lookup
+- Leaderboard AI Tips: AI grounded in real numbers, deterministic fallback
+- Public API: /api/leaderboard, /api/leaderboard/categories
+- Business API: /business/api/score, /business/api/score/tips
+- Platform API: /platform/api/leaderboard/recompute (admin-only, 5/min)
+- Public /leaderboard page (tabs per category, badges, mini-bars)
+- Business /business/score widget (overall + 5 criteria + rewards + AI tips)
+- Badges on business cards (businesses.html, home, category pages)
+- recompute_scores CLI (python -m app.scripts.recompute_scores)
+- NOTE: public API path is /api/leaderboard (HTML page occupies /leaderboard)
+
 ### Phase 20 — Business Owner Panel: COMPLETE
 Tag: v0.9.0-business
 - Separate panel under /business/*
@@ -156,7 +174,7 @@ Tag: v0.13.0-dynamic-pricing
 - UI: Rule Builder page in Business Panel (/business/pricing)
 - Automated smoke test: scripts/smoke-pricing-rules.sh (11 checks)
 
-## 6. Data Models (18 tables)
+## 6. Data Models (19 tables)
 
 Global:
 - tenants (slug, name, tier, status, config JSON with branding/images/rating)
@@ -187,6 +205,15 @@ New in Phase 22:
   conditions JSON, action JSON, service_ids JSON, valid_from, valid_to, created_by_user_id)
 - pricing_rule_applications (tenant_id, rule_id, service_id, booking_id,
   original_price, adjusted_price, delta_amount, delta_percent, currency, note)
+
+New in Phase 29:
+- business_scores (tenant_id, category, period_start, period_end,
+  overall_score, customer_satisfaction, service_quality,
+  pricing_competitiveness, engagement, loyalty, rank_overall,
+  rank_in_category, criteria_breakdown JSON, computed_at)
+  UniqueConstraint(tenant_id, period_start, period_end)
+  Indexes: (category, period_end, overall_score DESC) for leaderboard,
+           (tenant_id, period_end) for tenant lookup
 
 ---
 
@@ -319,18 +346,13 @@ All idempotent.
 
 ## 11. Remaining Work
 
-**Phase 29 — Business Leaderboard + AI Scoring (NEXT)**
+**Phase 23 — AI Content Writer + Onboarding (NEXT)**
 Per Business-First Order. Includes:
-- BusinessScore model + migration (period, category, 5 criteria, ranks)
-- Deterministic Scoring Engine (Customer Satisfaction 30%, Service Quality 25%,
-  Pricing Competitiveness 20%, Engagement 15%, Loyalty 10%)
-- Leaderboard service (rank per category, tie-breaking, auto-rewards logic)
-- API: /leaderboard (public), /business/api/score, /platform/api/leaderboard/recompute
-- AI tips (analyze weak criteria, suggest improvements)
-- Public /leaderboard page
-- Business Panel: My Score widget + AI tips
-- Badges on business cards
-- Milestone close (v0.14.0-leaderboard)
+- AI auto-generate service descriptions (4 languages)
+- AI-suggested images
+- AI Onboarding: extract business info from URL
+- AI menu/room importer
+- Milestone close (v0.15.0-content-ai)
 
 
 ## 12. Future Phases (v2 Roadmap)
@@ -549,9 +571,22 @@ Business login:
   slug=trianon-hotel / owner@trianon-hotel.com / OwnerPass123
   slug=saffron-restaurant / owner@saffron-restaurant.com / OwnerPass123
 
+Leaderboard recompute (CLI):
+  python -m app.scripts.recompute_scores            # current month
+  python -m app.scripts.recompute_scores --previous # previous month
+  python -m app.scripts.recompute_scores --all      # both
+
+Leaderboard endpoints:
+  GET  /leaderboard                   (HTML page)
+  GET  /api/leaderboard               (JSON)
+  GET  /api/leaderboard/categories    (JSON)
+  GET  /business/api/score            (auth)
+  GET  /business/api/score/tips       (auth)
+  POST /platform/api/leaderboard/recompute  (admin)
+
 ---
 
-## 14. Test Count: 273 tests, all passing
+## 14. Test Count: 346 tests, all passing
 
 Test files:
 - test_health.py
@@ -584,6 +619,14 @@ Test files:
 - test_business_pricing_api.py (17, Phase 22)
 - test_booking_pricing_integration.py (8, Phase 22)
 - test_business_pricing_page.py (4, Phase 22)
+- test_scoring_engine.py (21, Phase 29)
+- test_leaderboard_service.py (12, Phase 29)
+- test_leaderboard_api.py (18, Phase 29)
+- test_leaderboard_tips.py (8, Phase 29)
+- test_leaderboard_page.py (4, Phase 29)
+- test_business_score_page.py (4, Phase 29)
+- test_badges_helper.py (2, Phase 29)
+- test_businesses_badges.py (4, Phase 29)
 
 Speed: BCRYPT_ROUNDS=4 in tests, schema created once per session.
 
@@ -977,9 +1020,9 @@ Current working order. Do NOT jump phases. Do NOT skip.
 2. Phase 18 (AI Foundation) — COMPLETE
 3. Phase 21 (AI Business Assistant / Pricing Coach) — COMPLETE
 4. Phase 22 (Dynamic Pricing Rules) — COMPLETE
-5. Phase 29 (Leaderboard + AI Scoring) — **NEXT**
+5. Phase 29 (Leaderboard + AI Scoring) — COMPLETE
 6. Phase 19 (User AI) — COMPLETE
-7. Phase 23 (AI Content Writer)
+7. Phase 23 (AI Content Writer) — **NEXT**
 8. Phase 24 (Cross-Business Rewards)
 9. Phase 10 (Payment Production — needs Telr/Stripe account)
 10. Phases 25-28 (AI Marketing, Occupancy, Competitor Insights, Review Responder)
@@ -1016,7 +1059,7 @@ before guests. Reason: businesses pay; users use.
 4. Phase 22 (Dynamic Pricing Rules) — SOON
 5. Phase 29 (Leaderboard + AI Scoring) — SOON
 6. Phase 19 (User AI) — COMPLETE (was done early because foundation was ready)
-7. Phase 23 (AI Content Writer)
+7. Phase 23 (AI Content Writer) — **NEXT**
 8. Phase 24 (Cross-Business Rewards)
 9. Phase 10 (Payment Production)
 10. Phase 25-28 (AI Marketing, Occupancy, Competitor Insights, Review Responder)
@@ -1064,7 +1107,7 @@ before guests. Reason: businesses pay; users use.
 - **Phase 16 / 30** (Mobile App) — last
 - **Phase 23-25** (AI Content Writer, Cross-Business Rewards, AI Marketing) — soon
 - **Phase 26-28** (Realtime Occupancy, Competitor Insights, Review Writer) — soon
-- **Phase 29** (Leaderboard + AI Scoring) — NEXT (in progress soon)
+- **Phase 23-29** — Phase 29 done; others below still pending
 
 ### Key Rules for Future Sessions
 
