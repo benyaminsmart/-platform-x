@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.27.0-rate-plans (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-37 complete; 24 DEFERRED)
+> Version: v0.28.0-promotions (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-38 complete; 24 DEFERRED)
 
 Last updated: 2026-09-30
 
@@ -284,6 +284,15 @@ Tag: v0.27.0-rate-plans
 - [x] Step 4 — Rate plans page + sidebar
 - [x] Step 5a — Public service rate plans endpoint
 - [x] Phase close — tag v0.27.0-rate-plans
+
+**Phase 38 — Wave 1 / Promotions Engine: COMPLETE**
+Tag: v0.28.0-promotions
+- [x] Step 1 — Promotion model + migration
+- [x] Step 2 — Promotion service
+- [x] Step 3 — Promotions API + public validate
+- [x] Step 4 — Booking promotion integration
+- [x] Step 5 — Promotions UI + sidebar
+- [x] Phase close — tag v0.28.0-promotions
 
 ---
 
@@ -680,6 +689,18 @@ Tag: v0.27.0-rate-plans
   SERVICE base price (not client-supplied amount); 400 on invalid id
 - UI: /business/rate-plans page + sidebar link
 - Bugfix during phase: rate plan applies to service price, not client amount
+
+### Phase 38 — Promotions Engine: COMPLETE
+Tag: v0.28.0-promotions
+- Promotion model (18 columns; unique per tenant+code)
+- Service: CRUD + validate (active, dates, caps, min_amount,
+  service restriction) + apply (percent/fixed, floor at 0)
+- Business API: GET/POST/PATCH/DELETE + POST /validate (preview)
+- Booking integration: optional promotion_code applies discount to
+  SERVICE base price; used_count incremented; 400 on invalid code
+- UI: /business/promotions page + sidebar link
+- Bugfix during phase: promotion applies to service price, not
+  client amount
 
 ## 6. Data Models (19 tables)
 
@@ -1129,7 +1150,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 927 tests, all passing
+## 14. Test Count: 962 tests, all passing
 
 Test files:
 - test_health.py
