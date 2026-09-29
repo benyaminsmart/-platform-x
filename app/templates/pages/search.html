@@ -178,6 +178,18 @@
   background: #fff; cursor: pointer; font-family: inherit;
 }
 .sr-pager button:disabled { opacity: 0.4; cursor: default; }
+.sr-heart {
+  position: absolute; top: 10px; right: 10px;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,0.95); border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 18px; color: #9ca3af;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: transform 0.1s;
+}
+.sr-heart:hover { transform: scale(1.08); }
+.sr-heart.on { color: #e11d48; }
+.sr-card { position: relative; }
 .sr-map-btn {
   padding: 6px 12px; border-radius: 6px; border: 1px solid var(--px-line);
   background: #fff; cursor: pointer; font-family: inherit; font-size: 12px;
@@ -254,6 +266,7 @@
     }
 
     results.innerHTML = d.items.map(renderCard).join("");
+    bindHearts();
 
     // pager
     var pages = Math.ceil(d.total / d.page_size);
@@ -271,7 +284,8 @@
   function renderCard(i) {
     var img = i.cover_image ? ('style="background-image:url(' + esc(i.cover_image) + ')"') : "";
     var rating = i.rating ? ('★ ' + i.rating + ' · ' + i.reviews_count + ' reviews') : "";
-    return '<a class="sr-card" href="/' + esc(i.tenant_slug) + '/">' +
+    return '<a class="sr-card" data-service-id="' + esc(i.service_id) + '" href="/' + esc(i.tenant_slug) + '/">' +
+      '<button class="sr-heart" data-sid="' + esc(i.service_id) + '" type="button" title="Save">&#9829;</button>' +
       '<div class="sr-thumb" ' + img + '></div>' +
       '<div class="sr-body">' +
         '<span class="sr-cat">' + esc(i.category) + '</span>' +
@@ -359,6 +373,59 @@
     if (bounds.length && !currentCenter) {
       try { map.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 }); } catch(e){}
     }
+  }
+
+  // ============ Wishlist ============
+  var wishlistCache = {};  // service_id -> bool
+
+  function authHeaders() {
+    var t = null;
+    try { t = localStorage.getItem("px_token") || localStorage.getItem("token"); } catch(e){}
+    var h = { "Content-Type": "application/json" };
+    if (t) h["Authorization"] = "Bearer " + t;
+    return h;
+  }
+
+  function toggleHeart(btn) {
+    var sid = btn.getAttribute("data-sid");
+    var was = btn.classList.contains("on");
+    if (was) {
+      fetch("/wishlist/" + encodeURIComponent(sid), { method: "DELETE", headers: authHeaders() })
+        .then(function(r){
+          if (r.status === 401) { alert("Please sign in to save."); return; }
+          if (r.ok) { btn.classList.remove("on"); wishlistCache[sid] = false; }
+        });
+    } else {
+      fetch("/wishlist", {
+        method: "POST", headers: authHeaders(),
+        body: JSON.stringify({ service_id: sid }),
+      }).then(function(r){
+        if (r.status === 401) { alert("Please sign in to save."); return; }
+        if (r.ok) { btn.classList.add("on"); wishlistCache[sid] = true; }
+      });
+    }
+  }
+
+  function bindHearts() {
+    var btns = document.querySelectorAll(".sr-heart");
+    btns.forEach(function(b){
+      b.addEventListener("click", function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        toggleHeart(b);
+      });
+    });
+    // Load current wishlist state once
+    fetch("/wishlist", { headers: authHeaders() })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(list){
+        (list || []).forEach(function(it){
+          wishlistCache[it.service_id] = true;
+          var btn = document.querySelector('.sr-heart[data-sid="' + it.service_id + '"]');
+          if (btn) btn.classList.add("on");
+        });
+      })
+      .catch(function(){});
   }
 
   document.getElementById("sr-toggle-map").addEventListener("click", function(){
