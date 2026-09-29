@@ -1,0 +1,282 @@
+{% extends "business/business_base.html" %}
+{% block title %}Rate Plans — Business Panel{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h2>Rate Plans</h2>
+  <p class="admin-card-sub" style="margin-bottom: 0;">
+    Pricing options for each service (Room Only, Bed &amp; Breakfast, Half Board,
+    Non-refundable, etc.). Each plan adjusts the base price.
+  </p>
+</div>
+
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div class="coach-head">
+    <h3>Your rate plans</h3>
+    <button type="button" class="admin-btn" id="rp-new-btn">New Rate Plan</button>
+  </div>
+  <div style="margin-top: 10px; font-size:13px; color:var(--adm-muted);">
+    Filter by service:
+    <select id="rp-service-filter" class="ai-input" style="padding:6px 10px; margin-left:8px; width:auto; display:inline-block;">
+      <option value="">All services</option>
+    </select>
+  </div>
+  <div id="rp-list" class="rp-list"><div class="rp-loading">Loading…</div></div>
+</div>
+
+<div id="rp-modal" class="rp-modal" style="display:none;">
+  <div class="rp-modal-card">
+    <div class="rp-modal-head">
+      <h3 id="rp-modal-title">Create Rate Plan</h3>
+      <button type="button" class="admin-btn" id="rp-modal-close" style="background:var(--adm-surface-2); color:var(--adm-text);">Close</button>
+    </div>
+    <input type="hidden" id="rp-id">
+    <div class="rp-field">
+      <label>Service</label>
+      <select id="rp-service"></select>
+    </div>
+    <div class="rp-grid">
+      <div class="rp-field"><label>Name</label><input type="text" id="rp-name" placeholder="Bed &amp; Breakfast" maxlength="100"></div>
+      <div class="rp-field"><label>Code</label><input type="text" id="rp-code" placeholder="bb" maxlength="40"></div>
+    </div>
+    <div class="rp-grid">
+      <div class="rp-field">
+        <label>Modifier type</label>
+        <select id="rp-type">
+          <option value="percent">Percent (%)</option>
+          <option value="fixed">Fixed (AED)</option>
+        </select>
+      </div>
+      <div class="rp-field">
+        <label>Modifier value (use negative to discount)</label>
+        <input type="number" id="rp-value" step="0.01" placeholder="15">
+      </div>
+    </div>
+    <div class="rp-grid">
+      <div class="rp-field">
+        <label>Meal plan</label>
+        <select id="rp-meal">
+          <option value="none">None</option>
+          <option value="breakfast">Breakfast</option>
+          <option value="half">Half board</option>
+          <option value="full">Full board</option>
+        </select>
+      </div>
+      <div class="rp-field">
+        <label>Min nights (optional)</label>
+        <input type="number" id="rp-min" min="1" max="365">
+      </div>
+    </div>
+    <div class="rp-field">
+      <label style="display:flex; align-items:center; gap:6px;">
+        <input type="checkbox" id="rp-refundable" checked style="width:auto;"> Refundable
+      </label>
+    </div>
+    <div class="rp-field">
+      <label>Description (optional)</label>
+      <input type="text" id="rp-desc" maxlength="200">
+    </div>
+    <button type="button" class="admin-btn" id="rp-save">Save</button>
+    <div id="rp-msg" style="margin-top:10px; font-size:12.5px;"></div>
+  </div>
+</div>
+
+<style>
+.rp-list { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+.rp-loading { color: var(--adm-muted); }
+.rp-item {
+  padding: 12px 14px; border:1px solid var(--adm-line); border-radius:10px;
+  background: var(--adm-surface-2); display:flex; justify-content:space-between;
+  gap: 12px; align-items:center; flex-wrap:wrap;
+}
+.rp-item.inactive { opacity: 0.55; }
+.rp-name { font-family: var(--adm-font-display); font-size:15px; font-weight:700; color:var(--adm-text); }
+.rp-badge {
+  display:inline-block; padding:2px 8px; border-radius:999px; font-size:11px;
+  font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+  background: var(--adm-bg); border:1px solid var(--adm-line); color: var(--adm-text-soft);
+}
+.rp-badge.bb { background:rgba(52,211,153,.15); color:var(--adm-success); border-color:rgba(52,211,153,.3); }
+.rp-badge.nonref { background:rgba(248,113,113,.15); color:var(--adm-error); border-color:rgba(248,113,113,.3); }
+.rp-meta { font-size:12px; color: var(--adm-muted); margin-top:4px; }
+.rp-actions { display:flex; gap:6px; }
+.rp-actions button {
+  padding:6px 10px; font-size:12px; border-radius:6px;
+  border:1px solid var(--adm-line-2); background:var(--adm-bg); color:var(--adm-text-soft);
+  cursor:pointer; font-family: inherit;
+}
+.rp-actions button:hover { border-color: var(--adm-brand); color: var(--adm-text); }
+.rp-modal { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:1000; padding:20px; }
+.rp-modal-card { width:100%; max-width:560px; background: var(--adm-surface); border:1px solid var(--adm-line); border-radius:16px; padding:24px; max-height:90vh; overflow-y:auto; }
+.rp-modal-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px; }
+.rp-modal-head h3 { margin:0; font-family: var(--adm-font-display); }
+.rp-grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px; }
+@media (max-width:700px){ .rp-grid { grid-template-columns: 1fr; } }
+.rp-field { margin-bottom:12px; }
+.rp-field label { display:block; font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--adm-muted); margin-bottom:4px; }
+.rp-field input, .rp-field select {
+  width:100%; padding:10px 12px; border:1px solid var(--adm-line-2); border-radius:8px;
+  font-size:14px; font-family:inherit; background: var(--adm-surface-2); color: var(--adm-text); outline:none;
+}
+.rp-field input:focus, .rp-field select:focus { border-color: var(--adm-brand); }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login"; return; }
+  var slug = null;
+
+  function h() { return { "Authorization": "Bearer " + token, "X-Tenant-Slug": slug, "Content-Type": "application/json" }; }
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  async function resolveSlug() {
+    var res = await fetch("/business/api/me", { headers: { "Authorization": "Bearer " + token } });
+    if (!res.ok) { window.location.href = "/business/login"; return; }
+    slug = (await res.json()).tenant_slug;
+  }
+
+  async function loadServices() {
+    var res = await fetch("/business/api/services", { headers: h() });
+    if (!res.ok) return;
+    var list = await res.json();
+    var opts = list.map(function(s){ return { id: s.id, label: s.name + " (" + s.type + ")" }; });
+    var filter = document.getElementById("rp-service-filter");
+    filter.innerHTML = '<option value="">All services</option>' + opts.map(function(o){
+      return '<option value="' + esc(o.id) + '">' + esc(o.label) + '</option>';
+    }).join("");
+    var sel = document.getElementById("rp-service");
+    sel.innerHTML = opts.map(function(o){
+      return '<option value="' + esc(o.id) + '">' + esc(o.label) + '</option>';
+    }).join("");
+  }
+
+  async function loadPlans() {
+    var list = document.getElementById("rp-list");
+    list.innerHTML = '<div class="rp-loading">Loading…</div>';
+    var sid = document.getElementById("rp-service-filter").value;
+    var url = "/business/api/rate-plans" + (sid ? ("?service_id=" + encodeURIComponent(sid)) : "");
+    var res = await fetch(url, { headers: h() });
+    if (!res.ok) { list.innerHTML = '<div class="rp-loading">Failed.</div>'; return; }
+    var d = await res.json();
+    if (!d.items.length) {
+      list.innerHTML = '<div class="rp-loading">No rate plans yet.</div>';
+      return;
+    }
+    list.innerHTML = d.items.map(renderPlan).join("");
+    list.querySelectorAll("button[data-act]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var id = b.getAttribute("data-id");
+        var act = b.getAttribute("data-act");
+        if (act === "edit") openModal(id);
+        if (act === "del") delPlan(id);
+      });
+    });
+  }
+
+  function modifierLabel(rp) {
+    var v = parseFloat(rp.price_modifier_value);
+    var sign = v >= 0 ? "+" : "";
+    return rp.price_modifier_type === "percent" ? (sign + v + "%") : (sign + v + " AED");
+  }
+
+  function renderPlan(rp) {
+    var meal = rp.meal_plan !== "none" ? (" · " + esc(rp.meal_plan)) : "";
+    var refund = rp.refundable ? "" : ' <span class="rp-badge nonref">non-refundable</span>';
+    return '<div class="rp-item' + (rp.active ? "" : " inactive") + '">' +
+      '<div>' +
+        '<div class="rp-name">' + esc(rp.name) + ' <span class="rp-badge ' + (rp.meal_plan !== "none" ? "bb" : "") + '">' + esc(rp.code) + '</span>' + refund + '</div>' +
+        '<div class="rp-meta">Modifier: <strong>' + esc(modifierLabel(rp)) + '</strong>' + meal +
+          (rp.min_nights ? (" · min " + rp.min_nights + " nights") : "") + '</div>' +
+      '</div>' +
+      '<div class="rp-actions">' +
+        '<button data-act="edit" data-id="' + esc(rp.id) + '">Edit</button>' +
+        (rp.active ? '<button data-act="del" data-id="' + esc(rp.id) + '">Deactivate</button>' : '') +
+      '</div>' +
+    '</div>';
+  }
+
+  function openModal(id) {
+    document.getElementById("rp-msg").textContent = "";
+    if (id) {
+      document.getElementById("rp-modal-title").textContent = "Edit Rate Plan";
+      document.getElementById("rp-id").value = id;
+      fetch("/business/api/rate-plans", { headers: h() }).then(function(r){ return r.json(); }).then(function(d){
+        var rp = d.items.find(function(x){ return x.id === id; });
+        if (!rp) return;
+        document.getElementById("rp-service").value = rp.service_id;
+        document.getElementById("rp-service").disabled = true;
+        document.getElementById("rp-name").value = rp.name;
+        document.getElementById("rp-code").value = rp.code;
+        document.getElementById("rp-type").value = rp.price_modifier_type;
+        document.getElementById("rp-value").value = rp.price_modifier_value;
+        document.getElementById("rp-meal").value = rp.meal_plan;
+        document.getElementById("rp-min").value = rp.min_nights || "";
+        document.getElementById("rp-refundable").checked = rp.refundable;
+        document.getElementById("rp-desc").value = rp.description || "";
+      });
+    } else {
+      document.getElementById("rp-modal-title").textContent = "Create Rate Plan";
+      document.getElementById("rp-id").value = "";
+      document.getElementById("rp-service").disabled = false;
+      document.getElementById("rp-name").value = "";
+      document.getElementById("rp-code").value = "";
+      document.getElementById("rp-type").value = "percent";
+      document.getElementById("rp-value").value = "";
+      document.getElementById("rp-meal").value = "none";
+      document.getElementById("rp-min").value = "";
+      document.getElementById("rp-refundable").checked = true;
+      document.getElementById("rp-desc").value = "";
+    }
+    document.getElementById("rp-modal").style.display = "flex";
+  }
+
+  document.getElementById("rp-new-btn").addEventListener("click", function(){ openModal(null); });
+  document.getElementById("rp-modal-close").addEventListener("click", function(){
+    document.getElementById("rp-modal").style.display = "none";
+  });
+  document.getElementById("rp-service-filter").addEventListener("change", loadPlans);
+
+  document.getElementById("rp-save").addEventListener("click", async function(){
+    var msg = document.getElementById("rp-msg");
+    var id = document.getElementById("rp-id").value;
+    var body = {
+      name: document.getElementById("rp-name").value.trim(),
+      code: document.getElementById("rp-code").value.trim(),
+      price_modifier_type: document.getElementById("rp-type").value,
+      price_modifier_value: parseFloat(document.getElementById("rp-value").value) || 0,
+      meal_plan: document.getElementById("rp-meal").value,
+      min_nights: document.getElementById("rp-min").value === "" ? null : parseInt(document.getElementById("rp-min").value, 10),
+      refundable: document.getElementById("rp-refundable").checked,
+      description: document.getElementById("rp-desc").value.trim() || null,
+    };
+    if (!id) body.service_id = document.getElementById("rp-service").value;
+    if (!body.name || !body.code) { msg.textContent = "Name and code are required."; return; }
+    msg.textContent = "Saving…";
+    var url = id ? ("/business/api/rate-plans/" + id) : "/business/api/rate-plans";
+    var method = id ? "PATCH" : "POST";
+    var res = await fetch(url, { method: method, headers: h(), body: JSON.stringify(body) });
+    var d = await res.json();
+    if (!res.ok) { msg.textContent = d.detail || "Failed."; return; }
+    document.getElementById("rp-modal").style.display = "none";
+    loadPlans();
+  });
+
+  async function delPlan(id) {
+    if (!confirm("Deactivate this rate plan?")) return;
+    await fetch("/business/api/rate-plans/" + id, { method: "DELETE", headers: h() });
+    loadPlans();
+  }
+
+  (async function(){
+    await resolveSlug();
+    if (!slug) return;
+    await loadServices();
+    loadPlans();
+  })();
+})();
+</script>
+{% endblock %}
