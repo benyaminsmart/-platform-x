@@ -128,6 +128,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 36 Step 2 — Rooms service + API
 - [x] Phase 36 Step 1 — Room model + migration
 - [x] Phase 35 Step 5 — No-show UI in dashboard
 - [x] Phase 35 Step 4 — No-show detection + API
@@ -148,7 +149,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 36 Step 1 — Room model + migration (2026-09-30 01:11)
+Last step: Phase 36 Step 2 — Rooms service + API (2026-09-30 01:12)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -170,6 +171,7 @@ Last step: Phase 36 Step 1 — Room model + migration (2026-09-30 01:11)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 8d94420 Phase 36 Step 2 — Rooms service + API
 - 857fbef Phase 36 Step 1 — Room model + migration
 - cc6526c Phase 35 Step 5 — No-show UI in dashboard
 - 30e0dd4 Phase 35 Step 4 — No-show detection + API
