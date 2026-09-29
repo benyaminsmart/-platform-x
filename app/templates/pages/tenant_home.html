@@ -49,6 +49,92 @@ k{% extends "layouts/platform_base.html" %}
   </div>
 </section>
 
+<section class="px-section px-tenant-gallery" data-tenant="{{ tenant.slug }}">
+  <div class="px-container">
+    <div class="px-section-head">
+      <h2>Rooms &amp; services</h2>
+      <p class="px-section-sub">Photos and highlights of what we offer.</p>
+    </div>
+    <div id="tg-body" class="px-tg-body"><div class="px-tg-loading">Loading…</div></div>
+  </div>
+</section>
+
+<style>
+.px-tenant-gallery{padding:40px 0;}
+.px-tg-body{display:flex;flex-direction:column;gap:24px;margin-top:20px;}
+.px-tg-loading{color:var(--px-muted);font-size:14px;}
+.px-tg-svc{background:#fff;border:1px solid var(--px-line);border-radius:16px;padding:16px;}
+.px-tg-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
+.px-tg-name{font-family:var(--px-font-display);font-size:17px;font-weight:700;color:var(--px-navy);margin:0;}
+.px-tg-price{font-size:13px;color:var(--px-muted);}
+.px-tg-imgs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+@media (max-width:700px){.px-tg-imgs{grid-template-columns:repeat(2,1fr);}}
+.px-tg-img{aspect-ratio:4/3;border-radius:10px;background-size:cover;background-position:center;background-color:#eef1f5;cursor:pointer;}
+.px-tg-attrs{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;}
+.px-tg-attr{display:inline-block;padding:3px 10px;border-radius:999px;background:#f3f4f6;color:#374151;font-size:12px;font-weight:600;}
+.px-tg-desc{font-size:13.5px;color:#374151;margin-top:10px;line-height:1.6;}
+.px-tg-lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:3000;padding:20px;}
+.px-tg-lightbox img{max-width:95vw;max-height:90vh;border-radius:12px;}
+</style>
+
+<script>
+(function(){
+  var slug = "{{ tenant.slug }}";
+  var root = document.currentScript.parentElement.querySelector("#tg-body");
+  if (!root) return;
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  var headers = { "X-Tenant-Slug": slug };
+  fetch("/services?limit=50", { headers: headers })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      var items = (d.items || []).filter(function(s){ return s.status === "active"; });
+      if (!items.length) { root.innerHTML = '<div class="px-tg-loading">No services yet.</div>'; return; }
+      var slice = items.slice(0, 12);
+      return Promise.all(slice.map(function(s){
+        return fetch("/services/" + encodeURIComponent(s.id) + "/gallery", { headers: headers })
+          .then(function(r){ return r.ok ? r.json() : null; })
+          .catch(function(){ return null; });
+      })).then(function(galleries){
+        var valid = galleries.filter(Boolean);
+        if (!valid.length) { root.innerHTML = '<div class="px-tg-loading">No gallery images yet.</div>'; return; }
+        root.innerHTML = valid.map(renderSvc).join("");
+        bindLightbox();
+      });
+    })
+    .catch(function(){ root.innerHTML = '<div class="px-tg-loading">Could not load services.</div>'; });
+  function renderSvc(g) {
+    var imgs = (g.images || []).map(function(url){
+      return '<div class="px-tg-img" data-url="' + esc(url) + '" style="background-image:url(' + esc(url) + ')"></div>';
+    }).join("");
+    var attrs = Object.keys(g.attributes || {}).slice(0, 6).map(function(k){
+      return '<span class="px-tg-attr">' + esc(k) + ': ' + esc(g.attributes[k]) + '</span>';
+    }).join("");
+    var desc = g.description ? '<div class="px-tg-desc">' + esc(g.description) + '</div>' : "";
+    var priceLine = g.price ? (g.price + " " + (g.currency || "")) : "";
+    return '<div class="px-tg-svc">' +
+      '<div class="px-tg-head"><h3 class="px-tg-name">' + esc(g.service_name) + '</h3>' +
+      '<div class="px-tg-price">' + esc(priceLine) + '</div></div>' +
+      (imgs ? '<div class="px-tg-imgs">' + imgs + '</div>' : '') +
+      (attrs ? '<div class="px-tg-attrs">' + attrs + '</div>' : '') +
+      desc + '</div>';
+  }
+  function bindLightbox() {
+    document.querySelectorAll(".px-tg-img").forEach(function(el){
+      el.addEventListener("click", function(){
+        var url = el.getAttribute("data-url");
+        var lb = document.createElement("div");
+        lb.className = "px-tg-lightbox";
+        lb.innerHTML = '<img src="' + url + '" alt="">';
+        lb.addEventListener("click", function(){ lb.remove(); });
+        document.body.appendChild(lb);
+      });
+    });
+  }
+})();
+</script>
+
+
+
 <!-- GALLERY -->
 {% if tenant.config.gallery %}
 <section class="px-section-tight">
