@@ -135,6 +135,27 @@ def mark_success(
             booking.payment_status = "paid"
             if booking.status == "pending":
                 booking.status = "confirmed"
+
+            # Auto-assign a physical room if the service has rooms and none
+            # is assigned yet (best-effort; never fails the payment).
+            if not booking.room_number and booking.service_id:
+                try:
+                    from app.models.tenant import Tenant as _T2
+                    from app.services import room_service
+                    _t2 = db.query(_T2).filter(_T2.id == payment.tenant_id).one_or_none()
+                    if _t2 is not None:
+                        out = room_service.assign_room_to_booking(
+                            db, tenant=_t2, booking=booking, room=None
+                        )
+                        if out.get("ok"):
+                            booking.room_number = out["room_number"]
+                            db.add(booking)
+                            db.commit()
+                            db.refresh(booking)
+                except Exception:
+                    # Never fail the payment because of room assignment issues.
+                    pass
+
             # Award points: 1 point per 10 currency units (min 5 points)
             from app.services import reward_service
             points = max(5, int(float(booking.total_amount) / 10))
