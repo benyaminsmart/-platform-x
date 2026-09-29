@@ -128,6 +128,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 37 Step 1 — RatePlan model + migration
 - [x] Phase 36 Step 5 — Room number in receipt + account
 - [x] Phase 36 Step 4 — Auto-assign room on payment
 - [x] Phase 36 Step 3 — Rooms page + sidebar
@@ -152,7 +153,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 36 Step 5 — Room number in receipt + account (2026-09-30 01:14)
+Last step: Phase 37 Step 1 — RatePlan model + migration (2026-09-30 01:19)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -174,6 +175,7 @@ Last step: Phase 36 Step 5 — Room number in receipt + account (2026-09-30 01:1
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 238c984 Phase 37 Step 1 — RatePlan model + migration
 - ee6f054 Phase 36 Step 5 — Room number in receipt + account
 - e8240f9 Phase 36 Step 4 — Auto-assign room on payment
 - 63da3f2 Phase 36 Step 3 — Rooms page + sidebar
