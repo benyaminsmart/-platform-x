@@ -96,6 +96,34 @@ def create_booking(
             else:
                 discount = Decimal("0.00")
 
+    # Phase 38: promotion code (applied to the current base_amount).
+    promotion_code = None
+    promo_discount = Decimal("0.00")
+    if getattr(payload, "promotion_code", None):
+        from app.services import promotion_service
+        p_code = payload.promotion_code.strip().lower()
+        promo, reason = promotion_service.validate_promotion(
+            db, tenant_id=tenant_id, code=p_code,
+            base_amount=base_amount, user_id=user_id,
+            service_id=payload.service_id,
+        ) if False else (None, "placeholder")
+        # Call with correct signature
+        from app.models.tenant import Tenant as _T
+        _t = db.query(_T).filter(_T.id == tenant_id).one_or_none()
+        if _t is not None:
+            promo, reason = promotion_service.validate_promotion(
+                db, tenant=_t, code=p_code,
+                base_amount=base_amount, user_id=user_id,
+                service_id=payload.service_id,
+            )
+        if promo is None:
+            raise ValueError(f"promotion: {reason}")
+        new_amount, disc = promotion_service.apply_promotion(base_amount, promo)
+        promo_discount = disc
+        base_amount = new_amount
+        final_amount = new_amount
+        promotion_code = promo.code
+
     # Total is authoritative: if rules produced a final amount, use it as-is.
     # Otherwise, legacy formula (base - discount).
     if final_amount is not None:
@@ -123,9 +151,27 @@ def create_booking(
         rate_plan_code=rate_plan_code,
         notes=payload.notes,
     )
+    if promotion_code:
+        tag = f"promo={promotion_code}"
+        booking.notes = ((booking.notes or "") + "\n" + tag).strip()
     db.add(booking)
     db.commit()
     db.refresh(booking)
+
+    # Phase 38: bump promotion usage count (best-effort).
+    if promotion_code:
+        try:
+            from app.services import promotion_service
+            from app.models.promotion import Promotion
+            p_row = (
+                db.query(Promotion)
+                .filter(Promotion.tenant_id == tenant_id, Promotion.code == promotion_code)
+                .one_or_none()
+            )
+            if p_row is not None:
+                promotion_service.increment_usage(db, p_row)
+        except Exception:
+            pass
 
     # Audit each applied rule against this booking (best-effort; must not
     # break the booking if it fails).

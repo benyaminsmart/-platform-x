@@ -35,6 +35,9 @@ class BookingCreate(BaseModel):
     # Phase 37: optional rate plan selection
     rate_plan_id: str | None = None
 
+    # Phase 38: optional promotion code
+    promotion_code: str | None = None
+
     @model_validator(mode="after")
     def validate_dates(self) -> "BookingCreate":
         if self.check_out is not None and self.check_out < self.check_in:
@@ -65,5 +68,6 @@ class BookingPublic(TimestampedModel):
     referral_code: str | None
     rate_plan_id: str | None = None
     rate_plan_code: str | None = None
+    promotion_code: str | None = None
     notes: str | None
     cancelled_at: datetime | None
