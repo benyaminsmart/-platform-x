@@ -131,6 +131,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 40 Step 2 — Group service
 - [x] Phase 40 Step 1 — GroupMember model + is_group
 - [x] Phase 39 Step 6 — Messages inbox page + sidebar
 - [x] Phase 39 Step 5 — Messages service + API
@@ -172,7 +173,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 40 Step 1 — GroupMember model + is_group (2026-09-30 02:07)
+Last step: Phase 40 Step 2 — Group service (2026-09-30 02:44)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -194,6 +195,7 @@ Last step: Phase 40 Step 1 — GroupMember model + is_group (2026-09-30 02:07)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 2918edf Phase 40 Step 2 — Group service
 - e24af21 Phase 40 Step 1 — GroupMember model + is_group
 - dc08826 Phase 39 Step 6 — Messages inbox page + sidebar
 - 645f0ba Phase 39 Step 5 — Messages service + API
