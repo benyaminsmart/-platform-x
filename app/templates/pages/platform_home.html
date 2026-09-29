@@ -19,19 +19,29 @@
 
       <p class="px-hero-sub">{{ t('home.hero_sub', current_lang) }}</p>
 
-      <form class="px-search" action="/businesses" method="get">
+      <form class="px-search" action="/search" method="get">
         <div class="px-search-field">
-          <label>{{ t('common.where', current_lang) }}</label>
-          <input type="text" name="q" placeholder="{{ t('home.search_placeholder', current_lang) }}">
+          <label>Check-in</label>
+          <input type="date" name="check_in" min="{{ today }}">
+        </div>
+        <div class="px-search-divider"></div>
+        <div class="px-search-field">
+          <label>Check-out</label>
+          <input type="date" name="check_out" min="{{ today }}">
+        </div>
+        <div class="px-search-divider"></div>
+        <div class="px-search-field">
+          <label>Guests</label>
+          <input type="number" name="guests" value="1" min="1" max="50">
         </div>
         <div class="px-search-divider"></div>
         <div class="px-search-field">
           <label>{{ t('common.category', current_lang) }}</label>
           <select name="category">
             <option value="">{{ t('common.any', current_lang) }}</option>
-            <option value="hotel">{{ t('nav.hotels', current_lang) }}</option>
-            <option value="restaurant">{{ t('nav.restaurants', current_lang) }}</option>
-            <option value="travel_agency">{{ t('nav.travel', current_lang) }}</option>
+            <option value="hotels">{{ t('nav.hotels', current_lang) }}</option>
+            <option value="restaurants">{{ t('nav.restaurants', current_lang) }}</option>
+            <option value="travel">{{ t('nav.travel', current_lang) }}</option>
             <option value="entertainment">{{ t('nav.entertainment', current_lang) }}</option>
           </select>
         </div>

@@ -155,11 +155,13 @@ def home(request: Request, db: DBSession = Depends(get_db)) -> HTMLResponse:
         "cities": len(cities) if cities else 1,
     }
 
+    from datetime import date as _date
     return templates.TemplateResponse(
         request,
         "pages/platform_home.html",
         {
             "tenant": None,
+            "today": _date.today().isoformat(),
             "businesses": tenants,
             "counts": counts,
             "featured": featured,
@@ -177,6 +179,18 @@ def api_docs_page(request: Request) -> HTMLResponse:
         "pages/api_docs.html",
         {
             "active_nav": "docs",
+        },
+    )
+
+
+@router.get("/search", response_class=HTMLResponse)
+def search_page(request: Request) -> HTMLResponse:
+    """Public search results page (client-side fetch from /api/search)."""
+    return templates.TemplateResponse(
+        request,
+        "pages/search.html",
+        {
+            "active_nav": "search",
         },
     )
 

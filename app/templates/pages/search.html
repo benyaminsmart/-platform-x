@@ -1,0 +1,263 @@
+{% extends "layouts/platform_base.html" %}
+{% block title %}Search — Platform-X{% endblock %}
+
+{% block content %}
+<section class="px-hero px-hero-compact">
+  <div class="px-container">
+    <div class="px-hero-content">
+      <div class="px-breadcrumb">
+        <a href="/">Home</a><span>/</span><span>Search</span>
+      </div>
+      <h1 class="px-hero-title-sm">Find your next experience</h1>
+      <p class="px-hero-sub-sm">
+        Search hotels, restaurants, travel, and entertainment across all Platform-X businesses.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="px-section">
+  <div class="px-container">
+
+    <form id="sr-form" class="sr-form" method="get" action="/search">
+      <div class="sr-field">
+        <label>Check-in</label>
+        <input type="date" name="check_in" id="sr-ci">
+      </div>
+      <div class="sr-field">
+        <label>Check-out</label>
+        <input type="date" name="check_out" id="sr-co">
+      </div>
+      <div class="sr-field">
+        <label>Guests</label>
+        <input type="number" name="guests" id="sr-g" min="1" max="50">
+      </div>
+      <div class="sr-field">
+        <label>Category</label>
+        <select name="category" id="sr-cat">
+          <option value="">Any</option>
+          <option value="hotels">Hotels</option>
+          <option value="restaurants">Restaurants</option>
+          <option value="travel">Travel</option>
+          <option value="entertainment">Entertainment</option>
+        </select>
+      </div>
+      <div class="sr-field">
+        <label>Sort</label>
+        <select name="sort" id="sr-sort">
+          <option value="popular">Popular</option>
+          <option value="price_asc">Price: low to high</option>
+          <option value="price_desc">Price: high to low</option>
+          <option value="rating">Top rated</option>
+        </select>
+      </div>
+      <button type="submit" class="sr-submit">Update</button>
+    </form>
+
+    <div id="sr-meta" class="sr-meta"></div>
+    <div id="sr-results" class="sr-grid">
+      <div class="sr-empty">Loading…</div>
+    </div>
+
+    <div id="sr-pager" class="sr-pager"></div>
+
+  </div>
+</section>
+
+<style>
+.sr-form {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr) auto;
+  gap: 10px;
+  background: #fff;
+  padding: 14px;
+  border: 1px solid var(--px-line);
+  border-radius: 14px;
+  margin-bottom: 24px;
+}
+@media (max-width: 900px) {
+  .sr-form { grid-template-columns: repeat(2, 1fr); }
+  .sr-submit { grid-column: 1 / -1; }
+}
+.sr-field label {
+  display: block; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--px-muted);
+  margin-bottom: 4px;
+}
+.sr-field input, .sr-field select {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--px-line);
+  border-radius: 8px; font-size: 14px; font-family: inherit;
+  background: #fff; color: var(--px-text); outline: none;
+}
+.sr-field input:focus, .sr-field select:focus { border-color: var(--px-navy); }
+.sr-submit {
+  align-self: end; padding: 10px 18px; border-radius: 8px;
+  background: var(--px-navy); color: #fff; border: none;
+  font-family: inherit; font-size: 14px; font-weight: 600;
+  cursor: pointer;
+}
+.sr-meta { font-size: 13px; color: var(--px-muted); margin-bottom: 12px; }
+.sr-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 900px) { .sr-grid { grid-template-columns: 1fr; } }
+.sr-empty {
+  grid-column: 1 / -1;
+  padding: 40px; text-align: center; color: var(--px-muted);
+}
+.sr-card {
+  display: flex; flex-direction: column;
+  background: #fff; border: 1px solid var(--px-line); border-radius: 14px;
+  overflow: hidden; text-decoration: none; color: inherit;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.sr-card:hover {
+  box-shadow: 0 10px 30px rgba(15,61,92,0.08);
+  transform: translateY(-2px);
+}
+.sr-thumb {
+  height: 180px; background-size: cover; background-position: center;
+  background-color: #eef1f5;
+}
+.sr-body { padding: 14px 16px 18px; display: flex; flex-direction: column; gap: 6px; }
+.sr-cat {
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.04em; background: #eef1f5; color: var(--px-navy);
+  align-self: flex-start;
+}
+.sr-name { font-family: var(--px-font-display); font-size: 16px; font-weight: 700; color: var(--px-navy); margin: 4px 0 0; }
+.sr-loc { font-size: 12.5px; color: var(--px-muted); }
+.sr-price { font-family: var(--px-font-display); font-size: 20px; font-weight: 800; color: var(--px-navy); margin-top: 6px; }
+.sr-price small { font-weight: 500; font-size: 11px; color: var(--px-muted); margin-left: 4px; }
+.sr-rating { font-size: 12.5px; color: #6b7280; }
+.sr-pager { display: flex; gap: 8px; justify-content: center; margin-top: 24px; }
+.sr-pager button {
+  padding: 8px 14px; border-radius: 8px; border: 1px solid var(--px-line);
+  background: #fff; cursor: pointer; font-family: inherit;
+}
+.sr-pager button:disabled { opacity: 0.4; cursor: default; }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var form = document.getElementById("sr-form");
+  var results = document.getElementById("sr-results");
+  var meta = document.getElementById("sr-meta");
+  var pager = document.getElementById("sr-pager");
+  var currentPage = 1;
+  var lastPayload = null;
+
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  function readForm() {
+    return {
+      check_in: document.getElementById("sr-ci").value || "",
+      check_out: document.getElementById("sr-co").value || "",
+      guests: document.getElementById("sr-g").value || "1",
+      category: document.getElementById("sr-cat").value || "",
+      sort: document.getElementById("sr-sort").value || "popular",
+    };
+  }
+
+  function writeForm(p) {
+    document.getElementById("sr-ci").value = p.check_in || "";
+    document.getElementById("sr-co").value = p.check_out || "";
+    document.getElementById("sr-g").value = p.guests || "1";
+    document.getElementById("sr-cat").value = p.category || "";
+    document.getElementById("sr-sort").value = p.sort || "popular";
+  }
+
+  async function runSearch(page) {
+    var p = readForm();
+    p.page = page || 1;
+    lastPayload = p;
+    var qs = new URLSearchParams();
+    Object.keys(p).forEach(function(k){ if (p[k]) qs.append(k, p[k]); });
+
+    results.innerHTML = '<div class="sr-empty">Searching…</div>';
+    try {
+      var res = await fetch("/api/search?" + qs.toString());
+      var d = await res.json();
+      render(d);
+    } catch(e) {
+      results.innerHTML = '<div class="sr-empty">Network error.</div>';
+    }
+  }
+
+  function render(d) {
+    meta.textContent = d.total + " result" + (d.total === 1 ? "" : "s")
+      + (d.check_in && d.check_out ? (" · " + d.check_in + " → " + d.check_out) : "")
+      + " · " + d.guests + " guest" + (d.guests == 1 ? "" : "s");
+
+    if (!d.items.length) {
+      results.innerHTML = '<div class="sr-empty">No results. Try different dates or filters.</div>';
+      pager.innerHTML = "";
+      return;
+    }
+
+    results.innerHTML = d.items.map(renderCard).join("");
+
+    // pager
+    var pages = Math.ceil(d.total / d.page_size);
+    if (pages <= 1) { pager.innerHTML = ""; return; }
+    var html = "";
+    if (d.page > 1) html += '<button data-p="' + (d.page - 1) + '">← Prev</button>';
+    html += '<span style="align-self:center;font-size:13px;color:var(--px-muted);">Page ' + d.page + " / " + pages + '</span>';
+    if (d.page < pages) html += '<button data-p="' + (d.page + 1) + '">Next →</button>';
+    pager.innerHTML = html;
+    pager.querySelectorAll("button").forEach(function(b){
+      b.addEventListener("click", function(){ runSearch(parseInt(b.getAttribute("data-p"), 10)); });
+    });
+  }
+
+  function renderCard(i) {
+    var img = i.cover_image ? ('style="background-image:url(' + esc(i.cover_image) + ')"') : "";
+    var rating = i.rating ? ('★ ' + i.rating + ' · ' + i.reviews_count + ' reviews') : "";
+    return '<a class="sr-card" href="/' + esc(i.tenant_slug) + '/">' +
+      '<div class="sr-thumb" ' + img + '></div>' +
+      '<div class="sr-body">' +
+        '<span class="sr-cat">' + esc(i.category) + '</span>' +
+        '<h3 class="sr-name">' + esc(i.service_name) + '</h3>' +
+        '<div class="sr-loc">' + esc(i.tenant_name) + (i.location ? ' · ' + esc(i.location) : '') + '</div>' +
+        (rating ? '<div class="sr-rating">' + esc(rating) + '</div>' : '') +
+        '<div class="sr-price">' + i.price + ' ' + esc(i.currency) + '<small>/night</small></div>' +
+      '</div>' +
+    '</a>';
+  }
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var p = readForm();
+    var qs = new URLSearchParams(p);
+    history.replaceState(null, "", "/search?" + qs.toString());
+    runSearch(1);
+  });
+
+  // ---- boot: read query params ----
+  var u = new URLSearchParams(window.location.search);
+  if (u.has("check_in") || u.has("check_out") || u.has("category") || u.has("guests") || u.has("sort")) {
+    writeForm({
+      check_in: u.get("check_in") || "",
+      check_out: u.get("check_out") || "",
+      guests: u.get("guests") || "1",
+      category: u.get("category") || "",
+      sort: u.get("sort") || "popular",
+    });
+  } else {
+    // set defaults
+    var today = new Date();
+    var tomorrow = new Date(Date.now() + 86400000);
+    var yyyymmdd = function(d){ return d.toISOString().slice(0,10); };
+    document.getElementById("sr-ci").value = yyyymmdd(today);
+    document.getElementById("sr-co").value = yyyymmdd(tomorrow);
+    document.getElementById("sr-g").value = "1";
+  }
+  runSearch(1);
+})();
+</script>
+{% endblock %}
