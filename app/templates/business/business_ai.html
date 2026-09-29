@@ -3,36 +3,246 @@
 {% block title %}AI Assistant — Business Panel{% endblock %}
 
 {% block content %}
-
 <div class="admin-card" style="margin-bottom: 24px;">
   <h2>AI Business Assistant</h2>
   <p class="admin-card-sub" style="margin-bottom: 0;">
-    Ask about your services, pricing, bookings, or how to grow your business.
+    Chat with your AI assistant, or use the Pricing Coach to analyze your
+    prices, get suggestions, forecast demand, and see anonymized market insights.
   </p>
 </div>
 
-<div class="admin-card" style="max-width: 800px;">
-  <div id="biz-ai-body" style="min-height: 320px; max-height: 480px; overflow-y: auto; padding: 16px; background: #faf8f5; border-radius: 12px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 10px;">
-    <div style="padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.5; max-width: 88%; background: white; color: var(--px-text); border: 1px solid var(--px-line); align-self: flex-start;">
-      Hi! I'm your AI business assistant. I can help with pricing, services, bookings, and growth ideas. What would you like to know?
-    </div>
+<div class="admin-card" style="margin-bottom: 16px;">
+  <div style="display: flex; gap: 8px; border-bottom: 1px solid var(--px-line);">
+    <button class="ai-tab-btn ai-tab-active" data-tab="chat" type="button">Chat</button>
+    <button class="ai-tab-btn" data-tab="coach" type="button">Pricing Coach</button>
   </div>
-  <form id="biz-ai-form" style="display: flex; gap: 8px;">
-    <input type="text" id="biz-ai-input" placeholder="Ask me anything about your business..." style="flex: 1; padding: 12px 16px; border: 1px solid var(--px-line); border-radius: 10px; font-size: 14px; outline: none; font-family: inherit;" autocomplete="off">
-    <button type="submit" class="admin-btn">Send</button>
-  </form>
 </div>
+
+<!-- ============ TAB: CHAT ============ -->
+<div id="tab-chat" class="ai-tab-panel">
+  <div class="admin-card" style="max-width: 900px;">
+    <div id="biz-ai-body" style="min-height: 320px; max-height: 480px; overflow-y: auto; padding: 16px; background: #faf8f5; border-radius: 12px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 10px;">
+      <div class="ai-msg ai-msg-assistant">
+        Hi! I'm your AI business assistant, grounded in your real data. Ask about
+        pricing, services, bookings, or growth ideas.
+      </div>
+    </div>
+    <form id="biz-ai-form" style="display: flex; gap: 8px;">
+      <input type="text" id="biz-ai-input" placeholder="Ask me anything about your business..." class="ai-input" autocomplete="off">
+      <button type="submit" class="admin-btn">Send</button>
+    </form>
+  </div>
+</div>
+
+<!-- ============ TAB: COACH ============ -->
+<div id="tab-coach" class="ai-tab-panel" style="display:none;">
+  <div class="coach-grid">
+
+    <!-- Analyze -->
+    <div class="admin-card coach-card">
+      <div class="coach-head">
+        <h3>Pricing Analysis</h3>
+        <button class="admin-btn coach-run" data-act="analyze" type="button">Analyze</button>
+      </div>
+      <p class="admin-card-sub">Where you stand vs the anonymized peer cohort.</p>
+      <div id="out-analyze" class="coach-out"></div>
+    </div>
+
+    <!-- Suggest -->
+    <div class="admin-card coach-card">
+      <div class="coach-head">
+        <h3>Price Suggestions</h3>
+        <button class="admin-btn coach-run" data-act="suggest" type="button">Suggest</button>
+      </div>
+      <p class="admin-card-sub">Deterministic suggestions with reasoning.</p>
+      <div id="out-suggest" class="coach-out"></div>
+    </div>
+
+    <!-- Forecast -->
+    <div class="admin-card coach-card">
+      <div class="coach-head">
+        <h3>Demand Forecast</h3>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <select id="forecast-days" class="ai-input" style="padding:8px 10px; width:auto;">
+            <option value="7">7 days</option>
+            <option value="30" selected>30 days</option>
+            <option value="60">60 days</option>
+            <option value="90">90 days</option>
+          </select>
+          <button class="admin-btn coach-run" data-act="forecast" type="button">Forecast</button>
+        </div>
+      </div>
+      <p class="admin-card-sub">Projected bookings based on your recent trend.</p>
+      <div id="out-forecast" class="coach-out"></div>
+    </div>
+
+    <!-- Insights -->
+    <div class="admin-card coach-card">
+      <div class="coach-head">
+        <h3>Market Insights</h3>
+        <button class="admin-btn coach-run" data-act="insights" type="button">Insights</button>
+      </div>
+      <p class="admin-card-sub">Anonymized signals from your category on Platform-X.</p>
+      <div id="out-insights" class="coach-out"></div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.ai-tab-btn {
+  background: transparent;
+  border: none;
+  padding: 12px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--px-text-soft, #6b7280);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.ai-tab-btn.ai-tab-active {
+  color: var(--px-text, #111);
+  border-bottom-color: #0f3d5c;
+}
+.ai-msg {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  max-width: 88%;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.ai-msg-user {
+  background: #0f3d5c;
+  color: #fff;
+  align-self: flex-end;
+}
+.ai-msg-assistant {
+  background: #fff;
+  color: var(--px-text, #111);
+  border: 1px solid var(--px-line, #e5e7eb);
+  align-self: flex-start;
+}
+.ai-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid var(--px-line, #e5e7eb);
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+}
+.coach-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 900px) {
+  .coach-grid { grid-template-columns: 1fr; }
+}
+.coach-card { min-height: 260px; }
+.coach-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.coach-head h3 {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+.coach-out {
+  margin-top: 12px;
+  font-size: 13.5px;
+  color: var(--px-text, #111);
+}
+.coach-out .metric-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--px-line, #e5e7eb);
+}
+.coach-out .metric-row:last-child { border-bottom: none; }
+.coach-out .metric-k { color: var(--px-text-soft, #6b7280); }
+.coach-out .metric-v { font-weight: 600; }
+.coach-out .advice {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: #f5f3ef;
+  border-radius: 10px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+.coach-out .pos-below_market { color: #b45309; }
+.coach-out .pos-above_market { color: #991b1b; }
+.coach-out .pos-at_market { color: #166534; }
+.coach-out .sugg {
+  padding: 10px 12px;
+  border: 1px solid var(--px-line, #e5e7eb);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+.coach-out .sugg-title { font-weight: 600; margin-bottom: 4px; }
+.coach-out .sugg-delta.pos { color: #166534; }
+.coach-out .sugg-delta.neg { color: #991b1b; }
+.coach-out .sugg-note { color: var(--px-text-soft, #6b7280); font-size: 13px; }
+.coach-out .loading { color: var(--px-text-soft, #6b7280); }
+.coach-out .err { color: #991b1b; }
+</style>
 
 {% endblock %}
 
 {% block scripts %}
 <script>
 (function(){
-  var token = null; try { token = localStorage.getItem("px_business_token"); } catch(e){}
-  if (!token) { window.location.href = "/business/login?tenant=trianon-hotel"; return; }
-  var lo = document.getElementById("business-logout");
-  if (lo) lo.addEventListener("click", function(){ try{localStorage.removeItem("px_business_token");}catch(e){}; window.location.href = "/business/login?tenant=trianon-hotel"; });
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login"; return; }
 
+  var lo = document.getElementById("business-logout");
+  if (lo) lo.addEventListener("click", function(){
+    try{ localStorage.removeItem("px_business_token"); }catch(e){}
+    window.location.href = "/business/login";
+  });
+
+  var slug = null;
+
+  // -------- Tabs --------
+  var tabs = document.querySelectorAll(".ai-tab-btn");
+  var panels = { chat: document.getElementById("tab-chat"), coach: document.getElementById("tab-coach") };
+  tabs.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabs.forEach(function(b){ b.classList.remove("ai-tab-active"); });
+      btn.classList.add("ai-tab-active");
+      var t = btn.getAttribute("data-tab");
+      Object.keys(panels).forEach(function(k){ panels[k].style.display = (k === t) ? "block" : "none"; });
+    });
+  });
+
+  // -------- Auth header helper --------
+  function h() {
+    return { "Authorization": "Bearer " + token, "X-Tenant-Slug": slug, "Content-Type": "application/json" };
+  }
+
+  // -------- Resolve tenant slug via /me --------
+  async function resolveSlug() {
+    var res = await fetch("/business/api/me", { headers: { "Authorization": "Bearer " + token } });
+    if (!res.ok) {
+      try{ localStorage.removeItem("px_business_token"); }catch(e){}
+      window.location.href = "/business/login";
+      return;
+    }
+    var data = await res.json();
+    slug = data.tenant_slug;
+  }
+
+  // -------- Chat --------
   var form = document.getElementById("biz-ai-form");
   var input = document.getElementById("biz-ai-input");
   var body = document.getElementById("biz-ai-body");
@@ -40,11 +250,7 @@
 
   function append(role, text) {
     var div = document.createElement("div");
-    var bg = role === "user" ? "#0f3d5c" : "white";
-    var color = role === "user" ? "white" : "var(--px-text)";
-    var align = role === "user" ? "flex-end" : "flex-start";
-    div.style.cssText = "padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.5; max-width: 88%; background: " + bg + "; color: " + color + "; align-self: " + align + "; white-space: pre-wrap; word-wrap: break-word;";
-    if (role === "assistant") div.style.border = "1px solid var(--px-line)";
+    div.className = "ai-msg " + (role === "user" ? "ai-msg-user" : "ai-msg-assistant");
     div.textContent = text;
     body.appendChild(div);
     body.scrollTop = body.scrollHeight;
@@ -59,27 +265,136 @@
     var typing = document.createElement("div");
     typing.id = "biz-ai-typing";
     typing.textContent = "…";
-    typing.style.cssText = "padding: 6px 12px; opacity: 0.6; align-self: flex-start;";
+    typing.style.cssText = "padding:6px 12px; opacity:0.6; align-self:flex-start;";
     body.appendChild(typing);
     body.scrollTop = body.scrollHeight;
 
     try {
       var res = await fetch("/business/api/ai/chat", {
         method: "POST",
-        headers: {"Authorization": "Bearer " + token, "X-Tenant-Slug": "trianon-hotel", "Content-Type": "application/json"},
-        body: JSON.stringify({message: msg, history: history.slice(-10)}),
+        headers: h(),
+        body: JSON.stringify({ message: msg, history: history.slice(-10) }),
       });
       var data = await res.json();
       var t = document.getElementById("biz-ai-typing"); if (t) t.remove();
       if (!res.ok) { append("assistant", data.detail || "Sorry."); return; }
       append("assistant", data.content);
-      history.push({role:"user", content: msg});
-      history.push({role:"assistant", content: data.content});
+      history.push({ role: "user", content: msg });
+      history.push({ role: "assistant", content: data.content });
     } catch(e) {
       var t2 = document.getElementById("biz-ai-typing"); if (t2) t2.remove();
       append("assistant", "Network error.");
     }
   });
+
+  // -------- Coach --------
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  function renderMetrics(metrics) {
+    var rows = [];
+    function row(k, v) {
+      if (v === null || v === undefined || v === "") return;
+      rows.push('<div class="metric-row"><span class="metric-k">' + esc(k) + '</span><span class="metric-v">' + esc(v) + '</span></div>');
+    }
+    // analyze
+    if (metrics.dominant_type !== undefined) {
+      row("Category", metrics.dominant_type || "—");
+      row("Active services", metrics.active_services);
+      if (metrics.position_by_type) {
+        Object.keys(metrics.position_by_type).forEach(function(t){
+          var pos = metrics.position_by_type[t];
+          var label = pos === "below_market" ? "below market" : pos === "above_market" ? "above market" : "at market";
+          rows.push('<div class="metric-row"><span class="metric-k">Position (' + esc(t) + ')</span><span class="metric-v pos-' + esc(pos) + '">' + esc(label) + '</span></div>');
+        });
+      }
+      if (metrics.benchmark && metrics.benchmark.cohort_size) {
+        row("Peer cohort size", metrics.benchmark.cohort_size + " businesses");
+        row("Peer avg price", metrics.benchmark.avg_price + " AED");
+        row("Peer median price", metrics.benchmark.median_price + " AED");
+        row("Your price vs cohort", (metrics.benchmark.tenant_price_vs_cohort_pct >= 0 ? "+" : "") + metrics.benchmark.tenant_price_vs_cohort_pct + "%");
+      }
+    }
+    // suggestions
+    if (metrics.suggestions) {
+      metrics.suggestions.forEach(function(s){
+        if (s.type === null) {
+          rows.push('<div class="sugg"><div class="sugg-title">Not enough data</div><div class="sugg-note">' + esc(s.note) + '</div></div>');
+          return;
+        }
+        var sign = s.suggested_change_pct >= 0 ? "+" : "";
+        var cls = s.suggested_change_pct > 0 ? "pos" : (s.suggested_change_pct < 0 ? "neg" : "");
+        rows.push(
+          '<div class="sugg">' +
+            '<div class="sugg-title">' + esc(s.type) + '</div>' +
+            '<div class="metric-row"><span class="metric-k">Current avg</span><span class="metric-v">' + esc(s.current_avg_aed) + ' AED</span></div>' +
+            '<div class="metric-row"><span class="metric-k">Peer avg</span><span class="metric-v">' + esc(s.cohort_avg_aed) + ' AED</span></div>' +
+            '<div class="metric-row"><span class="metric-k">Suggested change</span><span class="metric-v sugg-delta ' + cls + '">' + sign + esc(s.suggested_change_pct) + '% → ' + esc(s.suggested_new_avg_aed) + ' AED</span></div>' +
+            '<div class="sugg-note" style="margin-top:6px;">' + esc(s.reason) + '</div>' +
+          '</div>'
+        );
+      });
+    }
+    // forecast
+    if (metrics.expected_bookings !== undefined) {
+      row("Days", metrics.days);
+      row("Weekly avg (last 30d)", metrics.weekly_avg_last_30d);
+      row("Expected bookings", metrics.expected_bookings);
+      row("Low estimate", metrics.low_bookings);
+      row("High estimate", metrics.high_bookings);
+      row("Revenue this month", metrics.revenue_this_month_aed + " AED");
+      row("Revenue prev month", metrics.revenue_prev_month_aed + " AED");
+      if (metrics.revenue_growth_pct !== null && metrics.revenue_growth_pct !== undefined) {
+        row("Revenue growth", (metrics.revenue_growth_pct >= 0 ? "+" : "") + metrics.revenue_growth_pct + "%");
+      }
+    }
+    // insights
+    if (metrics.cohort_size !== undefined && metrics.dominant_type !== undefined && metrics.your_position_pct !== undefined) {
+      row("Category", metrics.dominant_type || "—");
+      row("Peer cohort size", metrics.cohort_size);
+      row("Peer avg price", metrics.cohort_avg_price_aed !== null ? metrics.cohort_avg_price_aed + " AED" : "—");
+      row("Peer median price", metrics.cohort_median_price_aed !== null ? metrics.cohort_median_price_aed + " AED" : "—");
+      row("Your avg price", metrics.your_avg_price_aed !== null ? metrics.your_avg_price_aed + " AED" : "—");
+      if (metrics.your_position_pct !== null && metrics.your_position_pct !== undefined) {
+        row("Your position", (metrics.your_position_pct >= 0 ? "+" : "") + metrics.your_position_pct + "%");
+      }
+    }
+    return rows.join("");
+  }
+
+  async function runCoach(act, container) {
+    container.innerHTML = '<div class="loading">Analyzing…</div>';
+    var url = "/business/api/ai/pricing/analyze";
+    if (act === "suggest") url = "/business/api/ai/pricing/suggest";
+    if (act === "insights") url = "/business/api/ai/insights";
+    if (act === "forecast") {
+      var d = document.getElementById("forecast-days").value || "30";
+      url = "/business/api/ai/demand/forecast?days=" + encodeURIComponent(d);
+    }
+    try {
+      var res = await fetch(url, { method: "POST", headers: h(), body: "{}" });
+      var data = await res.json();
+      if (!res.ok) { container.innerHTML = '<div class="err">' + esc(data.detail || "Error.") + '</div>'; return; }
+      var html = renderMetrics(data.metrics || {});
+      if (data.advice) html += '<div class="advice">' + esc(data.advice) + '</div>';
+      container.innerHTML = html || '<div class="loading">No data.</div>';
+    } catch(e) {
+      container.innerHTML = '<div class="err">Network error.</div>';
+    }
+  }
+
+  document.querySelectorAll(".coach-run").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var act = btn.getAttribute("data-act");
+      var container = document.getElementById("out-" + act);
+      runCoach(act, container);
+    });
+  });
+
+  // -------- Boot --------
+  resolveSlug();
 })();
 </script>
 {% endblock %}
