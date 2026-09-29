@@ -33,6 +33,7 @@ from app.api import business_marketing as business_marketing_router
 from app.api import business_no_show as business_no_show_router
 from app.api import business_pricing as business_pricing_router
 from app.api import leaderboard as leaderboard_router
+from app.api import messages as messages_router
 from app.api import notifications as notifications_router
 from app.api import orders as orders_router
 from app.api import partners as partners_router
@@ -178,6 +179,8 @@ app.include_router(business_rooms_router.router)
 app.include_router(business_market_router.router)
 app.include_router(business_webhooks_router.router)
 app.include_router(business_pricing_router.router)
+app.include_router(messages_router.router)
+app.include_router(messages_router.business_router)
 app.include_router(leaderboard_router.router)
 app.include_router(leaderboard_router.business_router)
 app.include_router(leaderboard_router.platform_router)
