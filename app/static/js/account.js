@@ -165,9 +165,14 @@ PX.initAccount = function (slug) {
         var html = "";
         d.items.forEach(function (b) {
           var cancellable = (b.status === "pending" || b.status === "confirmed");
-          var actionHtml = cancellable
-            ? '<button class="px-btn px-btn-ghost px-cancel-btn" data-bid="' + esc(b.id) + '" style="margin-top:6px; font-size:12px; padding:4px 10px;">Cancel</button>'
-            : '';
+          var modifiable = cancellable && (new Date(b.check_in) > new Date());
+          var actionHtml = "";
+          if (modifiable) {
+            actionHtml += '<button class="px-btn px-btn-ghost px-mod-btn" data-bid="' + esc(b.id) + '" style="margin-top:6px; font-size:12px; padding:4px 10px; margin-right:4px;">Modify</button>';
+          }
+          if (cancellable) {
+            actionHtml += '<button class="px-btn px-btn-ghost px-cancel-btn" data-bid="' + esc(b.id) + '" style="margin-top:6px; font-size:12px; padding:4px 10px;">Cancel</button>';
+          }
           html += '<div class="px-list-item" data-bid="' + esc(b.id) + '">' +
             '<div class="px-list-item-main">' +
               '<div class="px-list-item-title">' + esc(b.service_name) + "</div>" +
@@ -180,6 +185,9 @@ PX.initAccount = function (slug) {
         list.innerHTML = html;
         list.querySelectorAll(".px-cancel-btn").forEach(function(btn){
           btn.addEventListener("click", function(){ handleCancel(btn); });
+        });
+        list.querySelectorAll(".px-mod-btn").forEach(function(btn){
+          btn.addEventListener("click", function(){ handleModify(btn); });
         });
       }
       renderRecent();
@@ -349,6 +357,90 @@ function showCancelModal(bid, p) {
         } else {
           alert("Could not cancel: " + (res && res.detail ? res.detail : "unknown"));
         }
+      })
+      .catch(function(){ alert("Network error."); });
+  });
+}
+
+// ============================================================
+// Booking modification flow (Phase 35 / Wave 1)
+// ============================================================
+function handleModify(btn) {
+  var bid = btn.getAttribute("data-bid");
+  if (!bid) return;
+  var headers = window.PX_AUTH ? window.PX_AUTH.headers() : {};
+  var t = new Date(); t.setDate(t.getDate() + 1);
+  var t2 = new Date(); t2.setDate(t2.getDate() + 3);
+  var iso = function(d){ return d.toISOString().slice(0,10); };
+  showModifyModal(bid, iso(t), iso(t2), headers);
+}
+
+function showModifyModal(bid, ci, co, headers) {
+  var modalId = "px-mod-modal";
+  var old = document.getElementById(modalId);
+  if (old) old.remove();
+
+  var html = '' +
+    '<div id="' + modalId + '" style="position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:2000; padding:20px;">' +
+      '<div style="background:#fff; border-radius:16px; padding:24px; max-width:480px; width:100%;">' +
+        '<h3 style="font-family:var(--px-font-display); margin:0 0 12px; color:var(--px-navy);">Modify booking dates</h3>' +
+        '<label style="display:block; font-size:12px; color:#6b7280; margin-bottom:4px;">New check-in</label>' +
+        '<input type="date" id="' + modalId + '-ci" value="' + ci + '" style="width:100%; padding:10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:14px; margin-bottom:12px;">' +
+        '<label style="display:block; font-size:12px; color:#6b7280; margin-bottom:4px;">New check-out</label>' +
+        '<input type="date" id="' + modalId + '-co" value="' + co + '" style="width:100%; padding:10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:14px; margin-bottom:12px;">' +
+        '<div id="' + modalId + '-preview" style="font-size:13px; color:#374151; padding:10px 12px; background:#f5f3ef; border-radius:8px; margin-bottom:14px;">Select dates to see price change.</div>' +
+        '<div style="display:flex; gap:8px; justify-content:flex-end;">' +
+          '<button id="' + modalId + '-no" class="px-btn px-btn-ghost">Cancel</button>' +
+          '<button id="' + modalId + '-save" class="px-btn px-btn-primary">Apply</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  document.body.insertAdjacentHTML("beforeend", html);
+
+  var ciEl = document.getElementById(modalId + "-ci");
+  var coEl = document.getElementById(modalId + "-co");
+  var prevEl = document.getElementById(modalId + "-preview");
+
+  function refreshPreview() {
+    var ci = ciEl.value, co = coEl.value;
+    if (!ci) return;
+    prevEl.textContent = "Loading…";
+    var url = "/bookings/" + encodeURIComponent(bid) + "/modify-preview?new_check_in=" + encodeURIComponent(ci);
+    if (co) url += "&new_check_out=" + encodeURIComponent(co);
+    fetch(url, { headers: headers })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (!d.can_modify) { prevEl.textContent = "Cannot modify: " + (d.reason || "unknown"); return; }
+        var delta = parseFloat(d.delta_amount || "0");
+        var sign = delta > 0 ? "+" : "";
+        var cls = delta > 0 ? "#991b1b" : (delta < 0 ? "#166534" : "#6b7280");
+        prevEl.innerHTML = 'Current: ' + d.current_total + ' ' + d.currency +
+          '<br>New total: <strong>' + d.new_total + ' ' + d.currency + '</strong>' +
+          '<br><span style="color:' + cls + '; font-weight:600;">Delta: ' + sign + d.delta_amount + ' ' + d.currency + '</span>';
+      })
+      .catch(function(){ prevEl.textContent = "Network error."; });
+  }
+
+  ciEl.addEventListener("change", refreshPreview);
+  coEl.addEventListener("change", refreshPreview);
+  refreshPreview();
+
+  document.getElementById(modalId + "-no").addEventListener("click", function(){
+    document.getElementById(modalId).remove();
+  });
+  document.getElementById(modalId + "-save").addEventListener("click", function(){
+    var ci2 = ciEl.value, co2 = coEl.value;
+    if (!ci2) { alert("Check-in is required"); return; }
+    fetch("/bookings/" + encodeURIComponent(bid) + "/modify", {
+      method: "POST", headers: headers,
+      body: JSON.stringify({ new_check_in: ci2, new_check_out: co2 || null }),
+    })
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        if (!res.ok) { alert("Cannot modify: " + (res.reason || "unknown")); return; }
+        document.getElementById(modalId).remove();
+        alert("Dates updated. Delta: " + res.delta_amount + " " + res.currency);
+        location.reload();
       })
       .catch(function(){ alert("Network error."); });
   });
