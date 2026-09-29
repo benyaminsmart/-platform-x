@@ -16,6 +16,7 @@ from app.api import auth as auth_router
 from app.api import bookings as bookings_router
 from app.api import business as business_router
 from app.api import business_insights as business_insights_router
+from app.api import business_reviews as business_reviews_router
 from app.api import business_market as business_market_router
 from app.api import business_marketing as business_marketing_router
 from app.api import business_pricing as business_pricing_router
@@ -26,6 +27,7 @@ from app.api import partners as partners_router
 from app.api import payments as payments_router
 from app.api import platform_admin as platform_admin_router
 from app.api import referrals as referrals_router
+from app.api import reviews as reviews_router
 from app.api import rewards as rewards_router
 from app.api import services as services_router
 from app.api import tenants as tenants_router
@@ -145,6 +147,7 @@ app.include_router(bookings_router.router)
 app.include_router(business_router.router)
 app.include_router(business_marketing_router.router)
 app.include_router(business_insights_router.router)
+app.include_router(business_reviews_router.router)
 app.include_router(business_market_router.router)
 app.include_router(business_pricing_router.router)
 app.include_router(leaderboard_router.router)
@@ -156,6 +159,7 @@ app.include_router(partners_router.router)
 app.include_router(payments_router.router)
 app.include_router(platform_admin_router.router)
 app.include_router(referrals_router.router)
+app.include_router(reviews_router.router)
 app.include_router(rewards_router.router)
 app.include_router(services_router.router)
 app.include_router(tenants_router.router)
