@@ -1,0 +1,136 @@
+{% extends "layouts/platform_base.html" %}
+{% block title %}My Wishlist — Platform-X{% endblock %}
+
+{% block content %}
+<section class="px-hero px-hero-compact">
+  <div class="px-container">
+    <div class="px-hero-content">
+      <div class="px-breadcrumb">
+        <a href="/">Home</a><span>/</span><a href="/account">Account</a><span>/</span><span>Wishlist</span>
+      </div>
+      <h1 class="px-hero-title-sm">My Wishlist</h1>
+      <p class="px-hero-sub-sm">Saved experiences you're considering.</p>
+    </div>
+  </div>
+</section>
+
+<section class="px-section">
+  <div class="px-container">
+    <div id="wl-body" class="px-wl-body"><p class="px-muted">Loading…</p></div>
+  </div>
+</section>
+
+<style>
+.px-wl-body { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+@media (max-width: 900px) { .px-wl-body { grid-template-columns: 1fr; } }
+.px-wl-card {
+  display: flex; flex-direction: column;
+  background: #fff; border: 1px solid var(--px-line); border-radius: 14px;
+  overflow: hidden; position: relative;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.px-wl-card:hover { box-shadow: 0 10px 30px rgba(15,61,92,0.08); transform: translateY(-2px); }
+.px-wl-thumb { height: 160px; background-size: cover; background-position: center; background-color: #eef1f5; }
+.px-wl-info { padding: 14px 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.px-wl-name { font-family: var(--px-font-display); font-size: 15px; font-weight: 700; color: var(--px-navy); margin: 0; }
+.px-wl-tenant { font-size: 12.5px; color: var(--px-muted); }
+.px-wl-price { font-family: var(--px-font-display); font-size: 18px; font-weight: 800; color: var(--px-navy); }
+.px-wl-price small { font-size: 11px; font-weight: 500; color: var(--px-muted); }
+.px-wl-actions { display: flex; gap: 6px; padding: 0 16px 14px; }
+.px-wl-actions button, .px-wl-actions a {
+  flex: 1; padding: 8px 12px; border-radius: 8px; text-align: center;
+  font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+  text-decoration: none; border: 1px solid var(--px-line); background: #fff; color: var(--px-navy);
+}
+.px-wl-actions a.primary { background: var(--px-navy); color: #fff; border-color: var(--px-navy); }
+.px-wl-actions button:hover { border-color: var(--px-error, #991b1b); color: #991b1b; }
+.px-wl-note {
+  font-size: 12px; color: var(--px-muted); font-style: italic;
+  padding: 0 16px 8px;
+}
+.px-wl-empty { padding: 60px 20px; text-align: center; color: var(--px-muted); }
+.px-wl-empty .px-wl-icon { font-size: 48px; margin-bottom: 12px; }
+.px-wl-empty h3 { color: var(--px-navy); margin: 0 0 8px; }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/account.js"></script>
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_token") || localStorage.getItem("token"); } catch(e){}
+
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function authHeaders() {
+    var h = { "Content-Type": "application/json" };
+    if (token) h["Authorization"] = "Bearer " + token;
+    return h;
+  }
+
+  if (!token) {
+    document.getElementById("wl-body").innerHTML =
+      '<div class="px-wl-empty"><div class="px-wl-icon">❤️</div>' +
+      '<h3>Sign in to see your wishlist</h3>' +
+      '<a href="/login" class="px-btn px-btn-primary" style="display:inline-block; margin-top:12px;">Sign in</a></div>';
+    return;
+  }
+
+  function renderCard(it) {
+    var img = it.cover_image ? 'style="background-image:url(' + esc(it.cover_image) + ')"' : '';
+    var price = it.price ? (it.price + " " + (it.currency || "")) : "";
+    var note = it.note ? '<div class="px-wl-note">' + esc(it.note) + '</div>' : '';
+    return '<div class="px-wl-card" data-sid="' + esc(it.service_id) + '">' +
+      '<a href="/' + esc(it.tenant_slug) + '/" style="text-decoration:none; color:inherit;">' +
+        '<div class="px-wl-thumb" ' + img + '></div>' +
+      '</a>' +
+      '<div class="px-wl-info">' +
+        '<h3 class="px-wl-name">' + esc(it.service_name) + '</h3>' +
+        '<div class="px-wl-tenant">' + esc(it.tenant_name) + (it.location ? " · " + esc(it.location) : "") + '</div>' +
+        '<div class="px-wl-price">' + esc(price) + '<small>/night</small></div>' +
+      '</div>' +
+      note +
+      '<div class="px-wl-actions">' +
+        '<a href="/' + esc(it.tenant_slug) + '/" class="primary">View</a>' +
+        '<button data-remove="' + esc(it.service_id) + '">Remove</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function bindRemoveButtons() {
+    document.querySelectorAll("button[data-remove]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var sid = b.getAttribute("data-remove");
+        if (!confirm("Remove from wishlist?")) return;
+        fetch("/wishlist/" + encodeURIComponent(sid), { method: "DELETE", headers: authHeaders() })
+          .then(function(r){ if (r.ok) load(); });
+      });
+    });
+  }
+
+  function load() {
+    fetch("/wishlist", { headers: authHeaders() })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(list){
+        var el = document.getElementById("wl-body");
+        if (!list.length) {
+          el.innerHTML = '<div class="px-wl-empty" style="grid-column:1/-1;">' +
+            '<div class="px-wl-icon">💫</div>' +
+            '<h3>Nothing saved yet</h3>' +
+            '<p>Tap the heart on any experience to save it here.</p>' +
+            '<a href="/search" class="px-btn px-btn-primary" style="display:inline-block; margin-top:12px;">Browse experiences</a>' +
+          '</div>';
+          return;
+        }
+        el.innerHTML = list.map(renderCard).join("");
+        bindRemoveButtons();
+      })
+      .catch(function(){
+        document.getElementById("wl-body").innerHTML = '<p class="px-muted">Network error.</p>';
+      });
+  }
+
+  load();
+})();
+</script>
+{% endblock %}

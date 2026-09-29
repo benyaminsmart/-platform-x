@@ -183,6 +183,18 @@ def api_docs_page(request: Request) -> HTMLResponse:
     )
 
 
+@router.get("/account/wishlist", response_class=HTMLResponse)
+def account_wishlist_page(request: Request) -> HTMLResponse:
+    """User's saved wishlist (client-side fetch from /wishlist)."""
+    return templates.TemplateResponse(
+        request,
+        "pages/wishlist.html",
+        {
+            "active_nav": "account",
+        },
+    )
+
+
 @router.get("/search", response_class=HTMLResponse)
 def search_page(request: Request) -> HTMLResponse:
     """Public search results page (client-side fetch from /api/search)."""
