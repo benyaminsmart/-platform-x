@@ -1,0 +1,239 @@
+{% extends "business/business_base.html" %}
+{% block title %}Rooms — Business Panel{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h2>Rooms</h2>
+  <p class="admin-card-sub" style="margin-bottom: 0;">
+    Manage physical rooms / units. Each room can be linked to a service type
+    and assigned automatically to bookings.
+  </p>
+</div>
+
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div class="coach-head">
+    <h3>Your rooms</h3>
+    <button type="button" class="admin-btn" id="rm-new-btn">New Room</button>
+  </div>
+  <div id="rm-list" class="rm-list">
+    <div class="rm-loading">Loading…</div>
+  </div>
+</div>
+
+<div id="rm-modal" class="rm-modal" style="display:none;">
+  <div class="rm-modal-card">
+    <div class="rm-modal-head">
+      <h3 id="rm-modal-title">Create Room</h3>
+      <button type="button" class="admin-btn" id="rm-modal-close" style="background:var(--adm-surface-2); color:var(--adm-text);">Close</button>
+    </div>
+    <input type="hidden" id="rm-id">
+    <div class="rm-field">
+      <label>Number</label>
+      <input type="text" id="rm-number" placeholder="101" maxlength="20">
+    </div>
+    <div class="rm-field">
+      <label>Service (optional)</label>
+      <select id="rm-service"><option value="">— not linked —</option></select>
+    </div>
+    <div class="rm-field">
+      <label>Floor (optional)</label>
+      <input type="number" id="rm-floor" min="-10" max="200">
+    </div>
+    <div class="rm-field">
+      <label>Type (optional)</label>
+      <input type="text" id="rm-type" placeholder="deluxe" maxlength="50">
+    </div>
+    <div class="rm-field">
+      <label>Status</label>
+      <select id="rm-status">
+        <option value="available">available</option>
+        <option value="occupied">occupied</option>
+        <option value="maintenance">maintenance</option>
+        <option value="inactive">inactive</option>
+      </select>
+    </div>
+    <div class="rm-field">
+      <label>Notes (optional)</label>
+      <input type="text" id="rm-notes" placeholder="Corner room" maxlength="200">
+    </div>
+    <button type="button" class="admin-btn" id="rm-save">Save</button>
+    <div id="rm-msg" style="margin-top:10px; font-size:12.5px;"></div>
+  </div>
+</div>
+
+<style>
+.rm-list { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+.rm-loading { color: var(--adm-muted); }
+.rm-item {
+  padding: 12px 14px; border:1px solid var(--adm-line); border-radius:10px;
+  background: var(--adm-surface-2); display:flex; justify-content:space-between;
+  gap: 12px; align-items:center; flex-wrap:wrap;
+}
+.rm-item.inactive { opacity: 0.55; }
+.rm-num { font-family: var(--adm-font-display); font-size:16px; font-weight:700; color:var(--adm-text); }
+.rm-meta { font-size:12px; color: var(--adm-muted); display:flex; gap:12px; flex-wrap:wrap; }
+.rm-badge {
+  display:inline-block; padding:2px 8px; border-radius:999px; font-size:11px;
+  font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+  background: var(--adm-bg); border:1px solid var(--adm-line); color: var(--adm-text-soft);
+}
+.rm-badge.available { background:rgba(52,211,153,.15); color:var(--adm-success); border-color:rgba(52,211,153,.3); }
+.rm-badge.occupied { background:rgba(251,191,36,.15); color:var(--adm-warning); border-color:rgba(251,191,36,.3); }
+.rm-badge.maintenance { background:rgba(248,113,113,.15); color:var(--adm-error); border-color:rgba(248,113,113,.3); }
+.rm-actions { display:flex; gap:6px; }
+.rm-actions button {
+  padding:6px 10px; font-size:12px; border-radius:6px;
+  border:1px solid var(--adm-line-2); background:var(--adm-bg); color:var(--adm-text-soft);
+  cursor:pointer; font-family: inherit;
+}
+.rm-actions button:hover { border-color: var(--adm-brand); color: var(--adm-text); }
+.rm-modal { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:1000; padding:20px; }
+.rm-modal-card { width:100%; max-width:520px; background: var(--adm-surface); border:1px solid var(--adm-line); border-radius:16px; padding:24px; max-height: 90vh; overflow-y: auto; }
+.rm-modal-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px; }
+.rm-modal-head h3 { margin:0; font-family: var(--adm-font-display); }
+.rm-field { margin-bottom:12px; }
+.rm-field label { display:block; font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--adm-muted); margin-bottom:4px; }
+.rm-field input, .rm-field select {
+  width:100%; padding:10px 12px; border:1px solid var(--adm-line-2); border-radius:8px;
+  font-size:14px; font-family:inherit; background: var(--adm-surface-2); color: var(--adm-text); outline:none;
+}
+.rm-field input:focus, .rm-field select:focus { border-color: var(--adm-brand); }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login"; return; }
+  var slug = null;
+
+  function h() { return { "Authorization": "Bearer " + token, "X-Tenant-Slug": slug, "Content-Type": "application/json" }; }
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  async function resolveSlug() {
+    var res = await fetch("/business/api/me", { headers: { "Authorization": "Bearer " + token } });
+    if (!res.ok) { window.location.href = "/business/login"; return; }
+    slug = (await res.json()).tenant_slug;
+  }
+
+  async function loadServices() {
+    var res = await fetch("/business/api/services", { headers: h() });
+    if (!res.ok) return;
+    var list = await res.json();
+    var sel = document.getElementById("rm-service");
+    sel.innerHTML = '<option value="">— not linked —</option>' + list.map(function(s){
+      return '<option value="' + esc(s.id) + '">' + esc(s.name) + ' (' + esc(s.type) + ')</option>';
+    }).join("");
+  }
+
+  async function loadRooms() {
+    var list = document.getElementById("rm-list");
+    list.innerHTML = '<div class="rm-loading">Loading…</div>';
+    var res = await fetch("/business/api/rooms", { headers: h() });
+    if (!res.ok) { list.innerHTML = '<div class="rm-loading">Failed.</div>'; return; }
+    var d = await res.json();
+    if (!d.items.length) {
+      list.innerHTML = '<div class="rm-loading">No rooms yet.</div>';
+      return;
+    }
+    list.innerHTML = d.items.map(renderRoom).join("");
+    list.querySelectorAll("button[data-act]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var id = b.getAttribute("data-id");
+        var act = b.getAttribute("data-act");
+        if (act === "edit") openModal(id);
+        if (act === "del") delRoom(id);
+      });
+    });
+  }
+
+  function renderRoom(r) {
+    var meta = [];
+    if (r.floor != null) meta.push("Floor " + r.floor);
+    if (r.type) meta.push(esc(r.type));
+    if (r.notes) meta.push(esc(r.notes));
+    return '<div class="rm-item' + (r.status === "inactive" ? " inactive" : "") + '">' +
+      '<div>' +
+        '<div class="rm-num">Room ' + esc(r.number) + ' <span class="rm-badge ' + esc(r.status) + '">' + esc(r.status) + '</span></div>' +
+        '<div class="rm-meta">' + meta.join(" · ") + '</div>' +
+      '</div>' +
+      '<div class="rm-actions">' +
+        '<button data-act="edit" data-id="' + esc(r.id) + '">Edit</button>' +
+        (r.status !== "inactive" ? '<button data-act="del" data-id="' + esc(r.id) + '">Deactivate</button>' : '') +
+      '</div>' +
+    '</div>';
+  }
+
+  function openModal(id) {
+    document.getElementById("rm-msg").textContent = "";
+    if (id) {
+      document.getElementById("rm-modal-title").textContent = "Edit Room";
+      document.getElementById("rm-id").value = id;
+      // fetch current
+      fetch("/business/api/rooms", { headers: h() }).then(function(r){ return r.json(); }).then(function(d){
+        var r = d.items.find(function(x){ return x.id === id; });
+        if (!r) return;
+        document.getElementById("rm-number").value = r.number;
+        document.getElementById("rm-service").value = r.service_id || "";
+        document.getElementById("rm-floor").value = (r.floor == null ? "" : r.floor);
+        document.getElementById("rm-type").value = r.type || "";
+        document.getElementById("rm-status").value = r.status;
+        document.getElementById("rm-notes").value = r.notes || "";
+      });
+    } else {
+      document.getElementById("rm-modal-title").textContent = "Create Room";
+      document.getElementById("rm-id").value = "";
+      document.getElementById("rm-number").value = "";
+      document.getElementById("rm-service").value = "";
+      document.getElementById("rm-floor").value = "";
+      document.getElementById("rm-type").value = "";
+      document.getElementById("rm-status").value = "available";
+      document.getElementById("rm-notes").value = "";
+    }
+    document.getElementById("rm-modal").style.display = "flex";
+  }
+
+  document.getElementById("rm-new-btn").addEventListener("click", function(){ openModal(null); });
+  document.getElementById("rm-modal-close").addEventListener("click", function(){
+    document.getElementById("rm-modal").style.display = "none";
+  });
+
+  document.getElementById("rm-save").addEventListener("click", async function(){
+    var msg = document.getElementById("rm-msg");
+    var id = document.getElementById("rm-id").value;
+    var body = {
+      number: document.getElementById("rm-number").value.trim(),
+      service_id: document.getElementById("rm-service").value || null,
+      floor: document.getElementById("rm-floor").value === "" ? null : parseInt(document.getElementById("rm-floor").value, 10),
+      type: document.getElementById("rm-type").value.trim() || null,
+      status: document.getElementById("rm-status").value,
+      notes: document.getElementById("rm-notes").value.trim() || null,
+    };
+    if (!body.number) { msg.textContent = "Number is required."; return; }
+    msg.textContent = "Saving…";
+    var url = id ? ("/business/api/rooms/" + id) : "/business/api/rooms";
+    var method = id ? "PATCH" : "POST";
+    var res = await fetch(url, { method: method, headers: h(), body: JSON.stringify(body) });
+    var d = await res.json();
+    if (!res.ok) { msg.textContent = d.detail || "Failed."; return; }
+    document.getElementById("rm-modal").style.display = "none";
+    loadRooms();
+  });
+
+  async function delRoom(id) {
+    if (!confirm("Deactivate this room?")) return;
+    await fetch("/business/api/rooms/" + id, { method: "DELETE", headers: h() });
+    loadRooms();
+  }
+
+  (async function(){
+    await resolveSlug();
+    if (!slug) return;
+    loadServices();
+    loadRooms();
+  })();
+})();
+</script>
+{% endblock %}

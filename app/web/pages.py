@@ -781,6 +781,21 @@ def business_api_keys_page(request: Request) -> HTMLResponse:
     )
 
 
+@router.get("/business/rooms", response_class=HTMLResponse)
+def business_rooms_page(request: Request) -> HTMLResponse:
+    """Rooms management page for the current business."""
+    return templates.TemplateResponse(
+        request,
+        "business/business_rooms.html",
+        {
+            "business_user": {"first_name": "Owner", "last_name": ""},
+            "tenant_name": "Business",
+            "tenant_slug": "trianon-hotel",
+            "active_nav": "rooms",
+        },
+    )
+
+
 @router.get("/business/pricing", response_class=HTMLResponse)
 def business_pricing_page(request: Request) -> HTMLResponse:
     """Pricing Rules builder for the current business."""
