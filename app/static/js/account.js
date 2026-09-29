@@ -177,7 +177,9 @@ PX.initAccount = function (slug) {
             '<div class="px-list-item-main">' +
               '<div class="px-list-item-title">' + esc(b.service_name) + "</div>" +
               '<div class="px-list-item-sub">' + esc(b.check_in) +
-              (b.check_out ? " \u2192 " + esc(b.check_out) : "") + " \u00B7 " + b.guests + " guests</div></div>" +
+              (b.check_out ? " \u2192 " + esc(b.check_out) : "") + " \u00B7 " + b.guests + " guests" +
+              (b.room_number ? (" \u00B7 Room " + esc(b.room_number)) : "") +
+              '</div></div>" +
             '<div class="px-list-item-side">' + badge(b.status) +
               '<div class="px-list-item-amount">' + esc(b.total_amount) + " " + esc(b.currency) + "</div>" +
               actionHtml + "</div></div>";

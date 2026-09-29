@@ -37,7 +37,7 @@ th{{color:#6b7280;font-weight:600;font-size:11px;text-transform:uppercase;letter
 <p style="font-size:13.5px;color:#374151;margin:0 0 4px;">{location}</p>
 <p style="font-size:13.5px;color:#374151;margin:0;">{customer_email}</p>
 <table><thead><tr><th>Item</th><th>Details</th><th>Amount</th></tr></thead><tbody>
-<tr><td>{service_name}</td><td>{check_in} to {check_out} | {guests} guests</td><td>{total_amount} {currency}</td></tr>
+<tr><td>{service_name}{room_line}</td><td>{check_in} to {check_out} | {guests} guests</td><td>{total_amount} {currency}</td></tr>
 <tr class="total-row"><td colspan="2">Total</td><td>{total_amount} {currency}</td></tr>
 </tbody></table>
 <p class="note">System-generated receipt from Platform-X on behalf of {tenant_name}. Payment status: <strong>{payment_status}</strong>.<br>Generated: {generated_at}</p>
@@ -59,8 +59,10 @@ def booking_receipt(
     cfg = (t.config or {}) if t else {}
     from datetime import datetime, timezone
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    room_line = f" — Room {b.room_number}" if b.room_number else ""
     html = _RECEIPT_HTML.format(
         booking_id=b.id,
+        room_line=room_line,
         created_at=b.created_at.strftime("%Y-%m-%d") if b.created_at else now,
         status=b.status,
         tenant_name=(t.name if t else "Business"),
