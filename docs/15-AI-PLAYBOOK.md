@@ -204,4 +204,16 @@ the expected strings, then run step.sh.
 
 ---
 
+### Lesson 6 — Jinja <script> placement
+A <script> block placed AFTER {% endblock %} in a template that has
+no {% block scripts %} is silently ignored at render time. Script must
+live INSIDE the content block (or inside a real scripts block).
+
+### Lesson 7 — Test fixtures that depend on other data
+When a page renders a section conditionally (e.g. {% if reviews %}),
+the test must create the prerequisite row (a review) before asserting
+on the rendered section. Otherwise the assertion fails on missing HTML.
+
+---
+
 END OF PLAYBOOK
