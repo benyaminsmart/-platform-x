@@ -1,0 +1,389 @@
+{% extends "business/business_base.html" %}
+
+{% block title %}Content Studio — Business Panel{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h2>Content Studio</h2>
+  <p class="admin-card-sub" style="margin-bottom: 0;">
+    Generate descriptions and taglines with AI, or import services from raw text.
+    AI is grounded in your real data and never invents facts.
+  </p>
+</div>
+
+<!-- ============ Tagline Generator ============ -->
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div class="coach-head">
+    <h3>Business tagline</h3>
+    <div style="display:flex; gap:6px; align-items:center;">
+      <select id="tg-lang" class="ai-input" style="padding:8px 10px; width:auto; flex:0 0 auto;">
+        <option value="en">English</option>
+        <option value="ar">Arabic</option>
+        <option value="fil">Filipino</option>
+        <option value="hi">Hindi</option>
+      </select>
+      <button type="button" class="admin-btn" id="tg-btn">Generate</button>
+    </div>
+  </div>
+  <div id="tg-result" class="cs-result">Click "Generate" to get a tagline.</div>
+</div>
+
+<!-- ============ Import Services ============ -->
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div class="coach-head">
+    <h3>Import services from text</h3>
+    <button type="button" class="admin-btn" id="imp-toggle" style="background:var(--adm-surface-2); color:var(--adm-text);">Show</button>
+  </div>
+  <p class="admin-card-sub">Paste a menu, room list, or package list. AI will extract them.</p>
+
+  <div id="imp-panel" style="display:none; margin-top:12px;">
+    <div class="cs-grid">
+      <div class="cs-field">
+        <label>Default type</label>
+        <select id="imp-type">
+          <option value="room">Room</option>
+          <option value="menu_item">Menu item</option>
+          <option value="table">Table</option>
+          <option value="package">Package</option>
+          <option value="tour">Tour</option>
+          <option value="ticket">Ticket</option>
+          <option value="activity">Activity</option>
+          <option value="treatment">Treatment</option>
+          <option value="event">Event</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="cs-field">
+        <label>Language for AI</label>
+        <select id="imp-lang">
+          <option value="en">English</option>
+          <option value="ar">Arabic</option>
+          <option value="fil">Filipino</option>
+          <option value="hi">Hindi</option>
+        </select>
+      </div>
+    </div>
+    <div class="cs-field">
+      <label>Raw text</label>
+      <textarea id="imp-text" rows="6" placeholder="Deluxe Room - 850&#10;Standard Room - 500&#10;Sea View Suite - 1200"></textarea>
+    </div>
+    <div style="display:flex; gap:8px; margin-top:12px;">
+      <button type="button" class="admin-btn" id="imp-parse">Parse</button>
+      <button type="button" class="admin-btn" id="imp-create" style="display:none; background:var(--adm-success); color:#000;">Create all</button>
+    </div>
+    <div id="imp-result" class="cs-result"></div>
+  </div>
+</div>
+
+<!-- ============ Services List ============ -->
+<div class="admin-card">
+  <div class="coach-head">
+    <h3>Your services</h3>
+    <button type="button" class="admin-btn" id="svc-refresh" style="background:var(--adm-surface-2); color:var(--adm-text);">Refresh</button>
+  </div>
+  <div id="svc-list" class="cs-list">
+    <div class="cs-loading">Loading…</div>
+  </div>
+</div>
+
+<style>
+.cs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+@media (max-width: 700px) { .cs-grid { grid-template-columns: 1fr; } }
+.cs-field label { display:block; font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color: var(--adm-muted); margin-bottom:4px; }
+.cs-field select, .cs-field input, .cs-field textarea {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--adm-line-2); border-radius: 8px;
+  font-size: 14px; font-family: inherit; background: var(--adm-surface-2); color: var(--adm-text);
+  outline: none; resize: vertical;
+}
+.cs-field textarea:focus, .cs-field select:focus, .cs-field input:focus { border-color: var(--adm-brand); }
+.cs-result {
+  margin-top: 14px; padding: 12px 14px; background: var(--adm-surface-2);
+  border: 1px solid var(--adm-line); border-radius: 10px; font-size: 13.5px;
+  color: var(--adm-text-soft); white-space: pre-wrap; line-height: 1.55;
+}
+.cs-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+.cs-loading { color: var(--adm-muted); }
+.cs-svc {
+  padding: 14px 16px; border: 1px solid var(--adm-line); border-radius: 10px;
+  background: var(--adm-surface-2);
+}
+.cs-svc-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; flex-wrap:wrap; }
+.cs-svc-name { font-weight: 600; color: var(--adm-text); margin-bottom: 4px; }
+.cs-svc-meta { font-size: 12.5px; color: var(--adm-muted); display: flex; gap: 12px; flex-wrap: wrap; }
+.cs-svc-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.cs-svc-actions select {
+  padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--adm-line-2);
+  background: var(--adm-bg); color: var(--adm-text-soft); font-family: inherit;
+}
+.cs-svc-actions button {
+  padding: 6px 10px; font-size: 12px; border-radius: 6px;
+  border: 1px solid var(--adm-line-2); background: var(--adm-bg); color: var(--adm-text-soft);
+  cursor: pointer; font-family: inherit;
+}
+.cs-svc-actions button:hover { border-color: var(--adm-brand); color: var(--adm-text); }
+.cs-svc-actions button.primary { background: var(--adm-brand); color: #fff; border-color: var(--adm-brand); }
+.cs-preview {
+  margin-top: 10px; padding: 10px 12px; border-radius: 8px;
+  background: var(--adm-bg); border: 1px dashed var(--adm-line-2);
+  font-size: 13px; color: var(--adm-text-soft); white-space: pre-wrap;
+}
+.cs-candidates { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.cs-cand {
+  padding: 8px 10px; border: 1px solid var(--adm-line); border-radius: 8px;
+  background: var(--adm-bg); display: flex; justify-content: space-between;
+  gap: 10px; align-items: center; font-size: 13px;
+}
+.cs-cand .cs-cand-info { color: var(--adm-text-soft); }
+.cs-cand strong { color: var(--adm-text); }
+.cs-cand .cs-cand-remove {
+  padding: 4px 8px; font-size: 11px; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--adm-line-2); background: transparent; color: var(--adm-muted);
+  font-family: inherit;
+}
+.cs-cand .cs-cand-remove:hover { color: var(--adm-error); border-color: var(--adm-error); }
+.cs-success { color: var(--adm-success); }
+.cs-error { color: var(--adm-error); }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login"; return; }
+
+  var lo = document.getElementById("business-logout");
+  if (lo) lo.addEventListener("click", function(){
+    try{ localStorage.removeItem("px_business_token"); }catch(e){}
+    window.location.href = "/business/login";
+  });
+
+  var slug = null;
+  var candidates = [];  // current import candidates
+
+  function h() {
+    return { "Authorization": "Bearer " + token, "X-Tenant-Slug": slug, "Content-Type": "application/json" };
+  }
+
+  async function resolveSlug() {
+    var res = await fetch("/business/api/me", { headers: { "Authorization": "Bearer " + token } });
+    if (!res.ok) { try{ localStorage.removeItem("px_business_token"); }catch(e){}; window.location.href = "/business/login"; return; }
+    var data = await res.json();
+    slug = data.tenant_slug;
+  }
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  // -------- Tagline --------
+  document.getElementById("tg-btn").addEventListener("click", async function(){
+    var box = document.getElementById("tg-result");
+    box.textContent = "Generating…";
+    var lang = document.getElementById("tg-lang").value;
+    try {
+      var res = await fetch("/business/api/ai/content/tagline", {
+        method: "POST", headers: h(),
+        body: JSON.stringify({ language: lang, tone: "professional" }),
+      });
+      var data = await res.json();
+      box.textContent = res.ok ? data.tagline : ("Error: " + (data.detail || "unknown"));
+    } catch (e) {
+      box.textContent = "Network error.";
+    }
+  });
+
+  // -------- Import --------
+  var toggle = document.getElementById("imp-toggle");
+  var panel = document.getElementById("imp-panel");
+  toggle.addEventListener("click", function(){
+    var show = panel.style.display === "none";
+    panel.style.display = show ? "block" : "none";
+    toggle.textContent = show ? "Hide" : "Show";
+  });
+
+  document.getElementById("imp-parse").addEventListener("click", async function(){
+    var box = document.getElementById("imp-result");
+    var text = document.getElementById("imp-text").value;
+    if (!text.trim()) { box.innerHTML = '<span class="cs-error">Text is empty.</span>'; return; }
+    box.textContent = "Parsing with AI…";
+    try {
+      var res = await fetch("/business/api/ai/content/import/preview", {
+        method: "POST", headers: h(),
+        body: JSON.stringify({
+          text: text,
+          default_type: document.getElementById("imp-type").value,
+          language: document.getElementById("imp-lang").value,
+        }),
+      });
+      var data = await res.json();
+      if (!res.ok) { box.innerHTML = '<span class="cs-error">' + esc(data.detail || "Failed.") + '</span>'; return; }
+      candidates = data.candidates || [];
+      renderCandidates(data);
+      document.getElementById("imp-create").style.display = candidates.length ? "inline-block" : "none";
+    } catch(e) {
+      box.innerHTML = '<span class="cs-error">Network error.</span>';
+    }
+  });
+
+  function renderCandidates(data) {
+    var box = document.getElementById("imp-result");
+    if (!candidates.length) {
+      box.innerHTML = '<span class="cs-error">No candidates found.</span>';
+      return;
+    }
+    var html = '<div>Provider: <strong>' + esc(data.provider) + '</strong> · Found <strong>' +
+      data.count + '</strong> candidate(s)</div>';
+    html += '<div class="cs-candidates">';
+    candidates.forEach(function(c, i){
+      var price = c.price ? (c.price + " " + (c.currency || "")) : "no price";
+      html += '<div class="cs-cand">' +
+        '<div class="cs-cand-info"><strong>' + esc(c.name) + '</strong> · ' +
+        esc(c.type) + ' · ' + esc(price) + '</div>' +
+        '<button class="cs-cand-remove" data-i="' + i + '">remove</button></div>';
+    });
+    html += '</div>';
+    box.innerHTML = html;
+    box.querySelectorAll(".cs-cand-remove").forEach(function(b){
+      b.addEventListener("click", function(){
+        var i = parseInt(b.getAttribute("data-i"), 10);
+        candidates.splice(i, 1);
+        renderCandidates({ provider: "local", count: candidates.length });
+        if (!candidates.length) {
+          document.getElementById("imp-create").style.display = "none";
+        }
+      });
+    });
+  }
+
+  document.getElementById("imp-create").addEventListener("click", async function(){
+    if (!candidates.length) return;
+    var box = document.getElementById("imp-result");
+    box.textContent = "Creating " + candidates.length + " services…";
+    try {
+      var res = await fetch("/business/api/ai/content/import/create", {
+        method: "POST", headers: h(),
+        body: JSON.stringify({ candidates: candidates }),
+      });
+      var data = await res.json();
+      if (!res.ok) { box.innerHTML = '<span class="cs-error">' + esc(data.detail || "Failed.") + '</span>'; return; }
+      box.innerHTML = '<span class="cs-success">Created ' + data.created + ' service(s).' +
+        (data.skipped && data.skipped.length ? (' Skipped ' + data.skipped.length + '.') : '') + '</span>';
+      candidates = [];
+      document.getElementById("imp-create").style.display = "none";
+      loadServices();
+    } catch(e) {
+      box.innerHTML = '<span class="cs-error">Network error.</span>';
+    }
+  });
+
+  // -------- Services list --------
+  var svcList = document.getElementById("svc-list");
+
+  async function loadServices() {
+    svcList.innerHTML = '<div class="cs-loading">Loading…</div>';
+    try {
+      var res = await fetch("/business/api/services", { headers: h() });
+      if (!res.ok) { svcList.innerHTML = '<div class="cs-loading">Failed to load services.</div>'; return; }
+      var list = await res.json();
+      if (!list.length) {
+        svcList.innerHTML = '<div class="cs-loading">No services yet. Import some above.</div>';
+        return;
+      }
+      svcList.innerHTML = list.map(renderSvc).join("");
+      svcList.querySelectorAll("button[data-gen]").forEach(function(b){
+        b.addEventListener("click", function(){ generateFor(b.getAttribute("data-id")); });
+      });
+      svcList.querySelectorAll("button[data-apply]").forEach(function(b){
+        b.addEventListener("click", function(){ applyFor(b.getAttribute("data-id")); });
+      });
+    } catch(e) {
+      svcList.innerHTML = '<div class="cs-loading">Network error.</div>';
+    }
+  }
+
+  function renderSvc(s) {
+    var price = s.price ? (s.price + " " + (s.currency || "")) : "—";
+    return (
+      '<div class="cs-svc" data-svc="' + esc(s.id) + '">' +
+        '<div class="cs-svc-head">' +
+          '<div>' +
+            '<div class="cs-svc-name">' + esc(s.name) + '</div>' +
+            '<div class="cs-svc-meta"><span>' + esc(s.type) + '</span><span>' + esc(price) + '</span><span>' + esc(s.status) + '</span></div>' +
+          '</div>' +
+          '<div class="cs-svc-actions">' +
+            '<select data-lang-for="' + esc(s.id) + '">' +
+              '<option value="en">EN</option><option value="ar">AR</option>' +
+              '<option value="fil">FIL</option><option value="hi">HI</option>' +
+            '</select>' +
+            '<select data-tone-for="' + esc(s.id) + '">' +
+              '<option value="professional">Professional</option>' +
+              '<option value="friendly">Friendly</option>' +
+              '<option value="luxury">Luxury</option>' +
+              '<option value="playful">Playful</option>' +
+            '</select>' +
+            '<button data-gen="' + esc(s.id) + '">Generate</button>' +
+            '<button class="primary" data-apply="' + esc(s.id) + '" style="display:none;">Apply & save</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="cs-preview" data-preview-for="' + esc(s.id) + '" style="display:none;"></div>' +
+      '</div>'
+    );
+  }
+
+  function currentLang(id) {
+    var el = document.querySelector('select[data-lang-for="' + id + '"]');
+    return el ? el.value : "en";
+  }
+  function currentTone(id) {
+    var el = document.querySelector('select[data-tone-for="' + id + '"]');
+    return el ? el.value : "professional";
+  }
+
+  async function generateFor(id) {
+    var preview = document.querySelector('[data-preview-for="' + id + '"]');
+    preview.style.display = "block";
+    preview.textContent = "Generating…";
+    try {
+      var res = await fetch("/business/api/ai/content/service/" + id, {
+        method: "POST", headers: h(),
+        body: JSON.stringify({ language: currentLang(id), tone: currentTone(id) }),
+      });
+      var data = await res.json();
+      if (!res.ok) { preview.innerHTML = '<span class="cs-error">' + esc(data.detail || "Failed.") + '</span>'; return; }
+      preview.textContent = data.description;
+      var apply = document.querySelector('button[data-apply="' + id + '"]');
+      if (apply) apply.style.display = "inline-block";
+    } catch(e) {
+      preview.innerHTML = '<span class="cs-error">Network error.</span>';
+    }
+  }
+
+  async function applyFor(id) {
+    var preview = document.querySelector('[data-preview-for="' + id + '"]');
+    preview.textContent = "Saving…";
+    try {
+      var res = await fetch("/business/api/ai/content/service/" + id + "/apply", {
+        method: "POST", headers: h(),
+        body: JSON.stringify({ language: currentLang(id), tone: currentTone(id) }),
+      });
+      var data = await res.json();
+      if (!res.ok) { preview.innerHTML = '<span class="cs-error">' + esc(data.detail || "Failed.") + '</span>'; return; }
+      preview.innerHTML = '<span class="cs-success">Saved.</span>\n\n' + esc(data.description);
+    } catch(e) {
+      preview.innerHTML = '<span class="cs-error">Network error.</span>';
+    }
+  }
+
+  document.getElementById("svc-refresh").addEventListener("click", loadServices);
+
+  (async function(){
+    await resolveSlug();
+    if (!slug) return;
+    loadServices();
+  })();
+})();
+</script>
+{% endblock %}
