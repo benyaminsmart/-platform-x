@@ -216,4 +216,18 @@ on the rendered section. Otherwise the assertion fails on missing HTML.
 
 ---
 
+### Lesson 8 — SQLite NOT NULL columns in migrations
+ALTER TABLE ... ADD COLUMN ... NOT NULL fails on SQLite if the column
+has no default. Use `server_default=sa.text('0')` in the migration file
+(before running upgrade head). If the migration partially applied and
+left the DB in an inconsistent state, fix the column manually with
+ALTER TABLE ... ADD COLUMN ... DEFAULT, then `alembic stamp head`.
+
+### Lesson 9 — Alembic "already exists" errors
+If a migration fails midway on SQLite (non-transactional DDL), the DB can
+be left partially migrated. If the missing piece can be applied manually
+without conflict, do it, then `alembic stamp head` to mark it done.
+
+---
+
 END OF PLAYBOOK
