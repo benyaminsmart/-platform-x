@@ -4,6 +4,7 @@ from app.models.analytics_event import AnalyticsEvent
 from app.models.ai_chat import AIChatMessage
 from app.models.audit_log import AuditLog
 from app.models.booking import Booking
+from app.models.business_score import BusinessScore
 from app.models.notification import Notification
 from app.models.order import Order
 from app.models.partner_application import PartnerApplication
@@ -24,6 +25,7 @@ __all__ = [
     "AIChatMessage",
     "AuditLog",
     "Booking",
+    "BusinessScore",
     "Notification",
     "Order",
     "PartnerApplication",
