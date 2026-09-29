@@ -166,12 +166,16 @@ PX.initAccount = function (slug) {
         d.items.forEach(function (b) {
           var cancellable = (b.status === "pending" || b.status === "confirmed");
           var modifiable = cancellable && (new Date(b.check_in) > new Date());
+          var reviewable = (b.status === "checked_out" || (b.status === "confirmed" && new Date(b.check_in) < new Date()));
           var actionHtml = "";
           if (modifiable) {
             actionHtml += '<button class="px-btn px-btn-ghost px-mod-btn" data-bid="' + esc(b.id) + '" style="margin-top:6px; font-size:12px; padding:4px 10px; margin-right:4px;">Modify</button>';
           }
           if (cancellable) {
             actionHtml += '<button class="px-btn px-btn-ghost px-cancel-btn" data-bid="' + esc(b.id) + '" style="margin-top:6px; font-size:12px; padding:4px 10px;">Cancel</button>';
+          }
+          if (reviewable) {
+            actionHtml += '<button class="px-btn px-btn-ghost px-review-btn" data-bid="' + esc(b.id) + '" data-service="' + esc(b.service_name || "") + '" style="margin-top:6px; font-size:12px; padding:4px 10px; margin-left:4px;">Write review</button>';
           }
           html += '<div class="px-list-item" data-bid="' + esc(b.id) + '">' +
             '<div class="px-list-item-main">' +
@@ -190,6 +194,9 @@ PX.initAccount = function (slug) {
         });
         list.querySelectorAll(".px-mod-btn").forEach(function(btn){
           btn.addEventListener("click", function(){ handleModify(btn); });
+        });
+        list.querySelectorAll(".px-review-btn").forEach(function(btn){
+          btn.addEventListener("click", function(){ handleWriteReview(btn); });
         });
       }
       renderRecent();
@@ -448,3 +455,104 @@ function showModifyModal(bid, ci, co, headers) {
   });
 }
 
+
+// ============================================================
+// Write-review flow (Phase 39 / Wave 1)
+// ============================================================
+function handleWriteReview(btn) {
+  var bid = btn.getAttribute("data-bid");
+  var serviceName = btn.getAttribute("data-service") || "this service";
+  if (!bid) return;
+  showReviewModal(bid, serviceName);
+}
+
+function showReviewModal(bookingId, serviceName) {
+  var modalId = "px-rv-modal";
+  var old = document.getElementById(modalId);
+  if (old) old.remove();
+
+  var html = '' +
+    '<div id="' + modalId + '" style="position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:2000; padding:20px; overflow-y:auto;">' +
+      '<div style="background:#fff; border-radius:16px; padding:24px; max-width:520px; width:100%;">' +
+        '<h3 style="font-family:var(--px-font-display); margin:0 0 4px; color:var(--px-navy);">Write a review</h3>' +
+        '<p style="margin:0 0 16px; font-size:13px; color:#6b7280;">for <strong>' + esc(serviceName) + '</strong></p>' +
+        '<label style="display:block; font-size:12px; color:#6b7280; margin-bottom:4px;">Rating</label>' +
+        '<div id="' + modalId + '-stars" style="font-size:28px; color:#c9a961; letter-spacing:4px; cursor:pointer; margin-bottom:12px;">' +
+          '<span data-v="1">&#9734;</span><span data-v="2">&#9734;</span><span data-v="3">&#9734;</span><span data-v="4">&#9734;</span><span data-v="5">&#9734;</span>' +
+        '</div>' +
+        '<input type="hidden" id="' + modalId + '-rating" value="0">' +
+        '<label style="display:block; font-size:12px; color:#6b7280; margin-bottom:4px;">Title (optional)</label>' +
+        '<input type="text" id="' + modalId + '-title" maxlength="100" style="width:100%; padding:10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:14px; margin-bottom:12px;">' +
+        '<label style="display:block; font-size:12px; color:#6b7280; margin-bottom:4px;">Your review</label>' +
+        '<textarea id="' + modalId + '-content" rows="4" style="width:100%; padding:10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:14px; resize:vertical; margin-bottom:12px;"></textarea>' +
+        '<label style="display:block; font-size:12px; color:#6b7280; margin-bottom:4px;">Photos (max 3, JPG/PNG/WebP, 5 MB each)</label>' +
+        '<input type="file" id="' + modalId + '-files" accept="image/jpeg,image/png,image/webp" multiple style="margin-bottom:12px; font-size:13px;">' +
+        '<div style="display:flex; gap:8px; justify-content:flex-end;">' +
+          '<button id="' + modalId + '-no" class="px-btn px-btn-ghost">Cancel</button>' +
+          '<button id="' + modalId + '-save" class="px-btn px-btn-primary">Submit review</button>' +
+        '</div>' +
+        '<div id="' + modalId + '-msg" style="margin-top:10px; font-size:12.5px; color:#374151;"></div>' +
+      '</div>' +
+    '</div>';
+  document.body.insertAdjacentHTML("beforeend", html);
+
+  var ratingInput = document.getElementById(modalId + "-rating");
+  document.querySelectorAll("#" + modalId + "-stars span").forEach(function(s){
+    s.addEventListener("click", function(){
+      var v = parseInt(s.getAttribute("data-v"), 10);
+      ratingInput.value = v;
+      document.querySelectorAll("#" + modalId + "-stars span").forEach(function(x, i){
+        x.textContent = (i < v) ? "\u2605" : "\u2606";
+      });
+    });
+  });
+
+  document.getElementById(modalId + "-no").addEventListener("click", function(){
+    document.getElementById(modalId).remove();
+  });
+
+  document.getElementById(modalId + "-save").addEventListener("click", async function(){
+    var msg = document.getElementById(modalId + "-msg");
+    var rating = parseInt(ratingInput.value, 10);
+    var content = document.getElementById(modalId + "-content").value.trim();
+    var title = document.getElementById(modalId + "-title").value.trim() || null;
+    var files = document.getElementById(modalId + "-files").files;
+
+    if (!rating || rating < 1) { msg.textContent = "Please pick a rating."; return; }
+    if (content.length < 5) { msg.textContent = "Please write at least 5 characters."; return; }
+    if (files.length > 3) { msg.textContent = "Max 3 photos."; return; }
+
+    msg.textContent = "Submitting review...";
+    var headers = window.PX_AUTH ? window.PX_AUTH.headers() : {};
+    var body = { rating: rating, content: content, title: title, language: "en" };
+
+    try {
+      var res = await fetch("/reviews", { method: "POST", headers: headers, body: JSON.stringify(body) });
+      var d = await res.json();
+      if (!res.ok) { msg.textContent = "Failed: " + (d.detail || "unknown"); return; }
+      var reviewId = d.id;
+
+      var uploaded = 0;
+      for (var i = 0; i < files.length; i++) {
+        var fd = new FormData();
+        fd.append("file", files[i]);
+        msg.textContent = "Uploading photo " + (i + 1) + " of " + files.length + "...";
+        var rh = { "Authorization": headers["Authorization"] };
+        try {
+          var upRes = await fetch("/reviews/" + encodeURIComponent(reviewId) + "/photos", {
+            method: "POST", headers: rh, body: fd,
+          });
+          if (upRes.ok) uploaded++;
+        } catch (e) {}
+      }
+
+      msg.textContent = "Review submitted. " + uploaded + " photo(s) uploaded.";
+      setTimeout(function(){
+        document.getElementById(modalId).remove();
+        location.reload();
+      }, 1200);
+    } catch (e) {
+      msg.textContent = "Network error.";
+    }
+  });
+}
