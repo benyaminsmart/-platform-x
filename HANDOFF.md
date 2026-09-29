@@ -268,6 +268,31 @@ Tag: v0.18.0-market-insights
 - Bug found and fixed during smoke: AI can return advice as list
   or summary as dict; added _as_text() coercion + regression tests
 
+### Phase 28 — AI Review Writer + Responder: COMPLETE
+Tag: v0.19.0-reviews
+- Review model + migration (19 columns, 3 indexes)
+- Review service (deterministic):
+  - compute_sentiment: lexicon (EN/AR/FIL/HI) + rating prior
+  - create_review with verified-booking check
+  - list / get / hide / set_response
+  - tenant_review_summary (counts, avg, sentiment breakdown, verified)
+- AI Review Writer/Responder:
+  - polish_review: rewrite raw guest text (4 languages)
+  - respond_to_review: professional reply (3 tones)
+    Negative -> acknowledge + apologize + invite contact
+    No promises of compensation
+    Deterministic fallback per sentiment
+- API:
+  - /reviews/tenant/{slug} (public), /reviews (create), /reviews/mine
+  - /business/api/reviews (list), /summary, /{id}/hide,
+    /{id}/respond (AI or manual), /{id}/respond/preview, /polish
+- UI:
+  - Business Reviews page at /business/reviews
+    (KPIs, list, response modal, AI preview, language + tone)
+  - Reviews section on tenant home page (5 most recent published)
+- 60+ tests, 12 smoke checks
+- Bug fix during smoke: missing {% endif %} broke tenant_home.html
+
 ### Phase 20 — Business Owner Panel: COMPLETE
 Tag: v0.9.0-business
 - Separate panel under /business/*
@@ -469,15 +494,21 @@ All idempotent.
 ## 11. Remaining Work
 
 **Phase 24 (merged with Phase 8) — Cross-Business Rewards: DEFERRED BY USER**
-User (2026-09-29): do NOT start until explicitly told. Do NOT prompt about it.
+User (2026-09-29): do NOT start until explicitly told.
 
-**Phase 28 — AI Review Writer + Responder: NEXT**
-- AI writes reviews from guest input
-- Business AI auto-responds to reviews
-- Multi-language reviews
-- Sentiment analysis
+**Phases remaining (per Business-First order):**
+- Phase 10 (Payment Production / Telr) — needs business account
+- Phase 12 (VPS + Domain + Named Tunnel) — needs purchase
+- Phase 13 (Business Onboarding Tools) — needs Phase 12
+- Phase 14 (API + Webhooks + SDK)
+- Phase 15 (Trianon Migration) — after VPS
+- Phase 16 / 30 (Mobile App)
+- Phase 23-29 (AI business features) — ALL DONE
 
-**Then per Business-First order:** 10 (Payment), 12 (VPS), 13, 14, 15, 16.
+**All AI-focused phases are complete.**
+Next logical moves without user-side purchases:
+- Phase 14 (API + Webhooks + SDK) — pure dev, no purchases needed
+- OR wait for user decision on VPS / Payment / Rewards plan.
 
 
 ## 12. Future Phases (v2 Roadmap)
@@ -704,6 +735,9 @@ Insights smoke test:
 Market Insights smoke test:
   bash scripts/smoke-market.sh
 
+Reviews smoke test:
+  bash scripts/smoke-reviews.sh
+
 Fast backup scripts:
   bash scripts/backup.sh phase-N-step-M-done       (code only, ~0.2s)
   bash scripts/backup-full.sh vX.Y.Z-name          (code + DB + .env, ~0.25s)
@@ -727,7 +761,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 587 tests, all passing (+ 65 smoke checks)
+## 14. Test Count: ~648 tests, all passing (+ 77 smoke checks)
 
 Test files:
 - test_health.py
@@ -787,6 +821,10 @@ Test files:
 - test_market_analyst.py (12, Phase 27)
 - test_business_market_api.py (14, Phase 27)
 - test_business_market_page.py (7, Phase 27)
+- test_review_service.py (21, Phase 28)
+- test_reviews_api.py (17, Phase 28)
+- test_business_reviews_page.py (6, Phase 28)
+- test_tenant_home_reviews.py (4, Phase 28)
 
 Speed: BCRYPT_ROUNDS=4 in tests, schema created once per session.
 
@@ -1185,7 +1223,7 @@ Current working order. Do NOT jump phases. Do NOT skip.
 7. Phase 23 (AI Content Writer) — COMPLETE
 8. Phase 24 (Cross-Business Rewards) — DEFERRED BY USER (do not start until told)
 9. Phase 10 (Payment Production — needs Telr/Stripe account)
-10. Phases 25, 26, 27 DONE; 28 next (AI Marketing, Occupancy, Competitor Insights, Review Responder)
+10. Phases 25-28 DONE (all AI features complete) (AI Marketing, Occupancy, Competitor Insights, Review Responder)
 11. Phase 12 (VPS + Domain + Named Tunnel — needs purchase)
 12. Phase 13 (Business Onboarding Tools — needs Phase 12)
 13. Phase 14 (API + Webhooks + SDK)
@@ -1268,7 +1306,8 @@ before guests. Reason: businesses pay; users use.
 - **Phase 23-25** (AI Content Writer, Cross-Business Rewards, AI Marketing) — soon
 - **Phase 26-28** (Realtime Occupancy, Competitor Insights, Review Writer) — soon
 - **Phase 24 (merged with 8)** — WAITING for user's Rewards + Referral plan
-- **Phase 27 DONE; Phase 28 pending**
+- **Phases 25-28 ALL DONE (AI features complete)**
+- **Phase 14 (API/Webhooks/SDK)** — next candidate (no purchases needed)
 
 ### Known Pitfall — pydantic + FastAPI routes
 
