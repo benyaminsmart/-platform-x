@@ -1,0 +1,453 @@
+{% extends "business/business_base.html" %}
+
+{% block title %}Pricing Rules — Business Panel{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h2>Pricing Rules</h2>
+  <p class="admin-card-sub" style="margin-bottom: 0;">
+    Automatically adjust your prices based on weekday, season, urgency,
+    capacity, or last-minute bookings. Rules are applied in priority order
+    (lower number = applied first). Customers see the final price at booking.
+  </p>
+</div>
+
+<!-- ==================== New Rule Form ==================== -->
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div class="coach-head">
+    <h3>Create a new rule</h3>
+    <button type="button" class="admin-btn" id="toggle-new-rule">Show form</button>
+  </div>
+
+  <form id="new-rule-form" style="display: none; margin-top: 16px;">
+    <div class="pr-grid">
+      <div class="pr-field">
+        <label>Name</label>
+        <input type="text" id="r-name" placeholder="Weekend boost" maxlength="200" required>
+      </div>
+      <div class="pr-field">
+        <label>Rule type</label>
+        <select id="r-type">
+          <option value="weekend">Weekend</option>
+          <option value="season">Season (date range)</option>
+          <option value="urgency">Urgency (check-in soon)</option>
+          <option value="last_minute">Last minute</option>
+          <option value="capacity">Low capacity</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Dynamic conditions -->
+    <div class="pr-field">
+      <label>Conditions</label>
+      <div id="r-conditions-area"></div>
+    </div>
+
+    <div class="pr-grid">
+      <div class="pr-field">
+        <label>Action type</label>
+        <select id="r-action-type">
+          <option value="percent">Percent (%)</option>
+          <option value="fixed">Fixed (AED)</option>
+        </select>
+      </div>
+      <div class="pr-field">
+        <label>Action value (use negative to discount)</label>
+        <input type="number" id="r-action-value" step="0.01" placeholder="20" required>
+      </div>
+    </div>
+
+    <div class="pr-grid">
+      <div class="pr-field">
+        <label>Priority (lower = applied first)</label>
+        <input type="number" id="r-priority" value="100" min="0" required>
+      </div>
+      <div class="pr-field">
+        <label>Description (optional)</label>
+        <input type="text" id="r-description" placeholder="Short note" maxlength="500">
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:12px;">
+      <button type="submit" class="admin-btn">Create rule</button>
+      <button type="button" class="admin-btn" id="cancel-new-rule" style="background:var(--adm-surface-2); color:var(--adm-text);">Cancel</button>
+    </div>
+    <div id="form-alert" class="pr-alert" style="display:none;"></div>
+  </form>
+</div>
+
+<!-- ==================== Rules List ==================== -->
+<div class="admin-card">
+  <div class="coach-head">
+    <h3>Your rules</h3>
+    <button type="button" class="admin-btn" id="refresh-rules" style="background:var(--adm-surface-2); color:var(--adm-text);">Refresh</button>
+  </div>
+  <div id="rules-list" class="pr-list">
+    <div class="pr-loading">Loading…</div>
+  </div>
+</div>
+
+<style>
+.pr-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+@media (max-width: 700px) {
+  .pr-grid { grid-template-columns: 1fr; }
+}
+.pr-field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--adm-muted);
+  margin-bottom: 4px;
+}
+.pr-field input,
+.pr-field select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--adm-line-2);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--adm-surface-2);
+  color: var(--adm-text);
+  outline: none;
+}
+.pr-field input:focus,
+.pr-field select:focus { border-color: var(--adm-brand); }
+.pr-field input::placeholder { color: var(--adm-muted); }
+.pr-days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.pr-day {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--adm-line-2);
+  background: var(--adm-surface-2);
+  color: var(--adm-text-soft);
+  cursor: pointer;
+  font-size: 13px;
+  user-select: none;
+}
+.pr-day.on {
+  background: var(--adm-brand);
+  color: #fff;
+  border-color: var(--adm-brand);
+}
+.pr-alert {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.pr-alert.err { background: rgba(248,113,113,0.12); color: var(--adm-error); }
+.pr-alert.ok  { background: rgba(52,211,153,0.12); color: var(--adm-success); }
+.pr-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+.pr-loading { color: var(--adm-muted); }
+.pr-item {
+  padding: 14px 16px;
+  border: 1px solid var(--adm-line);
+  border-radius: 10px;
+  background: var(--adm-surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.pr-item.inactive { opacity: 0.55; }
+.pr-item-title {
+  font-weight: 600;
+  color: var(--adm-text);
+  margin-bottom: 4px;
+}
+.pr-item-meta {
+  font-size: 12.5px;
+  color: var(--adm-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.pr-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--adm-bg);
+  border: 1px solid var(--adm-line);
+  color: var(--adm-text-soft);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.pr-actions { display: flex; gap: 6px; align-items: flex-start; }
+.pr-actions button {
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--adm-line-2);
+  background: var(--adm-bg);
+  color: var(--adm-text-soft);
+  cursor: pointer;
+  font-family: inherit;
+}
+.pr-actions button:hover { border-color: var(--adm-brand); color: var(--adm-text); }
+.pr-actions button.danger:hover { border-color: var(--adm-error); color: var(--adm-error); }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login"; return; }
+
+  var lo = document.getElementById("business-logout");
+  if (lo) lo.addEventListener("click", function(){
+    try{ localStorage.removeItem("px_business_token"); }catch(e){}
+    window.location.href = "/business/login";
+  });
+
+  var slug = null;
+
+  function h() {
+    return { "Authorization": "Bearer " + token, "X-Tenant-Slug": slug, "Content-Type": "application/json" };
+  }
+
+  async function resolveSlug() {
+    var res = await fetch("/business/api/me", { headers: { "Authorization": "Bearer " + token } });
+    if (!res.ok) {
+      try{ localStorage.removeItem("px_business_token"); }catch(e){}
+      window.location.href = "/business/login";
+      return;
+    }
+    var data = await res.json();
+    slug = data.tenant_slug;
+  }
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  // -------- Dynamic conditions UI --------
+
+  var conditionsArea = document.getElementById("r-conditions-area");
+  var rType = document.getElementById("r-type");
+  var selectedDays = new Set([5, 6]); // default Sat/Sun
+
+  function renderConditions() {
+    var t = rType.value;
+    if (t === "weekend") {
+      var days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+      conditionsArea.innerHTML =
+        '<div class="pr-days" id="pr-days">' +
+        days.map(function(d, i){
+          return '<div class="pr-day' + (selectedDays.has(i) ? ' on' : '') + '" data-d="' + i + '">' + d + '</div>';
+        }).join("") +
+        '</div>';
+      var cont = document.getElementById("pr-days");
+      cont.querySelectorAll(".pr-day").forEach(function(el){
+        el.addEventListener("click", function(){
+          var d = parseInt(el.getAttribute("data-d"), 10);
+          if (selectedDays.has(d)) { selectedDays.delete(d); el.classList.remove("on"); }
+          else { selectedDays.add(d); el.classList.add("on"); }
+        });
+      });
+    } else if (t === "season") {
+      conditionsArea.innerHTML =
+        '<div class="pr-grid">' +
+          '<div class="pr-field"><label>From</label><input type="date" id="c-from"></div>' +
+          '<div class="pr-field"><label>To</label><input type="date" id="c-to"></div>' +
+        '</div>';
+    } else if (t === "urgency" || t === "last_minute") {
+      conditionsArea.innerHTML =
+        '<div class="pr-field"><label>Days ahead (max)</label><input type="number" id="c-days" value="2" min="0"></div>';
+    } else if (t === "capacity") {
+      conditionsArea.innerHTML =
+        '<div class="pr-field"><label>Applies when remaining capacity ≤</label><input type="number" id="c-max" value="2" min="0"></div>';
+    } else {
+      conditionsArea.innerHTML = '<div class="pr-hint" style="color:var(--adm-muted);font-size:13px;">No conditions — always eligible.</div>';
+    }
+  }
+
+  rType.addEventListener("change", renderConditions);
+  renderConditions();
+
+  function buildConditions() {
+    var t = rType.value;
+    if (t === "weekend") {
+      return { days_of_week: Array.from(selectedDays).sort() };
+    }
+    if (t === "season") {
+      var f = document.getElementById("c-from") ? document.getElementById("c-from").value : "";
+      var to = document.getElementById("c-to") ? document.getElementById("c-to").value : "";
+      var c = {};
+      if (f) c.from = f;
+      if (to) c.to = to;
+      return c;
+    }
+    if (t === "urgency" || t === "last_minute") {
+      var d = document.getElementById("c-days");
+      return { days_ahead_max: parseInt(d.value, 10) || 0 };
+    }
+    if (t === "capacity") {
+      var m = document.getElementById("c-max");
+      return { max_remaining: parseInt(m.value, 10) || 0 };
+    }
+    return {};
+  }
+
+  // -------- New rule form --------
+
+  var toggleBtn = document.getElementById("toggle-new-rule");
+  var cancelBtn = document.getElementById("cancel-new-rule");
+  var form = document.getElementById("new-rule-form");
+  var formAlert = document.getElementById("form-alert");
+
+  toggleBtn.addEventListener("click", function(){
+    var show = form.style.display === "none";
+    form.style.display = show ? "block" : "none";
+    toggleBtn.textContent = show ? "Hide form" : "Show form";
+  });
+  cancelBtn.addEventListener("click", function(){
+    form.style.display = "none";
+    toggleBtn.textContent = "Show form";
+    formAlert.style.display = "none";
+  });
+
+  form.addEventListener("submit", async function(ev){
+    ev.preventDefault();
+    formAlert.style.display = "none";
+
+    var payload = {
+      name: document.getElementById("r-name").value.trim(),
+      description: document.getElementById("r-description").value.trim() || null,
+      rule_type: rType.value,
+      conditions: buildConditions(),
+      action: {
+        type: document.getElementById("r-action-type").value,
+        value: parseFloat(document.getElementById("r-action-value").value),
+      },
+      priority: parseInt(document.getElementById("r-priority").value, 10) || 100,
+      active: true,
+      service_ids: [],
+    };
+
+    if (!payload.name) { showAlert("err", "Name is required."); return; }
+    if (isNaN(payload.action.value)) { showAlert("err", "Action value is required."); return; }
+
+    try {
+      var res = await fetch("/business/api/pricing/rules", {
+        method: "POST",
+        headers: h(),
+        body: JSON.stringify(payload),
+      });
+      var data = await res.json();
+      if (!res.ok) { showAlert("err", data.detail || "Failed."); return; }
+      showAlert("ok", "Rule created.");
+      form.reset();
+      renderConditions();
+      loadRules();
+    } catch(e) {
+      showAlert("err", "Network error.");
+    }
+  });
+
+  function showAlert(kind, msg) {
+    formAlert.className = "pr-alert " + kind;
+    formAlert.textContent = msg;
+    formAlert.style.display = "block";
+  }
+
+  // -------- Rules list --------
+
+  var rulesList = document.getElementById("rules-list");
+
+  async function loadRules() {
+    rulesList.innerHTML = '<div class="pr-loading">Loading…</div>';
+    try {
+      var res = await fetch("/business/api/pricing/rules", { headers: h() });
+      if (!res.ok) { rulesList.innerHTML = '<div class="pr-loading">Failed to load.</div>'; return; }
+      var rules = await res.json();
+      if (!rules.length) {
+        rulesList.innerHTML = '<div class="pr-loading">No rules yet. Create your first rule above.</div>';
+        return;
+      }
+      rulesList.innerHTML = rules.map(renderRule).join("");
+      rulesList.querySelectorAll(".pr-actions button").forEach(function(b){
+        b.addEventListener("click", function(){
+          var id = b.getAttribute("data-id");
+          var act = b.getAttribute("data-act");
+          if (act === "toggle") toggleRule(id);
+          if (act === "delete") deleteRule(id);
+        });
+      });
+    } catch(e) {
+      rulesList.innerHTML = '<div class="pr-loading">Network error.</div>';
+    }
+  }
+
+  function renderRule(r) {
+    var action = r.action || {};
+    var sign = (action.value >= 0) ? "+" : "";
+    var actionLabel = action.type === "percent"
+      ? (sign + action.value + "%")
+      : (sign + action.value + " AED");
+    var active = r.active ? "" : " inactive";
+    return (
+      '<div class="pr-item' + active + '">' +
+        '<div style="flex:1; min-width: 200px;">' +
+          '<div class="pr-item-title">' + esc(r.name) + ' <span class="pr-badge">' + esc(r.rule_type) + '</span>' + (r.active ? '' : ' <span class="pr-badge">inactive</span>') + '</div>' +
+          '<div class="pr-item-meta">' +
+            '<span>Action: <strong>' + esc(actionLabel) + '</strong></span>' +
+            '<span>Priority: ' + esc(r.priority) + '</span>' +
+            (r.description ? '<span>' + esc(r.description) + '</span>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="pr-actions">' +
+          '<button data-id="' + esc(r.id) + '" data-act="toggle">' + (r.active ? 'Deactivate' : 'Activate') + '</button>' +
+          '<button class="danger" data-id="' + esc(r.id) + '" data-act="delete">Delete</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  async function toggleRule(id) {
+    // fetch, flip active, PATCH
+    var res = await fetch("/business/api/pricing/rules/" + id, { headers: h() });
+    if (!res.ok) return;
+    var r = await res.json();
+    await fetch("/business/api/pricing/rules/" + id, {
+      method: "PATCH",
+      headers: h(),
+      body: JSON.stringify({ active: !r.active }),
+    });
+    loadRules();
+  }
+
+  async function deleteRule(id) {
+    if (!confirm("Deactivate this rule?")) return;
+    await fetch("/business/api/pricing/rules/" + id, { method: "DELETE", headers: h() });
+    loadRules();
+  }
+
+  document.getElementById("refresh-rules").addEventListener("click", loadRules);
+
+  // -------- Boot --------
+  (async function(){
+    await resolveSlug();
+    if (!slug) return;
+    loadRules();
+  })();
+})();
+</script>
+{% endblock %}
