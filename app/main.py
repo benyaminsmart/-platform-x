@@ -26,6 +26,7 @@ from app.api import orders as orders_router
 from app.api import partners as partners_router
 from app.api import payments as payments_router
 from app.api import platform_admin as platform_admin_router
+from app.api import public_v1 as public_v1_router
 from app.api import referrals as referrals_router
 from app.api import reviews as reviews_router
 from app.api import rewards as rewards_router
@@ -159,6 +160,7 @@ app.include_router(partners_router.router)
 app.include_router(payments_router.router)
 app.include_router(platform_admin_router.router)
 app.include_router(referrals_router.router)
+app.include_router(public_v1_router.router)
 app.include_router(reviews_router.router)
 app.include_router(rewards_router.router)
 app.include_router(services_router.router)
