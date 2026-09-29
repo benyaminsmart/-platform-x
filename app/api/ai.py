@@ -334,3 +334,93 @@ def business_suggest_image_keywords(
     service = _get_tenant_service(db, tenant, service_id)
     out = content_writer.suggest_image_keywords(tenant, service)
     return ImageKeywordsResponse(**out)
+
+
+# ---------- Content Importer (Phase 23, Step 3) ----------
+
+
+class ImportTextRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=8000)
+    default_type: str = Field(default="room", max_length=50)
+    language: str = Field(default="en", pattern="^(en|ar|fil|hi)$")
+
+
+class ImportCandidate(BaseModel):
+    name: str
+    type: str
+    description: str | None = None
+    price: str | None = None
+    currency: str = "AED"
+    capacity: int | None = None
+    attributes: dict[str, Any] = Field(default_factory=dict)
+
+
+class ImportPreviewResponse(BaseModel):
+    candidates: list[ImportCandidate]
+    provider: str
+    count: int
+
+
+class ImportBulkCreateRequest(BaseModel):
+    candidates: list[ImportCandidate] = Field(min_length=1, max_length=100)
+
+
+class ImportBulkCreateResponse(BaseModel):
+    created: int
+    skipped: list[dict[str, Any]]
+    service_ids: list[str]
+
+
+@business_router.post(
+    "/content/import/preview",
+    response_model=ImportPreviewResponse,
+)
+@limiter.limit("10/minute")
+def business_content_import_preview(
+    request: Request,
+    payload: ImportTextRequest,
+    user: User = Depends(get_current_business_user),
+    tenant: Tenant = Depends(get_business_tenant),
+    db=Depends(get_db),
+) -> ImportPreviewResponse:
+    """Parse free text into candidate services (preview, no DB writes)."""
+    from app.services.ai import content_importer
+
+    _require_ai_enabled()
+    try:
+        out = content_importer.parse_services_from_text(
+            db, tenant=tenant,
+            text=payload.text,
+            default_type=payload.default_type,
+            language=payload.language,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return ImportPreviewResponse(**out)
+
+
+@business_router.post(
+    "/content/import/create",
+    response_model=ImportBulkCreateResponse,
+)
+@limiter.limit("10/minute")
+def business_content_import_create(
+    request: Request,
+    payload: ImportBulkCreateRequest,
+    user: User = Depends(get_current_business_user),
+    tenant: Tenant = Depends(get_business_tenant),
+    db=Depends(get_db),
+) -> ImportBulkCreateResponse:
+    """Create services from a list of candidates (owner/manager only)."""
+    from app.services.ai import content_importer
+
+    if user.business_role not in {"owner", "manager"}:
+        raise HTTPException(status_code=403, detail="Only owner or manager can import services")
+
+    out = content_importer.bulk_create_services(
+        db, tenant=tenant,
+        candidates=[c.model_dump() for c in payload.candidates],
+        user_id=user.id,
+    )
+    return ImportBulkCreateResponse(**out)

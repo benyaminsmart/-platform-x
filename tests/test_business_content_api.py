@@ -282,3 +282,131 @@ def test_suggest_image_keywords_cross_tenant(client: TestClient, db: Session) ->
         headers=_h(tok, a.slug),
     )
     assert r.status_code == 404
+
+
+# ---------- Content Importer (Phase 23, Step 3) ----------
+
+
+def test_import_preview_requires_auth(client: TestClient, sample_tenant: Tenant) -> None:
+    r = client.post(
+        "/business/api/ai/content/import/preview",
+        json={"text": "A - 10"},
+        headers={"X-Tenant-Slug": sample_tenant.slug},
+    )
+    assert r.status_code == 401
+
+
+def test_import_preview_happy_path(client: TestClient, db: Session, monkeypatch) -> None:
+    from app.services.ai import service as ai_service
+
+    payload = (
+        '{"candidates": ['
+        '{"name": "Deluxe Room", "type": "room", "price": 850, "currency": "AED", "capacity": 2, "attributes": {}},'
+        '{"name": "Standard Room", "type": "room", "price": 500, "currency": "AED", "capacity": null, "attributes": {}}'
+        ']}'
+    )
+    def _fake(message, *, history=None, provider_name=None):
+        return {"content": payload, "provider": "stub", "model": "x", "tokens_used": 0}
+    monkeypatch.setattr(ai_service, "chat", _fake)
+
+    t = _tenant(db)
+    _biz_user(db, t)
+    tok = _login(client, t.slug)
+
+    r = client.post(
+        "/business/api/ai/content/import/preview",
+        json={"text": "Deluxe Room - 850\nStandard Room - 500", "default_type": "room"},
+        headers=_h(tok, t.slug),
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["count"] == 2
+    assert body["provider"] == "ai"
+    assert body["candidates"][0]["name"] == "Deluxe Room"
+
+
+def test_import_preview_falls_back(client: TestClient, db: Session, monkeypatch) -> None:
+    from app.services.ai import service as ai_service
+
+    def _boom(*a, **kw):
+        raise RuntimeError("fail")
+    monkeypatch.setattr(ai_service, "chat", _boom)
+
+    t = _tenant(db)
+    _biz_user(db, t)
+    tok = _login(client, t.slug)
+
+    r = client.post(
+        "/business/api/ai/content/import/preview",
+        json={"text": "Room A - 100\nRoom B - 200", "default_type": "room"},
+        headers=_h(tok, t.slug),
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["provider"] == "fallback"
+    assert body["count"] == 2
+
+
+def test_import_preview_validation(client: TestClient, db: Session) -> None:
+    t = _tenant(db)
+    _biz_user(db, t)
+    tok = _login(client, t.slug)
+    # Empty text -> 422 (min_length=1)
+    r = client.post(
+        "/business/api/ai/content/import/preview",
+        json={"text": ""},
+        headers=_h(tok, t.slug),
+    )
+    assert r.status_code == 422
+
+
+def test_import_create_requires_owner_or_manager(client: TestClient, db: Session) -> None:
+    t = _tenant(db)
+    _biz_user(db, t, email="staff@biz.test", role="staff")
+    tok = _login(client, t.slug, "staff@biz.test")
+    r = client.post(
+        "/business/api/ai/content/import/create",
+        json={"candidates": [{"name": "A", "type": "room", "price": "100"}]},
+        headers=_h(tok, t.slug),
+    )
+    assert r.status_code == 403
+
+
+def test_import_create_happy_path(client: TestClient, db: Session) -> None:
+    t = _tenant(db)
+    _biz_user(db, t)
+    tok = _login(client, t.slug)
+    r = client.post(
+        "/business/api/ai/content/import/create",
+        json={
+            "candidates": [
+                {"name": "Room A", "type": "room", "price": "100"},
+                {"name": "Room B", "type": "room", "price": "200"},
+            ]
+        },
+        headers=_h(tok, t.slug),
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["created"] == 2
+    assert len(body["service_ids"]) == 2
+
+
+def test_import_create_skips_invalid(client: TestClient, db: Session) -> None:
+    t = _tenant(db)
+    _biz_user(db, t)
+    tok = _login(client, t.slug)
+    r = client.post(
+        "/business/api/ai/content/import/create",
+        json={
+            "candidates": [
+                {"name": "Good", "type": "room", "price": "100"},
+                {"name": "Bad", "type": "room", "price": "-50"},
+            ]
+        },
+        headers=_h(tok, t.slug),
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["created"] == 1
+    assert len(body["skipped"]) == 1
