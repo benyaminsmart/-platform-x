@@ -1,0 +1,118 @@
+{% extends "layouts/platform_base.html" %}
+{% block title %}Compare — Platform-X{% endblock %}
+
+{% block content %}
+<section class="px-hero px-hero-compact">
+  <div class="px-container">
+    <div class="px-hero-content">
+      <div class="px-breadcrumb">
+        <a href="/">Home</a><span>/</span><a href="/search">Search</a><span>/</span><span>Compare</span>
+      </div>
+      <h1 class="px-hero-title-sm">Compare experiences</h1>
+      <p class="px-hero-sub-sm">Side-by-side comparison of your selected services.</p>
+    </div>
+  </div>
+</section>
+
+<section class="px-section">
+  <div class="px-container">
+    <div id="cmp-body" class="px-cmp-wrap"><p class="px-muted">Loading…</p></div>
+  </div>
+</section>
+
+<style>
+.px-cmp-wrap { overflow-x: auto; }
+.px-cmp-table {
+  width: 100%; min-width: 640px; border-collapse: separate; border-spacing: 0;
+  background: #fff; border: 1px solid var(--px-line); border-radius: 14px; overflow: hidden;
+}
+.px-cmp-table th, .px-cmp-table td {
+  padding: 12px 16px; text-align: left; font-size: 13.5px;
+  border-bottom: 1px solid var(--px-line); vertical-align: top;
+}
+.px-cmp-table thead th {
+  background: #faf8f5; color: var(--px-navy); font-family: var(--px-font-display);
+  font-weight: 700; font-size: 14px;
+}
+.px-cmp-table thead th .px-cmp-price { display: block; color: var(--px-navy); font-size: 16px; margin-top: 6px; }
+.px-cmp-table thead th .px-cmp-price small { font-size: 11px; color: var(--px-muted); font-weight: 500; }
+.px-cmp-table thead th .px-cmp-cat {
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  background: #eef1f5; color: var(--px-navy); font-size: 10.5px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px;
+}
+.px-cmp-table thead th .px-cmp-thumb {
+  height: 100px; border-radius: 8px; background-size: cover; background-position: center;
+  background-color: #eef1f5; margin-bottom: 10px;
+}
+.px-cmp-table tbody tr:last-child td { border-bottom: none; }
+.px-cmp-table tbody td:first-child { color: var(--px-muted); font-weight: 600; width: 160px; }
+.px-cmp-attr { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #f3f4f6; color: #374151; font-size: 11.5px; margin: 2px; }
+.px-cmp-view { display: inline-block; margin-top: 10px; padding: 6px 12px; border-radius: 8px; background: var(--px-navy); color: #fff; text-decoration: none; font-size: 12.5px; font-weight: 600; }
+.px-cmp-empty { padding: 60px 20px; text-align: center; color: var(--px-muted); }
+.px-cmp-empty h3 { color: var(--px-navy); margin: 0 0 8px; }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  var el = document.getElementById("cmp-body");
+  var u = new URLSearchParams(window.location.search);
+  var ids = (u.get("ids") || "").split(",").filter(Boolean);
+  if (ids.length < 2) {
+    el.innerHTML = '<div class="px-cmp-empty"><h3>Nothing to compare</h3>' +
+      '<p>Select 2 to 4 experiences from <a href="/search">search</a>.</p></div>';
+    return;
+  }
+  fetch("/api/compare?ids=" + encodeURIComponent(ids.join(",")))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      var items = d.items || [];
+      if (items.length < 2) {
+        el.innerHTML = '<div class="px-cmp-empty"><h3>Not enough items</h3><p>Some selections are no longer available.</p></div>';
+        return;
+      }
+      var head = '<tr><th></th>' + items.map(function(i){
+        var img = i.cover_image ? 'style="background-image:url(' + esc(i.cover_image) + ')"' : '';
+        var price = i.price + " " + (i.currency || "");
+        return '<th>' +
+          '<div class="px-cmp-thumb" ' + img + '></div>' +
+          '<span class="px-cmp-cat">' + esc(i.category) + '</span>' +
+          '<div>' + esc(i.service_name) + '</div>' +
+          '<div style="font-weight:400; color:var(--px-muted); font-size:12px; margin-top:4px;">' + esc(i.tenant_name) + '</div>' +
+          '<span class="px-cmp-price">' + esc(price) + ' <small>/night</small></span>' +
+          '<a class="px-cmp-view" href="/' + esc(i.tenant_slug) + '/">Open</a>' +
+        '</th>';
+      }).join("") + '</tr>';
+
+      function row(label, getter) {
+        return '<tr><td>' + label + '</td>' + items.map(function(i){
+          var v = getter(i);
+          return '<td>' + (v == null || v === "" ? '—' : v) + '</td>';
+        }).join("") + '</tr>';
+      }
+
+      var attrsRow = row("Attributes", function(i){
+        var a = i.attributes || {};
+        var keys = Object.keys(a).slice(0, 6);
+        if (!keys.length) return "—";
+        return keys.map(function(k){ return '<span class="px-cmp-attr">' + esc(k) + ': ' + esc(a[k]) + '</span>'; }).join("");
+      });
+
+      var body = '<table class="px-cmp-table"><thead>' + head + '</thead><tbody>' +
+        row("Category", function(i){ return esc(i.category); }) +
+        row("Location", function(i){ return esc(i.location || "—"); }) +
+        row("Rating", function(i){ return i.rating ? ('★ ' + i.rating + ' (' + i.reviews_count + ')') : "—"; }) +
+        row("Capacity", function(i){ return i.capacity == null ? "unlimited" : i.capacity; }) +
+        attrsRow +
+        row("Description", function(i){ return i.description ? esc(i.description) : "—"; }) +
+      '</tbody></table>';
+
+      el.innerHTML = body;
+    })
+    .catch(function(){ el.innerHTML = '<p class="px-muted">Network error.</p>'; });
+})();
+</script>
+{% endblock %}

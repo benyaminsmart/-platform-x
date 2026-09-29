@@ -190,6 +190,27 @@
 .sr-heart:hover { transform: scale(1.08); }
 .sr-heart.on { color: #e11d48; }
 .sr-card { position: relative; }
+.sr-compare-btn {
+  position: absolute; top: 10px; left: 10px;
+  padding: 4px 8px; border-radius: 999px;
+  background: rgba(255,255,255,0.95); border: none;
+  font-size: 11px; font-weight: 600; cursor: pointer;
+  color: var(--px-navy); box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  font-family: inherit;
+}
+.sr-compare-btn.on { background: var(--px-navy); color: #fff; }
+.sr-cmp-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--px-navy); color: #fff; padding: 12px 20px;
+  display: flex; gap: 12px; align-items: center; justify-content: center;
+  z-index: 500;
+}
+.sr-cmp-bar button {
+  padding: 8px 14px; border-radius: 8px; border: 1px solid #fff;
+  background: transparent; color: #fff; font-family: inherit; font-weight: 600;
+  cursor: pointer; font-size: 13px;
+}
+.sr-cmp-bar button.primary { background: #fff; color: var(--px-navy); }
 .sr-map-btn {
   padding: 6px 12px; border-radius: 6px; border: 1px solid var(--px-line);
   background: #fff; cursor: pointer; font-family: inherit; font-size: 12px;
@@ -286,6 +307,7 @@
     var rating = i.rating ? ('★ ' + i.rating + ' · ' + i.reviews_count + ' reviews') : "";
     return '<a class="sr-card" data-service-id="' + esc(i.service_id) + '" href="/' + esc(i.tenant_slug) + '/">' +
       '<button class="sr-heart" data-sid="' + esc(i.service_id) + '" type="button" title="Save">&#9829;</button>' +
+      '<button class="sr-compare-btn" data-cmp="' + esc(i.service_id) + '" type="button">+ Compare</button>' +
       '<div class="sr-thumb" ' + img + '></div>' +
       '<div class="sr-body">' +
         '<span class="sr-cat">' + esc(i.category) + '</span>' +
@@ -375,6 +397,57 @@
     }
   }
 
+  // ============ Compare ============
+  var compareSet = [];
+
+  function updateCompareBar() {
+    var bar = document.getElementById("sr-cmp-bar");
+    if (!bar) {
+      bar = document.createElement("div");
+      bar.id = "sr-cmp-bar";
+      bar.className = "sr-cmp-bar";
+      document.body.appendChild(bar);
+    }
+    if (compareSet.length === 0) { bar.style.display = "none"; return; }
+    bar.style.display = "flex";
+    bar.innerHTML =
+      '<span>' + compareSet.length + ' selected for comparison</span>' +
+      '<button id="sr-cmp-go" class="primary">Compare</button>' +
+      '<button id="sr-cmp-clear">Clear</button>';
+    document.getElementById("sr-cmp-go").onclick = function(){
+      window.location.href = "/compare?ids=" + encodeURIComponent(compareSet.join(","));
+    };
+    document.getElementById("sr-cmp-clear").onclick = function(){
+      compareSet = [];
+      document.querySelectorAll(".sr-compare-btn").forEach(function(b){ b.classList.remove("on"); });
+      updateCompareBar();
+    };
+  }
+
+  function toggleCompare(btn) {
+    var sid = btn.getAttribute("data-cmp");
+    var idx = compareSet.indexOf(sid);
+    if (idx >= 0) {
+      compareSet.splice(idx, 1);
+      btn.classList.remove("on");
+    } else {
+      if (compareSet.length >= 4) { alert("Maximum 4 items to compare."); return; }
+      compareSet.push(sid);
+      btn.classList.add("on");
+    }
+    updateCompareBar();
+  }
+
+  function bindCompareButtons() {
+    document.querySelectorAll(".sr-compare-btn").forEach(function(b){
+      b.addEventListener("click", function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        toggleCompare(b);
+      });
+    });
+  }
+
   // ============ Wishlist ============
   var wishlistCache = {};  // service_id -> bool
 
@@ -407,6 +480,7 @@
   }
 
   function bindHearts() {
+    bindCompareButtons();
     var btns = document.querySelectorAll(".sr-heart");
     btns.forEach(function(b){
       b.addEventListener("click", function(ev){

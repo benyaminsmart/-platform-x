@@ -195,6 +195,18 @@ def account_wishlist_page(request: Request) -> HTMLResponse:
     )
 
 
+@router.get("/compare", response_class=HTMLResponse)
+def compare_page(request: Request) -> HTMLResponse:
+    """Compare services side by side (client-side fetch from /api/compare)."""
+    return templates.TemplateResponse(
+        request,
+        "pages/compare.html",
+        {
+            "active_nav": "compare",
+        },
+    )
+
+
 @router.get("/search", response_class=HTMLResponse)
 def search_page(request: Request) -> HTMLResponse:
     """Public search results page (client-side fetch from /api/search)."""
