@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.28.0-promotions (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-38 complete; 24 DEFERRED)
+> Version: v0.29.0-reviews-messaging (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-39 complete; 24 DEFERRED)
 
 Last updated: 2026-09-30
 
@@ -305,6 +305,16 @@ Tag: v0.28.0-promotions
 - [x] Step 4 — Booking promotion integration
 - [x] Step 5 — Promotions UI + sidebar
 - [x] Phase close — tag v0.28.0-promotions
+
+**Phase 39 — Wave 1 / Review photos + Guest messaging: COMPLETE**
+Tag: v0.29.0-reviews-messaging
+- [x] Step 1 — ReviewPhoto model + upload API
+- [x] Step 2 — Review photos on tenant page
+- [x] Step 3 — Write-review modal with photo upload
+- [x] Step 4 — Message model + migration
+- [x] Step 5 — Messages service + API
+- [x] Step 6 — Messages inbox page + sidebar
+- [x] Phase close — tag v0.29.0-reviews-messaging
 
 ---
 
@@ -713,6 +723,18 @@ Tag: v0.28.0-promotions
 - UI: /business/promotions page + sidebar link
 - Bugfix during phase: promotion applies to service price, not
   client amount
+
+### Phase 39 — Reviews Photos + Guest Messaging: COMPLETE
+Tag: v0.29.0-reviews-messaging
+- ReviewPhoto model (8 columns; max 3 per review, JPG/PNG/WebP, 5 MB)
+- Photo upload API (POST /reviews/{id}/photos, DELETE .../photos/{id})
+- Tenant page renders photos with lightbox
+- Account: write-review modal with rating, title, body, photo upload
+- Message model (11 columns; thread per booking)
+- Messages service (thread listing with unread counts, mark-read)
+- Messages API (user: /messages/*, business: /business/api/messages/*)
+- Business Messages inbox page + sidebar link
+- 981 tests passing
 
 ## 6. Data Models (19 tables)
 
@@ -1162,7 +1184,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 962 tests, all passing
+## 14. Test Count: 981 tests, all passing
 
 Test files:
 - test_health.py
