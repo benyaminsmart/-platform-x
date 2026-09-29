@@ -127,7 +127,7 @@ Last step: Step 10b — Gallery section on tenant page (2026-09-29 23:18)
 - [x] Step 9 — Extended search filters (rating, type, location)
 - [x] Step 9b — Extended filters in /search UI
 - [x] Step 10a — Service gallery API
-- [x] Step 10b — Gallery section on tenant page (in progress)
+- [x] Step 10b — Gallery section on tenant page
 - [ ] Phase close — milestone tag + full HANDOFF update
 
 **Commits (recent):**
