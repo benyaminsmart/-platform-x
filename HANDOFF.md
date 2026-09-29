@@ -206,6 +206,42 @@ Tag: v0.16.0-marketing-ai
 - NOTE: Phase 8 and Phase 24 merged; both WAITING for user's
   Rewards + Referral business plan.
 
+### Phase 26 — Real-Time Occupancy + Analytics: COMPLETE
+Tag: v0.17.0-occupancy
+- Occupancy service:
+  - occupancy_summary (booked nights vs capacity nights, clamped to window)
+  - occupancy_by_service (per-service breakdown, sorted by occupancy)
+  - occupancy_trend (current vs previous window + delta %)
+  - Excludes cancelled bookings; capacity-only services counted
+- Heatmap service:
+  - day_of_week_heatmap (Mon..Sun + share %)
+  - hour_of_day_heatmap (0-23, uses created_at as proxy)
+  - calendar_heatmap (per-day series + peak)
+  - Handles naive SQLite datetimes correctly
+- Revenue forecast:
+  - forecast_revenue: weighted daily avg (0.7*a30 + 0.3*a90) * growth * days
+    growth from last 30 vs prior 30 (clamped +/-50%)
+    +/-20% band
+  - forecast_with_advice: same + AI interpretation + fallback
+  - Only PAID bookings count; cancelled excluded
+- Predictive capacity:
+  - available_capacity per day + summary (min/max/avg)
+  - near_fully_booked (threshold %)
+  - next_available_date(service, guests) with bounded search
+- Business Insights API (9 endpoints under /business/api/insights):
+  - /occupancy, /occupancy/trend, /occupancy/by-service
+  - /heatmap/day-of-week, /heatmap/hour-of-day, /heatmap/calendar
+  - /revenue/forecast?days=&with_advice=
+  - /capacity/available, /capacity/near-full, /capacity/next-available/{id}
+  - Rate limits: 60/min reads, 15/min AI forecast
+- Insights UI at /business/insights:
+  - 4 KPI cards (occupancy %, booked nights, revenue 30d, forecast 30d)
+  - Day-of-week heatmap, calendar heatmap (5 intensity levels, CSS-only)
+  - Capacity summary + near-full days list
+  - Revenue forecast with AI advice button
+  - Days selector (30/90/180)
+  - Dark theme, responsive
+
 ### Phase 20 — Business Owner Panel: COMPLETE
 Tag: v0.9.0-business
 - Separate panel under /business/*
@@ -406,17 +442,22 @@ All idempotent.
 
 ## 11. Remaining Work
 
-**Phase 24 (merged with Phase 8) — Cross-Business Rewards Enhancement: WAITING**
-Requires user's Rewards + Referral business plan. Once received, build:
-- Redeem catalog (rewards shop)
-- Rewards dashboard (tier progress, milestones)
-- Referral dashboard + milestones
-- Special offers / promo codes
-- Birthday rewards
-- Real tier benefits
+**Phase 24 (merged with Phase 8) — Cross-Business Rewards: WAITING**
+Requires user's Rewards + Referral business plan.
 
-**Alternative NEXT while waiting: Phase 26 (Real-Time Occupancy + Analytics)**
-No business plan needed. Deterministic + AI features.
+**Phase 27 — Competitor Insights (NEXT, no plan needed)**
+- Aggregate market data (anonymized)
+- Industry benchmarks
+- Anonymous peer comparison
+- Region / category insights
+
+**Phase 28 — AI Review Writer + Responder**
+- AI writes reviews from guest input
+- Business AI auto-responds to reviews
+- Multi-language reviews
+- Sentiment analysis
+
+**Phase 14, 12, 13, 15, 16** — as documented in Business-First order.
 
 
 ## 12. Future Phases (v2 Roadmap)
@@ -637,6 +678,9 @@ Content Studio smoke test:
 Marketing Copilot smoke test:
   bash scripts/smoke-marketing.sh
 
+Insights smoke test:
+  bash scripts/smoke-insights.sh
+
 Fast backup scripts:
   bash scripts/backup.sh phase-N-step-M-done       (code only, ~0.2s)
   bash scripts/backup-full.sh vX.Y.Z-name          (code + DB + .env, ~0.25s)
@@ -660,7 +704,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 462 tests, all passing (+ 42 smoke checks)
+## 14. Test Count: 540 tests, all passing (+ 55 smoke checks)
 
 Test files:
 - test_health.py
@@ -710,6 +754,12 @@ Test files:
 - test_discount_suggester.py (10, Phase 25)
 - test_business_marketing_api.py (16, Phase 25)
 - test_business_marketing_page.py (6, Phase 25)
+- test_occupancy_service.py (14, Phase 26)
+- test_heatmap_service.py (9, Phase 26)
+- test_revenue_forecast.py (12, Phase 26)
+- test_capacity_forecast.py (15, Phase 26)
+- test_business_insights_api.py (22, Phase 26)
+- test_business_insights_page.py (6, Phase 26)
 
 Speed: BCRYPT_ROUNDS=4 in tests, schema created once per session.
 
@@ -1108,7 +1158,7 @@ Current working order. Do NOT jump phases. Do NOT skip.
 7. Phase 23 (AI Content Writer) — COMPLETE
 8. Phase 24 (Cross-Business Rewards) — WAITING (needs user plan; merged with Phase 8)
 9. Phase 10 (Payment Production — needs Telr/Stripe account)
-10. Phase 25 DONE; Phases 26-28 (AI Marketing, Occupancy, Competitor Insights, Review Responder)
+10. Phases 25, 26 DONE; 27-28 pending (AI Marketing, Occupancy, Competitor Insights, Review Responder)
 11. Phase 12 (VPS + Domain + Named Tunnel — needs purchase)
 12. Phase 13 (Business Onboarding Tools — needs Phase 12)
 13. Phase 14 (API + Webhooks + SDK)
@@ -1191,7 +1241,7 @@ before guests. Reason: businesses pay; users use.
 - **Phase 23-25** (AI Content Writer, Cross-Business Rewards, AI Marketing) — soon
 - **Phase 26-28** (Realtime Occupancy, Competitor Insights, Review Writer) — soon
 - **Phase 24 (merged with 8)** — WAITING for user's Rewards + Referral plan
-- **Phase 26-28** — pending (Phase 25 done)
+- **Phase 26 DONE; Phase 27-28 pending**
 
 ### Known Pitfall — pydantic + FastAPI routes
 
