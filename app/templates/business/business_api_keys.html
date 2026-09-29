@@ -1,0 +1,247 @@
+{% extends "business/business_base.html" %}
+
+{% block title %}API Keys — Business Panel{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h2>API Keys</h2>
+  <p class="admin-card-sub" style="margin-bottom: 0;">
+    Generate API keys to let your own systems (websites, apps, PMS, POS) read
+    your Platform-X data. Each key is scoped, revocable, and shown only once.
+  </p>
+</div>
+
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div class="coach-head">
+    <h3>Your keys</h3>
+    <button type="button" class="admin-btn" id="ak-new-btn">New API Key</button>
+  </div>
+  <div id="ak-list" class="ak-list">
+    <div class="ak-loading">Loading…</div>
+  </div>
+</div>
+
+<!-- ============ Create modal ============ -->
+<div id="ak-modal" class="ak-modal" style="display:none;">
+  <div class="ak-modal-card">
+    <div class="ak-modal-head">
+      <h3>Create API Key</h3>
+      <button type="button" class="admin-btn" id="ak-modal-close" style="background:var(--adm-surface-2); color:var(--adm-text);">Close</button>
+    </div>
+    <div class="ak-field">
+      <label>Name</label>
+      <input type="text" id="ak-name" placeholder="Backend integration" maxlength="200">
+    </div>
+    <div class="ak-field">
+      <label>Scopes</label>
+      <div id="ak-scopes" class="ak-scopes"></div>
+    </div>
+    <div class="ak-field">
+      <label>Expires in (days, optional)</label>
+      <input type="number" id="ak-expires" min="1" max="3650" placeholder="never">
+    </div>
+    <button type="button" class="admin-btn" id="ak-create-btn">Create key</button>
+    <div id="ak-modal-msg" style="margin-top:10px; font-size:12.5px;"></div>
+  </div>
+</div>
+
+<!-- ============ Show plaintext modal ============ -->
+<div id="ak-show-modal" class="ak-modal" style="display:none;">
+  <div class="ak-modal-card">
+    <div class="ak-modal-head">
+      <h3>Key created — save it now</h3>
+      <button type="button" class="admin-btn" id="ak-show-close" style="background:var(--adm-surface-2); color:var(--adm-text);">Close</button>
+    </div>
+    <p class="admin-card-sub">This is the only time the plaintext key will be shown. Copy it now.</p>
+    <textarea id="ak-plaintext" rows="3" readonly style="width:100%; padding:10px 12px; border:1px solid var(--adm-line-2); border-radius:8px; background:var(--adm-surface-2); color:var(--adm-text); font-family: monospace; font-size:13px;"></textarea>
+    <div style="display:flex; gap:8px; margin-top:10px;">
+      <button type="button" class="admin-btn" id="ak-copy-btn">Copy</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.ak-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+.ak-loading { color: var(--adm-muted); }
+.ak-item {
+  padding: 14px 16px; border: 1px solid var(--adm-line); border-radius: 10px;
+  background: var(--adm-surface-2); display: flex; justify-content: space-between;
+  gap: 12px; align-items: flex-start; flex-wrap: wrap;
+}
+.ak-item.inactive { opacity: 0.55; }
+.ak-item-head { font-weight: 600; color: var(--adm-text); margin-bottom: 4px; }
+.ak-item-meta { font-size: 12px; color: var(--adm-muted); display: flex; gap: 12px; flex-wrap: wrap; }
+.ak-item-scopes { font-size: 12px; color: var(--adm-text-soft); margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap; }
+.ak-scope-chip {
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  background: var(--adm-bg); border: 1px solid var(--adm-line);
+  font-size: 11px; font-weight: 600; color: var(--adm-text-soft);
+}
+.ak-actions { display: flex; gap: 6px; }
+.ak-actions button {
+  padding: 6px 10px; font-size: 12px; border-radius: 6px;
+  border: 1px solid var(--adm-line-2); background: var(--adm-bg); color: var(--adm-text-soft);
+  cursor: pointer; font-family: inherit;
+}
+.ak-actions button.danger:hover { border-color: var(--adm-error); color: var(--adm-error); }
+.ak-modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+}
+.ak-modal-card {
+  width: 100%; max-width: 560px; background: var(--adm-surface);
+  border: 1px solid var(--adm-line); border-radius: 16px; padding: 24px;
+  max-height: 90vh; overflow-y: auto;
+}
+.ak-modal-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom: 16px; }
+.ak-modal-head h3 { margin: 0; font-family: var(--adm-font-display); }
+.ak-field { margin-bottom: 12px; }
+.ak-field label { display:block; font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--adm-muted); margin-bottom:4px; }
+.ak-field input {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--adm-line-2); border-radius: 8px;
+  font-size: 14px; font-family: inherit; background: var(--adm-surface-2);
+  color: var(--adm-text); outline: none;
+}
+.ak-scopes { display: flex; gap: 6px; flex-wrap: wrap; }
+.ak-scope-toggle {
+  padding: 6px 12px; border-radius: 999px; cursor: pointer; user-select: none;
+  border: 1px solid var(--adm-line-2); background: var(--adm-surface-2);
+  color: var(--adm-text-soft); font-size: 12px; font-weight: 600;
+}
+.ak-scope-toggle.on { background: var(--adm-brand); color: #fff; border-color: var(--adm-brand); }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login"; return; }
+  var slug = null;
+  var allowedScopes = [];
+  var selectedScopes = new Set();
+
+  function h() { return { "Authorization": "Bearer " + token, "X-Tenant-Slug": slug, "Content-Type": "application/json" }; }
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  async function resolveSlug() {
+    var res = await fetch("/business/api/me", { headers: { "Authorization": "Bearer " + token } });
+    if (!res.ok) { try{ localStorage.removeItem("px_business_token"); }catch(e){}; window.location.href = "/business/login"; return; }
+    slug = (await res.json()).tenant_slug;
+  }
+
+  function fmtDate(s) {
+    if (!s) return "—";
+    return s.slice(0, 16).replace("T", " ");
+  }
+
+  async function loadKeys() {
+    var list = document.getElementById("ak-list");
+    list.innerHTML = '<div class="ak-loading">Loading…</div>';
+    var res = await fetch("/business/api/keys", { headers: h() });
+    if (!res.ok) { list.innerHTML = '<div class="ak-loading">Failed.</div>'; return; }
+    var d = await res.json();
+    allowedScopes = d.allowed_scopes || [];
+    renderScopes();
+    if (!d.items.length) {
+      list.innerHTML = '<div class="ak-loading">No API keys yet.</div>';
+      return;
+    }
+    list.innerHTML = d.items.map(renderKey).join("");
+    list.querySelectorAll("button[data-revoke]").forEach(function(b){
+      b.addEventListener("click", function(){ revoke(b.getAttribute("data-revoke")); });
+    });
+  }
+
+  function renderKey(k) {
+    var chips = (k.scopes || []).map(function(s){ return '<span class="ak-scope-chip">' + esc(s) + '</span>'; }).join("");
+    var lastUsed = k.last_used_at ? ("Last used: " + fmtDate(k.last_used_at)) : "Never used";
+    var expires = k.expires_at ? ("Expires: " + fmtDate(k.expires_at)) : "No expiry";
+    return '<div class="ak-item' + (k.active ? '' : ' inactive') + '">' +
+      '<div style="flex:1; min-width:200px;">' +
+        '<div class="ak-item-head">' + esc(k.name) + (k.active ? '' : ' · revoked') + '</div>' +
+        '<div class="ak-item-meta">' +
+          '<span>Prefix: <code>' + esc(k.prefix) + '…</code></span>' +
+          '<span>' + esc(lastUsed) + '</span>' +
+          '<span>' + esc(expires) + '</span>' +
+        '</div>' +
+        '<div class="ak-item-scopes">' + chips + '</div>' +
+      '</div>' +
+      '<div class="ak-actions">' +
+        (k.active ? '<button class="danger" data-revoke="' + esc(k.id) + '">Revoke</button>' : '') +
+      '</div>' +
+    '</div>';
+  }
+
+  function renderScopes() {
+    var wrap = document.getElementById("ak-scopes");
+    wrap.innerHTML = allowedScopes.map(function(s){
+      return '<div class="ak-scope-toggle' + (selectedScopes.has(s) ? ' on' : '') + '" data-s="' + esc(s) + '">' + esc(s) + '</div>';
+    }).join("");
+    wrap.querySelectorAll(".ak-scope-toggle").forEach(function(el){
+      el.addEventListener("click", function(){
+        var s = el.getAttribute("data-s");
+        if (selectedScopes.has(s)) { selectedScopes.delete(s); el.classList.remove("on"); }
+        else { selectedScopes.add(s); el.classList.add("on"); }
+      });
+    });
+  }
+
+  // -------- Create modal --------
+  document.getElementById("ak-new-btn").addEventListener("click", function(){
+    selectedScopes = new Set();
+    document.getElementById("ak-name").value = "";
+    document.getElementById("ak-expires").value = "";
+    document.getElementById("ak-modal-msg").textContent = "";
+    renderScopes();
+    document.getElementById("ak-modal").style.display = "flex";
+  });
+  document.getElementById("ak-modal-close").addEventListener("click", function(){
+    document.getElementById("ak-modal").style.display = "none";
+  });
+  document.getElementById("ak-show-close").addEventListener("click", function(){
+    document.getElementById("ak-show-modal").style.display = "none";
+  });
+
+  document.getElementById("ak-create-btn").addEventListener("click", async function(){
+    var msg = document.getElementById("ak-modal-msg");
+    var name = document.getElementById("ak-name").value.trim();
+    var expires = parseInt(document.getElementById("ak-expires").value, 10);
+    if (!name) { msg.textContent = "Name is required."; return; }
+    if (!selectedScopes.size) { msg.textContent = "Pick at least one scope."; return; }
+    msg.textContent = "Creating…";
+    var body = { name: name, scopes: Array.from(selectedScopes) };
+    if (!isNaN(expires)) body.expires_in_days = expires;
+
+    var res = await fetch("/business/api/keys", { method: "POST", headers: h(), body: JSON.stringify(body) });
+    var d = await res.json();
+    if (!res.ok) { msg.textContent = d.detail || "Failed."; return; }
+
+    document.getElementById("ak-modal").style.display = "none";
+    document.getElementById("ak-plaintext").value = d.plaintext;
+    document.getElementById("ak-show-modal").style.display = "flex";
+    loadKeys();
+  });
+
+  document.getElementById("ak-copy-btn").addEventListener("click", function(){
+    var ta = document.getElementById("ak-plaintext");
+    ta.select();
+    try { document.execCommand("copy"); } catch(e) {}
+    alert("Copied to clipboard.");
+  });
+
+  async function revoke(id) {
+    if (!confirm("Revoke this key? Any system using it will stop working.")) return;
+    await fetch("/business/api/keys/" + id + "/revoke", { method: "POST", headers: h() });
+    loadKeys();
+  }
+
+  (async function(){
+    await resolveSlug();
+    if (!slug) return;
+    loadKeys();
+  })();
+})();
+</script>
+{% endblock %}

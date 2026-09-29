@@ -15,6 +15,7 @@ from app.api import analytics as analytics_router
 from app.api import auth as auth_router
 from app.api import bookings as bookings_router
 from app.api import business as business_router
+from app.api import business_api_keys as business_api_keys_router
 from app.api import business_insights as business_insights_router
 from app.api import business_reviews as business_reviews_router
 from app.api import business_market as business_market_router
@@ -147,6 +148,7 @@ app.include_router(auth_router.router)
 app.include_router(bookings_router.router)
 app.include_router(business_router.router)
 app.include_router(business_marketing_router.router)
+app.include_router(business_api_keys_router.router)
 app.include_router(business_insights_router.router)
 app.include_router(business_reviews_router.router)
 app.include_router(business_market_router.router)
