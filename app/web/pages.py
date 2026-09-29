@@ -10,6 +10,36 @@ from app.models.tenant import Tenant
 from app.services import service_service
 from app.web.templates import templates
 
+# ---------- Leaderboard badges helper (Phase 29) ----------
+
+
+def _badges_by_tenant(db) -> dict[str, str]:
+    """Return {tenant_id: 'gold'|'silver'|'bronze'} for the current period.
+
+    Only tenants ranked 1..3 in their category get a badge.
+    Safe when no scores exist yet (returns {}).
+    """
+    try:
+        from app.models.business_score import BusinessScore
+        from app.services.scoring_engine import current_period
+
+        ps, pe = current_period()
+        rows = (
+            db.query(BusinessScore)
+            .filter(
+                BusinessScore.period_start == ps,
+                BusinessScore.period_end == pe,
+                BusinessScore.rank_in_category.in_([1, 2, 3]),
+            )
+            .all()
+        )
+        mapping = {1: "gold", 2: "silver", 3: "bronze"}
+        return {r.tenant_id: mapping[r.rank_in_category] for r in rows if r.rank_in_category in mapping}
+    except Exception:
+        return {}
+
+
+
 router = APIRouter(tags=["web"])
 
 # Paths that must never be treated as tenant slugs
@@ -168,6 +198,7 @@ def businesses(request: Request, db: DBSession = Depends(get_db)) -> HTMLRespons
         "pages/businesses.html",
         {
             "tenant": None,
+            "badges": _badges_by_tenant(db),
             "businesses": _active_tenants(db),
         },
     )

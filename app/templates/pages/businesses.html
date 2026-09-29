@@ -37,6 +37,10 @@
         <a href="/{{ b.slug }}/" class="px-biz-card">
           <div class="px-biz-thumb" style="background: linear-gradient(135deg, {{ branding.get('primary_color', '#6366f1') }}, {{ branding.get('secondary_color', '#818cf8') }});">
             <span class="px-biz-thumb-initial">{{ b.name[0] }}</span>
+            {% if badges and badges.get(b.id) %}
+              {% set badge = badges.get(b.id) %}
+              <span class="px-lb-card-badge px-lb-card-badge-{{ badge }}">{% if badge == 'gold' %}🥇{% elif badge == 'silver' %}🥈{% else %}🥉{% endif %}</span>
+            {% endif %}
           </div>
           <div class="px-biz-body">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
@@ -57,5 +61,26 @@
     </div>
   </div>
 </section>
+
+
+<style>
+.px-biz-thumb { position: relative; }
+.px-lb-card-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+.px-lb-card-badge-gold   { background: linear-gradient(135deg, #f5c542, #d4a017); }
+.px-lb-card-badge-silver { background: linear-gradient(135deg, #d8dde6, #a3aab5); }
+.px-lb-card-badge-bronze { background: linear-gradient(135deg, #e0a878, #b47a3a); }
+</style>
 
 {% endblock %}
