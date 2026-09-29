@@ -1,0 +1,342 @@
+{% extends "business/business_base.html" %}
+
+{% block title %}My Score — Business Panel{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h2>My Leaderboard Score</h2>
+  <p class="admin-card-sub" style="margin-bottom: 0;">
+    Your monthly AI-driven score based on 5 criteria. Top 3 in each category earn
+    badges and platform rewards. Score is recomputed monthly by the platform.
+  </p>
+</div>
+
+<div id="score-alert" class="sc-alert" style="display:none;"></div>
+
+<!-- ==================== Score Overview ==================== -->
+<div id="score-block" style="display:none;">
+  <div class="sc-grid">
+    <div class="admin-card sc-overall">
+      <div class="sc-overall-label">Overall score</div>
+      <div class="sc-overall-value"><span id="sc-overall">–</span><span class="sc-overall-max">/100</span></div>
+      <div class="sc-overall-meta">
+        <span id="sc-rank-overall">Rank –</span>
+        <span id="sc-rank-cat">Category rank –</span>
+      </div>
+      <div id="sc-badge-wrap"></div>
+    </div>
+
+    <div class="admin-card sc-criteria">
+      <h3>Criteria breakdown</h3>
+      <div id="sc-criteria-list"></div>
+    </div>
+  </div>
+
+  <div class="admin-card" id="sc-rewards-wrap" style="display:none; margin-top:16px;">
+    <h3>Your rewards</h3>
+    <div id="sc-rewards-list"></div>
+  </div>
+
+  <div class="admin-card" id="sc-gap-wrap" style="display:none; margin-top:16px;">
+    <h3>Next rank</h3>
+    <div id="sc-gap-list"></div>
+  </div>
+
+  <div class="admin-card" style="margin-top:16px;">
+    <div class="coach-head">
+      <h3>AI tips to improve</h3>
+      <button type="button" class="admin-btn" id="btn-tips">Get tips</button>
+    </div>
+    <div id="sc-tips" class="sc-tips">Click "Get tips" to see personalized recommendations.</div>
+  </div>
+</div>
+
+<div id="score-empty" class="admin-card" style="display:none;">
+  <div class="sc-empty">
+    <div class="sc-empty-icon">🏆</div>
+    <h3>No score yet for this month</h3>
+    <p>The platform recomputes scores monthly. Ask a platform admin to run a recompute, or check back at the start of next month.</p>
+  </div>
+</div>
+
+<style>
+.sc-alert {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+.sc-alert.err { background: rgba(248,113,113,0.12); color: var(--adm-error); }
+.sc-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 16px;
+}
+@media (max-width: 800px) {
+  .sc-grid { grid-template-columns: 1fr; }
+}
+.sc-overall {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 28px 20px;
+}
+.sc-overall-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--adm-muted);
+  margin-bottom: 8px;
+}
+.sc-overall-value {
+  font-family: var(--adm-font-display);
+  font-size: 64px;
+  font-weight: 800;
+  color: var(--adm-text);
+  line-height: 1;
+}
+.sc-overall-max {
+  font-size: 22px;
+  color: var(--adm-muted);
+  font-weight: 600;
+  margin-left: 4px;
+}
+.sc-overall-meta {
+  display: flex;
+  gap: 14px;
+  margin-top: 12px;
+  color: var(--adm-text-soft);
+  font-size: 13px;
+}
+.sc-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 14px;
+}
+.sc-badge.gold   { background: linear-gradient(135deg, #f5c542, #d4a017); color: #4a3300; }
+.sc-badge.silver { background: linear-gradient(135deg, #d8dde6, #a3aab5); color: #2b3038; }
+.sc-badge.bronze { background: linear-gradient(135deg, #e0a878, #b47a3a); color: #3a1f08; }
+.sc-criteria h3, .sc-overall h3 { margin: 0 0 12px; font-family: var(--adm-font-display); font-size: 16px; }
+.sc-crit-row {
+  display: grid;
+  grid-template-columns: 170px 1fr 60px;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 0;
+}
+.sc-crit-label {
+  font-size: 13.5px;
+  color: var(--adm-text-soft);
+}
+.sc-crit-bar {
+  height: 8px;
+  background: var(--adm-surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--adm-line);
+}
+.sc-crit-fill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--adm-brand), var(--adm-accent));
+  border-radius: 999px;
+}
+.sc-crit-value {
+  font-weight: 700;
+  text-align: right;
+  color: var(--adm-text);
+}
+.sc-tips {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--adm-text-soft);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  min-height: 60px;
+}
+.sc-tips .sc-weak-list {
+  margin: 8px 0 12px 0;
+  padding: 0;
+  list-style: none;
+}
+.sc-tips .sc-weak-list li {
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--adm-line);
+  font-size: 13px;
+  color: var(--adm-text);
+}
+.sc-tips .sc-weak-list li:last-child { border-bottom: none; }
+.sc-tips .sc-weak-score { color: var(--adm-warning); font-weight: 700; }
+.sc-empty {
+  text-align: center;
+  padding: 40px 20px;
+}
+.sc-empty-icon { font-size: 48px; margin-bottom: 12px; }
+.sc-empty h3 { margin: 0 0 8px; }
+.sc-empty p { color: var(--adm-muted); }
+.sc-rewards-list, .sc-gap-list { margin-top: 10px; font-size: 14px; color: var(--adm-text-soft); }
+.sc-reward-item {
+  display: inline-block;
+  padding: 6px 12px;
+  background: var(--adm-surface-2);
+  border: 1px solid var(--adm-line);
+  border-radius: 8px;
+  margin: 4px 6px 4px 0;
+  font-size: 13px;
+  color: var(--adm-text);
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login"; return; }
+
+  var lo = document.getElementById("business-logout");
+  if (lo) lo.addEventListener("click", function(){
+    try{ localStorage.removeItem("px_business_token"); }catch(e){}
+    window.location.href = "/business/login";
+  });
+
+  var slug = null;
+
+  function h() {
+    return { "Authorization": "Bearer " + token, "X-Tenant-Slug": slug, "Content-Type": "application/json" };
+  }
+
+  async function resolveSlug() {
+    var res = await fetch("/business/api/me", { headers: { "Authorization": "Bearer " + token } });
+    if (!res.ok) {
+      try{ localStorage.removeItem("px_business_token"); }catch(e){}
+      window.location.href = "/business/login";
+      return;
+    }
+    var data = await res.json();
+    slug = data.tenant_slug;
+  }
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  var CRITERIA = [
+    ["customer_satisfaction", "Customer Satisfaction"],
+    ["service_quality", "Service Quality"],
+    ["pricing_competitiveness", "Pricing Competitiveness"],
+    ["engagement", "Engagement"],
+    ["loyalty", "Loyalty"],
+  ];
+
+  function renderCriteria(d) {
+    return CRITERIA.map(function(pair){
+      var key = pair[0], label = pair[1];
+      var v = Math.max(0, Math.min(100, Number(d[key]) || 0));
+      return (
+        '<div class="sc-crit-row">' +
+          '<div class="sc-crit-label">' + esc(label) + '</div>' +
+          '<div class="sc-crit-bar"><div class="sc-crit-fill" style="width:' + v + '%"></div></div>' +
+          '<div class="sc-crit-value">' + v.toFixed(1) + '</div>' +
+        '</div>'
+      );
+    }).join("");
+  }
+
+  function rewardChips(rewards) {
+    if (!rewards) return "";
+    var chips = [];
+    if (rewards.hero_featured) chips.push("Hero featured on home");
+    if (rewards.category_featured) chips.push("Category featured");
+    if (rewards.sponsored_promotion) chips.push("Sponsored promotion");
+    if (rewards.commission_discount_pct === 100) chips.push("0% commission next month");
+    else if (rewards.commission_discount_pct === 50) chips.push("50% off commission next month");
+    if (rewards.search_boost) chips.push("Search boost: " + rewards.search_boost);
+    return chips.map(function(c){ return '<span class="sc-reward-item">' + esc(c) + '</span>'; }).join("");
+  }
+
+  async function loadScore() {
+    var res = await fetch("/business/api/score", { headers: h() });
+    if (res.status === 404) {
+      document.getElementById("score-empty").style.display = "block";
+      return;
+    }
+    if (!res.ok) {
+      showErr("Could not load your score.");
+      return;
+    }
+    var d = await res.json();
+    document.getElementById("score-block").style.display = "block";
+    document.getElementById("sc-overall").textContent = Number(d.overall_score).toFixed(1);
+    document.getElementById("sc-rank-overall").textContent = "Rank #" + (d.rank_overall || "-");
+    document.getElementById("sc-rank-cat").textContent = "Category rank #" + (d.rank_in_category || "-");
+    document.getElementById("sc-criteria-list").innerHTML = renderCriteria(d);
+
+    var bw = document.getElementById("sc-badge-wrap");
+    if (d.rewards && d.rewards.badge) {
+      bw.innerHTML = '<span class="sc-badge ' + esc(d.rewards.badge) + '">' + esc(d.rewards.label) + '</span>';
+    }
+
+    if (d.rewards) {
+      document.getElementById("sc-rewards-wrap").style.display = "block";
+      document.getElementById("sc-rewards-list").innerHTML = rewardChips(d.rewards) || "<em>No specific rewards at this rank.</em>";
+    }
+  }
+
+  async function loadTips() {
+    var box = document.getElementById("sc-tips");
+    box.textContent = "Analyzing your score…";
+    var res = await fetch("/business/api/score/tips", { headers: h() });
+    if (!res.ok) {
+      box.textContent = "Could not load tips right now.";
+      return;
+    }
+    var d = await res.json();
+    var html = "";
+    if (d.weakest && d.weakest.length) {
+      html += '<ul class="sc-weak-list">';
+      d.weakest.forEach(function(w){
+        html += '<li>' + esc(w.label) + ' — <span class="sc-weak-score">' + Number(w.score).toFixed(1) + '/100</span></li>';
+      });
+      html += '</ul>';
+    }
+    html += esc(d.advice || "");
+    box.innerHTML = html;
+
+    if (d.next_rank_gap) {
+      document.getElementById("sc-gap-wrap").style.display = "block";
+      document.getElementById("sc-gap-list").innerHTML =
+        'To reach rank <strong>#' + d.next_rank_gap.target_rank + '</strong>, ' +
+        'you need <strong>+' + Number(d.next_rank_gap.gap).toFixed(1) + ' points</strong> ' +
+        '(target score: ' + Number(d.next_rank_gap.target_overall_score).toFixed(1) + ').';
+    }
+  }
+
+  function showErr(msg) {
+    var a = document.getElementById("score-alert");
+    a.className = "sc-alert err";
+    a.textContent = msg;
+    a.style.display = "block";
+  }
+
+  document.getElementById("btn-tips").addEventListener("click", loadTips);
+
+  (async function(){
+    await resolveSlug();
+    if (!slug) return;
+    loadScore();
+  })();
+})();
+</script>
+{% endblock %}
