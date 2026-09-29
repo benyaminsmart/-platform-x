@@ -7,6 +7,40 @@ Last updated: 2026-09-29
 
 ---
 
+## 0. STRATEGIC PRIORITY — READ THIS FIRST
+
+> **Mission:** Platform-X must be *better and more attractive than
+> Booking.com and Agoda* in every dimension. This is the standing
+> directive from the project owner (2026-09-29).
+>
+> **Detailed strategy:** `docs/14-ROADMAP-V3-COMPETITIVE.md`
+>
+> That file is the canonical competitive roadmap. It contains:
+> - Reference competitors (Booking.com, Agoda)
+> - 30 features competitors have that we must add (Tier 1-3)
+> - 19 AI moats we already have (they don't)
+> - 15 blue-ocean innovations no competitor has
+> - 6 implementation waves (Wave 0-5)
+> - Business rules + success metrics + decision log
+>
+> **Current reality (2026-09-29):**
+> - All AI-focused phases complete (~750 tests, 90 smoke checks)
+> - Public API + Webhooks complete
+> - BLOCKED by two user-side items:
+>   1. VPS + Domain purchase (Phase 12)
+>   2. Payment account — Telr/Stripe (Phase 10)
+> - **NEXT: Wave 0 — Foundation for advertising** (see Roadmap v3 §6)
+>
+> **This HANDOFF is the "what is."** The Roadmap v3 is the "where
+> we go and why." Read both.
+>
+> **Anti-features** (do NOT build): social feeds, forum, video
+> reviews, crypto payments, human live chat, virtual currency,
+> auction booking, blockchain. (See Roadmap v3 §5.)
+
+---
+
+
 ## 1. Project Overview
 
 **Name:** Platform-X (working name)
