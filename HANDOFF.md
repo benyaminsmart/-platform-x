@@ -172,6 +172,40 @@ Tag: v0.15.0-content-ai
   - Dark theme, responsive
 - NOTE: URL Onboarding deferred to Phase 13 (Business Onboarding Tools)
 
+### Phase 25 — AI Marketing Copilot: COMPLETE
+Tag: v0.16.0-marketing-ai
+- Marketing service: customer segmentation
+  - 6 segments: all, past_bookers, inactive_90d, high_value (top 20%),
+    new_30d, loyalty_gold_plus
+  - Read-only; cross-tenant isolated; suspended users excluded
+- AI Campaign Writer:
+  - suggest_campaigns (3-5 grounded ideas per tenant, AI sees only counts)
+  - generate_campaign (targeted by segment + goal)
+  - AI never invents discounts; deterministic fallback always available
+- AI Discount Suggester:
+  - Fixed platform policy (max 20%): inactive_90d 15%, high_value 12%,
+    loyalty_gold_plus 10%, new_30d 10%, past_bookers 8%, all 5%
+  - AI writes ONLY the rationale; deterministic impact estimate
+  - Platform cap enforced even if policy tampered
+- Business Marketing API (7 endpoints under /business/api/marketing):
+  - GET  /config              return email_enabled flag
+  - GET  /segments            segmentation summary
+  - GET  /segments/{name}     full email list (owner/manager only)
+  - POST /campaigns/suggest   AI 3-5 ideas
+  - POST /campaigns/generate  AI targeted campaign
+  - POST /discounts/suggest   AI policy-bounded discounts
+  - POST /campaigns/send      send (owner/manager), dry-run if EMAIL_ENABLED=false
+- Marketing Copilot UI at /business/marketing:
+  - Segments grid (click to view emails)
+  - AI campaign ideas (language picker)
+  - Targeted campaign generator
+  - Discount suggestions with impact estimate
+  - Send campaign form (subject + body)
+  - Config badge (Sending enabled / Dry run only)
+- Email sending gated by EMAIL_ENABLED (Phase 11 integration)
+- NOTE: Phase 8 and Phase 24 merged; both WAITING for user's
+  Rewards + Referral business plan.
+
 ### Phase 20 — Business Owner Panel: COMPLETE
 Tag: v0.9.0-business
 - Separate panel under /business/*
@@ -372,16 +406,17 @@ All idempotent.
 
 ## 11. Remaining Work
 
-**Phase 24 — Cross-Business Rewards Enhancement (NEXT)**
-Per Business-First Order. Includes:
+**Phase 24 (merged with Phase 8) — Cross-Business Rewards Enhancement: WAITING**
+Requires user's Rewards + Referral business plan. Once received, build:
 - Redeem catalog (rewards shop)
 - Rewards dashboard (tier progress, milestones)
-- Referral dashboard (referred users, total earned)
-- Referral milestones (bonus at 5, 10, 25 referrals)
+- Referral dashboard + milestones
 - Special offers / promo codes
 - Birthday rewards
-- Tier benefits (real perks)
-- Milestone close (v0.16.0-cross-rewards)
+- Real tier benefits
+
+**Alternative NEXT while waiting: Phase 26 (Real-Time Occupancy + Analytics)**
+No business plan needed. Deterministic + AI features.
 
 
 ## 12. Future Phases (v2 Roadmap)
@@ -599,6 +634,9 @@ Pricing Rules smoke test:
 Content Studio smoke test:
   bash scripts/smoke-content-studio.sh
 
+Marketing Copilot smoke test:
+  bash scripts/smoke-marketing.sh
+
 Fast backup scripts:
   bash scripts/backup.sh phase-N-step-M-done       (code only, ~0.2s)
   bash scripts/backup-full.sh vX.Y.Z-name          (code + DB + .env, ~0.25s)
@@ -622,7 +660,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 403 tests, all passing (+ 32 smoke checks)
+## 14. Test Count: 462 tests, all passing (+ 42 smoke checks)
 
 Test files:
 - test_health.py
@@ -667,6 +705,11 @@ Test files:
 - test_content_importer.py (18, Phase 23)
 - test_business_content_api.py (20, Phase 23)
 - test_business_content_page.py (6, Phase 23)
+- test_marketing_segments.py (13, Phase 25)
+- test_campaign_writer.py (14, Phase 25)
+- test_discount_suggester.py (10, Phase 25)
+- test_business_marketing_api.py (16, Phase 25)
+- test_business_marketing_page.py (6, Phase 25)
 
 Speed: BCRYPT_ROUNDS=4 in tests, schema created once per session.
 
@@ -1063,9 +1106,9 @@ Current working order. Do NOT jump phases. Do NOT skip.
 5. Phase 29 (Leaderboard + AI Scoring) — COMPLETE
 6. Phase 19 (User AI) — COMPLETE
 7. Phase 23 (AI Content Writer) — COMPLETE
-8. Phase 24 (Cross-Business Rewards) — **NEXT**
+8. Phase 24 (Cross-Business Rewards) — WAITING (needs user plan; merged with Phase 8)
 9. Phase 10 (Payment Production — needs Telr/Stripe account)
-10. Phases 25-28 (AI Marketing, Occupancy, Competitor Insights, Review Responder)
+10. Phase 25 DONE; Phases 26-28 (AI Marketing, Occupancy, Competitor Insights, Review Responder)
 11. Phase 12 (VPS + Domain + Named Tunnel — needs purchase)
 12. Phase 13 (Business Onboarding Tools — needs Phase 12)
 13. Phase 14 (API + Webhooks + SDK)
@@ -1100,7 +1143,7 @@ before guests. Reason: businesses pay; users use.
 5. Phase 29 (Leaderboard + AI Scoring) — SOON
 6. Phase 19 (User AI) — COMPLETE (was done early because foundation was ready)
 7. Phase 23 (AI Content Writer) — COMPLETE
-8. Phase 24 (Cross-Business Rewards) — **NEXT**
+8. Phase 24 (Cross-Business Rewards) — WAITING (needs user plan; merged with Phase 8)
 9. Phase 10 (Payment Production)
 10. Phase 25-28 (AI Marketing, Occupancy, Competitor Insights, Review Responder)
 11. Phase 12 (VPS + Domain + Named Tunnel) — requires purchase
@@ -1147,7 +1190,17 @@ before guests. Reason: businesses pay; users use.
 - **Phase 16 / 30** (Mobile App) — last
 - **Phase 23-25** (AI Content Writer, Cross-Business Rewards, AI Marketing) — soon
 - **Phase 26-28** (Realtime Occupancy, Competitor Insights, Review Writer) — soon
-- **Phase 23-29** — Phase 23 and 29 done; Phase 24-28 pending
+- **Phase 24 (merged with 8)** — WAITING for user's Rewards + Referral plan
+- **Phase 26-28** — pending (Phase 25 done)
+
+### Known Pitfall — pydantic + FastAPI routes
+
+Do NOT use `from __future__ import annotations` in API files that define
+pydantic schemas referenced in route signatures. It converts type hints
+to strings and pydantic may fail with:
+  PydanticUndefinedAnnotation: name 'X' is not defined
+This was hit in Phase 25 (business_marketing.py). Keep API files free of
+that import.
 
 ### Key Rules for Future Sessions
 
