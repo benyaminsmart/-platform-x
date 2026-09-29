@@ -895,12 +895,20 @@ def tenant_home(
     services, _total = service_service.list_services(
         db, tenant_id=tenant.id, status_filter="active", page=1, limit=100
     )
+
+    # Recent public reviews (Phase 28)
+    from app.services import review_service
+    reviews = review_service.list_reviews(db, tenant, include_hidden=False, limit=5)
+    review_summary = review_service.tenant_review_summary(db, tenant)
+
     return templates.TemplateResponse(
         request,
         "pages/tenant_home.html",
         {
             "tenant": tenant,
             "services": services,
+            "reviews": reviews,
+            "review_summary": review_summary,
         },
     )
 
