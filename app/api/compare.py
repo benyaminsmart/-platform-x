@@ -55,7 +55,7 @@ def _cat(t: Tenant) -> str:
 @limiter.limit("30/minute")
 def compare(
     request: Request,
-    ids: str = Query(min_length=3, max_length=200),
+    ids: str = Query(min_length=3, max_length=400),
     db: DBSession = Depends(get_db),
 ) -> CompareResponse:
     """Compare 2-4 services side by side (public)."""
