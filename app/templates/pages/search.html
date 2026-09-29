@@ -19,6 +19,21 @@
 <section class="px-section">
   <div class="px-container">
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+    <div id="sr-map-wrap" style="display:none; margin-bottom: 20px;">
+      <div id="sr-map" style="height: 380px; border-radius: 14px; border: 1px solid var(--px-line);"></div>
+      <div class="sr-map-controls" style="display:flex; gap:8px; align-items:center; margin-top:10px; flex-wrap:wrap;">
+        <label style="font-size:12px; color:var(--px-muted);">Search center:</label>
+        <button type="button" class="sr-map-btn" data-lat="25.2048" data-lng="55.2708">Dubai</button>
+        <button type="button" class="sr-map-btn" data-lat="24.4539" data-lng="54.3773">Abu Dhabi</button>
+        <label style="font-size:12px; color:var(--px-muted); margin-left:12px;">Radius (km):</label>
+        <input type="number" id="sr-radius" min="1" max="500" value="20" style="width:80px; padding:6px 8px; border:1px solid var(--px-line); border-radius:6px; font-family:inherit;">
+        <button type="button" class="sr-map-btn" id="sr-clear-geo">Clear</button>
+      </div>
+    </div>
+
     <form id="sr-form" class="sr-form" method="get" action="/search">
       <div class="sr-field">
         <label>Check-in</label>
@@ -75,6 +90,7 @@
         </select>
       </div>
       <button type="submit" class="sr-submit">Update</button>
+      <button type="button" class="sr-submit" id="sr-toggle-map" style="background:var(--px-muted);">Map</button>
     </form>
 
     <div id="sr-meta" class="sr-meta"></div>
@@ -162,6 +178,12 @@
   background: #fff; cursor: pointer; font-family: inherit;
 }
 .sr-pager button:disabled { opacity: 0.4; cursor: default; }
+.sr-map-btn {
+  padding: 6px 12px; border-radius: 6px; border: 1px solid var(--px-line);
+  background: #fff; cursor: pointer; font-family: inherit; font-size: 12px;
+}
+.sr-map-btn:hover { border-color: var(--px-navy); }
+.sr-map-btn.on { background: var(--px-navy); color: #fff; border-color: var(--px-navy); }
 </style>
 {% endblock %}
 
@@ -291,6 +313,119 @@
     document.getElementById("sr-co").value = yyyymmdd(tomorrow);
     document.getElementById("sr-g").value = "1";
   }
+  // ============ Map ============
+  var map = null;
+  var markersLayer = null;
+  var currentCenter = null;
+
+  function initMap() {
+    if (map) return;
+    map = L.map("sr-map").setView([25.2048, 55.2708], 10);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap",
+      maxZoom: 18,
+    }).addTo(map);
+    markersLayer = L.layerGroup().addTo(map);
+  }
+
+  function renderMarkers(items) {
+    if (!map) return;
+    markersLayer.clearLayers();
+    var bounds = [];
+    items.forEach(function(i){
+      var c = i.coordinates;
+      if (!c || c.lat == null || c.lng == null) return;
+      var marker = L.marker([c.lat, c.lng]);
+      var priceTxt = i.price + " " + (i.currency || "");
+      var href = "/" + i.tenant_slug + "/";
+      marker.bindPopup(
+        '<div style="font-family:inherit; font-size:13px;">' +
+          '<strong>' + esc(i.service_name) + '</strong><br>' +
+          esc(i.tenant_name) + '<br>' +
+          '<span style="color:#6b7280;">' + esc(i.location || "") + '</span><br>' +
+          '<strong>' + priceTxt + '</strong><br>' +
+          '<a href="' + href + '" style="color:#0f3d5c; font-weight:600;">Open →</a>' +
+        '</div>'
+      );
+      marker.addTo(markersLayer);
+      bounds.push([c.lat, c.lng]);
+    });
+    if (currentCenter) {
+      L.circle([currentCenter.lat, currentCenter.lng], {
+        radius: (currentCenter.radius_km || 20) * 1000,
+        color: "#0f3d5c", fillColor: "#0f3d5c", fillOpacity: 0.06, weight: 1,
+      }).addTo(markersLayer);
+    }
+    if (bounds.length && !currentCenter) {
+      try { map.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 }); } catch(e){}
+    }
+  }
+
+  document.getElementById("sr-toggle-map").addEventListener("click", function(){
+    var wrap = document.getElementById("sr-map-wrap");
+    var hidden = wrap.style.display === "none";
+    wrap.style.display = hidden ? "block" : "none";
+    if (hidden) {
+      initMap();
+      setTimeout(function(){ map.invalidateSize(); }, 50);
+      if (lastItems && lastItems.length) renderMarkers(lastItems);
+    }
+  });
+
+  document.querySelectorAll(".sr-map-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var lat = btn.getAttribute("data-lat");
+      var lng = btn.getAttribute("data-lng");
+      if (lat == null) {  // clear
+        currentCenter = null;
+        var u = new URLSearchParams(window.location.search);
+        u.delete("lat"); u.delete("lng"); u.delete("radius_km");
+        history.replaceState(null, "", "/search?" + u.toString());
+        runSearch(1);
+        return;
+      }
+      currentCenter = {
+        lat: parseFloat(lat), lng: parseFloat(lng),
+        radius_km: parseFloat(document.getElementById("sr-radius").value) || 20,
+      };
+      var qs = new URLSearchParams(readForm());
+      qs.set("lat", currentCenter.lat);
+      qs.set("lng", currentCenter.lng);
+      qs.set("radius_km", currentCenter.radius_km);
+      history.replaceState(null, "", "/search?" + qs.toString());
+      runSearch(1);
+    });
+  });
+
+  document.getElementById("sr-clear-geo").addEventListener("click", function(){
+    currentCenter = null;
+    var u = new URLSearchParams(window.location.search);
+    u.delete("lat"); u.delete("lng"); u.delete("radius_km");
+    history.replaceState(null, "", "/search?" + u.toString());
+    runSearch(1);
+  });
+
+  // store last items for map render
+  var lastItems = [];
+
+  // patch render to also feed markers
+  var _origRender = render;
+  render = function(d){
+    lastItems = d.items || [];
+    _origRender(d);
+    if (map) renderMarkers(lastItems);
+  };
+
+  // also read geo from URL on boot
+  if (u.has("lat") && u.has("lng")) {
+    currentCenter = {
+      lat: parseFloat(u.get("lat")),
+      lng: parseFloat(u.get("lng")),
+      radius_km: parseFloat(u.get("radius_km") || "20"),
+    };
+    document.getElementById("sr-radius").value = currentCenter.radius_km;
+  }
+
   runSearch(1);
 })();
 </script>
