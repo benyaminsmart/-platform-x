@@ -1,6 +1,75 @@
 {% extends "business/business_base.html" %}
 
 {% block title %}Dashboard — {{ tenant_name }}
+<!-- ============ No-shows ============ -->
+<div class="admin-card" style="margin-top: 24px;">
+  <div class="coach-head">
+    <h3>No-shows</h3>
+    <button type="button" class="admin-btn" id="ns-refresh" style="background:var(--adm-surface-2); color:var(--adm-text);">Refresh</button>
+  </div>
+  <p class="admin-card-sub">Bookings past check-in that were never checked in. Mark as no-show to close them.</p>
+  <div id="ns-list" style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+    <div style="color:var(--adm-muted); font-size:13px;">Loading…</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) return;
+  var slug = null;
+  fetch("/business/api/me", { headers: { "Authorization": "Bearer " + token } })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){ if (d) slug = d.tenant_slug; loadNoShows(); });
+
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  function loadNoShows() {
+    if (!slug) return;
+    var list = document.getElementById("ns-list");
+    list.innerHTML = '<div style="color:var(--adm-muted); font-size:13px;">Loading…</div>';
+    fetch("/business/api/no-shows", { headers: { "Authorization": "Bearer " + token, "X-Tenant-Slug": slug } })
+      .then(function(r){ return r.ok ? r.json() : { total: 0, items: [] }; })
+      .then(function(d){
+        if (!d.items || !d.items.length) {
+          list.innerHTML = '<div style="color:var(--adm-muted); font-size:13px;">No pending no-shows.</div>';
+          return;
+        }
+        list.innerHTML = d.items.map(function(b){
+          return '<div style="padding:10px 12px; border:1px solid var(--adm-line); border-radius:8px; background:var(--adm-surface-2); display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap;">' +
+            '<div style="font-size:13px; color:var(--adm-text);">' +
+              '<strong>' + esc(b.service_name) + '</strong> · check-in ' + esc(b.check_in) +
+              ' · ' + esc(b.total_amount) + ' ' + esc(b.currency) +
+            '</div>' +
+            '<button class="admin-btn ns-mark" data-bid="' + esc(b.id) + '" style="padding:6px 12px; font-size:12px;">Mark no-show</button>' +
+          '</div>';
+        }).join("");
+        list.querySelectorAll(".ns-mark").forEach(function(btn){
+          btn.addEventListener("click", function(){ markNoShow(btn.getAttribute("data-bid")); });
+        });
+      })
+      .catch(function(){ list.innerHTML = '<div style="color:var(--adm-error); font-size:13px;">Network error.</div>'; });
+  }
+
+  function markNoShow(bid) {
+    if (!confirm("Mark this booking as no-show? No refund will be issued per policy.")) return;
+    fetch("/business/api/no-shows/" + encodeURIComponent(bid) + "/mark", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + token, "X-Tenant-Slug": slug },
+    })
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        if (!res.ok) { alert("Failed: " + (res.reason || "unknown")); return; }
+        loadNoShows();
+      })
+      .catch(function(){ alert("Network error."); });
+  }
+
+  document.getElementById("ns-refresh").addEventListener("click", loadNoShows);
+})();
+</script>
+
 <!-- ============ Reports & Exports ============ -->
 <div class="admin-card" style="margin-top: 24px;">
   <div class="coach-head">
