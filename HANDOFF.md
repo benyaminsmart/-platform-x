@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.21.0-wave0-part-a (Phases 0-7, 9, 11, 14, 18-23, 25-30 complete; 24 DEFERRED)
+> Version: v0.22.0-map-location (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32 complete; 24 DEFERRED)
 
 Last updated: 2026-09-29
 
@@ -147,6 +147,16 @@ Last step: Step 4 — Map section on tenant page (2026-09-29 23:31)
 - 7ec863b feat(phase-30/step-7): booking receipt HTML
 
 **Wave 0 part B (needs purchases):** VPS, Domain, Payment (Phase 31)
+
+---
+
+**Phase 32 — Wave 1 / Map + Location Search: COMPLETE**
+Tag: v0.22.0-map-location
+- [x] Step 1 — Coordinates seed for tenants
+- [x] Step 2 — Geographic filter in search (Haversine)
+- [x] Step 3 — Leaflet map in /search (markers + radius)
+- [x] Step 4 — Map section on tenant page (Find nearby)
+- [x] Phase close — tag v0.22.0-map-location
 
 ---
 
