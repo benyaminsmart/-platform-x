@@ -1298,7 +1298,7 @@ Estimated: 4-5 steps
 - AI suggestions for improvement
 Estimated: 6-8 steps
 
-### Phase 30 — Mobile App
+### Phase 40 — Mobile App (formerly Phase 30 in v2 roadmap)
 - Framework: React Native or Flutter
 - Guest app (iOS + Android)
 - Business staff app
