@@ -74,6 +74,9 @@ def search(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
     currency: str | None = Query(default=None, max_length=5),
+    min_rating: float | None = Query(default=None, ge=0, le=5),
+    service_type: str | None = Query(default=None, max_length=50),
+    location: str | None = Query(default=None, max_length=200),
     db: DBSession = Depends(get_db),
 ) -> SearchResponse:
     """Search services across all active tenants."""
@@ -90,5 +93,8 @@ def search(
         page=page,
         page_size=page_size,
         display_currency=currency,
+        min_rating=min_rating,
+        service_type=service_type,
+        location_search=location,
     )
     return SearchResponse(**out)

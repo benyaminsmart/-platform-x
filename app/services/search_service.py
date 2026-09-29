@@ -74,6 +74,9 @@ def search_services(
     page: int = 1,
     page_size: int = 20,
     display_currency: str | None = None,
+    min_rating: float | None = None,
+    service_type: str | None = None,
+    location_search: str | None = None,
 ) -> dict[str, Any]:
     """Return paginated search results.
 
@@ -116,6 +119,23 @@ def search_services(
         rows = [(s, t) for (s, t) in rows if float(s.price) >= float(min_price)]
     if max_price is not None:
         rows = [(s, t) for (s, t) in rows if float(s.price) <= float(max_price)]
+
+    if min_rating is not None:
+        rows = [
+            (s, t) for (s, t) in rows
+            if float(((t.config or {}).get("rating") or 0)) >= float(min_rating)
+        ]
+
+    if service_type:
+        rows = [(s, t) for (s, t) in rows if s.type == service_type]
+
+    if location_search:
+        needle = location_search.strip().lower()
+        if needle:
+            def _has_loc(t):
+                loc = ((t.config or {}).get("location") or "").lower()
+                return needle in loc
+            rows = [(s, t) for (s, t) in rows if _has_loc(t)]
 
     # 2. Guests filter (only for capacity-bearing services)
     if guests > 1:
