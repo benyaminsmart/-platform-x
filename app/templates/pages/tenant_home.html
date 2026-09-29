@@ -199,6 +199,52 @@ k{% extends "layouts/platform_base.html" %}
 </section>
 
 
+<section class="px-section px-tenant-map">
+  <div class="px-container">
+    <div class="px-section-head">
+      <h2>Location</h2>
+    </div>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <div id="tm-map" style="height: 320px; border-radius: 14px; border: 1px solid var(--px-line); background: #eef1f5;"></div>
+    <div style="display:flex; gap:8px; margin-top: 10px; flex-wrap: wrap;">
+      <button type="button" id="tm-find-near" class="px-btn px-btn-primary" style="font-size:13px; padding:8px 14px;">Find similar nearby</button>
+      <a id="tm-open-maps" class="px-btn px-btn-ghost" style="font-size:13px; padding:8px 14px;" target="_blank" rel="noopener">Open in OpenStreetMap</a>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  var lat = {{ (tenant.config.coordinates.lat if tenant.config and tenant.config.coordinates else 25.2048) }};
+  var lng = {{ (tenant.config.coordinates.lng if tenant.config and tenant.config.coordinates else 55.2708) }};
+  var name = "{{ tenant.name|replace('"', '\"') }}";
+
+  var el = document.getElementById("tm-map");
+  if (!el || typeof L === "undefined") return;
+
+  var map = L.map("tm-map").setView([lat, lng], 14);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap", maxZoom: 18,
+  }).addTo(map);
+  L.marker([lat, lng]).addTo(map).bindPopup("<strong>" + name + "</strong>").openPopup();
+
+  var near = document.getElementById("tm-find-near");
+  if (near) {
+    near.addEventListener("click", function(){
+      var qs = new URLSearchParams({
+        lat: lat, lng: lng, radius_km: 15, guests: 1,
+      });
+      window.location.href = "/search?" + qs.toString();
+    });
+  }
+  var osm = document.getElementById("tm-open-maps");
+  if (osm) {
+    osm.href = "https://www.openstreetmap.org/?mlat=" + lat + "&mlon=" + lng + "#map=15/" + lat + "/" + lng;
+  }
+})();
+</script>
+
 <section class="px-section px-tenant-availability" data-tenant="{{ tenant.slug }}">
   <div class="px-container">
     <div class="px-section-head">
