@@ -234,10 +234,22 @@ def interpret_market(
                             return None
             return None
 
+        def _as_text(v) -> str:
+            """Coerce a value (str, list[str], dict) into a plain string."""
+            if v is None:
+                return ""
+            if isinstance(v, str):
+                return v
+            if isinstance(v, list):
+                return "\n".join(_as_text(x) for x in v if x is not None)
+            if isinstance(v, dict):
+                return "\n".join(f"{k}: {_as_text(val)}" for k, val in v.items())
+            return str(v)
+
         parsed = _try_parse(raw)
-        if parsed and isinstance(parsed.get("summary"), str):
-            summary = parsed["summary"].strip()[:500]
-            advice = (parsed.get("advice") or "").strip()[:1200] or None
+        if parsed and isinstance(parsed.get("summary"), (str, list, dict)):
+            summary = _as_text(parsed.get("summary")).strip()[:500]
+            advice = _as_text(parsed.get("advice")).strip()[:1200] or None
             if summary:
                 provider = "ai"
 

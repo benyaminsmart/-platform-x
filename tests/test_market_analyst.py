@@ -171,3 +171,37 @@ def test_interpret_languages(db: Session, monkeypatch) -> None:
     for lang in ["en", "ar", "fil", "hi"]:
         out = market_analyst.interpret_market(db, t, language=lang)
         assert out["summary"] == "ok"
+
+def test_interpret_ai_returns_list_advice(db: Session, monkeypatch) -> None:
+    """Regression: AI may return advice as a list of strings."""
+    from app.services.ai import service as ai_service
+
+    payload = (
+        '{"summary": "Great position.", '
+        '"advice": ["Improve pricing", "Add services", "Boost marketing"]}'
+    )
+    monkeypatch.setattr(ai_service, "chat", _stub_ai(payload))
+
+    t = _tenant(db, "ai-list", cfg={"type": "hotel"})
+    out = market_analyst.interpret_market(db, t)
+    assert out["provider"] == "ai"
+    assert "Improve pricing" in out["advice"]
+    assert "Add services" in out["advice"]
+
+
+def test_interpret_ai_returns_dict_summary(db: Session, monkeypatch) -> None:
+    """Regression: AI may return summary as a dict."""
+    from app.services.ai import service as ai_service
+
+    payload = (
+        '{"summary": {"title": "Position", "body": "Top quartile."}, '
+        '"advice": "Keep going."}'
+    )
+    monkeypatch.setattr(ai_service, "chat", _stub_ai(payload))
+
+    t = _tenant(db, "ai-dict", cfg={"type": "hotel"})
+    out = market_analyst.interpret_market(db, t)
+    assert out["provider"] == "ai"
+    assert "Position" in out["summary"]
+    assert "Top quartile" in out["summary"]
+
