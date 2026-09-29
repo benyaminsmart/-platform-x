@@ -35,6 +35,30 @@ def create_booking(
     final_amount: Decimal | None = None
     applied_rules: list[dict] = []
 
+    # Phase 37: rate plan override
+    rate_plan_id = None
+    rate_plan_code = None
+    if getattr(payload, "rate_plan_id", None) and payload.service_id:
+        from app.models.rate_plan import RatePlan
+        from app.services import rate_plan_service
+        rp = (
+            db.query(RatePlan)
+            .filter(
+                RatePlan.id == payload.rate_plan_id,
+                RatePlan.tenant_id == tenant_id,
+                RatePlan.service_id == payload.service_id,
+                RatePlan.active.is_(True),
+            )
+            .one_or_none()
+        )
+        if rp is None:
+            raise ValueError("rate_plan_id does not belong to this service or is inactive")
+        new_price, _delta = rate_plan_service.apply_plan_to_price(base_amount, rp)
+        base_amount = new_price
+        final_amount = new_price
+        rate_plan_id = rp.id
+        rate_plan_code = rp.code
+
     if payload.apply_pricing_rules and payload.service_id:
         service = (
             db.query(Service)
@@ -84,6 +108,8 @@ def create_booking(
         status="pending",
         payment_status="pending",
         referral_code=payload.referral_code,
+        rate_plan_id=rate_plan_id,
+        rate_plan_code=rate_plan_code,
         notes=payload.notes,
     )
     db.add(booking)

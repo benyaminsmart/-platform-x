@@ -48,6 +48,8 @@ class Booking(UUIDMixin, TimestampMixin, Base):
     )
 
     referral_code: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    rate_plan_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    rate_plan_code: Mapped[str | None] = mapped_column(String(40), nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 

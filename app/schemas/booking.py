@@ -32,6 +32,9 @@ class BookingCreate(BaseModel):
     # Default False to preserve existing behavior for all current callers.
     apply_pricing_rules: bool = False
 
+    # Phase 37: optional rate plan selection
+    rate_plan_id: str | None = None
+
     @model_validator(mode="after")
     def validate_dates(self) -> "BookingCreate":
         if self.check_out is not None and self.check_out < self.check_in:
@@ -60,5 +63,7 @@ class BookingPublic(TimestampedModel):
     status: str
     payment_status: str
     referral_code: str | None
+    rate_plan_id: str | None = None
+    rate_plan_code: str | None = None
     notes: str | None
     cancelled_at: datetime | None
