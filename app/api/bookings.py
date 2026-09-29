@@ -25,9 +25,12 @@ def create_booking(
     db: DBSession = Depends(get_db),
 ) -> BookingPublic:
     """Create a new booking for the current user."""
-    booking = booking_service.create_booking(
-        db, tenant_id=tenant.id, user_id=user.id, payload=payload
-    )
+    try:
+        booking = booking_service.create_booking(
+            db, tenant_id=tenant.id, user_id=user.id, payload=payload
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
     return BookingPublic.model_validate(booking)
 
 
