@@ -13,6 +13,7 @@ from app.models.payment import Payment
 from app.models.password_reset import PasswordReset
 from app.models.platform_admin import PlatformAdmin
 from app.models.pricing_rule import PricingRule, PricingRuleApplication
+from app.models.rate_plan import RatePlan
 from app.models.referral import Referral
 from app.models.review import Review
 from app.models.room import Room
@@ -40,6 +41,7 @@ __all__ = [
     "PlatformAdmin",
     "PricingRule",
     "PricingRuleApplication",
+    "RatePlan",
     "Referral",
     "Review",
     "Room",
