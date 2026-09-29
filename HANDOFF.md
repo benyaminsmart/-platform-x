@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.19.0-reviews (Phases 0-7, 9, 11, 18-23, 25-29 complete; 24 DEFERRED; 10/12-16 pending)
+> Version: v0.20.0-public-api (Phases 0-7, 9, 11, 14, 18-23, 25-29 complete; 24 DEFERRED)
 
 Last updated: 2026-09-29
 
@@ -293,6 +293,39 @@ Tag: v0.19.0-reviews
 - 60+ tests, 12 smoke checks
 - Bug fix during smoke: missing {% endif %} broke tenant_home.html
 
+### Phase 14 — Public API + Webhooks + SDK: COMPLETE
+Tag: v0.20.0-public-api
+- APIKey model + service:
+  - pk_live_ prefix, SHA-256 storage, scopes, expiry
+  - constant-time auth (prefix lookup + hmac.compare_digest)
+  - scopes: read:services, read:bookings, read:orders,
+    read:reviews, read:analytics, write:webhooks
+- Public API v1 (X-API-Key header, tenant-scoped):
+  - GET /api/v1/me
+  - GET /api/v1/services[/{id}]
+  - GET /api/v1/bookings[/{id}]
+  - GET /api/v1/reviews
+  - GET /api/v1/analytics/summary?days=N
+  - Read-only, paginated, scope-enforced
+- Webhook model + service:
+  - events: booking.created, booking.confirmed, booking.cancelled,
+    payment.paid, review.created, review.responded
+  - HMAC-SHA256 signature header: X-PlatformX-Signature: sha256=<hex>
+  - Delivery log (WebhookDelivery) with status/response/error
+  - URL rule: https or http://localhost (dev only)
+- Business panel:
+  - /business/api-keys: list/create/revoke API keys
+  - Webhooks section on the same page: list/create/delete
+- Public documentation:
+  - /docs/api: overview, scopes, endpoints, Python/JS/cURL examples,
+    webhook signature verification, error table, Swagger link
+- KNOWN LIMITATION (technical debt):
+  - Webhook secrets are stored as SHA-256 hash only; system-triggered
+    delivery requires plaintext secret. Future phase: encrypted
+    secret storage (per-installation symmetric key).
+- 60+ tests, 13 smoke checks
+- All AI-focused phases + Public API now complete.
+
 ### Phase 20 — Business Owner Panel: COMPLETE
 Tag: v0.9.0-business
 - Separate panel under /business/*
@@ -496,19 +529,24 @@ All idempotent.
 **Phase 24 (merged with Phase 8) — Cross-Business Rewards: DEFERRED BY USER**
 User (2026-09-29): do NOT start until explicitly told.
 
-**Phases remaining (per Business-First order):**
+**All AI-focused phases + Public API are COMPLETE.**
+
+Remaining phases all require user-side decisions or purchases:
 - Phase 10 (Payment Production / Telr) — needs business account
 - Phase 12 (VPS + Domain + Named Tunnel) — needs purchase
 - Phase 13 (Business Onboarding Tools) — needs Phase 12
-- Phase 14 (API + Webhooks + SDK)
 - Phase 15 (Trianon Migration) — after VPS
-- Phase 16 / 30 (Mobile App)
-- Phase 23-29 (AI business features) — ALL DONE
+- Phase 16 / 30 (Mobile App) — long-term
 
-**All AI-focused phases are complete.**
-Next logical moves without user-side purchases:
-- Phase 14 (API + Webhooks + SDK) — pure dev, no purchases needed
-- OR wait for user decision on VPS / Payment / Rewards plan.
+**Technical debt (from Phase 14):**
+- Webhook secret storage: currently SHA-256 only. To enable
+  system-triggered deliveries, need encrypted secret storage
+  (planned for a future phase, before production).
+
+**Suggested next moves (all pending user):**
+- Purchase VPS + domain → Phase 12 (VPS deploy)
+- Get Telr/Stripe account → Phase 10 (Payment production)
+- Provide Rewards plan → Phase 24
 
 
 ## 12. Future Phases (v2 Roadmap)
@@ -738,6 +776,9 @@ Market Insights smoke test:
 Reviews smoke test:
   bash scripts/smoke-reviews.sh
 
+Public API smoke test:
+  bash scripts/smoke-public-api.sh
+
 Fast backup scripts:
   bash scripts/backup.sh phase-N-step-M-done       (code only, ~0.2s)
   bash scripts/backup-full.sh vX.Y.Z-name          (code + DB + .env, ~0.25s)
@@ -761,7 +802,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: ~648 tests, all passing (+ 77 smoke checks)
+## 14. Test Count: ~750 tests, all passing (+ 90 smoke checks)
 
 Test files:
 - test_health.py
@@ -825,6 +866,12 @@ Test files:
 - test_reviews_api.py (17, Phase 28)
 - test_business_reviews_page.py (6, Phase 28)
 - test_tenant_home_reviews.py (4, Phase 28)
+- test_api_key_service.py (16, Phase 14)
+- test_public_api_v1.py (14, Phase 14)
+- test_webhook_service.py (15, Phase 14)
+- test_business_api_keys_api.py (11, Phase 14)
+- test_business_webhooks_api.py (12, Phase 14)
+- test_api_docs_page.py (6, Phase 14)
 
 Speed: BCRYPT_ROUNDS=4 in tests, schema created once per session.
 
