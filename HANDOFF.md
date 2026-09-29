@@ -131,6 +131,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 41 Step 3 — Nearby attractions UI
 - [x] Phase 41 Step 2 — Attractions service + API
 - [x] Phase 41 Step 1 — Attraction model + migration + seed
 - [x] Phase 40 Step 4 — Group management UI
@@ -177,7 +178,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 41 Step 2 — Attractions service + API (2026-09-30 02:54)
+Last step: Phase 41 Step 3 — Nearby attractions UI (2026-09-30 02:55)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -199,6 +200,7 @@ Last step: Phase 41 Step 2 — Attractions service + API (2026-09-30 02:54)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- cf6bbac Phase 41 Step 3 — Nearby attractions UI
 - 6e236e1 Phase 41 Step 2 — Attractions service + API
 - f544763 Phase 41 Step 1 — Attraction model + migration + seed
 - 36ff651 Phase 40 Step 4 — Group management UI
