@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.22.0-map-location (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32 complete; 24 DEFERRED)
+> Version: v0.23.0-wishlist-compare (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32, 33 complete; 24 DEFERRED)
 
 Last updated: 2026-09-29
 
@@ -169,6 +169,16 @@ Tag: v0.22.0-map-location
 - [x] Step 3 — Leaflet map in /search (markers + radius)
 - [x] Step 4 — Map section on tenant page (Find nearby)
 - [x] Phase close — tag v0.22.0-map-location
+
+**Phase 33 — Wave 1 / Wishlist + Compare: COMPLETE**
+Tag: v0.23.0-wishlist-compare
+- [x] Step 1 — Wishlist model + migration
+- [x] Step 2 — Wishlist service + API
+- [x] Step 3 — Heart button in search results
+- [x] Step 4 — Wishlist page (/account/wishlist)
+- [x] Step 5a — Compare API
+- [x] Step 5b — Compare UI + button in search
+- [x] Phase close — tag v0.23.0-wishlist-compare
 
 ---
 
