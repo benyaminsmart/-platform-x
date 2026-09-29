@@ -51,6 +51,16 @@
           <option value="rating">Top rated</option>
         </select>
       </div>
+      <div class="sr-field">
+        <label>Currency</label>
+        <select name="currency" id="sr-cur">
+          <option value="AED">AED</option>
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+          <option value="GBP">GBP</option>
+          <option value="SAR">SAR</option>
+        </select>
+      </div>
       <button type="submit" class="sr-submit">Update</button>
     </form>
 
@@ -161,6 +171,7 @@
       guests: document.getElementById("sr-g").value || "1",
       category: document.getElementById("sr-cat").value || "",
       sort: document.getElementById("sr-sort").value || "popular",
+      currency: document.getElementById("sr-cur").value || "AED",
     };
   }
 
@@ -170,6 +181,7 @@
     document.getElementById("sr-g").value = p.guests || "1";
     document.getElementById("sr-cat").value = p.category || "";
     document.getElementById("sr-sort").value = p.sort || "popular";
+    document.getElementById("sr-cur").value = p.currency || "AED";
   }
 
   async function runSearch(page) {
@@ -190,9 +202,11 @@
   }
 
   function render(d) {
-    meta.textContent = d.total + " result" + (d.total === 1 ? "" : "s")
+    var metaText = d.total + " result" + (d.total === 1 ? "" : "s")
       + (d.check_in && d.check_out ? (" · " + d.check_in + " → " + d.check_out) : "")
       + " · " + d.guests + " guest" + (d.guests == 1 ? "" : "s");
+    if (d.currency_note) metaText += " · " + d.currency_note;
+    meta.textContent = metaText;
 
     if (!d.items.length) {
       results.innerHTML = '<div class="sr-empty">No results. Try different dates or filters.</div>';
@@ -240,13 +254,14 @@
 
   // ---- boot: read query params ----
   var u = new URLSearchParams(window.location.search);
-  if (u.has("check_in") || u.has("check_out") || u.has("category") || u.has("guests") || u.has("sort")) {
+  if (u.has("check_in") || u.has("check_out") || u.has("category") || u.has("guests") || u.has("sort") || u.has("currency")) {
     writeForm({
       check_in: u.get("check_in") || "",
       check_out: u.get("check_out") || "",
       guests: u.get("guests") || "1",
       category: u.get("category") || "",
       sort: u.get("sort") || "popular",
+      currency: u.get("currency") || "AED",
     });
   } else {
     // set defaults
