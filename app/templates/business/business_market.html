@@ -1,0 +1,250 @@
+{% extends "business/business_base.html" %}
+
+{% block title %}Market Insights — Business Panel{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h2>Market Insights</h2>
+  <p class="admin-card-sub" style="margin-bottom: 0;">
+    Anonymous benchmarks from other active businesses in your category and region.
+    No competitor names are ever shown — only aggregate statistics.
+  </p>
+</div>
+
+<!-- ============ Cohort overview ============ -->
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div class="coach-head">
+    <h3>Your cohort</h3>
+    <button type="button" class="admin-btn" id="mk-refresh" style="background:var(--adm-surface-2); color:var(--adm-text);">Refresh</button>
+  </div>
+  <div id="mk-cohort" class="mk-summary">Loading…</div>
+</div>
+
+<!-- ============ Position cards ============ -->
+<div class="mk-grid">
+  <div class="admin-card mk-card">
+    <div class="mk-card-label">Avg price (AED)</div>
+    <div class="mk-card-value" id="pos-price-val">–</div>
+    <div class="mk-bar"><div class="mk-bar-fill" id="pos-price-bar" style="width:0%"></div></div>
+    <div class="mk-card-sub" id="pos-price-sub">—</div>
+  </div>
+  <div class="admin-card mk-card">
+    <div class="mk-card-label">Rating</div>
+    <div class="mk-card-value" id="pos-rating-val">–</div>
+    <div class="mk-bar"><div class="mk-bar-fill" id="pos-rating-bar" style="width:0%"></div></div>
+    <div class="mk-card-sub" id="pos-rating-sub">—</div>
+  </div>
+  <div class="admin-card mk-card">
+    <div class="mk-card-label">Active services</div>
+    <div class="mk-card-value" id="pos-svc-val">–</div>
+    <div class="mk-bar"><div class="mk-bar-fill" id="pos-svc-bar" style="width:0%"></div></div>
+    <div class="mk-card-sub" id="pos-svc-sub">—</div>
+  </div>
+  <div class="admin-card mk-card">
+    <div class="mk-card-label">Bookings (30d)</div>
+    <div class="mk-card-value" id="pos-bk-val">–</div>
+    <div class="mk-bar"><div class="mk-bar-fill" id="pos-bk-bar" style="width:0%"></div></div>
+    <div class="mk-card-sub" id="pos-bk-sub">—</div>
+  </div>
+</div>
+
+<!-- ============ Strengths / Weaknesses ============ -->
+<div class="mk-split">
+  <div class="admin-card mk-list-card">
+    <h3 style="color:var(--adm-success);">Strengths</h3>
+    <ul id="mk-strengths" class="mk-list"><li class="mk-loading">Loading…</li></ul>
+  </div>
+  <div class="admin-card mk-list-card">
+    <h3 style="color:var(--adm-warning);">Weaknesses</h3>
+    <ul id="mk-weaknesses" class="mk-list"><li class="mk-loading">Loading…</li></ul>
+  </div>
+</div>
+
+<!-- ============ Benchmarks table ============ -->
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h3>Category benchmarks (anonymized)</h3>
+  <div id="mk-bench" class="mk-bench">Loading…</div>
+</div>
+
+<!-- ============ AI interpretation ============ -->
+<div class="admin-card">
+  <div class="coach-head">
+    <h3>AI interpretation</h3>
+    <div style="display:flex; gap:6px; align-items:center;">
+      <select id="ai-lang" class="mk-input" style="padding:8px 10px; width:auto; flex:0 0 auto;">
+        <option value="en">EN</option>
+        <option value="ar">AR</option>
+        <option value="fil">FIL</option>
+        <option value="hi">HI</option>
+      </select>
+      <button type="button" class="admin-btn" id="ai-btn">Analyze</button>
+    </div>
+  </div>
+  <div id="mk-ai-out" class="mk-out">Click "Analyze" for a plain-language interpretation of your market position.</div>
+</div>
+
+<style>
+.mk-summary { font-size: 13.5px; color: var(--adm-text-soft); line-height: 1.6; margin-top: 8px; }
+.mk-pill {
+  display: inline-block; padding: 4px 10px; border-radius: 999px;
+  background: var(--adm-surface-2); border: 1px solid var(--adm-line);
+  color: var(--adm-text); font-weight: 600; margin-right: 8px; font-size: 12px;
+}
+.mk-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+@media (max-width: 900px) { .mk-grid { grid-template-columns: repeat(2, 1fr); } }
+.mk-card { padding: 20px 18px; }
+.mk-card-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--adm-muted); margin-bottom: 8px; }
+.mk-card-value { font-family: var(--adm-font-display); font-size: 30px; font-weight: 800; color: var(--adm-text); line-height: 1; }
+.mk-bar { height: 8px; margin: 12px 0 8px; background: var(--adm-surface-2); border: 1px solid var(--adm-line); border-radius: 999px; overflow: hidden; }
+.mk-bar-fill { height: 100%; background: linear-gradient(90deg, var(--adm-brand), var(--adm-accent)); border-radius: 999px; transition: width 0.3s; }
+.mk-card-sub { font-size: 12px; color: var(--adm-text-soft); }
+.mk-split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+@media (max-width: 900px) { .mk-split { grid-template-columns: 1fr; } }
+.mk-list-card h3 { margin: 0 0 12px; font-family: var(--adm-font-display); font-size: 16px; }
+.mk-list { list-style: none; padding: 0; margin: 0; }
+.mk-list li {
+  padding: 8px 0; border-bottom: 1px dashed var(--adm-line);
+  font-size: 13.5px; color: var(--adm-text-soft);
+  display: flex; justify-content: space-between;
+}
+.mk-list li:last-child { border-bottom: none; }
+.mk-list .mk-pct { font-weight: 700; color: var(--adm-text); }
+.mk-loading { color: var(--adm-muted); }
+.mk-bench { font-size: 13px; color: var(--adm-text-soft); margin-top: 10px; }
+.mk-bench table { width: 100%; border-collapse: collapse; }
+.mk-bench th, .mk-bench td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--adm-line); }
+.mk-bench th { color: var(--adm-muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+.mk-bench td { color: var(--adm-text); }
+.mk-out {
+  margin-top: 12px; padding: 12px 14px; background: var(--adm-surface-2);
+  border: 1px solid var(--adm-line); border-radius: 10px; font-size: 13.5px;
+  color: var(--adm-text-soft); line-height: 1.6; white-space: pre-wrap;
+}
+.mk-input { border: 1px solid var(--adm-line-2); border-radius: 8px; background: var(--adm-surface-2); color: var(--adm-text); font-family: inherit; outline: none; }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login"; return; }
+  var slug = null;
+
+  function h() { return { "Authorization": "Bearer " + token, "X-Tenant-Slug": slug, "Content-Type": "application/json" }; }
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  async function resolveSlug() {
+    var res = await fetch("/business/api/me", { headers: { "Authorization": "Bearer " + token } });
+    if (!res.ok) { try{ localStorage.removeItem("px_business_token"); }catch(e){}; window.location.href = "/business/login"; return; }
+    slug = (await res.json()).tenant_slug;
+  }
+
+  async function loadInsights() {
+    var cohort = document.getElementById("mk-cohort");
+    cohort.textContent = "Loading…";
+    var res = await fetch("/business/api/market/insights", { headers: h() });
+    if (!res.ok) { cohort.textContent = "Failed to load."; return; }
+    var d = await res.json();
+
+    var m = d.metrics || {};
+    var cs = m.category_summary || {};
+    cohort.innerHTML =
+      '<span class="mk-pill">Category: ' + esc(m.tenant_category || "—") + '</span>' +
+      '<span class="mk-pill">Region: ' + esc(m.tenant_region || "—") + '</span>' +
+      '<span class="mk-pill">Peers: ' + (cs.cohort_size || 0) + '</span>' +
+      (cs.note ? '<div style="margin-top:8px; color:var(--adm-warning);">' + esc(cs.note) + '</div>' : '');
+
+    // Position cards
+    var pos = (m.tenant_position || {}).positions || {};
+    fillCard("price", pos.avg_price, function(v){ return Number(v).toFixed(0); });
+    fillCard("rating", pos.rating, function(v){ return Number(v).toFixed(2); });
+    fillCard("svc", pos.service_count, function(v){ return Number(v).toFixed(0); });
+    fillCard("bk", pos.bookings_last_30d, function(v){ return Number(v).toFixed(0); });
+
+    // Strengths
+    var sl = document.getElementById("mk-strengths");
+    if (d.strengths && d.strengths.length) {
+      sl.innerHTML = d.strengths.map(function(s){
+        return '<li><span>' + esc(s.label) + '</span><span class="mk-pct">' + s.percentile + '%</span></li>';
+      }).join("");
+    } else {
+      sl.innerHTML = '<li class="mk-loading">No strong dimensions yet.</li>';
+    }
+
+    var wl = document.getElementById("mk-weaknesses");
+    if (d.weaknesses && d.weaknesses.length) {
+      wl.innerHTML = d.weaknesses.map(function(w){
+        return '<li><span>' + esc(w.label) + '</span><span class="mk-pct">' + w.percentile + '%</span></li>';
+      }).join("");
+    } else {
+      wl.innerHTML = '<li class="mk-loading">No weak dimensions identified.</li>';
+    }
+
+    // Benchmarks table
+    var bt = document.getElementById("mk-bench");
+    var metrics = cs.metrics || {};
+    var LABELS = {
+      avg_price: "Avg price (AED)",
+      rating: "Rating",
+      service_count: "Service count",
+      bookings_last_30d: "Bookings (last 30d)",
+    };
+    var rows = "";
+    Object.keys(LABELS).forEach(function(k){
+      var q = metrics[k];
+      if (!q) return;
+      rows += '<tr>' +
+        '<td>' + esc(LABELS[k]) + '</td>' +
+        '<td>' + q.p25 + '</td>' +
+        '<td>' + q.median + '</td>' +
+        '<td>' + q.p75 + '</td>' +
+      '</tr>';
+    });
+    if (rows) {
+      bt.innerHTML = '<table>' +
+        '<thead><tr><th>Metric</th><th>P25</th><th>Median</th><th>P75</th></tr></thead>' +
+        '<tbody>' + rows + '</tbody>' +
+      '</table>';
+    } else {
+      bt.innerHTML = '<div class="mk-loading">No benchmark data.</div>';
+    }
+  }
+
+  function fillCard(key, position, fmt) {
+    var valEl = document.getElementById("pos-" + key + "-val");
+    var barEl = document.getElementById("pos-" + key + "-bar");
+    var subEl = document.getElementById("pos-" + key + "-sub");
+    if (!position) {
+      valEl.textContent = "—";
+      barEl.style.width = "0%";
+      subEl.textContent = "No data";
+      return;
+    }
+    valEl.textContent = fmt(position.value);
+    barEl.style.width = Math.max(2, Math.min(100, position.percentile)) + "%";
+    var top = 100 - position.percentile;
+    subEl.textContent = "You're in the top " + top.toFixed(0) + "%";
+  }
+
+  document.getElementById("ai-btn").addEventListener("click", async function(){
+    var out = document.getElementById("mk-ai-out");
+    out.textContent = "Analyzing…";
+    var lang = document.getElementById("ai-lang").value;
+    var res = await fetch("/business/api/market/insights/ai?language=" + encodeURIComponent(lang), { headers: h() });
+    var d = await res.json();
+    if (!res.ok) { out.textContent = d.detail || "Failed."; return; }
+    out.textContent = d.summary + "\n\n" + (d.advice || "");
+  });
+
+  document.getElementById("mk-refresh").addEventListener("click", loadInsights);
+
+  (async function(){
+    await resolveSlug();
+    if (!slug) return;
+    loadInsights();
+  })();
+})();
+</script>
+{% endblock %}
