@@ -223,3 +223,60 @@ def test_platform_recompute_invalid_period(client: TestClient, admin_client) -> 
     client, h = admin_client
     r = client.post("/platform/api/leaderboard/recompute?period=next", headers=h)
     assert r.status_code == 422  # pydantic pattern validation
+
+
+# ---------- Tips endpoint ----------
+
+
+def test_business_tips_requires_auth(client: TestClient, sample_tenant: Tenant) -> None:
+    r = client.get("/business/api/score/tips", headers={"X-Tenant-Slug": sample_tenant.slug})
+    assert r.status_code == 401
+
+
+def test_business_tips_404_when_not_computed(client: TestClient, sample_tenant: Tenant, db: Session) -> None:
+    _biz_user(db, sample_tenant)
+    tok = _login(client, sample_tenant.slug)
+    r = client.get(
+        "/business/api/score/tips",
+        headers={"Authorization": f"Bearer {tok}", "X-Tenant-Slug": sample_tenant.slug},
+    )
+    assert r.status_code == 404
+
+
+def test_business_tips_returns_tips(client: TestClient, db: Session) -> None:
+    t = _tenant(db, "tips-biz", {"type": "hotel", "rating": 4.0, "reviews_count": 100})
+    _biz_user(db, t)
+    ps, pe = scoring_engine.current_period()
+    lb_service.recompute_scores(db, period_start=ps, period_end=pe)
+
+    tok = _login(client, t.slug)
+    r = client.get(
+        "/business/api/score/tips",
+        headers={"Authorization": f"Bearer {tok}", "X-Tenant-Slug": t.slug},
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert "weakest" in body
+    assert len(body["weakest"]) == 3
+    assert "advice" in body
+    assert body["advice"]
+    # Rank 1 -> no next rank gap
+    assert body["next_rank_gap"] is None
+
+
+def test_business_tips_next_rank_gap_present(client: TestClient, db: Session) -> None:
+    a = _tenant(db, "top-a", {"type": "hotel", "rating": 5.0, "reviews_count": 1000})
+    b = _tenant(db, "second-b", {"type": "hotel", "rating": 3.0, "reviews_count": 100})
+    _biz_user(db, b, email="owner@b.test")
+    ps, pe = scoring_engine.current_period()
+    lb_service.recompute_scores(db, period_start=ps, period_end=pe)
+
+    tok_b = _login(client, b.slug, "owner@b.test")
+    r = client.get(
+        "/business/api/score/tips",
+        headers={"Authorization": f"Bearer {tok_b}", "X-Tenant-Slug": b.slug},
+    )
+    assert r.status_code == 200
+    gap = r.json()["next_rank_gap"]
+    assert gap is not None
+    assert gap["target_rank"] == 1

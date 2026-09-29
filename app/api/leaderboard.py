@@ -28,6 +28,7 @@ from app.models.business_score import BusinessScore
 from app.models.tenant import Tenant
 from app.models.user import User
 from app.services import leaderboard as lb_service
+from app.services import leaderboard_tips
 from app.services import scoring_engine
 
 
@@ -94,6 +95,25 @@ class RecomputeResponse(BaseModel):
     created: int
     updated: int
     ranks_assigned: int
+
+
+class Tip(BaseModel):
+    key: str
+    label: str
+    score: float
+    gap_to_100: float
+
+
+class NextRankGap(BaseModel):
+    target_rank: int
+    target_overall_score: float
+    gap: float
+
+
+class TipsResponse(BaseModel):
+    weakest: list[Tip]
+    next_rank_gap: NextRankGap | None
+    advice: str
 
 
 # ---------- Public ----------
@@ -172,6 +192,28 @@ def get_my_score(
             ),
         )
     return TenantScoreResponse(**d)
+
+
+@business_router.get("/score/tips", response_model=TipsResponse)
+@limiter.limit("20/minute")
+def get_my_tips(
+    request: Request,
+    user: User = Depends(get_current_business_user),
+    tenant: Tenant = Depends(get_business_tenant),
+    db: DBSession = Depends(get_db),
+) -> TipsResponse:
+    """Return AI-generated tips to improve this tenant's leaderboard score."""
+    row = lb_service.get_tenant_score(db, tenant_id=tenant.id)
+    if row is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                "No score computed yet for this period. "
+                "Ask a platform admin to run /platform/api/leaderboard/recompute."
+            ),
+        )
+    out = leaderboard_tips.generate_tips(db, tenant=tenant, row=row)
+    return TipsResponse(**out)
 
 
 # ---------- Platform admin ----------
