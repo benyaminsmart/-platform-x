@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.25.0-booking-mod (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-35 complete; 24 DEFERRED)
+> Version: v0.26.0-rooms (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-36 complete; 24 DEFERRED)
 
 Last updated: 2026-09-30
 
@@ -243,6 +243,15 @@ Tag: v0.25.0-booking-mod
 - [x] Step 4 — No-show detection + API
 - [x] Step 5 — No-show UI in dashboard
 - [x] Phase close — tag v0.25.0-booking-mod
+
+**Phase 36 — Wave 1 / Room inventory + auto-assignment: COMPLETE**
+Tag: v0.26.0-rooms
+- [x] Step 1 — Room model + migration
+- [x] Step 2 — Rooms service + API
+- [x] Step 3 — Rooms page + sidebar link
+- [x] Step 4 — Auto-assign room on payment
+- [x] Step 5 — Room number in receipt + account
+- [x] Phase close — tag v0.26.0-rooms
 
 ---
 
@@ -1076,7 +1085,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 880 tests, all passing
+## 14. Test Count: 902 tests, all passing
 
 Test files:
 - test_health.py
