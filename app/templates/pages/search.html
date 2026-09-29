@@ -43,6 +43,19 @@
         </select>
       </div>
       <div class="sr-field">
+        <label>Location</label>
+        <input type="text" name="location" id="sr-loc" placeholder="City or area" maxlength="200">
+      </div>
+      <div class="sr-field">
+        <label>Min rating</label>
+        <select name="min_rating" id="sr-rating">
+          <option value="">Any</option>
+          <option value="3">3+ stars</option>
+          <option value="4">4+ stars</option>
+          <option value="4.5">4.5+ stars</option>
+        </select>
+      </div>
+      <div class="sr-field">
         <label>Sort</label>
         <select name="sort" id="sr-sort">
           <option value="popular">Popular</option>
@@ -77,7 +90,7 @@
 <style>
 .sr-form {
   display: grid;
-  grid-template-columns: repeat(5, 1fr) auto;
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
   background: #fff;
   padding: 14px;
@@ -172,6 +185,8 @@
       category: document.getElementById("sr-cat").value || "",
       sort: document.getElementById("sr-sort").value || "popular",
       currency: document.getElementById("sr-cur").value || "AED",
+      location: document.getElementById("sr-loc").value || "",
+      min_rating: document.getElementById("sr-rating").value || "",
     };
   }
 
@@ -182,6 +197,8 @@
     document.getElementById("sr-cat").value = p.category || "";
     document.getElementById("sr-sort").value = p.sort || "popular";
     document.getElementById("sr-cur").value = p.currency || "AED";
+    document.getElementById("sr-loc").value = p.location || "";
+    document.getElementById("sr-rating").value = p.min_rating || "";
   }
 
   async function runSearch(page) {
@@ -254,7 +271,7 @@
 
   // ---- boot: read query params ----
   var u = new URLSearchParams(window.location.search);
-  if (u.has("check_in") || u.has("check_out") || u.has("category") || u.has("guests") || u.has("sort") || u.has("currency")) {
+  if (u.has("check_in") || u.has("check_out") || u.has("category") || u.has("guests") || u.has("sort") || u.has("currency") || u.has("location") || u.has("min_rating")) {
     writeForm({
       check_in: u.get("check_in") || "",
       check_out: u.get("check_out") || "",
@@ -262,6 +279,8 @@
       category: u.get("category") || "",
       sort: u.get("sort") || "popular",
       currency: u.get("currency") || "AED",
+      location: u.get("location") || "",
+      min_rating: u.get("min_rating") || "",
     });
   } else {
     // set defaults
