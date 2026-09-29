@@ -106,3 +106,31 @@ def delete_service(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
     return MessageResponse(message="Service deactivated")
 
+@router.get("/{service_id}/gallery")
+def service_gallery(
+    service_id: str,
+    tenant: Tenant = Depends(get_current_tenant),
+    db: DBSession = Depends(get_db),
+) -> dict:
+    """Return the image gallery + attributes for one service."""
+    from app.models.service import Service
+    s = (
+        db.query(Service)
+        .filter(Service.id == service_id, Service.tenant_id == tenant.id)
+        .one_or_none()
+    )
+    if s is None:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Service not found")
+    return {
+        "service_id": s.id,
+        "service_name": s.name,
+        "service_type": s.type,
+        "price": str(s.price),
+        "currency": s.currency,
+        "capacity": s.capacity,
+        "images": list(s.image_urls or []),
+        "attributes": dict(s.attributes or {}),
+        "description": s.description,
+    }
+

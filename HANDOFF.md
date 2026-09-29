@@ -109,7 +109,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
-Last step: phase-30-step-9-done (2026-09-29 23:09)
+Last step: phase-30-step-9b-done (2026-09-29 23:10)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
