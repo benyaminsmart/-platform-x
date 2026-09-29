@@ -393,6 +393,7 @@ k{% extends "layouts/platform_base.html" %}
           </div>
           {% if r.title %}<h4 class="px-review-title">{{ r.title }}</h4>{% endif %}
           <p class="px-review-content">{{ (r.content_polished or r.content) }}</p>
+          <div class="px-review-photos" data-review-id="{{ r.id }}"></div>
           {% if r.response_text %}
             <div class="px-review-response">
               <div class="px-review-response-head">Response from {{ tenant.name }}</div>
@@ -452,6 +453,25 @@ k{% extends "layouts/platform_base.html" %}
   color: #374151;
   white-space: pre-wrap;
 }
+.px-review-photos {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px;
+}
+.px-review-photos:empty { display: none; }
+.px-review-photo {
+  width: 80px; height: 80px; border-radius: 8px;
+  background-size: cover; background-position: center;
+  background-color: #eef1f5; cursor: pointer;
+  transition: transform 0.1s;
+}
+.px-review-photo:hover { transform: scale(1.05); }
+.px-review-photo-lightbox {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 3000; padding: 20px;
+}
+.px-review-photo-lightbox img {
+  max-width: 95vw; max-height: 90vh; border-radius: 12px;
+}
 .px-review-response-head {
   font-size: 11px;
   font-weight: 700;
@@ -461,5 +481,36 @@ k{% extends "layouts/platform_base.html" %}
   margin-bottom: 6px;
 }
 </style>
+
+<script>
+(function(){
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function openLightbox(url) {
+    var lb = document.createElement("div");
+    lb.className = "px-review-photo-lightbox";
+    lb.innerHTML = '<img src="' + esc(url) + '" alt="">';
+    lb.addEventListener("click", function(){ lb.remove(); });
+    document.body.appendChild(lb);
+  }
+  document.querySelectorAll(".px-review-photos").forEach(function(el){
+    var rid = el.getAttribute("data-review-id");
+    if (!rid) return;
+    fetch("/reviews/" + encodeURIComponent(rid) + "/photos")
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(list){
+        if (!list.length) return;
+        el.innerHTML = list.map(function(p){
+          return '<div class="px-review-photo" data-url="' + esc(p.url) + '" style="background-image:url(' + esc(p.url) + ')"></div>';
+        }).join("");
+        el.querySelectorAll(".px-review-photo").forEach(function(img){
+          img.addEventListener("click", function(){
+            openLightbox(img.getAttribute("data-url"));
+          });
+        });
+      })
+      .catch(function(){});
+  });
+})();
+</script>
 
 {% endblock %}
