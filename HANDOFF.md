@@ -131,6 +131,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 39 Step 4 — Message model + migration
 - [x] Phase 39 Step 3 — Write-review modal with photo upload
 - [x] Phase 39 Step 2 — Review photos on tenant page
 - [x] Phase 39 Step 1 — Review photos model + upload API
@@ -168,7 +169,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 39 Step 3 — Write-review modal with photo upload (2026-09-30 01:55)
+Last step: Phase 39 Step 4 — Message model + migration (2026-09-30 01:56)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -190,6 +191,7 @@ Last step: Phase 39 Step 3 — Write-review modal with photo upload (2026-09-30 
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 585334f Phase 39 Step 4 — Message model + migration
 - 3900370 Phase 39 Step 3 — Write-review modal with photo upload
 - b7af556 Phase 39 Step 2 — Review photos on tenant page
 - 5e9e5c0 Phase 39 Step 1 — Review photos model + upload API
