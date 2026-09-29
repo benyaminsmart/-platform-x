@@ -13,6 +13,7 @@ from app.models.password_reset import PasswordReset
 from app.models.platform_admin import PlatformAdmin
 from app.models.pricing_rule import PricingRule, PricingRuleApplication
 from app.models.referral import Referral
+from app.models.review import Review
 from app.models.reward import Reward
 from app.models.service import Service
 from app.models.session import Session
@@ -35,6 +36,7 @@ __all__ = [
     "PricingRule",
     "PricingRuleApplication",
     "Referral",
+    "Review",
     "Reward",
     "Service",
     "Session",
