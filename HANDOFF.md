@@ -242,6 +242,32 @@ Tag: v0.17.0-occupancy
   - Days selector (30/90/180)
   - Dark theme, responsive
 
+### Phase 27 — Competitor / Market Insights: COMPLETE
+Tag: v0.18.0-market-insights
+- Market Insights service (anonymized):
+  - category_summary: quartiles (min/p25/median/p75/max/avg) of
+    avg_price, rating, service_count, bookings_30d per category
+  - tenant_position: percentile of self vs cohort
+  - region_summary: aggregate peers by region (config.location last segment)
+  - market_insights: combined output
+  - Peer identities NEVER exposed (tested)
+- AI Market Analyst:
+  - highlight_strengths_and_weaknesses (deterministic from percentiles)
+  - interpret_market: AI summary + advice (4 languages)
+  - Robust JSON parsing (handles str, list, dict output variants)
+  - Fallback text always available
+- Business Market API (5 endpoints under /business/api/market):
+  GET /summary, /position, /region, /insights, /insights/ai
+  Rate limits: 30/min reads, 10/min AI
+- Market Insights UI at /business/market:
+  cohort card, position cards (percentile bars),
+  strengths/weaknesses lists, benchmark table,
+  AI interpretation with EN/AR/FIL/HI picker
+- 43 new tests
+- 10 smoke checks with real Gemini
+- Bug found and fixed during smoke: AI can return advice as list
+  or summary as dict; added _as_text() coercion + regression tests
+
 ### Phase 20 — Business Owner Panel: COMPLETE
 Tag: v0.9.0-business
 - Separate panel under /business/*
@@ -443,22 +469,15 @@ All idempotent.
 ## 11. Remaining Work
 
 **Phase 24 (merged with Phase 8) — Cross-Business Rewards: DEFERRED BY USER**
-User (2026-09-29): do NOT start this phase until explicitly told.
-Do NOT prompt about it. Wait for the user to bring the plan.
+User (2026-09-29): do NOT start until explicitly told. Do NOT prompt about it.
 
-**Phase 27 — Competitor Insights (NEXT, no plan needed)**
-- Aggregate market data (anonymized)
-- Industry benchmarks
-- Anonymous peer comparison
-- Region / category insights
-
-**Phase 28 — AI Review Writer + Responder**
+**Phase 28 — AI Review Writer + Responder: NEXT**
 - AI writes reviews from guest input
 - Business AI auto-responds to reviews
 - Multi-language reviews
 - Sentiment analysis
 
-**Phase 14, 12, 13, 15, 16** — as documented in Business-First order.
+**Then per Business-First order:** 10 (Payment), 12 (VPS), 13, 14, 15, 16.
 
 
 ## 12. Future Phases (v2 Roadmap)
@@ -682,6 +701,9 @@ Marketing Copilot smoke test:
 Insights smoke test:
   bash scripts/smoke-insights.sh
 
+Market Insights smoke test:
+  bash scripts/smoke-market.sh
+
 Fast backup scripts:
   bash scripts/backup.sh phase-N-step-M-done       (code only, ~0.2s)
   bash scripts/backup-full.sh vX.Y.Z-name          (code + DB + .env, ~0.25s)
@@ -705,7 +727,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 540 tests, all passing (+ 55 smoke checks)
+## 14. Test Count: 587 tests, all passing (+ 65 smoke checks)
 
 Test files:
 - test_health.py
@@ -761,6 +783,10 @@ Test files:
 - test_capacity_forecast.py (15, Phase 26)
 - test_business_insights_api.py (22, Phase 26)
 - test_business_insights_page.py (6, Phase 26)
+- test_market_insights.py (14, Phase 27)
+- test_market_analyst.py (12, Phase 27)
+- test_business_market_api.py (14, Phase 27)
+- test_business_market_page.py (7, Phase 27)
 
 Speed: BCRYPT_ROUNDS=4 in tests, schema created once per session.
 
@@ -1159,7 +1185,7 @@ Current working order. Do NOT jump phases. Do NOT skip.
 7. Phase 23 (AI Content Writer) — COMPLETE
 8. Phase 24 (Cross-Business Rewards) — DEFERRED BY USER (do not start until told)
 9. Phase 10 (Payment Production — needs Telr/Stripe account)
-10. Phases 25, 26 DONE; 27-28 pending (AI Marketing, Occupancy, Competitor Insights, Review Responder)
+10. Phases 25, 26, 27 DONE; 28 next (AI Marketing, Occupancy, Competitor Insights, Review Responder)
 11. Phase 12 (VPS + Domain + Named Tunnel — needs purchase)
 12. Phase 13 (Business Onboarding Tools — needs Phase 12)
 13. Phase 14 (API + Webhooks + SDK)
@@ -1242,7 +1268,7 @@ before guests. Reason: businesses pay; users use.
 - **Phase 23-25** (AI Content Writer, Cross-Business Rewards, AI Marketing) — soon
 - **Phase 26-28** (Realtime Occupancy, Competitor Insights, Review Writer) — soon
 - **Phase 24 (merged with 8)** — WAITING for user's Rewards + Referral plan
-- **Phase 26 DONE; Phase 27-28 pending**
+- **Phase 27 DONE; Phase 28 pending**
 
 ### Known Pitfall — pydantic + FastAPI routes
 
