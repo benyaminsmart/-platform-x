@@ -69,7 +69,6 @@ bash scripts/backup.sh "$LABEL"
 echo "▶ updating HANDOFF progress..."
 export STEP_LABEL="$LABEL"
 
-echo "▶ updating HANDOFF progress..."
 export STEP_LABEL="$LABEL"
 python3 - <<'PYHANDOFF'
 import os, re
