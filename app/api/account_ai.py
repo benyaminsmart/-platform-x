@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session as DBSession
 
-from app.api.deps import get_current_tenant, get_current_user
+from app.api.deps import get_current_user, get_user_home_tenant
 from app.core.config import settings
 from app.core.rate_limit import limiter
 from app.db.session import get_db
@@ -37,7 +37,7 @@ class ChatResponse(BaseModel):
 @router.get("/history")
 def get_history(
     limit: int = 50,
-    tenant: Tenant = Depends(get_current_tenant),
+    tenant: Tenant = Depends(get_user_home_tenant),
     user: User = Depends(get_current_user),
     db: DBSession = Depends(get_db),
 ) -> list[dict]:
@@ -68,7 +68,7 @@ def get_history(
 
 @router.delete("/history")
 def clear_history(
-    tenant: Tenant = Depends(get_current_tenant),
+    tenant: Tenant = Depends(get_user_home_tenant),
     user: User = Depends(get_current_user),
     db: DBSession = Depends(get_db),
 ) -> dict:
@@ -87,7 +87,7 @@ def clear_history(
 def account_ai_chat(
     request: Request,
     payload: ChatRequest,
-    tenant: Tenant = Depends(get_current_tenant),
+    tenant: Tenant = Depends(get_user_home_tenant),
     user: User = Depends(get_current_user),
     db: DBSession = Depends(get_db),
 ) -> ChatResponse:
@@ -172,7 +172,7 @@ class PlanResponse(BaseModel):
 def account_ai_plan(
     request: Request,
     payload: PlanRequest,
-    tenant: Tenant = Depends(get_current_tenant),
+    tenant: Tenant = Depends(get_user_home_tenant),
     user: User = Depends(get_current_user),
     db: DBSession = Depends(get_db),
 ) -> PlanResponse:
@@ -254,7 +254,7 @@ class BookResponse(BaseModel):
 def account_ai_book(
     request: Request,
     payload: BookRequest,
-    tenant: Tenant = Depends(get_current_tenant),
+    tenant: Tenant = Depends(get_user_home_tenant),
     user: User = Depends(get_current_user),
     db: DBSession = Depends(get_db),
 ) -> BookResponse:

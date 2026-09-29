@@ -76,3 +76,25 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user
+
+
+def get_user_home_tenant(
+    user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+) -> Tenant:
+    """Return the authenticated user's home tenant (from JWT-bound user_id).
+
+    Used by account-scoped features (e.g. Layer 2 User AI) where the
+    tenant must come from the authenticated user, not from the URL slug.
+    """
+    tenant = db.query(Tenant).filter(
+        Tenant.id == user.tenant_id,
+        Tenant.status == "active",
+        Tenant.deleted_at.is_(None),
+    ).one_or_none()
+    if tenant is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Home tenant not found for this user",
+        )
+    return tenant
