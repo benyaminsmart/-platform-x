@@ -57,7 +57,7 @@ def _login(client: TestClient, slug: str, email: str = "owner@biz.test") -> str:
 
 
 def test_public_leaderboard_empty(client: TestClient) -> None:
-    r = client.get("/leaderboard")
+    r = client.get("/api/leaderboard")
     assert r.status_code == 200
     assert r.json() == []
 
@@ -68,7 +68,7 @@ def test_public_leaderboard_returns_scores(client: TestClient, db: Session) -> N
     ps, pe = scoring_engine.current_period()
     lb_service.recompute_scores(db, period_start=ps, period_end=pe)
 
-    r = client.get("/leaderboard")
+    r = client.get("/api/leaderboard")
     assert r.status_code == 200
     rows = r.json()
     assert len(rows) == 2
@@ -85,7 +85,7 @@ def test_public_leaderboard_filter_by_category(client: TestClient, db: Session) 
     ps, pe = scoring_engine.current_period()
     lb_service.recompute_scores(db, period_start=ps, period_end=pe)
 
-    r = client.get("/leaderboard?category=hotels")
+    r = client.get("/api/leaderboard?category=hotels")
     assert r.status_code == 200
     rows = r.json()
     assert len(rows) == 1
@@ -94,7 +94,7 @@ def test_public_leaderboard_filter_by_category(client: TestClient, db: Session) 
 
 
 def test_public_leaderboard_invalid_category(client: TestClient) -> None:
-    r = client.get("/leaderboard?category=bogus")
+    r = client.get("/api/leaderboard?category=bogus")
     assert r.status_code == 400
 
 
@@ -104,7 +104,7 @@ def test_public_leaderboard_limit(client: TestClient, db: Session) -> None:
     ps, pe = scoring_engine.current_period()
     lb_service.recompute_scores(db, period_start=ps, period_end=pe)
 
-    r = client.get("/leaderboard?limit=2")
+    r = client.get("/api/leaderboard?limit=2")
     assert len(r.json()) == 2
 
 
@@ -118,7 +118,7 @@ def test_categories_endpoint(client: TestClient, db: Session) -> None:
     ps, pe = scoring_engine.current_period()
     lb_service.recompute_scores(db, period_start=ps, period_end=pe)
 
-    r = client.get("/leaderboard/categories")
+    r = client.get("/api/leaderboard/categories")
     assert r.status_code == 200
     cats = {c["category"]: c for c in r.json()}
     assert cats["hotels"]["tenants"] == 2

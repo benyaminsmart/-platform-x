@@ -32,7 +32,7 @@ from app.services import leaderboard_tips
 from app.services import scoring_engine
 
 
-router = APIRouter(prefix="/leaderboard", tags=["leaderboard"])
+router = APIRouter(prefix="/api/leaderboard", tags=["leaderboard"])
 business_router = APIRouter(prefix="/business/api", tags=["business-score"])
 platform_router = APIRouter(prefix="/platform/api", tags=["platform-leaderboard"])
 

@@ -139,6 +139,18 @@ def home(request: Request, db: DBSession = Depends(get_db)) -> HTMLResponse:
     )
 
 
+@router.get("/leaderboard", response_class=HTMLResponse)
+def leaderboard_page(request: Request) -> HTMLResponse:
+    """Public leaderboard page (data loaded client-side from /leaderboard API)."""
+    return templates.TemplateResponse(
+        request,
+        "pages/leaderboard.html",
+        {
+            "active_nav": "leaderboard",
+        },
+    )
+
+
 @router.get("/businesses", response_class=HTMLResponse)
 def businesses(request: Request, db: DBSession = Depends(get_db)) -> HTMLResponse:
     """List of businesses (kept for legacy links).
