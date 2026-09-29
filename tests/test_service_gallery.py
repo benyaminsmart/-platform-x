@@ -13,10 +13,14 @@ def _tenant(db, slug):
 
 
 def _svc(db, tenant, imgs=None, attrs=None):
+    if imgs is None:
+        imgs = ["https://img1.example.com/a.jpg", "https://img2.example.com/b.jpg"]
+    if attrs is None:
+        attrs = {"bed": "king", "view": "sea"}
     s = Service(tenant_id=tenant.id, type="room", name="Deluxe Suite",
                 price=Decimal("800"), currency="AED", capacity=2,
-                attributes=attrs or {"bed": "king", "view": "sea"},
-                image_urls=imgs or ["https://img1.example.com/a.jpg", "https://img2.example.com/b.jpg"],
+                attributes=attrs,
+                image_urls=imgs,
                 status="active", display_order=0)
     db.add(s); db.commit(); db.refresh(s)
     return s

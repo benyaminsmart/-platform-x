@@ -15,19 +15,19 @@ router = APIRouter(prefix="/bookings", tags=["receipts"])
 _RECEIPT_HTML = """<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><title>Receipt {booking_id}</title>
 <style>
-body{font-family:-apple-system,"Segoe UI",Roboto,sans-serif;max-width:720px;margin:40px auto;padding:0 20px;color:#111;}
-.hdr{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #0f3d5c;padding-bottom:16px;margin-bottom:24px;}
-.brand{font-size:22px;font-weight:800;color:#0f3d5c;}
-.brand small{display:block;font-weight:400;font-size:11px;color:#6b7280;letter-spacing:.08em;text-transform:uppercase;margin-top:2px;}
-.doc{font-size:12px;color:#6b7280;text-align:right;}
-h1{font-size:18px;margin:0 0 16px;color:#0f3d5c;}
-table{width:100%;border-collapse:collapse;margin:16px 0;}
-th,td{text-align:left;padding:10px 12px;border-bottom:1px solid #e5e7eb;font-size:13.5px;}
-th{color:#6b7280;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;}
-.total-row td{font-weight:700;font-size:15px;color:#0f3d5c;border-bottom:none;padding-top:16px;}
-.note{font-size:11.5px;color:#6b7280;margin-top:24px;line-height:1.6;}
-.btn{display:inline-block;margin-top:24px;padding:10px 20px;background:#0f3d5c;color:#fff;border-radius:8px;text-decoration:none;font-size:14px;font-weight:600;border:none;cursor:pointer;}
-@media print{.btn{display:none;} body{margin:0;}}
+body{{font-family:-apple-system,"Segoe UI",Roboto,sans-serif;max-width:720px;margin:40px auto;padding:0 20px;color:#111;}}
+.hdr{{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #0f3d5c;padding-bottom:16px;margin-bottom:24px;}}
+.brand{{font-size:22px;font-weight:800;color:#0f3d5c;}}
+.brand small{{display:block;font-weight:400;font-size:11px;color:#6b7280;letter-spacing:.08em;text-transform:uppercase;margin-top:2px;}}
+.doc{{font-size:12px;color:#6b7280;text-align:right;}}
+h1{{font-size:18px;margin:0 0 16px;color:#0f3d5c;}}
+table{{width:100%;border-collapse:collapse;margin:16px 0;}}
+th,td{{text-align:left;padding:10px 12px;border-bottom:1px solid #e5e7eb;font-size:13.5px;}}
+th{{color:#6b7280;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;}}
+.total-row td{{font-weight:700;font-size:15px;color:#0f3d5c;border-bottom:none;padding-top:16px;}}
+.note{{font-size:11.5px;color:#6b7280;margin-top:24px;line-height:1.6;}}
+.btn{{display:inline-block;margin-top:24px;padding:10px 20px;background:#0f3d5c;color:#fff;border-radius:8px;text-decoration:none;font-size:14px;font-weight:600;border:none;cursor:pointer;}}
+@media print{{.btn{{display:none;}} body{{margin:0;}}}}
 </style></head><body>
 <div class="hdr">
   <div class="brand">Platform-X<small>Booking receipt</small></div>
