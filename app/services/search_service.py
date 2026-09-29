@@ -22,6 +22,7 @@ from sqlalchemy.orm import Session as DBSession
 from app.models.booking import Booking
 from app.models.service import Service
 from app.models.tenant import Tenant
+from app.services import currency
 
 
 _EXCLUDED_STATUSES = ("cancelled",)
@@ -72,6 +73,7 @@ def search_services(
     sort: str = "popular",
     page: int = 1,
     page_size: int = 20,
+    display_currency: str | None = None,
 ) -> dict[str, Any]:
     """Return paginated search results.
 
@@ -182,14 +184,27 @@ def search_services(
     page_rows = rows[start : start + page_size]
 
     items: list[dict[str, Any]] = []
+    currency_note = None
+    if display_currency and currency.is_supported(display_currency):
+        display_currency = display_currency.upper()
+        if display_currency != currency.BASE_CURRENCY:
+            currency_note = f"Converted from AED to {display_currency} at an approximate rate."
+
     for s, t in page_rows:
         cfg = t.config or {}
+        price_value = float(s.price)
+        currency_code = s.currency
+        if display_currency and currency.is_supported(display_currency):
+            display_currency_u = display_currency.upper()
+            if display_currency_u != currency.BASE_CURRENCY:
+                price_value = float(currency.convert_from_aed(price_value, display_currency_u))
+                currency_code = display_currency_u
         items.append({
             "service_id": s.id,
             "service_name": s.name,
             "service_type": s.type,
-            "price": float(s.price),
-            "currency": s.currency,
+            "price": price_value,
+            "currency": currency_code,
             "capacity": s.capacity,
             "description": s.description,
             "tenant_id": t.id,
@@ -210,5 +225,6 @@ def search_services(
         "check_out": check_out.isoformat() if check_out else None,
         "guests": guests,
         "sort": sort,
+        "currency_note": currency_note,
         "items": items,
     }

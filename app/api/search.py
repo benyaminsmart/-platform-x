@@ -52,6 +52,7 @@ class SearchResponse(BaseModel):
     check_out: str | None
     guests: int
     sort: str
+    currency_note: str | None = None
     items: list[SearchItem]
 
 
@@ -72,6 +73,7 @@ def search(
     sort: str = Query(default="popular", pattern="^(popular|price_asc|price_desc|rating)$"),
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
+    currency: str | None = Query(default=None, max_length=5),
     db: DBSession = Depends(get_db),
 ) -> SearchResponse:
     """Search services across all active tenants."""
@@ -87,5 +89,6 @@ def search(
         sort=sort,
         page=page,
         page_size=page_size,
+        display_currency=currency,
     )
     return SearchResponse(**out)
