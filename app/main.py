@@ -24,6 +24,7 @@ from app.api import business_exports as business_exports_router
 from app.api import business_insights as business_insights_router
 from app.api import business_reports as business_reports_router
 from app.api import business_reviews as business_reviews_router
+from app.api import business_rooms as business_rooms_router
 from app.api import business_market as business_market_router
 from app.api import business_webhooks as business_webhooks_router
 from app.api import business_marketing as business_marketing_router
@@ -169,6 +170,7 @@ app.include_router(business_exports_router.router)
 app.include_router(business_insights_router.router)
 app.include_router(business_reports_router.router)
 app.include_router(business_reviews_router.router)
+app.include_router(business_rooms_router.router)
 app.include_router(business_market_router.router)
 app.include_router(business_webhooks_router.router)
 app.include_router(business_pricing_router.router)
