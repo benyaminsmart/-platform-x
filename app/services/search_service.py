@@ -25,6 +25,20 @@ from app.models.tenant import Tenant
 from app.services import currency
 
 
+import math
+
+
+def _haversine_km(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
+    """Great-circle distance between two points in km."""
+    R = 6371.0
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlam = math.radians(lng2 - lng1)
+    a = math.sin(dphi / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dlam / 2) ** 2
+    return 2 * R * math.asin(math.sqrt(a))
+
+
+
 _EXCLUDED_STATUSES = ("cancelled",)
 CATEGORY_FROM_TYPE = {
     "hotel": "hotels",
@@ -77,6 +91,9 @@ def search_services(
     min_rating: float | None = None,
     service_type: str | None = None,
     location_search: str | None = None,
+    lat: float | None = None,
+    lng: float | None = None,
+    radius_km: float | None = None,
 ) -> dict[str, Any]:
     """Return paginated search results.
 
@@ -136,6 +153,22 @@ def search_services(
                 loc = ((t.config or {}).get("location") or "").lower()
                 return needle in loc
             rows = [(s, t) for (s, t) in rows if _has_loc(t)]
+
+    # Geographic filter
+    if lat is not None and lng is not None and radius_km is not None and radius_km > 0:
+        filtered = []
+        for s, t in rows:
+            coords = ((t.config or {}).get("coordinates") or {})
+            t_lat = coords.get("lat")
+            t_lng = coords.get("lng")
+            if t_lat is None or t_lng is None:
+                continue
+            d = _haversine_km(float(lat), float(lng), float(t_lat), float(t_lng))
+            if d <= float(radius_km):
+                # attach distance to service object for later use
+                setattr(s, "_px_distance_km", round(d, 2))
+                filtered.append((s, t))
+        rows = filtered
 
     # 2. Guests filter (only for capacity-bearing services)
     if guests > 1:
@@ -235,6 +268,8 @@ def search_services(
             "rating": cfg.get("rating"),
             "reviews_count": cfg.get("reviews_count") or 0,
             "cover_image": cfg.get("cover_image"),
+            "coordinates": (cfg.get("coordinates") or None),
+            "distance_km": getattr(s, "_px_distance_km", None),
         })
 
     return {

@@ -42,6 +42,8 @@ class SearchItem(BaseModel):
     rating: float | None
     reviews_count: int
     cover_image: str | None
+    coordinates: dict | None = None
+    distance_km: float | None = None
 
 
 class SearchResponse(BaseModel):
@@ -77,6 +79,9 @@ def search(
     min_rating: float | None = Query(default=None, ge=0, le=5),
     service_type: str | None = Query(default=None, max_length=50),
     location: str | None = Query(default=None, max_length=200),
+    lat: float | None = Query(default=None, ge=-90, le=90),
+    lng: float | None = Query(default=None, ge=-180, le=180),
+    radius_km: float | None = Query(default=None, ge=0.1, le=500),
     db: DBSession = Depends(get_db),
 ) -> SearchResponse:
     """Search services across all active tenants."""
@@ -96,5 +101,8 @@ def search(
         min_rating=min_rating,
         service_type=service_type,
         location_search=location,
+        lat=lat,
+        lng=lng,
+        radius_km=radius_km,
     )
     return SearchResponse(**out)
