@@ -109,7 +109,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
-Last step: phase-30-step-10a-done (2026-09-29 23:11)
+Last step: Step 10b — Gallery section on tenant page (2026-09-29 23:18)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -127,10 +127,11 @@ Last step: phase-30-step-10a-done (2026-09-29 23:11)
 - [x] Step 9 — Extended search filters (rating, type, location)
 - [x] Step 9b — Extended filters in /search UI
 - [x] Step 10a — Service gallery API
-- [ ] Step 10b — Gallery section on tenant page (in progress)
+- [x] Step 10b — Gallery section on tenant page (in progress)
 - [ ] Phase close — milestone tag + full HANDOFF update
 
 **Commits (recent):**
+- 3c872b7 Step 10b — Gallery section on tenant page
 - f2485ae feat(phase-30/step-10a): service gallery API
 - 02988b0 feat(phase-30/step-9b): extra filters in /search UI
 - ceb5351 feat(phase-30/step-9): extended search filters
