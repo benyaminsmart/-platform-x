@@ -21,6 +21,21 @@
   </div>
 </div>
 
+<!-- ============ Webhooks ============ -->
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div class="coach-head">
+    <h3>Webhooks</h3>
+    <button type="button" class="admin-btn" id="wh-new-btn">New Webhook</button>
+  </div>
+  <p class="admin-card-sub">
+    We'll POST signed JSON to your URL whenever the selected events happen.
+    Signature header: <code>X-PlatformX-Signature: sha256=&lt;hex&gt;</code>
+  </p>
+  <div id="wh-list" class="ak-list">
+    <div class="ak-loading">Loading…</div>
+  </div>
+</div>
+
 <!-- ============ Create modal ============ -->
 <div id="ak-modal" class="ak-modal" style="display:none;">
   <div class="ak-modal-card">
@@ -42,6 +57,30 @@
     </div>
     <button type="button" class="admin-btn" id="ak-create-btn">Create key</button>
     <div id="ak-modal-msg" style="margin-top:10px; font-size:12.5px;"></div>
+  </div>
+</div>
+
+<!-- ============ Webhook create modal ============ -->
+<div id="wh-modal" class="ak-modal" style="display:none;">
+  <div class="ak-modal-card">
+    <div class="ak-modal-head">
+      <h3>Create Webhook</h3>
+      <button type="button" class="admin-btn" id="wh-modal-close" style="background:var(--adm-surface-2); color:var(--adm-text);">Close</button>
+    </div>
+    <div class="ak-field">
+      <label>Name</label>
+      <input type="text" id="wh-name" placeholder="My backend endpoint" maxlength="200">
+    </div>
+    <div class="ak-field">
+      <label>URL (https, or http://127.0.0.1 for dev)</label>
+      <input type="text" id="wh-url" placeholder="https://example.com/hooks/platform-x" maxlength="1000">
+    </div>
+    <div class="ak-field">
+      <label>Events</label>
+      <div id="wh-events" class="ak-scopes"></div>
+    </div>
+    <button type="button" class="admin-btn" id="wh-create-btn">Create webhook</button>
+    <div id="wh-modal-msg" style="margin-top:10px; font-size:12.5px;"></div>
   </div>
 </div>
 
@@ -237,10 +276,109 @@
     loadKeys();
   }
 
+  // ============ Webhooks ============
+  var allowedEvents = [];
+  var selectedEvents = new Set();
+
+  async function loadWebhooks() {
+    var list = document.getElementById("wh-list");
+    list.innerHTML = '<div class="ak-loading">Loading…</div>';
+    var res = await fetch("/business/api/webhooks", { headers: h() });
+    if (!res.ok) { list.innerHTML = '<div class="ak-loading">Failed.</div>'; return; }
+    var d = await res.json();
+    allowedEvents = d.allowed_events || [];
+    renderEvents();
+    if (!d.items.length) {
+      list.innerHTML = '<div class="ak-loading">No webhooks yet.</div>';
+      return;
+    }
+    list.innerHTML = d.items.map(renderWebhook).join("");
+    list.querySelectorAll("button[data-wh-del]").forEach(function(b){
+      b.addEventListener("click", function(){ deleteWebhook(b.getAttribute("data-wh-del")); });
+    });
+  }
+
+  function renderWebhook(w) {
+    var chips = (w.events || []).map(function(e){ return '<span class="ak-scope-chip">' + esc(e) + '</span>'; }).join("");
+    var lastOk = w.last_success_at ? ("Last OK: " + fmtDate(w.last_success_at)) : "Never OK";
+    var lastErr = w.last_failure_at ? ("Last fail: " + fmtDate(w.last_failure_at)) : "";
+    var status = (w.last_status_code != null) ? ("Status: " + w.last_status_code) : "";
+    var fails = w.failure_count ? ("Failures: " + w.failure_count) : "";
+    return '<div class="ak-item' + (w.active ? '' : ' inactive') + '">' +
+      '<div style="flex:1; min-width:200px;">' +
+        '<div class="ak-item-head">' + esc(w.name) + (w.active ? '' : ' · deleted') + '</div>' +
+        '<div class="ak-item-meta">' +
+          '<span><code>' + esc(w.url) + '</code></span>' +
+          '<span>' + esc(lastOk) + '</span>' +
+          (lastErr ? '<span>' + esc(lastErr) + '</span>' : '') +
+          (status ? '<span>' + esc(status) + '</span>' : '') +
+          (fails ? '<span>' + esc(fails) + '</span>' : '') +
+        '</div>' +
+        '<div class="ak-item-scopes">' + chips + '</div>' +
+      '</div>' +
+      '<div class="ak-actions">' +
+        (w.active ? '<button class="danger" data-wh-del="' + esc(w.id) + '">Delete</button>' : '') +
+      '</div>' +
+    '</div>';
+  }
+
+  function renderEvents() {
+    var wrap = document.getElementById("wh-events");
+    wrap.innerHTML = allowedEvents.map(function(e){
+      return '<div class="ak-scope-toggle' + (selectedEvents.has(e) ? ' on' : '') + '" data-e="' + esc(e) + '">' + esc(e) + '</div>';
+    }).join("");
+    wrap.querySelectorAll(".ak-scope-toggle").forEach(function(el){
+      el.addEventListener("click", function(){
+        var e = el.getAttribute("data-e");
+        if (selectedEvents.has(e)) { selectedEvents.delete(e); el.classList.remove("on"); }
+        else { selectedEvents.add(e); el.classList.add("on"); }
+      });
+    });
+  }
+
+  document.getElementById("wh-new-btn").addEventListener("click", function(){
+    selectedEvents = new Set();
+    document.getElementById("wh-name").value = "";
+    document.getElementById("wh-url").value = "";
+    document.getElementById("wh-modal-msg").textContent = "";
+    renderEvents();
+    document.getElementById("wh-modal").style.display = "flex";
+  });
+  document.getElementById("wh-modal-close").addEventListener("click", function(){
+    document.getElementById("wh-modal").style.display = "none";
+  });
+
+  document.getElementById("wh-create-btn").addEventListener("click", async function(){
+    var msg = document.getElementById("wh-modal-msg");
+    var name = document.getElementById("wh-name").value.trim();
+    var url = document.getElementById("wh-url").value.trim();
+    if (!name) { msg.textContent = "Name is required."; return; }
+    if (!url) { msg.textContent = "URL is required."; return; }
+    if (!selectedEvents.size) { msg.textContent = "Pick at least one event."; return; }
+    msg.textContent = "Creating…";
+    var res = await fetch("/business/api/webhooks", {
+      method: "POST", headers: h(),
+      body: JSON.stringify({ name: name, url: url, events: Array.from(selectedEvents) }),
+    });
+    var d = await res.json();
+    if (!res.ok) { msg.textContent = d.detail || "Failed."; return; }
+    document.getElementById("wh-modal").style.display = "none";
+    document.getElementById("ak-plaintext").value = d.plaintext_secret;
+    document.getElementById("ak-show-modal").style.display = "flex";
+    loadWebhooks();
+  });
+
+  async function deleteWebhook(id) {
+    if (!confirm("Delete this webhook? It will stop receiving events.")) return;
+    await fetch("/business/api/webhooks/" + id + "/delete", { method: "POST", headers: h() });
+    loadWebhooks();
+  }
+
   (async function(){
     await resolveSlug();
     if (!slug) return;
     loadKeys();
+    loadWebhooks();
   })();
 })();
 </script>
