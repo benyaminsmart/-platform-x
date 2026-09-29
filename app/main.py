@@ -14,6 +14,7 @@ from app.api import ai as ai_router
 from app.api import availability as availability_router
 from app.api import analytics as analytics_router
 from app.api import auth as auth_router
+from app.api import booking_mod as booking_mod_router
 from app.api import bookings as bookings_router
 from app.api import cancellation as cancellation_router
 from app.api import compare as compare_router
@@ -156,6 +157,7 @@ app.include_router(ai_router.business_router)
 app.include_router(analytics_router.router)
 app.include_router(auth_router.router)
 app.include_router(bookings_router.router)
+app.include_router(booking_mod_router.router)
 app.include_router(cancellation_router.router)
 app.include_router(compare_router.router)
 app.include_router(business_router.router)
