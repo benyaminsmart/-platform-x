@@ -442,8 +442,9 @@ All idempotent.
 
 ## 11. Remaining Work
 
-**Phase 24 (merged with Phase 8) — Cross-Business Rewards: WAITING**
-Requires user's Rewards + Referral business plan.
+**Phase 24 (merged with Phase 8) — Cross-Business Rewards: DEFERRED BY USER**
+User (2026-09-29): do NOT start this phase until explicitly told.
+Do NOT prompt about it. Wait for the user to bring the plan.
 
 **Phase 27 — Competitor Insights (NEXT, no plan needed)**
 - Aggregate market data (anonymized)
@@ -1156,7 +1157,7 @@ Current working order. Do NOT jump phases. Do NOT skip.
 5. Phase 29 (Leaderboard + AI Scoring) — COMPLETE
 6. Phase 19 (User AI) — COMPLETE
 7. Phase 23 (AI Content Writer) — COMPLETE
-8. Phase 24 (Cross-Business Rewards) — WAITING (needs user plan; merged with Phase 8)
+8. Phase 24 (Cross-Business Rewards) — DEFERRED BY USER (do not start until told)
 9. Phase 10 (Payment Production — needs Telr/Stripe account)
 10. Phases 25, 26 DONE; 27-28 pending (AI Marketing, Occupancy, Competitor Insights, Review Responder)
 11. Phase 12 (VPS + Domain + Named Tunnel — needs purchase)
@@ -1193,7 +1194,7 @@ before guests. Reason: businesses pay; users use.
 5. Phase 29 (Leaderboard + AI Scoring) — SOON
 6. Phase 19 (User AI) — COMPLETE (was done early because foundation was ready)
 7. Phase 23 (AI Content Writer) — COMPLETE
-8. Phase 24 (Cross-Business Rewards) — WAITING (needs user plan; merged with Phase 8)
+8. Phase 24 (Cross-Business Rewards) — DEFERRED BY USER (do not start until told)
 9. Phase 10 (Payment Production)
 10. Phase 25-28 (AI Marketing, Occupancy, Competitor Insights, Review Responder)
 11. Phase 12 (VPS + Domain + Named Tunnel) — requires purchase
