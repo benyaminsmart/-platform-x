@@ -93,7 +93,10 @@ Fast, safe, AI-driven loop:
 **Both commands must be run for every Step.** Without handoff.sh the
 checklist goes stale.
 
-**HANDOFF verification at Phase close (MANDATORY):**
+**HANDOFF verification at Phase close (MANDATORY — AI responsibility):**
+The AI MUST run this verification itself at Phase close, BEFORE tagging.
+Do NOT ask the user. If anything is stale, the AI fixes it in the same
+command sequence, commits, then tags.
 After every Phase (milestone), before tagging, verify HANDOFF is fresh:
   - Version line matches the new tag
   - Test Count matches the real `pytest tests/` output

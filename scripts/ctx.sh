@@ -23,5 +23,8 @@ cat WORKING-METHOD.md
 echo ""
 echo "=== DOCUMENT 3: docs/14-ROADMAP-V3-COMPETITIVE.md ==="
 cat docs/14-ROADMAP-V3-COMPETITIVE.md
+echo ""
+echo "=== DOCUMENT 4: docs/15-AI-PLAYBOOK.md ==="
+cat docs/15-AI-PLAYBOOK.md
 } > "$OUT"
 echo "WROTE: $OUT  ($(du -h "$OUT" | cut -f1), $(wc -l < "$OUT") lines)"

@@ -20,3 +20,6 @@ cat WORKING-METHOD.md
 echo ""
 echo "=== DOCUMENT 3: docs/14-ROADMAP-V3-COMPETITIVE.md ==="
 cat docs/14-ROADMAP-V3-COMPETITIVE.md
+echo ""
+echo "=== DOCUMENT 4: docs/15-AI-PLAYBOOK.md ==="
+cat docs/15-AI-PLAYBOOK.md
