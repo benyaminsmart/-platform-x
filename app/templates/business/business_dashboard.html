@@ -21,6 +21,7 @@
     <button type="button" class="admin-btn exp-btn" data-path="/business/api/exports/bookings.csv">📥 Bookings CSV</button>
     <button type="button" class="admin-btn exp-btn" data-path="/business/api/exports/customers.csv">📥 Customers CSV</button>
     <button type="button" class="admin-btn exp-btn" data-path="/business/api/exports/revenue.csv">📥 Revenue CSV</button>
+    <button type="button" class="admin-btn" id="exp-print-report">🖨️ Print full report (PDF)</button>
   </div>
   <div id="exp-msg" style="margin-top:10px; font-size:12.5px; color:var(--adm-muted);"></div>
 </div>
@@ -36,6 +37,14 @@
   fetch("/business/api/me", { headers: { "Authorization": "Bearer " + token } })
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(d){ if (d) slug = d.tenant_slug; });
+
+  var printBtn = document.getElementById("exp-print-report");
+  if (printBtn) {
+    printBtn.addEventListener("click", function(){
+      var days = document.getElementById("exp-days").value;
+      window.open("/business/reports/print?days=" + encodeURIComponent(days), "_blank");
+    });
+  }
 
   document.querySelectorAll(".exp-btn").forEach(function(btn){
     btn.addEventListener("click", function(){
