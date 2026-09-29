@@ -55,6 +55,31 @@ def _clean_tables() -> None:
             conn.execute(table.delete())
 
 
+@pytest.fixture(scope="function", autouse=True)
+def _fast_ai_stub(monkeypatch):
+    """Global AI stub so tests run fast and deterministically.
+
+    Any test that needs the real provider path can override this by
+    calling the provider directly (not through ai_service.chat) or by
+    explicitly restoring ai_service.chat via monkeypatch.
+    """
+    try:
+        from app.services.ai import service as ai_service
+
+        def _fast_chat(message, *, history=None, provider_name=None):
+            return {
+                "content": "[stub advice]",
+                "provider": "stub",
+                "model": "stub",
+                "tokens_used": 0,
+            }
+
+        monkeypatch.setattr(ai_service, "chat", _fast_chat)
+    except Exception:
+        pass
+    yield
+
+
 @pytest.fixture
 def db() -> Session:
     """Direct DB session for test setup/asserts."""
