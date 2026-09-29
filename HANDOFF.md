@@ -109,10 +109,11 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Step 4 — Map section on tenant page
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Step 3 — Leaflet map in /search (2026-09-29 23:31)
+Last step: Step 4 — Map section on tenant page (2026-09-29 23:31)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -134,6 +135,7 @@ Last step: Step 3 — Leaflet map in /search (2026-09-29 23:31)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- e97f6ee Step 4 — Map section on tenant page
 - 743c3e6 Step 3 — Leaflet map in /search
 - a043b85 Step 2 — Geographic filter in search
 - 9f609ca Step 1 — Coordinates seed for tenants
