@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.11.0-user-ai (Phases 0-7, 9, 11, 18, 19, 20 complete)
+> Version: v0.12.0-pricing-coach (Phases 0-7, 9, 11, 18, 19, 20, 21 complete)
 
 Last updated: 2026-09-28
 
@@ -282,7 +282,7 @@ All idempotent.
 
 ## 11. Remaining Work
 
-**Phase 7 — Admin Panel UI (NEXT)**
+**Phase 22 — Dynamic Pricing Rules (NEXT)**
 - Admin Login page
 - Admin Dashboard (analytics)
 - Tenants list/detail + status change
@@ -658,6 +658,22 @@ Tag: v0.11.0-user-ai
 - Chat history + context memory
 - Multi-language AI
 Estimated: 6-8 steps
+
+### Phase 21 — AI Business Assistant (Pricing Coach): COMPLETE
+Tag: v0.12.0-pricing-coach
+- Business Context Builder (real DB → structured AI context, deterministic)
+- Pricing Coach service: analyze / suggest / forecast / insights
+  (metrics computed in Python, AI only advises on top of real numbers)
+- 5 endpoints under /business/api/ai:
+    POST /chat, POST /pricing/analyze, POST /pricing/suggest,
+    POST /demand/forecast (7-90 days, clamped), POST /insights
+- UI: two tabs (Chat + Pricing Coach), dark-theme compatible
+- Bugfixes:
+    - account/ai: use authenticated user's home tenant, not URL slug
+    - business_ai: removed hardcoded 'trianon-hotel' slug
+    - business_ai: dark theme tokens (no hardcoded light colors)
+- Automated smoke test: scripts/smoke-business-ai.sh (11 checks)
+- 221 tests passing
 
 ### Phase 20 — Business Owner Panel
 - Separate panel: /business/*
