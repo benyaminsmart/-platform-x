@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.20.0-public-api (Phases 0-7, 9, 11, 14, 18-23, 25-29 complete; 24 DEFERRED)
+> Version: v0.21.0-wave0 (Wave 0 part A in progress; goals + method documented)
 
 Last updated: 2026-09-29
 
@@ -40,6 +40,97 @@ Last updated: 2026-09-29
 
 ---
 
+
+## 0.1 Standing Goals (user directive, 2026-09-29)
+
+Permanent goals guiding EVERY decision:
+
+**Primary mission:**
+Platform-X must be *better and more attractive than Booking.com and
+Agoda* in every dimension. Not an alternative — a superior product.
+
+**Strategic stance:**
+AI-First Hospitality Platform (Strategy B).
+- AI for guests (booking, planning, concierge, trip memory)
+- AI for businesses (pricing, marketing, insights, reviews)
+
+**Quality bar (non-negotiable):**
+- EXCELLENCE — no shortcuts, no bugs, production-ready
+- Every feature must answer: "Does this make us more attractive than
+  Booking/Agoda?" If no → reject.
+- Every new feature must consider AI augmentation.
+
+**Business-first direction:**
+Value for business owners comes before value for guests, because
+businesses pay; users use.
+
+**Anti-features (never build):** social feeds, forum, video reviews,
+crypto, human live chat, virtual currency, auction booking, blockchain.
+
+Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
+
+---
+
+## 0.2 Working Method (fast + safe)
+
+Fast, safe, AI-driven loop:
+
+**Per Step (one command):**
+1. Code + tests written together
+2. `bash scripts/step.sh --test <path> --message "<msg>" --label <lbl>`:
+   - git add -A
+   - pytest <test>  (MUST pass, else ABORT and unstage)
+   - git commit (only on green tests)
+   - backup.sh <label>
+   - auto-update HANDOFF progress
+3. Report in Persian
+
+**Per Phase (milestone):**
+1. Full test suite
+2. Milestone tag
+3. Full HANDOFF update
+4. Full backup (backup-full.sh)
+
+**Per Wave (multiple phases):**
+1. Re-read Section 0 + Roadmap v3
+2. Reassess wave success metrics
+3. Update Section 0.1 if needed
+
+**Rules unchanged:** backup, one step at a time, test before done,
+no AI-initiated features, no architecture changes without approval,
+Persian only.
+
+**Speed principle:** one chat message = one complete Step
+(code + tests + commit). Quality preserved because tests must pass.
+
+---
+
+## 0.5 Wave 0 Progress (auto-updated by step.sh)
+
+**Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
+Started: 2026-09-29
+Last step: phase-30-step-8-done (2026-09-29 23:05)
+
+- [x] Step 1 — Search service (cross-tenant, availability, filters)
+- [x] Step 2 — /api/search endpoint
+- [x] Step 3 — Search form on home + /search results page
+- [x] Step 4a — /api/availability endpoint
+- [x] Step 4b — Availability calendar on tenant page
+- [x] Step 5 — Cancellation + refund service
+- [x] Step 5b — Cancellation API
+- [x] Step 5c — Cancel UI in account page
+- [x] Step 6a — Multi-currency service
+- [x] Step 6b — Currency in search API
+- [x] Step 6c — Currency dropdown in /search UI
+- [x] Step 7 — Booking receipt (print to PDF)
+- [x] Step 8 — PWA (manifest + service worker + icon)
+- [ ] Step 9 — Filters + Sort (rating, location, service_type)
+- [ ] Step 10 — Room types + Gallery (enhanced)
+- [ ] Phase close — milestone tag + full HANDOFF update
+
+**Wave 0 part B (needs purchases):** VPS, Domain, Payment (Phase 31)
+
+---
 
 ## 1. Project Overview
 
