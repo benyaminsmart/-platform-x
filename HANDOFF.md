@@ -109,6 +109,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 34 Step 4 — Print report button in dashboard
 - [x] Phase 34 Step 3 — Printable business report
 - [x] Phase 34 Step 2 — Export buttons in dashboard
 - [x] Phase 34 Step 1 — Reports service + exports API
@@ -122,7 +123,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 34 Step 3 — Printable business report (2026-09-29 23:56)
+Last step: Phase 34 Step 4 — Print report button in dashboard (2026-09-29 23:56)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -144,6 +145,7 @@ Last step: Phase 34 Step 3 — Printable business report (2026-09-29 23:56)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 35d9dfb Phase 34 Step 4 — Print report button in dashboard
 - 1535d00 Phase 34 Step 3 — Printable business report
 - 2b658b7 Phase 34 Step 2 — Export buttons in dashboard
 - a3db0f5 Phase 34 Step 1 — Reports service + exports API
