@@ -131,6 +131,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 38 Step 3 — Promotions API
 - [x] Phase 38 Step 2 — Promotion service
 - [x] Phase 38 Step 1 — Promotion model + migration
 - [x] Phase 37 Step 5a — Public service rate plans endpoint
@@ -162,7 +163,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 38 Step 2 — Promotion service (2026-09-30 01:36)
+Last step: Phase 38 Step 3 — Promotions API (2026-09-30 01:37)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -184,6 +185,7 @@ Last step: Phase 38 Step 2 — Promotion service (2026-09-30 01:36)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- e70ff82 Phase 38 Step 3 — Promotions API
 - e774e6d Phase 38 Step 2 — Promotion service
 - daffa9a Phase 38 Step 1 — Promotion model + migration
 - 348bbf9 Phase 37 Step 5a — Public service rate plans endpoint
