@@ -134,3 +134,37 @@ def service_gallery(
         "description": s.description,
     }
 
+
+
+@router.get("/{service_id}/rate-plans")
+def service_rate_plans(
+    service_id: str,
+    tenant: Tenant = Depends(get_current_tenant),
+    db: DBSession = Depends(get_db),
+) -> list[dict]:
+    """Public: list active rate plans for a service."""
+    from app.models.rate_plan import RatePlan
+    rows = (
+        db.query(RatePlan)
+        .filter(
+            RatePlan.tenant_id == tenant.id,
+            RatePlan.service_id == service_id,
+            RatePlan.active.is_(True),
+        )
+        .order_by(RatePlan.price_modifier_value.asc())
+        .all()
+    )
+    return [
+        {
+            "id": rp.id,
+            "name": rp.name,
+            "code": rp.code,
+            "price_modifier_type": rp.price_modifier_type,
+            "price_modifier_value": str(rp.price_modifier_value),
+            "meal_plan": rp.meal_plan,
+            "refundable": rp.refundable,
+            "min_nights": rp.min_nights,
+            "description": rp.description,
+        }
+        for rp in rows
+    ]
