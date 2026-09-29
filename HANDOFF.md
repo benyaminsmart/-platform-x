@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.13.0-dynamic-pricing (Phases 0-7, 9, 11, 18, 19, 20, 21, 22 complete)
+> Version: v0.19.0-reviews (Phases 0-7, 9, 11, 18-23, 25-29 complete; 24 DEFERRED; 10/12-16 pending)
 
 Last updated: 2026-09-29
 
