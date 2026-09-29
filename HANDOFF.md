@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.29.0-reviews-messaging (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-39 complete; 24 DEFERRED)
+> Version: v0.30.0-group-booking (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-40 complete; 24 DEFERRED)
 
 Last updated: 2026-09-30
 
@@ -323,6 +323,14 @@ Tag: v0.29.0-reviews-messaging
 - [x] Step 5 — Messages service + API
 - [x] Step 6 — Messages inbox page + sidebar
 - [x] Phase close — tag v0.29.0-reviews-messaging
+
+**Phase 40 — Wave 1 / Group booking: COMPLETE**
+Tag: v0.30.0-group-booking
+- [x] Step 1 — GroupMember model + is_group on Booking
+- [x] Step 2 — Group service
+- [x] Step 3 — Group booking API
+- [x] Step 4 — Group management UI
+- [x] Phase close — tag v0.30.0-group-booking
 
 ---
 
@@ -743,6 +751,17 @@ Tag: v0.29.0-reviews-messaging
 - Messages API (user: /messages/*, business: /business/api/messages/*)
 - Business Messages inbox page + sidebar link
 - 981 tests passing
+
+### Phase 40 — Group Booking: COMPLETE
+Tag: v0.30.0-group-booking
+- GroupMember model (10 columns; unique email per booking)
+- Booking.is_group boolean (default False)
+- Group service: add/update/remove/list members with share validation
+  (total shares cannot exceed booking total; max 50 members)
+- share_summary: booking_total / shares_total / paid / unpaid / remaining
+- Group API: /bookings/{id}/group (GET, POST, PATCH/{member}, DELETE/{member})
+- Group management modal in account with add/mark-paid/remove
+- 1003 tests passing (milestone: crossed 1000)
 
 ## 6. Data Models (19 tables)
 
@@ -1192,7 +1211,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 981 tests, all passing
+## 14. Test Count: 1003 tests, all passing
 
 Test files:
 - test_health.py
