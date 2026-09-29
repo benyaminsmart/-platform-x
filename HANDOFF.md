@@ -131,6 +131,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 40 Step 4 — Group management UI
 - [x] Phase 40 Step 3 — Group booking API
 - [x] Phase 40 Step 2 — Group service
 - [x] Phase 40 Step 1 — GroupMember model + is_group
@@ -174,7 +175,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 40 Step 3 — Group booking API (2026-09-30 02:45)
+Last step: Phase 40 Step 4 — Group management UI (2026-09-30 02:46)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -196,6 +197,7 @@ Last step: Phase 40 Step 3 — Group booking API (2026-09-30 02:45)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 36ff651 Phase 40 Step 4 — Group management UI
 - 0e3378d Phase 40 Step 3 — Group booking API
 - 2918edf Phase 40 Step 2 — Group service
 - e24af21 Phase 40 Step 1 — GroupMember model + is_group
