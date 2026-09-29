@@ -24,6 +24,7 @@ from app.api.deps_business import get_business_tenant, get_current_business_user
 from app.core.config import settings
 from app.core.rate_limit import limiter
 from app.db.session import get_db
+from app.models.service import Service
 from app.models.tenant import Tenant
 from app.models.user import User
 from app.services.ai import pricing_coach
@@ -179,3 +180,157 @@ def business_market_insights(
     _require_ai_enabled()
     out = pricing_coach.market_insights(db, tenant)
     return CoachResponse(**out)
+
+
+# ---------- Content Writer (Phase 23) ----------
+
+
+class ContentWriteRequest(BaseModel):
+    language: str = Field(default="en", pattern="^(en|ar|fil|hi)$")
+    tone: str = Field(default="professional", pattern="^(professional|friendly|luxury|playful)$")
+
+
+class ServiceDescriptionResponse(BaseModel):
+    description: str
+    language: str
+    tone: str
+    provider: str
+
+
+class TaglineResponse(BaseModel):
+    tagline: str
+    language: str
+    provider: str
+
+
+class ImageKeywordsResponse(BaseModel):
+    keywords: list[str]
+    query: str
+    unsplash_search_url: str
+    unsplash_source_url: str
+
+
+class ApplyDescriptionRequest(ContentWriteRequest):
+    """Generate a description and save it to the service."""
+
+
+def _get_tenant_service(db, tenant: Tenant, service_id: str) -> Service:
+    s = (
+        db.query(Service)
+        .filter(Service.id == service_id, Service.tenant_id == tenant.id)
+        .one_or_none()
+    )
+    if s is None:
+        raise HTTPException(status_code=404, detail="Service not found")
+    return s
+
+
+@business_router.post(
+    "/content/service/{service_id}",
+    response_model=ServiceDescriptionResponse,
+)
+@limiter.limit("15/minute")
+def business_generate_service_description(
+    request: Request,
+    service_id: str,
+    payload: ContentWriteRequest,
+    user: User = Depends(get_current_business_user),
+    tenant: Tenant = Depends(get_business_tenant),
+    db=Depends(get_db),
+) -> ServiceDescriptionResponse:
+    """Generate an appealing description for a service (does not save)."""
+    from app.services.ai import content_writer
+
+    _require_ai_enabled()
+    service = _get_tenant_service(db, tenant, service_id)
+
+    try:
+        out = content_writer.write_service_description(
+            db, tenant=tenant, service=service,
+            language=payload.language, tone=payload.tone,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return ServiceDescriptionResponse(**out)
+
+
+@business_router.post(
+    "/content/service/{service_id}/apply",
+    response_model=ServiceDescriptionResponse,
+)
+@limiter.limit("15/minute")
+def business_apply_service_description(
+    request: Request,
+    service_id: str,
+    payload: ContentWriteRequest,
+    user: User = Depends(get_current_business_user),
+    tenant: Tenant = Depends(get_business_tenant),
+    db=Depends(get_db),
+) -> ServiceDescriptionResponse:
+    """Generate a description and SAVE it to the service.
+
+    Restricted to owner/manager.
+    """
+    from app.services.ai import content_writer
+
+    _require_ai_enabled()
+    if user.business_role not in {"owner", "manager"}:
+        raise HTTPException(status_code=403, detail="Only owner or manager can save content")
+
+    service = _get_tenant_service(db, tenant, service_id)
+
+    try:
+        out = content_writer.write_service_description(
+            db, tenant=tenant, service=service,
+            language=payload.language, tone=payload.tone,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    service.description = out["description"]
+    db.commit()
+    return ServiceDescriptionResponse(**out)
+
+
+@business_router.post("/content/tagline", response_model=TaglineResponse)
+@limiter.limit("15/minute")
+def business_generate_tagline(
+    request: Request,
+    payload: ContentWriteRequest,
+    user: User = Depends(get_current_business_user),
+    tenant: Tenant = Depends(get_business_tenant),
+    db=Depends(get_db),
+) -> TaglineResponse:
+    """Generate a tagline for the current business (does not save)."""
+    from app.services.ai import content_writer
+
+    _require_ai_enabled()
+    try:
+        out = content_writer.write_business_tagline(
+            db, tenant=tenant, language=payload.language,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return TaglineResponse(tagline=out["tagline"], language=out["language"], provider="ai")
+
+
+@business_router.post(
+    "/content/image-keywords/{service_id}",
+    response_model=ImageKeywordsResponse,
+)
+@limiter.limit("30/minute")
+def business_suggest_image_keywords(
+    request: Request,
+    service_id: str,
+    user: User = Depends(get_current_business_user),
+    tenant: Tenant = Depends(get_business_tenant),
+    db=Depends(get_db),
+) -> ImageKeywordsResponse:
+    """Suggest image keywords + Unsplash URLs for a service (no external call)."""
+    from app.services.ai import content_writer
+
+    service = _get_tenant_service(db, tenant, service_id)
+    out = content_writer.suggest_image_keywords(tenant, service)
+    return ImageKeywordsResponse(**out)
