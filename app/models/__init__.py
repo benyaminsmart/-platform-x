@@ -1,6 +1,7 @@
 """ORM models for Platform-X."""
 
 from app.models.analytics_event import AnalyticsEvent
+from app.models.api_key import APIKey
 from app.models.ai_chat import AIChatMessage
 from app.models.audit_log import AuditLog
 from app.models.booking import Booking
@@ -23,6 +24,7 @@ from app.models.user import User
 
 __all__ = [
     "AnalyticsEvent",
+    "APIKey",
     "AIChatMessage",
     "AuditLog",
     "Booking",
