@@ -17,6 +17,7 @@ from app.models.promotion import Promotion
 from app.models.rate_plan import RatePlan
 from app.models.referral import Referral
 from app.models.review import Review
+from app.models.review_photo import ReviewPhoto
 from app.models.room import Room
 from app.models.reward import Reward
 from app.models.service import Service
@@ -47,6 +48,7 @@ __all__ = [
     "Referral",
     "Review",
     "Room",
+    "ReviewPhoto",
     "Reward",
     "Service",
     "Session",

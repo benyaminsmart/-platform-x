@@ -9,7 +9,7 @@ User (auth required):
 
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, Request, UploadFile, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session as DBSession
 
@@ -181,3 +181,71 @@ def my_reviews(
         total=len(rows),
         items=[_serialize(r) for r in rows],
     )
+
+# ---------- Photos (Phase 39) ----------
+
+from app.services import review_photo_service
+
+
+@router.post("/{review_id}/photos", status_code=status.HTTP_201_CREATED)
+@limiter.limit("20/minute")
+async def upload_review_photo(
+    request: Request,
+    review_id: str,
+    file: UploadFile = File(...),
+    user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    """Upload one photo for a review (owner only, max 3)."""
+    from app.models.review import Review
+    r = db.query(Review).filter(Review.id == review_id).one_or_none()
+    if r is None:
+        raise HTTPException(status_code=404, detail="Review not found")
+    if r.user_id != user.id:
+        raise HTTPException(status_code=403, detail="Not your review")
+
+    content = await file.read()
+    try:
+        row = review_photo_service.save_photo(
+            db, review=r, content=content, content_type=file.content_type,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"id": row.id, "url": row.url, "position": row.position, "size_bytes": row.size_bytes}
+
+
+@router.get("/{review_id}/photos")
+@limiter.limit("60/minute")
+def list_review_photos(
+    request: Request,
+    review_id: str,
+    db: DBSession = Depends(get_db),
+):
+    """Public: list photos for a review."""
+    rows = review_photo_service.list_photos(db, review_id)
+    return [
+        {"id": p.id, "url": p.url, "position": p.position}
+        for p in rows
+    ]
+
+
+@router.delete("/{review_id}/photos/{photo_id}")
+@limiter.limit("20/minute")
+def delete_review_photo(
+    request: Request,
+    review_id: str,
+    photo_id: str,
+    user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    from app.models.review import Review
+    r = db.query(Review).filter(Review.id == review_id).one_or_none()
+    if r is None:
+        raise HTTPException(status_code=404, detail="Review not found")
+    if r.user_id != user.id:
+        raise HTTPException(status_code=403, detail="Not your review")
+    ok = review_photo_service.delete_photo(db, review_id=review_id, photo_id=photo_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Photo not found")
+    return {"deleted": True}
+
