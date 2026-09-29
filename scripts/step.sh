@@ -66,6 +66,36 @@ git commit -m "$MESSAGE"
 echo "▶ backup: $LABEL"
 bash scripts/backup.sh "$LABEL"
 
+echo "▶ updating HANDOFF progress..."
+export STEP_LABEL="$LABEL"
+
+echo "▶ updating HANDOFF progress..."
+export STEP_LABEL="$LABEL"
+python3 - <<'PYHANDOFF'
+import os, re
+from datetime import datetime
+
+path = "HANDOFF.md"
+try:
+    src = open(path, encoding="utf-8").read()
+except FileNotFoundError:
+    raise SystemExit(0)
+
+if "## 0.5 Wave 0 Progress" not in src:
+    raise SystemExit(0)
+
+label = os.environ.get("STEP_LABEL", "").strip()
+if not label:
+    raise SystemExit(0)
+
+now = datetime.now().strftime("%Y-%m-%d %H:%M")
+src = re.sub(r"^Last step: .*$", f"Last step: {label} ({now})", src, count=1, flags=re.MULTILINE)
+
+open(path, "w", encoding="utf-8").write(src)
+print("HANDOFF progress updated:", label)
+PYHANDOFF
+unset STEP_LABEL
+
 echo ""
 echo "=== STEP DONE ==="
 git log --oneline -1
