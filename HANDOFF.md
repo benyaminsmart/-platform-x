@@ -146,6 +146,32 @@ Tag: v0.14.0-leaderboard
 - recompute_scores CLI (python -m app.scripts.recompute_scores)
 - NOTE: public API path is /api/leaderboard (HTML page occupies /leaderboard)
 
+### Phase 23 — AI Content Writer + Importer: COMPLETE
+Tag: v0.15.0-content-ai
+- AI Content Writer service:
+  - write_service_description (4 languages x 4 tones)
+  - write_business_tagline
+  - suggest_image_keywords (Unsplash URLs, no API key)
+  - AI never invents facts (rating only mentioned if >= 4.5)
+  - Deterministic fallback always available
+- Business Content API (6 endpoints under /business/api/ai/content):
+  - POST /service/{id}          generate description (preview)
+  - POST /service/{id}/apply    generate + save (owner/manager only)
+  - POST /tagline               business tagline
+  - POST /image-keywords/{id}   keyword list + Unsplash URLs
+  - POST /import/preview        parse free text into candidates
+  - POST /import/create         bulk-create services (owner/manager only)
+- AI Menu/Room Importer:
+  - Parses menus, room lists, packages from text
+  - AI never invents prices (null if missing; validated on save)
+  - Deterministic line-based fallback (' - ', ': ', trailing number)
+- Content Studio UI at /business/content:
+  - Tagline generator (EN/AR/FIL/HI)
+  - Import from raw text (paste + parse + preview candidates + create)
+  - Per-service description generate + apply
+  - Dark theme, responsive
+- NOTE: URL Onboarding deferred to Phase 13 (Business Onboarding Tools)
+
 ### Phase 20 — Business Owner Panel: COMPLETE
 Tag: v0.9.0-business
 - Separate panel under /business/*
@@ -346,13 +372,16 @@ All idempotent.
 
 ## 11. Remaining Work
 
-**Phase 23 — AI Content Writer + Onboarding (NEXT)**
+**Phase 24 — Cross-Business Rewards Enhancement (NEXT)**
 Per Business-First Order. Includes:
-- AI auto-generate service descriptions (4 languages)
-- AI-suggested images
-- AI Onboarding: extract business info from URL
-- AI menu/room importer
-- Milestone close (v0.15.0-content-ai)
+- Redeem catalog (rewards shop)
+- Rewards dashboard (tier progress, milestones)
+- Referral dashboard (referred users, total earned)
+- Referral milestones (bonus at 5, 10, 25 referrals)
+- Special offers / promo codes
+- Birthday rewards
+- Tier benefits (real perks)
+- Milestone close (v0.16.0-cross-rewards)
 
 
 ## 12. Future Phases (v2 Roadmap)
@@ -567,6 +596,13 @@ Business AI smoke test:
 Pricing Rules smoke test:
   bash scripts/smoke-pricing-rules.sh
 
+Content Studio smoke test:
+  bash scripts/smoke-content-studio.sh
+
+Fast backup scripts:
+  bash scripts/backup.sh phase-N-step-M-done       (code only, ~0.2s)
+  bash scripts/backup-full.sh vX.Y.Z-name          (code + DB + .env, ~0.25s)
+
 Business login:
   slug=trianon-hotel / owner@trianon-hotel.com / OwnerPass123
   slug=saffron-restaurant / owner@saffron-restaurant.com / OwnerPass123
@@ -586,7 +622,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 346 tests, all passing
+## 14. Test Count: 403 tests, all passing (+ 32 smoke checks)
 
 Test files:
 - test_health.py
@@ -627,6 +663,10 @@ Test files:
 - test_business_score_page.py (4, Phase 29)
 - test_badges_helper.py (2, Phase 29)
 - test_businesses_badges.py (4, Phase 29)
+- test_content_writer.py (13, Phase 23)
+- test_content_importer.py (18, Phase 23)
+- test_business_content_api.py (20, Phase 23)
+- test_business_content_page.py (6, Phase 23)
 
 Speed: BCRYPT_ROUNDS=4 in tests, schema created once per session.
 
@@ -1022,8 +1062,8 @@ Current working order. Do NOT jump phases. Do NOT skip.
 4. Phase 22 (Dynamic Pricing Rules) — COMPLETE
 5. Phase 29 (Leaderboard + AI Scoring) — COMPLETE
 6. Phase 19 (User AI) — COMPLETE
-7. Phase 23 (AI Content Writer) — **NEXT**
-8. Phase 24 (Cross-Business Rewards)
+7. Phase 23 (AI Content Writer) — COMPLETE
+8. Phase 24 (Cross-Business Rewards) — **NEXT**
 9. Phase 10 (Payment Production — needs Telr/Stripe account)
 10. Phases 25-28 (AI Marketing, Occupancy, Competitor Insights, Review Responder)
 11. Phase 12 (VPS + Domain + Named Tunnel — needs purchase)
@@ -1059,8 +1099,8 @@ before guests. Reason: businesses pay; users use.
 4. Phase 22 (Dynamic Pricing Rules) — SOON
 5. Phase 29 (Leaderboard + AI Scoring) — SOON
 6. Phase 19 (User AI) — COMPLETE (was done early because foundation was ready)
-7. Phase 23 (AI Content Writer) — **NEXT**
-8. Phase 24 (Cross-Business Rewards)
+7. Phase 23 (AI Content Writer) — COMPLETE
+8. Phase 24 (Cross-Business Rewards) — **NEXT**
 9. Phase 10 (Payment Production)
 10. Phase 25-28 (AI Marketing, Occupancy, Competitor Insights, Review Responder)
 11. Phase 12 (VPS + Domain + Named Tunnel) — requires purchase
@@ -1107,7 +1147,7 @@ before guests. Reason: businesses pay; users use.
 - **Phase 16 / 30** (Mobile App) — last
 - **Phase 23-25** (AI Content Writer, Cross-Business Rewards, AI Marketing) — soon
 - **Phase 26-28** (Realtime Occupancy, Competitor Insights, Review Writer) — soon
-- **Phase 23-29** — Phase 29 done; others below still pending
+- **Phase 23-29** — Phase 23 and 29 done; Phase 24-28 pending
 
 ### Key Rules for Future Sessions
 
