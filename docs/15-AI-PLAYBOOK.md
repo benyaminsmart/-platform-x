@@ -172,4 +172,36 @@ If current Phase is complete and user says "continue":
 9. HANDOFF verification is the AI's responsibility at Phase close.
 10. If in doubt, verify against source/tests before acting.
 
+## 15. Lessons Learned (living log)
+
+These are real lessons from actual phases. Append new lessons here.
+
+### Lesson 1 — Milestone close sequencing
+When running HANDOFF check + fix + tag + backup in one long command,
+if the first sub-command fails, the rest silently don't run and HANDOFF
+can be left half-updated. Fix: run HANDOFF fix+commit in ONE command,
+verify all checks pass, THEN run tag + full backup in a SECOND command.
+
+### Lesson 2 — Rate plans and promotions apply to SERVICE price
+The client-supplied `amount` field is not authoritative. Rate plan
+modifiers and promotion codes must be applied to `service.price`, never
+to `payload.amount`.
+
+### Lesson 3 — Promotion per-user tracking
+Currently per-user promotion limits are tracked via a heuristic in
+`Booking.notes` (`promo=CODE`). A dedicated `PromotionUsage` table is
+planned for a future phase to replace this heuristic.
+
+### Lesson 4 — Jinja template insertion
+When inserting a block into an existing Jinja template, insert BEFORE
+the LAST `{% endblock %}`, not the first. Verify with:
+    grep -n "{% endblock %}" template.html
+
+### Lesson 5 — step.sh contract
+`step.sh` requires the test file to exist. If you patch a JS/template
+file (not a Python test), first write a small Python test that asserts
+the expected strings, then run step.sh.
+
+---
+
 END OF PLAYBOOK
