@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.23.0-wishlist-compare (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32, 33 complete; 24 DEFERRED)
+> Version: v0.24.0-reports (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-34 complete; 24 DEFERRED)
 
 Last updated: 2026-09-29
 
@@ -187,6 +187,14 @@ Tag: v0.23.0-wishlist-compare
 - [x] Step 5a — Compare API
 - [x] Step 5b — Compare UI + button in search
 - [x] Phase close — tag v0.23.0-wishlist-compare
+
+**Phase 34 — Wave 1 / Reports (CSV + PDF): COMPLETE**
+Tag: v0.24.0-reports
+- [x] Step 1 — Reports service + exports API
+- [x] Step 2 — Export buttons in dashboard
+- [x] Step 3 — Printable business report
+- [x] Step 4 — Print report button + milestone close
+- [x] Phase close — tag v0.24.0-reports
 
 ---
 
@@ -1020,7 +1028,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 843 tests, all passing
+## 14. Test Count: 854 tests, all passing
 
 Test files:
 - test_health.py
