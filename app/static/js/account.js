@@ -164,15 +164,23 @@ PX.initAccount = function (slug) {
       } else {
         var html = "";
         d.items.forEach(function (b) {
-          html += '<div class="px-list-item">' +
+          var cancellable = (b.status === "pending" || b.status === "confirmed");
+          var actionHtml = cancellable
+            ? '<button class="px-btn px-btn-ghost px-cancel-btn" data-bid="' + esc(b.id) + '" style="margin-top:6px; font-size:12px; padding:4px 10px;">Cancel</button>'
+            : '';
+          html += '<div class="px-list-item" data-bid="' + esc(b.id) + '">' +
             '<div class="px-list-item-main">' +
-            '<div class="px-list-item-title">' + esc(b.service_name) + "</div>" +
-            '<div class="px-list-item-sub">' + esc(b.check_in) +
-            (b.check_out ? " → " + esc(b.check_out) : "") + " · " + b.guests + " guests</div></div>" +
+              '<div class="px-list-item-title">' + esc(b.service_name) + "</div>" +
+              '<div class="px-list-item-sub">' + esc(b.check_in) +
+              (b.check_out ? " \u2192 " + esc(b.check_out) : "") + " \u00B7 " + b.guests + " guests</div></div>" +
             '<div class="px-list-item-side">' + badge(b.status) +
-            '<div class="px-list-item-amount">' + esc(b.total_amount) + " " + esc(b.currency) + "</div></div></div>";
+              '<div class="px-list-item-amount">' + esc(b.total_amount) + " " + esc(b.currency) + "</div>" +
+              actionHtml + "</div></div>";
         });
         list.innerHTML = html;
+        list.querySelectorAll(".px-cancel-btn").forEach(function(btn){
+          btn.addEventListener("click", function(){ handleCancel(btn); });
+        });
       }
       renderRecent();
     })
@@ -286,3 +294,63 @@ PX.initAccount = function (slug) {
     })
     .catch(function () {});
 };
+
+// ============================================================
+// Cancellation flow (Phase 30 / Wave 0 part A)
+// ============================================================
+function handleCancel(btn) {
+  var bid = btn.getAttribute("data-bid");
+  if (!bid) return;
+  var headers = window.PX_AUTH ? window.PX_AUTH.headers() : {};
+  fetch("/bookings/" + encodeURIComponent(bid) + "/refund-preview", { headers: headers })
+    .then(function(r){ return r.json(); })
+    .then(function(p){
+      if (!p || p.can_cancel === false) {
+        alert("This booking cannot be cancelled.");
+        return;
+      }
+      showCancelModal(bid, p);
+    })
+    .catch(function(){ alert("Could not load refund info."); });
+}
+
+function showCancelModal(bid, p) {
+  var modalId = "px-cancel-modal";
+  var old = document.getElementById(modalId);
+  if (old) old.remove();
+  var refundLine = (p.refund_pct > 0)
+    ? ("You will receive a refund of " + p.refund_amount + " " + p.currency + " (" + p.refund_pct + "%).")
+    : "No refund (less than 72 hours before check-in).";
+  var html = '' +
+    '<div id="' + modalId + '" style="position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:2000; padding:20px;">' +
+      '<div style="background:#fff; border-radius:16px; padding:24px; max-width:440px; width:100%;">' +
+        '<h3 style="font-family:var(--px-font-display); margin:0 0 12px; color:var(--px-navy);">Cancel this booking?</h3>' +
+        '<p style="margin:0 0 10px; font-size:14px; color:#374151;">Check-in in <strong>' + p.days_until_check_in + ' day(s)</strong>. ' + refundLine + '</p>' +
+        '<p style="margin:0 0 18px; font-size:13px; color:var(--px-muted);">' + p.reason + '</p>' +
+        '<div style="display:flex; gap:8px; justify-content:flex-end;">' +
+          '<button id="' + modalId + '-no" class="px-btn px-btn-ghost">Keep booking</button>' +
+          '<button id="' + modalId + '-yes" class="px-btn px-btn-primary">Cancel booking</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  document.body.insertAdjacentHTML("beforeend", html);
+  document.getElementById(modalId + "-no").addEventListener("click", function(){
+    document.getElementById(modalId).remove();
+  });
+  document.getElementById(modalId + "-yes").addEventListener("click", function(){
+    var headers = window.PX_AUTH ? window.PX_AUTH.headers() : {};
+    fetch("/bookings/" + encodeURIComponent(bid) + "/cancel-with-refund", { method: "POST", headers: headers })
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        document.getElementById(modalId).remove();
+        if (res && res.status === "cancelled") {
+          alert("Booking cancelled. Refund: " + res.refund_amount + " " + res.currency + " (" + res.refund_pct + "%).");
+          location.reload();
+        } else {
+          alert("Could not cancel: " + (res && res.detail ? res.detail : "unknown"));
+        }
+      })
+      .catch(function(){ alert("Network error."); });
+  });
+}
+
