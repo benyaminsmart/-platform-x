@@ -21,6 +21,7 @@ from app.models.session import Session
 from app.models.subscription import Subscription
 from app.models.tenant import Tenant
 from app.models.user import User
+from app.models.webhook import Webhook, WebhookDelivery
 
 __all__ = [
     "AnalyticsEvent",
@@ -45,4 +46,6 @@ __all__ = [
     "Subscription",
     "Tenant",
     "User",
+    "Webhook",
+    "WebhookDelivery",
 ]
