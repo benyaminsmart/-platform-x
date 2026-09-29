@@ -1,0 +1,249 @@
+{% extends "business/business_base.html" %}
+
+{% block title %}Insights — Business Panel{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h2>Business Insights</h2>
+  <p class="admin-card-sub" style="margin-bottom: 0;">
+    Real occupancy, bookings heatmaps, revenue forecast, and predictive capacity —
+    computed from your live data.
+  </p>
+</div>
+
+<!-- ============ KPI Cards ============ -->
+<div class="in-kpis">
+  <div class="admin-card in-kpi">
+    <div class="in-kpi-label">Occupancy (last 30d)</div>
+    <div class="in-kpi-value"><span id="kpi-occ">–</span><span class="in-kpi-unit">%</span></div>
+    <div class="in-kpi-sub" id="kpi-occ-delta">—</div>
+  </div>
+  <div class="admin-card in-kpi">
+    <div class="in-kpi-label">Booked nights</div>
+    <div class="in-kpi-value" id="kpi-nights">–</div>
+    <div class="in-kpi-sub" id="kpi-bookings">—</div>
+  </div>
+  <div class="admin-card in-kpi">
+    <div class="in-kpi-label">Revenue (last 30d)</div>
+    <div class="in-kpi-value"><span id="kpi-rev">–</span><span class="in-kpi-unit">AED</span></div>
+    <div class="in-kpi-sub" id="kpi-rev-prev">—</div>
+  </div>
+  <div class="admin-card in-kpi">
+    <div class="in-kpi-label">Forecast next 30d</div>
+    <div class="in-kpi-value"><span id="kpi-fc">–</span><span class="in-kpi-unit">AED</span></div>
+    <div class="in-kpi-sub" id="kpi-fc-band">—</div>
+  </div>
+</div>
+
+<!-- ============ Day-of-week heatmap ============ -->
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div class="coach-head">
+    <h3>Bookings by weekday</h3>
+    <select id="hm-days" class="in-input" style="padding:8px 10px; width:auto;">
+      <option value="30">Last 30 days</option>
+      <option value="90" selected>Last 90 days</option>
+      <option value="180">Last 180 days</option>
+    </select>
+  </div>
+  <div id="hm-dow" class="in-dow">Loading…</div>
+</div>
+
+<!-- ============ Calendar heatmap ============ -->
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h3>Daily bookings</h3>
+  <div id="hm-cal" class="in-cal">Loading…</div>
+  <div class="in-cal-legend"><span class="in-cal-cell lvl-0"></span>0 <span class="in-cal-cell lvl-1"></span>low <span class="in-cal-cell lvl-2"></span>mid <span class="in-cal-cell lvl-3"></span>high <span class="in-cal-cell lvl-4"></span>peak</div>
+</div>
+
+<!-- ============ Capacity ============ -->
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div class="coach-head">
+    <h3>Capacity (next 30 days)</h3>
+    <button type="button" class="admin-btn" id="cap-refresh" style="background:var(--adm-surface-2); color:var(--adm-text);">Refresh</button>
+  </div>
+  <div id="cap-summary" class="in-summary">Loading…</div>
+  <div id="cap-near-full" class="in-list"></div>
+</div>
+
+<!-- ============ Forecast + AI ============ -->
+<div class="admin-card">
+  <div class="coach-head">
+    <h3>Revenue forecast</h3>
+    <button type="button" class="admin-btn" id="fc-btn">Show AI advice</button>
+  </div>
+  <div id="fc-out" class="in-out">Click "Show AI advice" for a plain-language interpretation.</div>
+</div>
+
+<style>
+.in-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+@media (max-width: 900px) { .in-kpis { grid-template-columns: repeat(2, 1fr); } }
+.in-kpi { padding: 20px 18px; }
+.in-kpi-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--adm-muted); margin-bottom: 8px; }
+.in-kpi-value { font-family: var(--adm-font-display); font-size: 34px; font-weight: 800; color: var(--adm-text); line-height: 1; }
+.in-kpi-unit { font-size: 14px; color: var(--adm-muted); margin-left: 6px; font-weight: 600; }
+.in-kpi-sub { font-size: 12px; color: var(--adm-text-soft); margin-top: 8px; }
+.in-input { border: 1px solid var(--adm-line-2); border-radius: 8px; background: var(--adm-surface-2); color: var(--adm-text); font-family: inherit; outline: none; }
+.in-dow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 12px; }
+.in-dow-cell {
+  padding: 14px 8px; border-radius: 10px; text-align: center;
+  background: var(--adm-surface-2); border: 1px solid var(--adm-line);
+}
+.in-dow-label { font-size: 11px; color: var(--adm-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.in-dow-count { font-family: var(--adm-font-display); font-size: 22px; font-weight: 700; color: var(--adm-text); }
+.in-dow-share { font-size: 11px; color: var(--adm-text-soft); margin-top: 4px; }
+.in-cal { display: grid; grid-template-columns: repeat(15, 1fr); gap: 4px; margin-top: 12px; }
+@media (max-width: 700px) { .in-cal { grid-template-columns: repeat(10, 1fr); } }
+.in-cal-cell {
+  width: 100%; aspect-ratio: 1 / 1; border-radius: 4px;
+  background: var(--adm-surface-2); border: 1px solid var(--adm-line);
+  display: inline-block;
+}
+.in-cal-cell.lvl-0 { background: var(--adm-surface-2); }
+.in-cal-cell.lvl-1 { background: rgba(99,102,241,0.25); border-color: rgba(99,102,241,0.4); }
+.in-cal-cell.lvl-2 { background: rgba(99,102,241,0.45); border-color: rgba(99,102,241,0.6); }
+.in-cal-cell.lvl-3 { background: rgba(99,102,241,0.7); border-color: rgba(99,102,241,0.85); }
+.in-cal-cell.lvl-4 { background: linear-gradient(135deg, #6366f1, #c9a961); border-color: #c9a961; }
+.in-cal-legend { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 12px; color: var(--adm-muted); }
+.in-cal-legend .in-cal-cell { width: 14px; height: 14px; aspect-ratio: auto; }
+.in-summary { font-size: 13.5px; color: var(--adm-text-soft); line-height: 1.6; margin-top: 8px; }
+.in-summary .in-pill {
+  display: inline-block; padding: 4px 10px; border-radius: 999px;
+  background: var(--adm-surface-2); border: 1px solid var(--adm-line);
+  color: var(--adm-text); font-weight: 600; margin-right: 8px; font-size: 12px;
+}
+.in-list { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.in-hot { padding: 10px 12px; border: 1px solid var(--adm-line); border-radius: 8px; background: var(--adm-surface-2); font-size: 13px; color: var(--adm-text); display: flex; justify-content: space-between; }
+.in-hot.warn { border-color: rgba(251,191,36,0.35); }
+.in-hot.full { border-color: rgba(248,113,113,0.35); }
+.in-out { margin-top: 12px; padding: 12px 14px; background: var(--adm-surface-2); border: 1px solid var(--adm-line); border-radius: 10px; font-size: 13.5px; color: var(--adm-text-soft); line-height: 1.6; white-space: pre-wrap; }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login"; return; }
+  var slug = null;
+  var forecastMetrics = null;
+
+  function h() { return { "Authorization": "Bearer " + token, "X-Tenant-Slug": slug, "Content-Type": "application/json" }; }
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  async function resolveSlug() {
+    var res = await fetch("/business/api/me", { headers: { "Authorization": "Bearer " + token } });
+    if (!res.ok) { try{ localStorage.removeItem("px_business_token"); }catch(e){}; window.location.href = "/business/login"; return; }
+    slug = (await res.json()).tenant_slug;
+  }
+
+  // -------- KPI --------
+  async function loadKpis() {
+    var occ = await (await fetch("/business/api/insights/occupancy?days=30", { headers: h() })).json();
+    var trend = await (await fetch("/business/api/insights/occupancy/trend?days=30", { headers: h() })).json();
+    var fc = await (await fetch("/business/api/insights/revenue/forecast?days=30", { headers: h() })).json();
+
+    document.getElementById("kpi-occ").textContent = Number(occ.occupancy_pct || 0).toFixed(1);
+    var d = trend.occupancy_delta_pct;
+    document.getElementById("kpi-occ-delta").textContent =
+      (d === null || d === undefined) ? "no prior window" : (d > 0 ? "+" : "") + d + "% vs previous";
+
+    document.getElementById("kpi-nights").textContent = occ.booked_nights || 0;
+    document.getElementById("kpi-bookings").textContent = (occ.total_bookings || 0) + " bookings · " + (occ.total_guests || 0) + " guests";
+
+    document.getElementById("kpi-rev").textContent = Number(fc.metrics.revenue_last_30d || 0).toFixed(0);
+    document.getElementById("kpi-rev-prev").textContent = "prev: " + Number(fc.metrics.revenue_prev_30d || 0).toFixed(0) + " AED";
+
+    forecastMetrics = fc.metrics;
+    document.getElementById("kpi-fc").textContent = Number(fc.metrics.expected_revenue || 0).toFixed(0);
+    document.getElementById("kpi-fc-band").textContent = Number(fc.metrics.low_revenue || 0).toFixed(0) + " – " + Number(fc.metrics.high_revenue || 0).toFixed(0) + " AED";
+  }
+
+  // -------- Day of week --------
+  async function loadDow(days) {
+    var el = document.getElementById("hm-dow");
+    el.textContent = "Loading…";
+    var res = await fetch("/business/api/insights/heatmap/day-of-week?days=" + days, { headers: h() });
+    if (!res.ok) { el.textContent = "Failed."; return; }
+    var d = await res.json();
+    if (!d.items.length) { el.innerHTML = '<div class="in-summary">No bookings yet.</div>'; return; }
+    el.innerHTML = d.items.map(function(x){
+      return '<div class="in-dow-cell">' +
+        '<div class="in-dow-label">' + esc(x.label) + '</div>' +
+        '<div class="in-dow-count">' + x.bookings + '</div>' +
+        '<div class="in-dow-share">' + x.share_pct + '%</div>' +
+      '</div>';
+    }).join("");
+  }
+
+  // -------- Calendar --------
+  async function loadCalendar() {
+    var el = document.getElementById("hm-cal");
+    el.textContent = "Loading…";
+    var res = await fetch("/business/api/insights/heatmap/calendar?days=30", { headers: h() });
+    if (!res.ok) { el.textContent = "Failed."; return; }
+    var d = await res.json();
+    var max = Math.max(1, ...d.items.map(function(x){ return x.bookings; }));
+    el.innerHTML = d.items.map(function(x){
+      var lvl = 0;
+      if (x.bookings > 0) {
+        var r = x.bookings / max;
+        lvl = r >= 0.9 ? 4 : r >= 0.6 ? 3 : r >= 0.3 ? 2 : 1;
+      }
+      return '<div class="in-cal-cell lvl-' + lvl + '" title="' + esc(x.date) + ': ' + x.bookings + ' bookings"></div>';
+    }).join("");
+  }
+
+  // -------- Capacity --------
+  async function loadCapacity() {
+    var sum = document.getElementById("cap-summary");
+    var list = document.getElementById("cap-near-full");
+    sum.textContent = "Loading…";
+    list.innerHTML = "";
+
+    var cap = await (await fetch("/business/api/insights/capacity/available?days=30", { headers: h() })).json();
+    var nf = await (await fetch("/business/api/insights/capacity/near-full?days=30&threshold=80", { headers: h() })).json();
+
+    sum.innerHTML =
+      '<span class="in-pill">' + (cap.total_capacity_per_day || 0) + ' capacity/day</span>' +
+      '<span class="in-pill">min free: ' + cap.summary.min_available + '</span>' +
+      '<span class="in-pill">avg free: ' + cap.summary.avg_available + '</span>' +
+      '<span class="in-pill">max free: ' + cap.summary.max_available + '</span>' +
+      (cap.note ? '<div style="margin-top:8px; color:var(--adm-warning);">' + esc(cap.note) + '</div>' : '');
+
+    if (nf.count === 0) {
+      list.innerHTML = '<div style="color:var(--adm-muted); font-size:13px;">No near-full days in the next 30 days.</div>';
+      return;
+    }
+    list.innerHTML = nf.items.slice(0, 10).map(function(x){
+      var cls = x.occupancy_pct >= 100 ? "full" : "warn";
+      return '<div class="in-hot ' + cls + '"><span>' + esc(x.date) + '</span><span>' + x.occupancy_pct + '% occupied (' + x.booked + '/' + x.total_capacity + ')</span></div>';
+    }).join("");
+  }
+
+  // -------- Forecast AI --------
+  document.getElementById("fc-btn").addEventListener("click", async function(){
+    var out = document.getElementById("fc-out");
+    out.textContent = "Thinking…";
+    var res = await fetch("/business/api/insights/revenue/forecast?days=30&with_advice=true", { headers: h() });
+    var d = await res.json();
+    if (!res.ok) { out.textContent = d.detail || "Failed."; return; }
+    out.textContent = d.advice || "(no advice)";
+  });
+
+  document.getElementById("hm-days").addEventListener("change", function(){
+    loadDow(this.value);
+  });
+  document.getElementById("cap-refresh").addEventListener("click", loadCapacity);
+
+  (async function(){
+    await resolveSlug();
+    if (!slug) return;
+    loadKpis();
+    loadDow(90);
+    loadCalendar();
+    loadCapacity();
+  })();
+})();
+</script>
+{% endblock %}

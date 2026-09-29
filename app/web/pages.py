@@ -671,6 +671,21 @@ def business_marketing_page(request: Request) -> HTMLResponse:
     )
 
 
+@router.get("/business/insights", response_class=HTMLResponse)
+def business_insights_page(request: Request) -> HTMLResponse:
+    """Insights page for the current business."""
+    return templates.TemplateResponse(
+        request,
+        "business/business_insights.html",
+        {
+            "business_user": {"first_name": "Owner", "last_name": ""},
+            "tenant_name": "Business",
+            "tenant_slug": "trianon-hotel",
+            "active_nav": "insights",
+        },
+    )
+
+
 @router.get("/business/pricing", response_class=HTMLResponse)
 def business_pricing_page(request: Request) -> HTMLResponse:
     """Pricing Rules builder for the current business."""
