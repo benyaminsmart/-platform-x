@@ -109,7 +109,8 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
-Last step: Step 10b — Gallery section on tenant page (2026-09-29 23:18)
+- [x] Step 1 — Coordinates seed for tenants
+Last step: Step 1 — Coordinates seed for tenants (2026-09-29 23:29)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -131,6 +132,7 @@ Last step: Step 10b — Gallery section on tenant page (2026-09-29 23:18)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 9f609ca Step 1 — Coordinates seed for tenants
 - 3c872b7 Step 10b — Gallery section on tenant page
 - f2485ae feat(phase-30/step-10a): service gallery API
 - 02988b0 feat(phase-30/step-9b): extra filters in /search UI
