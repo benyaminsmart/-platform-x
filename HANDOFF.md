@@ -3,7 +3,7 @@
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
 > Version: v0.13.0-dynamic-pricing (Phases 0-7, 9, 11, 18, 19, 20, 21, 22 complete)
 
-Last updated: 2026-09-28
+Last updated: 2026-09-29
 
 ---
 
@@ -128,7 +128,35 @@ Tag: v0.4.0-full-flow
 
 ---
 
-## 6. Data Models (16 tables)
+### Phase 20 — Business Owner Panel: COMPLETE
+Tag: v0.9.0-business
+- Separate panel under /business/*
+- Business login, dashboard, services CRUD, bookings inbox, customers,
+  analytics, staff accounts (owner/manager/staff), settings
+- Business notifications on new bookings
+
+### Phase 21 — AI Business Assistant (Pricing Coach): COMPLETE
+Tag: v0.12.0-pricing-coach
+- Business Context Builder (real DB -> structured AI context, deterministic)
+- Pricing Coach service: analyze / suggest / forecast / insights
+  (metrics computed in Python, AI only advises on top of real numbers)
+- 5 endpoints under /business/api/ai
+- UI: two tabs (Chat + Pricing Coach), dark-theme compatible
+- Bugfixes: account/ai tenant resolution, hardcoded business slug
+
+### Phase 22 — Dynamic Pricing Rules: COMPLETE
+Tag: v0.13.0-dynamic-pricing
+- PricingRule + PricingRuleApplication models + Alembic migration
+- Pricing Rules service (evaluate / compute / preview / record_application)
+  Rule types: weekend / season / urgency / capacity / last_minute / custom
+  Actions: percent (+/-), fixed (+/-), Decimal math, floor at 0
+- Business Pricing API: 6 endpoints under /business/api/pricing
+- Booking integration: opt-in via apply_pricing_rules=True (server-computed
+  base price, priority-ordered stacking, audit per rule)
+- UI: Rule Builder page in Business Panel (/business/pricing)
+- Automated smoke test: scripts/smoke-pricing-rules.sh (11 checks)
+
+## 6. Data Models (18 tables)
 
 Global:
 - tenants (slug, name, tier, status, config JSON with branding/images/rating)
@@ -150,6 +178,15 @@ Per-tenant (all have tenant_id):
 
 New in Phase 5:
 - partner_applications (tenant_type, contact info, business info, tier_interest, languages, details JSON, status)
+
+New in Phase 18-19:
+- ai_chat_messages (tenant_id, user_id, layer (user|business), role, content, provider, tokens_used)
+
+New in Phase 22:
+- pricing_rules (tenant_id, name, description, active, priority, rule_type,
+  conditions JSON, action JSON, service_ids JSON, valid_from, valid_to, created_by_user_id)
+- pricing_rule_applications (tenant_id, rule_id, service_id, booking_id,
+  original_price, adjusted_price, delta_amount, delta_percent, currency, note)
 
 ---
 
@@ -283,14 +320,18 @@ All idempotent.
 ## 11. Remaining Work
 
 **Phase 29 — Business Leaderboard + AI Scoring (NEXT)**
-- Admin Login page
-- Admin Dashboard (analytics)
-- Tenants list/detail + status change
-- Applications review
-- Subscriptions management
-- Audit Logs viewer
-- 2FA for Platform Admin
-- Milestone Close (v0.6.0-admin)
+Per Business-First Order. Includes:
+- BusinessScore model + migration (period, category, 5 criteria, ranks)
+- Deterministic Scoring Engine (Customer Satisfaction 30%, Service Quality 25%,
+  Pricing Competitiveness 20%, Engagement 15%, Loyalty 10%)
+- Leaderboard service (rank per category, tie-breaking, auto-rewards logic)
+- API: /leaderboard (public), /business/api/score, /platform/api/leaderboard/recompute
+- AI tips (analyze weak criteria, suggest improvements)
+- Public /leaderboard page
+- Business Panel: My Score widget + AI tips
+- Badges on business cards
+- Milestone close (v0.14.0-leaderboard)
+
 
 ## 12. Future Phases (v2 Roadmap)
 
@@ -497,9 +538,20 @@ Restart Platform-X:
 Get current tunnel URL:
   cat ~/platform-x/logs/tunnel.url
 
+Business AI smoke test:
+  bash scripts/smoke-business-ai.sh
+  BASE=https://looks-...trycloudflare.com bash scripts/smoke-business-ai.sh
+
+Pricing Rules smoke test:
+  bash scripts/smoke-pricing-rules.sh
+
+Business login:
+  slug=trianon-hotel / owner@trianon-hotel.com / OwnerPass123
+  slug=saffron-restaurant / owner@saffron-restaurant.com / OwnerPass123
+
 ---
 
-## 14. Test Count: 154 tests, all passing
+## 14. Test Count: 273 tests, all passing
 
 Test files:
 - test_health.py
@@ -522,6 +574,16 @@ Test files:
 - test_payment_page.py (5)
 - test_account_page.py (6)
 - test_category_pages.py (7)
+- test_business_api.py (17, Phase 20)
+- test_business_context.py (10, Phase 21)
+- test_pricing_coach.py (17, Phase 21)
+- test_business_ai_api.py (18, Phase 21)
+- test_business_ai_page.py (3, Phase 21)
+- test_business_ai_page_theme.py (2, Phase 21)
+- test_pricing_rules_service.py (23, Phase 22)
+- test_business_pricing_api.py (17, Phase 22)
+- test_booking_pricing_integration.py (8, Phase 22)
+- test_business_pricing_page.py (4, Phase 22)
 
 Speed: BCRYPT_ROUNDS=4 in tests, schema created once per session.
 
@@ -907,6 +969,29 @@ state. Any new AI session MUST read this before suggesting next steps.
 **Consequence:** Phase 1 (real first tenant) will happen after the Demo
 is complete and VPS deployment is done. This is intentional.
 
+### Business-First Order (authoritative)
+
+Current working order. Do NOT jump phases. Do NOT skip.
+
+1. Phase 20 (Business Panel) — COMPLETE
+2. Phase 18 (AI Foundation) — COMPLETE
+3. Phase 21 (AI Business Assistant / Pricing Coach) — COMPLETE
+4. Phase 22 (Dynamic Pricing Rules) — COMPLETE
+5. Phase 29 (Leaderboard + AI Scoring) — **NEXT**
+6. Phase 19 (User AI) — COMPLETE
+7. Phase 23 (AI Content Writer)
+8. Phase 24 (Cross-Business Rewards)
+9. Phase 10 (Payment Production — needs Telr/Stripe account)
+10. Phases 25-28 (AI Marketing, Occupancy, Competitor Insights, Review Responder)
+11. Phase 12 (VPS + Domain + Named Tunnel — needs purchase)
+12. Phase 13 (Business Onboarding Tools — needs Phase 12)
+13. Phase 14 (API + Webhooks + SDK)
+14. Phase 15 (Trianon Migration — after VPS)
+15. Phase 16 (Mobile App)
+16. Phase 30 (Native Mobile App)
+
+Rationale: businesses pay; users use. Prioritize value for business owners first.
+
 ### Why Phase 8 (Rewards + Referral) is WAITING
 
 **Reason:** This phase requires a **business plan from the user** for
@@ -967,6 +1052,19 @@ before guests. Reason: businesses pay; users use.
 - **Phase 23-28** — AI features (soon)
 - **Phase 29** — Leaderboard + AI Scoring
 - **Phase 30** — Mobile Native App
+
+### What Is NOT Done Yet (honest list)
+
+- **Phase 8** (Rewards + Referral) — WAITING for user's business plan
+- **Phase 10** (Payment Production / Telr) — needs business account
+- **Phase 12** (VPS + Domain + Named Tunnel) — needs purchase
+- **Phase 13** (Business Onboarding Tools) — needs Phase 12 for subdomains
+- **Phase 14** (API + Webhooks + SDK) — later
+- **Phase 15** (Trianon Migration) — after VPS
+- **Phase 16 / 30** (Mobile App) — last
+- **Phase 23-25** (AI Content Writer, Cross-Business Rewards, AI Marketing) — soon
+- **Phase 26-28** (Realtime Occupancy, Competitor Insights, Review Writer) — soon
+- **Phase 29** (Leaderboard + AI Scoring) — NEXT (in progress soon)
 
 ### Key Rules for Future Sessions
 
