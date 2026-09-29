@@ -131,6 +131,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 38 Step 5 — Promotions UI + sidebar
 - [x] Phase 38 Step 4 — Booking promotion integration
 - [x] Phase 38 Step 3 — Promotions API
 - [x] Phase 38 Step 2 — Promotion service
@@ -164,7 +165,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 38 Step 4 — Booking promotion integration (2026-09-30 01:38)
+Last step: Phase 38 Step 5 — Promotions UI + sidebar (2026-09-30 01:38)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -186,6 +187,7 @@ Last step: Phase 38 Step 4 — Booking promotion integration (2026-09-30 01:38)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 759b8dd Phase 38 Step 5 — Promotions UI + sidebar
 - 40a37cd Phase 38 Step 4 — Booking promotion integration
 - e70ff82 Phase 38 Step 3 — Promotions API
 - e774e6d Phase 38 Step 2 — Promotion service
