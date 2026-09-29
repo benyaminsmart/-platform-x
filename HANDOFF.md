@@ -3,7 +3,7 @@
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
 > Version: v0.25.0-booking-mod (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-35 complete; 24 DEFERRED)
 
-Last updated: 2026-09-29
+Last updated: 2026-09-30
 
 ---
 
@@ -75,15 +75,23 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
 
 Fast, safe, AI-driven loop:
 
-**Per Step (one command):**
-1. Code + tests written together
-2. `bash scripts/step.sh --test <path> --message "<msg>" --label <lbl>`:
+**Per Step (TWO commands, in order):**
+1. Code + tests written together (by the AI in one message)
+2. `bash scripts/step.sh --test <path> --message "<msg>" --label <lbl>`
    - git add -A
    - pytest <test>  (MUST pass, else ABORT and unstage)
    - git commit (only on green tests)
    - backup.sh <label>
-   - auto-update HANDOFF progress
-3. Report in Persian
+   - updates `Last step:` line in HANDOFF Section 0.5
+3. `bash scripts/handoff.sh "<step description>" <sha> "<msg>"`
+   - flips the matching checklist item to [x] in Section 0.5
+   - prepends the commit to "Commits (recent)"
+   - commits HANDOFF
+   - backups
+4. Report in Persian
+
+**Both commands must be run for every Step.** Without handoff.sh the
+checklist goes stale.
 
 **Per Phase (milestone):**
 1. Full test suite
