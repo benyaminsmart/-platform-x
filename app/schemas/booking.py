@@ -28,6 +28,10 @@ class BookingCreate(BaseModel):
     referral_code: str | None = Field(default=None, max_length=50)
     notes: str | None = None
 
+    # Phase 22: opt-in to server-side pricing rules application.
+    # Default False to preserve existing behavior for all current callers.
+    apply_pricing_rules: bool = False
+
     @model_validator(mode="after")
     def validate_dates(self) -> "BookingCreate":
         if self.check_out is not None and self.check_out < self.check_in:

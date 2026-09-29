@@ -7,7 +7,9 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session as DBSession
 
 from app.models.booking import Booking
+from app.models.service import Service
 from app.schemas.booking import BookingCreate
+from app.services import pricing_rules as pricing_rules_service
 
 # Statuses a user may still cancel
 _CANCELLABLE = {"pending", "confirmed"}
@@ -20,8 +22,52 @@ def create_booking(
     user_id: str,
     payload: BookingCreate,
 ) -> Booking:
-    """Create a booking and compute total_amount."""
-    total = (payload.amount - payload.discount).quantize(Decimal("0.01"))
+    """Create a booking and compute total_amount.
+
+    If payload.apply_pricing_rules is True and payload.service_id refers
+    to a service owned by this tenant, dynamic pricing rules are applied
+    (server-side) and each applied rule is recorded in the audit log.
+
+    Otherwise, the payload amount is used as-is (legacy behavior).
+    """
+    base_amount = payload.amount
+    discount = payload.discount
+    final_amount: Decimal | None = None
+    applied_rules: list[dict] = []
+
+    if payload.apply_pricing_rules and payload.service_id:
+        service = (
+            db.query(Service)
+            .filter(Service.id == payload.service_id, Service.tenant_id == tenant_id)
+            .one_or_none()
+        )
+        if service is not None:
+            preview = pricing_rules_service.preview_price(
+                db,
+                tenant_id=tenant_id,
+                service=service,
+                check_in=payload.check_in,
+            )
+            # Server-computed original price (from service), not client-provided.
+            base_amount = Decimal(preview["original_price"])
+            final_amount = Decimal(preview["final_price"])
+            applied_rules = preview["applied_rules"]
+
+            # Represent the difference as (positive) discount only when the
+            # rules lowered the price; when rules increased the price we keep
+            # discount at 0 and let total_amount reflect the increase.
+            if final_amount < base_amount:
+                discount = (base_amount - final_amount).quantize(Decimal("0.01"))
+            else:
+                discount = Decimal("0.00")
+
+    # Total is authoritative: if rules produced a final amount, use it as-is.
+    # Otherwise, legacy formula (base - discount).
+    if final_amount is not None:
+        total = final_amount.quantize(Decimal("0.01"))
+    else:
+        total = (base_amount - discount).quantize(Decimal("0.01"))
+
     booking = Booking(
         tenant_id=tenant_id,
         user_id=user_id,
@@ -31,8 +77,8 @@ def create_booking(
         check_in=payload.check_in,
         check_out=payload.check_out,
         guests=payload.guests,
-        amount=payload.amount,
-        discount=payload.discount,
+        amount=base_amount,
+        discount=discount,
         total_amount=total,
         currency=payload.currency,
         status="pending",
@@ -43,6 +89,29 @@ def create_booking(
     db.add(booking)
     db.commit()
     db.refresh(booking)
+
+    # Audit each applied rule against this booking (best-effort; must not
+    # break the booking if it fails).
+    if applied_rules:
+        try:
+            for r in applied_rules:
+                pricing_rules_service.record_application(
+                    db,
+                    tenant_id=tenant_id,
+                    rule_id=r["id"],
+                    original_price=r["before"],
+                    adjusted_price=r["after"],
+                    delta_amount=r["delta_amount"],
+                    delta_percent=r["delta_percent"],
+                    currency=payload.currency,
+                    service_id=payload.service_id,
+                    booking_id=booking.id,
+                    note=r.get("reason"),
+                )
+        except Exception:
+            # Audit is non-critical; never fail the booking because of it.
+            pass
+
     return booking
 
 
