@@ -177,6 +177,9 @@ PX.initAccount = function (slug) {
           if (reviewable) {
             actionHtml += '<button class="px-btn px-btn-ghost px-review-btn" data-bid="' + esc(b.id) + '" data-service="' + esc(b.service_name || "") + '" style="margin-top:6px; font-size:12px; padding:4px 10px; margin-left:4px;">Write review</button>';
           }
+          if (b.is_group) {
+            actionHtml += '<button class="px-btn px-btn-ghost px-group-btn" data-bid="' + esc(b.id) + '" style="margin-top:6px; font-size:12px; padding:4px 10px; margin-left:4px;">Manage group</button>';
+          }
           html += '<div class="px-list-item" data-bid="' + esc(b.id) + '">' +
             '<div class="px-list-item-main">' +
               '<div class="px-list-item-title">' + esc(b.service_name) + "</div>" +
@@ -197,6 +200,9 @@ PX.initAccount = function (slug) {
         });
         list.querySelectorAll(".px-review-btn").forEach(function(btn){
           btn.addEventListener("click", function(){ handleWriteReview(btn); });
+        });
+        list.querySelectorAll(".px-group-btn").forEach(function(btn){
+          btn.addEventListener("click", function(){ openGroupModal(btn.getAttribute("data-bid")); });
         });
       }
       renderRecent();
@@ -555,4 +561,112 @@ function showReviewModal(bookingId, serviceName) {
       msg.textContent = "Network error.";
     }
   });
+}
+
+// ============================================================
+// Group booking management (Phase 40 / Wave 1)
+// ============================================================
+function openGroupModal(bookingId) {
+  var modalId = "px-grp-modal";
+  var old = document.getElementById(modalId);
+  if (old) old.remove();
+
+  var html = '' +
+    '<div id="' + modalId + '" style="position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:2100; padding:20px; overflow-y:auto;">' +
+      '<div style="background:#fff; border-radius:16px; padding:24px; max-width:600px; width:100%;">' +
+        '<h3 style="font-family:var(--px-font-display); margin:0 0 6px; color:var(--px-navy);">Group booking</h3>' +
+        '<div id="' + modalId + '-summary" style="font-size:13px; color:#6b7280; margin-bottom:16px;"></div>' +
+        '<div id="' + modalId + '-members" style="margin-bottom:16px;"></div>' +
+        '<div style="padding:12px; border:1px dashed #e5e7eb; border-radius:10px; margin-bottom:14px;">' +
+          '<div style="font-size:12px; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px;">Add member</div>' +
+          '<input type="text" id="' + modalId + '-name" placeholder="Name" style="width:100%; padding:8px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px; margin-bottom:6px;">' +
+          '<input type="email" id="' + modalId + '-email" placeholder="Email" style="width:100%; padding:8px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px; margin-bottom:6px;">' +
+          '<input type="number" id="' + modalId + '-share" placeholder="Share amount (AED)" min="0" step="0.01" style="width:100%; padding:8px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px; margin-bottom:8px;">' +
+          '<button id="' + modalId + '-add" class="px-btn px-btn-primary" style="font-size:13px;">Add</button>' +
+        '</div>' +
+        '<div style="display:flex; justify-content:flex-end;">' +
+          '<button id="' + modalId + '-no" class="px-btn px-btn-ghost">Close</button>' +
+        '</div>' +
+        '<div id="' + modalId + '-msg" style="margin-top:10px; font-size:12.5px; color:#374151;"></div>' +
+      '</div>' +
+    '</div>';
+  document.body.insertAdjacentHTML("beforeend", html);
+
+  function headers() { return window.PX_AUTH ? window.PX_AUTH.headers() : {}; }
+
+  async function refresh() {
+    var res = await fetch("/bookings/" + encodeURIComponent(bookingId) + "/group", { headers: headers() });
+    if (!res.ok) {
+      document.getElementById(modalId + "-summary").textContent = "Failed to load.";
+      return;
+    }
+    var d = await res.json();
+    var sum = document.getElementById(modalId + "-summary");
+    sum.innerHTML =
+      'Total: <strong>' + d.booking_total + ' AED</strong> · ' +
+      'Allocated: <strong>' + d.shares_total + '</strong> · ' +
+      'Remaining: <strong>' + d.remaining_to_allocate + '</strong> · ' +
+      'Paid: <strong>' + d.paid_total + '</strong>';
+
+    var mWrap = document.getElementById(modalId + "-members");
+    if (!d.members.length) {
+      mWrap.innerHTML = '<div style="color:#6b7280; font-size:13px;">No members yet.</div>';
+    } else {
+      mWrap.innerHTML = d.members.map(function(m){
+        var paidMark = m.paid ? ' <span style="color:#166534; font-weight:600;">PAID</span>' : '';
+        return '<div style="display:flex; justify-content:space-between; gap:8px; align-items:center; padding:8px 10px; border:1px solid #e5e7eb; border-radius:8px; margin-bottom:6px; font-size:13px;">' +
+          '<div><strong>' + esc(m.name) + '</strong> · ' + esc(m.email) + ' · ' + esc(m.share_amount) + ' AED' + paidMark + '</div>' +
+          '<div>' +
+            '<button data-mkpaid="' + esc(m.id) + '" data-val="' + (m.paid ? "0" : "1") + '" style="font-size:11px; padding:4px 8px; border-radius:6px; border:1px solid #e5e7eb; background:#fff; cursor:pointer;">' + (m.paid ? "Unmark" : "Mark paid") + '</button> ' +
+            '<button data-rm="' + esc(m.id) + '" style="font-size:11px; padding:4px 8px; border-radius:6px; border:1px solid #e5e7eb; background:#fff; cursor:pointer; color:#991b1b;">Remove</button>' +
+          '</div>' +
+        '</div>';
+      }).join("");
+      mWrap.querySelectorAll("button[data-mkpaid]").forEach(function(b){
+        b.addEventListener("click", async function(){
+          var paid = b.getAttribute("data-val") === "1";
+          await fetch("/bookings/" + encodeURIComponent(bookingId) + "/group/" + encodeURIComponent(b.getAttribute("data-mkpaid")), {
+            method: "PATCH", headers: headers(),
+            body: JSON.stringify({ paid: paid }),
+          });
+          refresh();
+        });
+      });
+      mWrap.querySelectorAll("button[data-rm]").forEach(function(b){
+        b.addEventListener("click", async function(){
+          if (!confirm("Remove this member?")) return;
+          await fetch("/bookings/" + encodeURIComponent(bookingId) + "/group/" + encodeURIComponent(b.getAttribute("data-rm")), {
+            method: "DELETE", headers: headers(),
+          });
+          refresh();
+        });
+      });
+    }
+  }
+
+  document.getElementById(modalId + "-add").addEventListener("click", async function(){
+    var msg = document.getElementById(modalId + "-msg");
+    msg.textContent = "";
+    var body = {
+      name: document.getElementById(modalId + "-name").value.trim(),
+      email: document.getElementById(modalId + "-email").value.trim(),
+      share_amount: parseFloat(document.getElementById(modalId + "-share").value) || 0,
+    };
+    if (!body.name || !body.email) { msg.textContent = "Name and email are required."; return; }
+    var res = await fetch("/bookings/" + encodeURIComponent(bookingId) + "/group", {
+      method: "POST", headers: headers(), body: JSON.stringify(body),
+    });
+    var d = await res.json();
+    if (!res.ok) { msg.textContent = d.detail || "Failed."; return; }
+    document.getElementById(modalId + "-name").value = "";
+    document.getElementById(modalId + "-email").value = "";
+    document.getElementById(modalId + "-share").value = "";
+    refresh();
+  });
+
+  document.getElementById(modalId + "-no").addEventListener("click", function(){
+    document.getElementById(modalId).remove();
+  });
+
+  refresh();
 }
