@@ -38,6 +38,7 @@ from app.api import rewards as rewards_router
 from app.api import search as search_router
 from app.api import services as services_router
 from app.api import tenants as tenants_router
+from app.api import wishlist as wishlist_router
 from app.core.config import settings
 from app.core.rate_limit import limiter
 from app.core.https_redirect import HTTPSRedirectMiddleware
@@ -177,6 +178,7 @@ app.include_router(rewards_router.router)
 app.include_router(search_router.router)
 app.include_router(services_router.router)
 app.include_router(tenants_router.router)
+app.include_router(wishlist_router.router)
 
 
 # ---------- Health (before web catch-all) ----------
