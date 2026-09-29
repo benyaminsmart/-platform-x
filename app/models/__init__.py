@@ -15,6 +15,7 @@ from app.models.platform_admin import PlatformAdmin
 from app.models.pricing_rule import PricingRule, PricingRuleApplication
 from app.models.referral import Referral
 from app.models.review import Review
+from app.models.room import Room
 from app.models.reward import Reward
 from app.models.service import Service
 from app.models.session import Session
@@ -41,6 +42,7 @@ __all__ = [
     "PricingRuleApplication",
     "Referral",
     "Review",
+    "Room",
     "Reward",
     "Service",
     "Session",
