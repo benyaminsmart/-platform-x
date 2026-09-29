@@ -1,0 +1,239 @@
+{% extends "business/business_base.html" %}
+{% block title %}Promotions — Business Panel{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h2>Promotions</h2>
+  <p class="admin-card-sub" style="margin-bottom: 0;">
+    Discount codes your guests can apply at checkout. Each code can be
+    limited by usage, per-user usage, minimum amount, validity window,
+    and service restriction.
+  </p>
+</div>
+
+<div class="admin-card">
+  <div class="coach-head">
+    <h3>Your promotions</h3>
+    <button type="button" class="admin-btn" id="pr-new-btn">New Promotion</button>
+  </div>
+  <div id="pr-list" class="pr-list"><div class="pr-loading">Loading…</div></div>
+</div>
+
+<div id="pr-modal" class="pr-modal" style="display:none;">
+  <div class="pr-modal-card">
+    <div class="pr-modal-head">
+      <h3 id="pr-modal-title">Create Promotion</h3>
+      <button type="button" class="admin-btn" id="pr-modal-close" style="background:var(--adm-surface-2); color:var(--adm-text);">Close</button>
+    </div>
+    <input type="hidden" id="pr-id">
+    <div class="pr-grid">
+      <div class="pr-field"><label>Code</label><input type="text" id="pr-code" placeholder="SUMMER20" maxlength="40" style="text-transform:uppercase;"></div>
+      <div class="pr-field"><label>Name</label><input type="text" id="pr-name" placeholder="Summer 20%" maxlength="120"></div>
+    </div>
+    <div class="pr-grid">
+      <div class="pr-field">
+        <label>Type</label>
+        <select id="pr-dtype"><option value="percent">Percent (%)</option><option value="fixed">Fixed (AED)</option></select>
+      </div>
+      <div class="pr-field"><label>Value</label><input type="number" id="pr-dvalue" step="0.01" min="0.01" placeholder="20"></div>
+    </div>
+    <div class="pr-grid">
+      <div class="pr-field"><label>Max uses (total, optional)</label><input type="number" id="pr-max" min="1"></div>
+      <div class="pr-field"><label>Max per user</label><input type="number" id="pr-per-user" min="1" value="1"></div>
+    </div>
+    <div class="pr-grid">
+      <div class="pr-field"><label>Min amount (optional)</label><input type="number" id="pr-min" step="0.01" min="0"></div>
+      <div class="pr-field"><label>Description (optional)</label><input type="text" id="pr-desc" maxlength="200"></div>
+    </div>
+    <div class="pr-grid">
+      <div class="pr-field"><label>Valid from (optional)</label><input type="date" id="pr-from"></div>
+      <div class="pr-field"><label>Valid to (optional)</label><input type="date" id="pr-to"></div>
+    </div>
+    <button type="button" class="admin-btn" id="pr-save">Save</button>
+    <div id="pr-msg" style="margin-top:10px; font-size:12.5px;"></div>
+  </div>
+</div>
+
+<style>
+.pr-list { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+.pr-loading { color: var(--adm-muted); }
+.pr-item {
+  padding: 12px 14px; border:1px solid var(--adm-line); border-radius:10px;
+  background: var(--adm-surface-2); display:flex; justify-content:space-between;
+  gap:12px; align-items:center; flex-wrap:wrap;
+}
+.pr-item.inactive { opacity: 0.55; }
+.pr-code { font-family: var(--adm-font-display); font-size:15px; font-weight:700; color:var(--adm-text); letter-spacing:.05em; }
+.pr-badge {
+  display:inline-block; padding:2px 8px; border-radius:999px; font-size:11px;
+  font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+  background: var(--adm-bg); border:1px solid var(--adm-line); color: var(--adm-text-soft);
+}
+.pr-badge.active { background:rgba(52,211,153,.15); color:var(--adm-success); border-color:rgba(52,211,153,.3); }
+.pr-badge.pct { background:rgba(99,102,241,.15); color:var(--adm-brand); border-color:rgba(99,102,241,.3); }
+.pr-meta { font-size:12px; color: var(--adm-muted); margin-top:4px; }
+.pr-actions { display:flex; gap:6px; }
+.pr-actions button {
+  padding:6px 10px; font-size:12px; border-radius:6px;
+  border:1px solid var(--adm-line-2); background:var(--adm-bg); color:var(--adm-text-soft);
+  cursor:pointer; font-family: inherit;
+}
+.pr-actions button:hover { border-color: var(--adm-brand); color: var(--adm-text); }
+.pr-modal { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:1000; padding:20px; }
+.pr-modal-card { width:100%; max-width:560px; background: var(--adm-surface); border:1px solid var(--adm-line); border-radius:16px; padding:24px; max-height:90vh; overflow-y:auto; }
+.pr-modal-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px; }
+.pr-modal-head h3 { margin:0; font-family: var(--adm-font-display); }
+.pr-grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px; }
+@media (max-width:700px){ .pr-grid { grid-template-columns: 1fr; } }
+.pr-field { margin-bottom:12px; }
+.pr-field label { display:block; font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--adm-muted); margin-bottom:4px; }
+.pr-field input, .pr-field select {
+  width:100%; padding:10px 12px; border:1px solid var(--adm-line-2); border-radius:8px;
+  font-size:14px; font-family:inherit; background: var(--adm-surface-2); color: var(--adm-text); outline:none;
+}
+.pr-field input:focus, .pr-field select:focus { border-color: var(--adm-brand); }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login"; return; }
+  var slug = null;
+
+  function h() { return { "Authorization": "Bearer " + token, "X-Tenant-Slug": slug, "Content-Type": "application/json" }; }
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  async function resolveSlug() {
+    var res = await fetch("/business/api/me", { headers: { "Authorization": "Bearer " + token } });
+    if (!res.ok) { window.location.href = "/business/login"; return; }
+    slug = (await res.json()).tenant_slug;
+  }
+
+  async function loadPromos() {
+    var list = document.getElementById("pr-list");
+    list.innerHTML = '<div class="pr-loading">Loading…</div>';
+    var res = await fetch("/business/api/promotions", { headers: h() });
+    if (!res.ok) { list.innerHTML = '<div class="pr-loading">Failed.</div>'; return; }
+    var d = await res.json();
+    if (!d.items.length) { list.innerHTML = '<div class="pr-loading">No promotions yet.</div>'; return; }
+    list.innerHTML = d.items.map(renderPromo).join("");
+    list.querySelectorAll("button[data-act]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var id = b.getAttribute("data-id");
+        var act = b.getAttribute("data-act");
+        if (act === "edit") openModal(id);
+        if (act === "del") delPromo(id);
+      });
+    });
+  }
+
+  function valueLabel(p) {
+    var v = parseFloat(p.discount_value);
+    return p.discount_type === "percent" ? (v + "%") : (v + " AED");
+  }
+
+  function renderPromo(p) {
+    var meta = [];
+    meta.push("Value: " + esc(valueLabel(p)));
+    if (p.max_uses != null) meta.push("Max uses: " + p.max_uses + " (used " + p.used_count + ")");
+    if (p.min_amount) meta.push("Min amount: " + esc(p.min_amount));
+    if (p.valid_from) meta.push("From: " + esc(p.valid_from));
+    if (p.valid_to) meta.push("To: " + esc(p.valid_to));
+    return '<div class="pr-item' + (p.active ? "" : " inactive") + '">' +
+      '<div>' +
+        '<div class="pr-code">' + esc(p.code.toUpperCase()) +
+          ' <span class="pr-badge ' + (p.active ? "active" : "") + '">' + (p.active ? "active" : "inactive") + '</span>' +
+          ' <span class="pr-badge pct">' + esc(valueLabel(p)) + '</span>' +
+        '</div>' +
+        '<div class="pr-meta">' + esc(p.name) + ' · ' + meta.join(" · ") + '</div>' +
+      '</div>' +
+      '<div class="pr-actions">' +
+        '<button data-act="edit" data-id="' + esc(p.id) + '">Edit</button>' +
+        (p.active ? '<button data-act="del" data-id="' + esc(p.id) + '">Deactivate</button>' : '') +
+      '</div>' +
+    '</div>';
+  }
+
+  function openModal(id) {
+    document.getElementById("pr-msg").textContent = "";
+    if (id) {
+      document.getElementById("pr-modal-title").textContent = "Edit Promotion";
+      document.getElementById("pr-id").value = id;
+      fetch("/business/api/promotions", { headers: h() }).then(function(r){ return r.json(); }).then(function(d){
+        var p = d.items.find(function(x){ return x.id === id; });
+        if (!p) return;
+        document.getElementById("pr-code").value = p.code;
+        document.getElementById("pr-code").disabled = true;
+        document.getElementById("pr-name").value = p.name;
+        document.getElementById("pr-dtype").value = p.discount_type;
+        document.getElementById("pr-dvalue").value = p.discount_value;
+        document.getElementById("pr-max").value = (p.max_uses == null ? "" : p.max_uses);
+        document.getElementById("pr-per-user").value = p.max_uses_per_user;
+        document.getElementById("pr-min").value = p.min_amount || "";
+        document.getElementById("pr-desc").value = p.description || "";
+        document.getElementById("pr-from").value = p.valid_from || "";
+        document.getElementById("pr-to").value = p.valid_to || "";
+      });
+    } else {
+      document.getElementById("pr-modal-title").textContent = "Create Promotion";
+      document.getElementById("pr-id").value = "";
+      document.getElementById("pr-code").disabled = false;
+      ["pr-code","pr-name","pr-dvalue","pr-max","pr-min","pr-desc","pr-from","pr-to"].forEach(function(i){
+        document.getElementById(i).value = "";
+      });
+      document.getElementById("pr-dtype").value = "percent";
+      document.getElementById("pr-per-user").value = "1";
+    }
+    document.getElementById("pr-modal").style.display = "flex";
+  }
+
+  document.getElementById("pr-new-btn").addEventListener("click", function(){ openModal(null); });
+  document.getElementById("pr-modal-close").addEventListener("click", function(){
+    document.getElementById("pr-modal").style.display = "none";
+  });
+
+  document.getElementById("pr-save").addEventListener("click", async function(){
+    var msg = document.getElementById("pr-msg");
+    var id = document.getElementById("pr-id").value;
+    var body = {
+      name: document.getElementById("pr-name").value.trim(),
+      discount_type: document.getElementById("pr-dtype").value,
+      discount_value: parseFloat(document.getElementById("pr-dvalue").value) || 0,
+      max_uses: document.getElementById("pr-max").value === "" ? null : parseInt(document.getElementById("pr-max").value, 10),
+      max_uses_per_user: parseInt(document.getElementById("pr-per-user").value, 10) || 1,
+      min_amount: document.getElementById("pr-min").value === "" ? null : parseFloat(document.getElementById("pr-min").value),
+      description: document.getElementById("pr-desc").value.trim() || null,
+      valid_from: document.getElementById("pr-from").value || null,
+      valid_to: document.getElementById("pr-to").value || null,
+    };
+    if (!id) body.code = document.getElementById("pr-code").value.trim();
+    if (!id && !body.code) { msg.textContent = "Code is required."; return; }
+    if (!body.name) { msg.textContent = "Name is required."; return; }
+    if (!body.discount_value) { msg.textContent = "Value is required."; return; }
+    msg.textContent = "Saving…";
+    var url = id ? ("/business/api/promotions/" + id) : "/business/api/promotions";
+    var method = id ? "PATCH" : "POST";
+    var res = await fetch(url, { method: method, headers: h(), body: JSON.stringify(body) });
+    var d = await res.json();
+    if (!res.ok) { msg.textContent = d.detail || "Failed."; return; }
+    document.getElementById("pr-modal").style.display = "none";
+    loadPromos();
+  });
+
+  async function delPromo(id) {
+    if (!confirm("Deactivate this promotion?")) return;
+    await fetch("/business/api/promotions/" + id, { method: "DELETE", headers: h() });
+    loadPromos();
+  }
+
+  (async function(){
+    await resolveSlug();
+    if (!slug) return;
+    loadPromos();
+  })();
+})();
+</script>
+{% endblock %}
