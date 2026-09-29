@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.12.0-pricing-coach (Phases 0-7, 9, 11, 18, 19, 20, 21 complete)
+> Version: v0.13.0-dynamic-pricing (Phases 0-7, 9, 11, 18, 19, 20, 21, 22 complete)
 
 Last updated: 2026-09-28
 
@@ -282,7 +282,7 @@ All idempotent.
 
 ## 11. Remaining Work
 
-**Phase 22 — Dynamic Pricing Rules (NEXT)**
+**Phase 29 — Business Leaderboard + AI Scoring (NEXT)**
 - Admin Login page
 - Admin Dashboard (analytics)
 - Tenants list/detail + status change
@@ -658,6 +658,21 @@ Tag: v0.11.0-user-ai
 - Chat history + context memory
 - Multi-language AI
 Estimated: 6-8 steps
+
+### Phase 22 — Dynamic Pricing Rules: COMPLETE
+Tag: v0.13.0-dynamic-pricing
+- PricingRule + PricingRuleApplication models + Alembic migration
+- Pricing Rules service (evaluate / compute / preview / record_application)
+  Rule types: weekend / season / urgency / capacity / last_minute / custom
+  Actions: percent (+/-) and fixed (+/-), Decimal math, floor at 0
+  Priority-ordered stacking (lower = first)
+- Business Pricing API: 6 endpoints under /business/api/pricing
+  CRUD + preview, owner/manager write, staff read-only, cross-tenant isolation
+- Booking integration: opt-in via apply_pricing_rules=True
+  Server-computed base price (from service), audit per applied rule
+- UI: Rule Builder page in Business Panel (/business/pricing)
+- Automated smoke test: scripts/smoke-pricing-rules.sh (11 checks)
+- 273 tests passing
 
 ### Phase 21 — AI Business Assistant (Pricing Coach): COMPLETE
 Tag: v0.12.0-pricing-coach
