@@ -11,6 +11,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 
+  <link rel="manifest" href="/static/manifest.webmanifest">
+  <meta name="theme-color" content="#0f3d5c">
+  <link rel="icon" type="image/svg+xml" href="/static/icons/icon.svg">
   <link rel="stylesheet" href="/static/css/typography.css?v={{ asset_version }}">
   <link rel="stylesheet" href="/static/css/platform.css?v={{ asset_version }}">
   <link rel="stylesheet" href="/static/css/platform-home.css?v={{ asset_version }}">
@@ -74,5 +77,12 @@
   <script src="/static/js/px-core.js?v={{ asset_version }}"></script>
   <script src="/static/js/ai-chat.js?v={{ asset_version }}"></script>
   {% block scripts %}{% endblock %}
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("/static/sw.js", { scope: "/" }).catch(function(){});
+  });
+}
+</script>
 </body>
 </html>

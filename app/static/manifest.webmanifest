@@ -1,0 +1,21 @@
+{
+  "name": "Platform-X — Hotels, Restaurants, Travel & Entertainment",
+  "short_name": "Platform-X",
+  "description": "Multi-service hospitality platform. AI-powered booking, travel planning, and rewards.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#faf8f5",
+  "theme_color": "#0f3d5c",
+  "lang": "en",
+  "categories": ["travel", "food", "business"],
+  "icons": [
+    {
+      "src": "/static/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
