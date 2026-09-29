@@ -93,7 +93,18 @@ Fast, safe, AI-driven loop:
 **Both commands must be run for every Step.** Without handoff.sh the
 checklist goes stale.
 
+**HANDOFF verification at Phase close (MANDATORY):**
+After every Phase (milestone), before tagging, verify HANDOFF is fresh:
+  - Version line matches the new tag
+  - Test Count matches the real `pytest tests/` output
+  - Section 0.5 checklist has no stale [ ] for finished Steps
+  - Phase appears in Section 5 (Phases Status)
+  - "Last updated" is today
+If anything is stale → fix it FIRST, commit, then tag.
+Never tag with stale HANDOFF.
+
 **Per Phase (milestone):**
+
 1. Full test suite
 2. Milestone tag
 3. Full HANDOFF update
