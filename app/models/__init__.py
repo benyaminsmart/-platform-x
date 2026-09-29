@@ -1,6 +1,7 @@
 """ORM models for Platform-X."""
 
 from app.models.analytics_event import AnalyticsEvent
+from app.models.attraction import Attraction
 from app.models.api_key import APIKey
 from app.models.ai_chat import AIChatMessage
 from app.models.audit_log import AuditLog
@@ -32,6 +33,7 @@ from app.models.wishlist import Wishlist
 
 __all__ = [
     "AnalyticsEvent",
+    "Attraction",
     "APIKey",
     "AIChatMessage",
     "AuditLog",
