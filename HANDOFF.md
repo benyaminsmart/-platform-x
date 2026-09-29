@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.30.0-group-booking (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-40 complete; 24 DEFERRED)
+> Version: v0.31.0-nearby (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-41 complete; 24 DEFERRED). WAVE 1 COMPLETE.
 
 Last updated: 2026-09-30
 
@@ -337,6 +337,21 @@ Tag: v0.30.0-group-booking
 - [x] Step 3 — Group booking API
 - [x] Step 4 — Group management UI
 - [x] Phase close — tag v0.30.0-group-booking
+
+**Phase 41 — Wave 1 / Nearby attractions: COMPLETE**
+Tag: v0.31.0-nearby
+- [x] Step 1 — Attraction model + migration + seed (12 Dubai attractions)
+- [x] Step 2 — Attraction service + public API
+- [x] Step 3 — Nearby attractions UI on tenant page
+- [x] Phase close — tag v0.31.0-nearby
+
+---
+
+## WAVE 1 COMPLETE (v0.31.0-nearby)
+
+Phases 32, 33, 34, 35, 36, 37, 38, 39, 40, 41 all done.
+Total tests: 1011. Public API + Webhooks + All Wave 1 features live.
+NEXT WAVE: Wave 2 — AI depth.
 
 ---
 
@@ -768,6 +783,32 @@ Tag: v0.30.0-group-booking
 - Group API: /bookings/{id}/group (GET, POST, PATCH/{member}, DELETE/{member})
 - Group management modal in account with add/mark-paid/remove
 - 1003 tests passing (milestone: crossed 1000)
+
+### Phase 41 — Nearby Attractions: COMPLETE
+Tag: v0.31.0-nearby
+- Attraction model (platform-scoped, shared across tenants)
+- Seed of 12 Dubai attractions
+- Attraction service (list_all, nearby via Haversine)
+- Public API: /api/attractions, /api/attractions/nearby?lat=&lng=&radius_km=
+- UI: Nearby attractions section on tenant page
+- 1011 tests passing
+
+## WAVE 1 MILESTONE — 2026-09-30
+
+Wave 1 (Competitive Parity) is COMPLETE:
+- 32: Map + Location
+- 33: Wishlist + Compare
+- 34: Reports (CSV + PDF)
+- 35: Booking modification + No-show
+- 36: Room inventory
+- 37: Rate Plans
+- 38: Promotions Engine
+- 39: Reviews Photos + Guest Messaging
+- 40: Group Booking
+- 41: Nearby Attractions
+- 10 phases, 1011 tests, all green.
+
+NEXT: Wave 2 (AI depth — connects AI to the Wave 1 foundation).
 
 ## 6. Data Models (19 tables)
 
@@ -1217,7 +1258,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1003 tests, all passing
+## 14. Test Count: 1011 tests, all passing
 
 Test files:
 - test_health.py
