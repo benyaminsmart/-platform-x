@@ -1,0 +1,166 @@
+{% extends "layouts/platform_base.html" %}
+{% block title %}API Documentation — Platform-X{% endblock %}
+{% block description %}Public API for Platform-X businesses: read services, bookings, reviews, and analytics.{% endblock %}
+
+{% block content %}
+<section class="px-hero px-hero-compact">
+  <div class="px-container">
+    <div class="px-hero-content">
+      <div class="px-breadcrumb">
+        <a href="/">Home</a><span>/</span><span>API Docs</span>
+      </div>
+      <h1 class="px-hero-title-sm">Public API</h1>
+      <p class="px-hero-sub-sm">
+        Read your own business data from Platform-X using a secure, scoped API key.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="px-section">
+  <div class="px-container" style="max-width: 900px;">
+
+    <h2>Authentication</h2>
+    <p>
+      Send your API key in the <code>X-API-Key</code> header with every request.
+      Keys are tenant-scoped: they only read the tenant they belong to.
+      Create keys in the business panel under
+      <a href="/business/api-keys">API &amp; Webhooks</a>.
+    </p>
+    <pre class="api-code">X-API-Key: pk_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</pre>
+
+    <h2>Scopes</h2>
+    <p>Each key carries scopes. Missing scope yields <code>403</code>.</p>
+    <table class="api-table">
+      <thead><tr><th>Scope</th><th>Allows</th></tr></thead>
+      <tbody>
+        <tr><td><code>read:services</code></td><td>GET /api/v1/services and /services/{id}</td></tr>
+        <tr><td><code>read:bookings</code></td><td>GET /api/v1/bookings and /bookings/{id}</td></tr>
+        <tr><td><code>read:reviews</code></td><td>GET /api/v1/reviews</td></tr>
+        <tr><td><code>read:analytics</code></td><td>GET /api/v1/analytics/summary</td></tr>
+        <tr><td><code>write:webhooks</code></td><td>Reserved for future write operations</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Endpoints</h2>
+    <table class="api-table">
+      <thead><tr><th>Method</th><th>Path</th><th>Scope</th></tr></thead>
+      <tbody>
+        <tr><td>GET</td><td>/api/v1/me</td><td>(any valid key)</td></tr>
+        <tr><td>GET</td><td>/api/v1/services?page=1&amp;page_size=20&amp;status=active</td><td>read:services</td></tr>
+        <tr><td>GET</td><td>/api/v1/services/{id}</td><td>read:services</td></tr>
+        <tr><td>GET</td><td>/api/v1/bookings?page=1&amp;page_size=20&amp;status=confirmed</td><td>read:bookings</td></tr>
+        <tr><td>GET</td><td>/api/v1/bookings/{id}</td><td>read:bookings</td></tr>
+        <tr><td>GET</td><td>/api/v1/reviews?page=1&amp;page_size=20</td><td>read:reviews</td></tr>
+        <tr><td>GET</td><td>/api/v1/analytics/summary?days=30</td><td>read:analytics</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Example — Python</h2>
+    <pre class="api-code">import requests
+
+API_KEY = "pk_live_..."
+BASE = "https://your-platform-x.example"
+
+r = requests.get(
+    f"{BASE}/api/v1/analytics/summary",
+    params={"days": 30},
+    headers={"X-API-Key": API_KEY},
+    timeout=10,
+)
+r.raise_for_status()
+print(r.json())</pre>
+
+    <h2>Example — JavaScript (fetch)</h2>
+    <pre class="api-code">const API_KEY = "pk_live_...";
+const BASE = "https://your-platform-x.example";
+
+const res = await fetch(`${BASE}/api/v1/services?page=1&amp;page_size=20`, {
+  headers: { "X-API-Key": API_KEY },
+});
+const data = await res.json();
+console.log(data.items);</pre>
+
+    <h2>Example — cURL</h2>
+    <pre class="api-code">curl -sS \
+  -H "X-API-Key: pk_live_..." \
+  "https://your-platform-x.example/api/v1/reviews?page_size=5"</pre>
+
+    <h2>Webhooks</h2>
+    <p>
+      Register a URL in <a href="/business/api-keys">API &amp; Webhooks</a>.
+      Platform-X sends signed POST requests for the events you select.
+    </p>
+    <p><strong>Headers sent:</strong></p>
+    <pre class="api-code">X-PlatformX-Event: booking.created
+X-PlatformX-Signature: sha256=&lt;hmac_sha256_hex&gt;
+Content-Type: application/json</pre>
+    <p><strong>Signature verification (Python):</strong></p>
+    <pre class="api-code">import hmac, hashlib, json
+
+def verify(raw_body: bytes, signature_header: str, secret: str) -> bool:
+    expected = "sha256=" + hmac.new(
+        secret.encode(), raw_body, hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature_header)</pre>
+
+    <h2>Errors</h2>
+    <table class="api-table">
+      <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>401</td><td>Missing or invalid API key</td></tr>
+        <tr><td>403</td><td>Key is valid but missing required scope</td></tr>
+        <tr><td>404</td><td>Resource not found (or belongs to another tenant)</td></tr>
+        <tr><td>429</td><td>Rate limit exceeded (100/min read)</td></tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top: 30px;">
+      Interactive OpenAPI (Swagger UI) is available at
+      <a href="/docs">/docs</a>.
+    </p>
+
+  </div>
+</section>
+
+<style>
+.api-code {
+  background: #0f1424;
+  color: #e5e7eb;
+  padding: 14px 16px;
+  border-radius: 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre;
+  margin: 12px 0 24px;
+}
+.api-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0 24px;
+  font-size: 14px;
+}
+.api-table th, .api-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--px-line);
+}
+.api-table th {
+  color: var(--px-muted);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.api-table code {
+  font-family: "JetBrains Mono", monospace;
+  background: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12.5px;
+}
+h2 { font-family: var(--px-font-display); margin-top: 36px; }
+</style>
+{% endblock %}

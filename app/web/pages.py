@@ -169,6 +169,18 @@ def home(request: Request, db: DBSession = Depends(get_db)) -> HTMLResponse:
     )
 
 
+@router.get("/docs/api", response_class=HTMLResponse)
+def api_docs_page(request: Request) -> HTMLResponse:
+    """Public API documentation page."""
+    return templates.TemplateResponse(
+        request,
+        "pages/api_docs.html",
+        {
+            "active_nav": "docs",
+        },
+    )
+
+
 @router.get("/leaderboard", response_class=HTMLResponse)
 def leaderboard_page(request: Request) -> HTMLResponse:
     """Public leaderboard page (data loaded client-side from /leaderboard API)."""
