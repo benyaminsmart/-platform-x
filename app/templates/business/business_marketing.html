@@ -1,0 +1,359 @@
+{% extends "business/business_base.html" %}
+
+{% block title %}Marketing Copilot — Business Panel{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h2>Marketing Copilot</h2>
+  <p class="admin-card-sub" style="margin-bottom: 0;">
+    AI-driven campaigns, customer segments, and discount suggestions — all grounded in
+    your real booking data. Emails are sent only when the platform enables it.
+  </p>
+</div>
+
+<div id="mk-alert" class="mk-alert" style="display:none;"></div>
+
+<!-- ============ Segments ============ -->
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div class="coach-head">
+    <h3>Customer segments</h3>
+    <button type="button" class="admin-btn" id="mk-refresh-segs" style="background:var(--adm-surface-2); color:var(--adm-text);">Refresh</button>
+  </div>
+  <p class="admin-card-sub">Your customers, automatically grouped. Click a segment to see emails.</p>
+  <div id="mk-segs" class="mk-grid">
+    <div class="mk-loading">Loading…</div>
+  </div>
+  <div id="mk-seg-users" style="display:none; margin-top:16px;"></div>
+</div>
+
+<!-- ============ Suggest Campaigns ============ -->
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div class="coach-head">
+    <h3>AI campaign ideas</h3>
+    <div style="display:flex; gap:6px; align-items:center;">
+      <select id="mk-sug-lang" class="mk-input" style="padding:8px 10px; width:auto; flex:0 0 auto;">
+        <option value="en">EN</option>
+        <option value="ar">AR</option>
+        <option value="fil">FIL</option>
+        <option value="hi">HI</option>
+      </select>
+      <button type="button" class="admin-btn" id="mk-sug-btn">Suggest campaigns</button>
+    </div>
+  </div>
+  <div id="mk-sug-out" class="mk-out">Click "Suggest campaigns" to see AI-generated ideas for your business.</div>
+</div>
+
+<!-- ============ Generate Targeted Campaign ============ -->
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div class="coach-head">
+    <h3>Targeted campaign</h3>
+    <button type="button" class="admin-btn" id="mk-gen-btn">Generate</button>
+  </div>
+  <div class="mk-grid">
+    <div class="mk-field">
+      <label>Segment</label>
+      <select id="mk-gen-seg">
+        <option value="past_bookers">Past bookers</option>
+        <option value="inactive_90d">Inactive (90+ days)</option>
+        <option value="high_value">High value (top 20%)</option>
+        <option value="new_30d">New (30 days)</option>
+        <option value="loyalty_gold_plus">Loyalty gold+</option>
+        <option value="all">All customers</option>
+      </select>
+    </div>
+    <div class="mk-field">
+      <label>Goal</label>
+      <input type="text" id="mk-gen-goal" placeholder="Boost weekend bookings" maxlength="300">
+    </div>
+  </div>
+  <div id="mk-gen-out" class="mk-out"></div>
+</div>
+
+<!-- ============ Discount Suggestions ============ -->
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div class="coach-head">
+    <h3>Discount suggestions</h3>
+    <button type="button" class="admin-btn" id="mk-disc-btn">Suggest discounts</button>
+  </div>
+  <p class="admin-card-sub">Policy-bounded (max {{ max_discount_pct }}%). AI only writes the rationale.</p>
+  <div id="mk-disc-out" class="mk-out"></div>
+</div>
+
+<!-- ============ Send Campaign ============ -->
+<div class="admin-card">
+  <div class="coach-head">
+    <h3>Send campaign</h3>
+    <span id="mk-send-status" class="mk-badge">Checking…</span>
+  </div>
+  <p class="admin-card-sub">
+    Emails are sent only if the platform has enabled sending. Otherwise this runs a dry run.
+  </p>
+  <div class="mk-grid">
+    <div class="mk-field">
+      <label>Segment</label>
+      <select id="mk-send-seg">
+        <option value="past_bookers">Past bookers</option>
+        <option value="inactive_90d">Inactive (90+ days)</option>
+        <option value="high_value">High value (top 20%)</option>
+        <option value="new_30d">New (30 days)</option>
+        <option value="loyalty_gold_plus">Loyalty gold+</option>
+        <option value="all">All customers</option>
+      </select>
+    </div>
+    <div class="mk-field">
+      <label>Subject</label>
+      <input type="text" id="mk-send-subject" placeholder="A special offer just for you" maxlength="200">
+    </div>
+  </div>
+  <div class="mk-field" style="margin-bottom: 12px;">
+    <label>Body</label>
+    <textarea id="mk-send-body" rows="5" placeholder="Write a short, friendly message…"></textarea>
+  </div>
+  <button type="button" class="admin-btn" id="mk-send-btn">Send</button>
+  <div id="mk-send-out" class="mk-out"></div>
+</div>
+
+<style>
+.mk-alert { margin-bottom: 16px; padding: 10px 14px; border-radius: 10px; font-size: 13px; }
+.mk-alert.warn { background: rgba(251,191,36,0.12); color: var(--adm-warning); }
+.mk-alert.err  { background: rgba(248,113,113,0.12); color: var(--adm-error); }
+.mk-alert.ok   { background: rgba(52,211,153,0.12); color: var(--adm-success); }
+.mk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+@media (max-width: 800px) { .mk-grid { grid-template-columns: 1fr; } }
+.mk-seg {
+  padding: 12px 14px; border: 1px solid var(--adm-line); border-radius: 10px;
+  background: var(--adm-surface-2); cursor: pointer;
+}
+.mk-seg:hover { border-color: var(--adm-brand); }
+.mk-seg-name { font-weight: 600; font-size: 13px; color: var(--adm-text); margin-bottom: 4px; text-transform: capitalize; }
+.mk-seg-count { font-family: var(--adm-font-display); font-size: 22px; font-weight: 700; color: var(--adm-text); }
+.mk-seg-hint { font-size: 11px; color: var(--adm-muted); margin-top: 4px; }
+.mk-field label { display:block; font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color: var(--adm-muted); margin-bottom:4px; }
+.mk-field input, .mk-field select, .mk-field textarea {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--adm-line-2); border-radius: 8px;
+  font-size: 14px; font-family: inherit; background: var(--adm-surface-2); color: var(--adm-text);
+  outline: none; resize: vertical;
+}
+.mk-field input:focus, .mk-field select:focus, .mk-field textarea:focus { border-color: var(--adm-brand); }
+.mk-out {
+  margin-top: 14px; padding: 12px 14px; background: var(--adm-surface-2);
+  border: 1px solid var(--adm-line); border-radius: 10px; font-size: 13.5px;
+  color: var(--adm-text-soft); white-space: pre-wrap; line-height: 1.55;
+}
+.mk-card-campaign {
+  padding: 12px 14px; border: 1px solid var(--adm-line); border-radius: 10px;
+  background: var(--adm-bg); margin-top: 10px;
+}
+.mk-card-campaign h4 { margin: 0 0 6px; color: var(--adm-text); font-size: 14px; }
+.mk-card-campaign .mk-meta { font-size: 12px; color: var(--adm-muted); margin-bottom: 6px; display: flex; gap: 12px; flex-wrap: wrap; }
+.mk-card-campaign .mk-subject { color: var(--adm-text); font-weight: 600; margin-top: 6px; }
+.mk-card-campaign .mk-body { margin-top: 6px; color: var(--adm-text-soft); white-space: pre-wrap; }
+.mk-card-campaign .mk-rationale { margin-top: 8px; font-size: 12.5px; color: var(--adm-muted); font-style: italic; }
+.mk-badge {
+  display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 11px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  background: var(--adm-surface-2); color: var(--adm-muted); border: 1px solid var(--adm-line);
+}
+.mk-badge.on { background: rgba(52,211,153,0.15); color: var(--adm-success); border-color: rgba(52,211,153,0.3); }
+.mk-badge.off { background: rgba(251,191,36,0.15); color: var(--adm-warning); border-color: rgba(251,191,36,0.3); }
+.mk-seg-users-list { font-family: monospace; font-size: 12px; color: var(--adm-text-soft); margin-top: 8px; max-height: 200px; overflow-y: auto; }
+.mk-seg-users-list span { display: inline-block; padding: 2px 6px; background: var(--adm-bg); border-radius: 4px; margin: 2px; }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login"; return; }
+  var slug = null;
+
+  function h() { return { "Authorization": "Bearer " + token, "X-Tenant-Slug": slug, "Content-Type": "application/json" }; }
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  async function resolveSlug() {
+    var res = await fetch("/business/api/me", { headers: { "Authorization": "Bearer " + token } });
+    if (!res.ok) { try{ localStorage.removeItem("px_business_token"); }catch(e){}; window.location.href = "/business/login"; return; }
+    slug = (await res.json()).tenant_slug;
+  }
+
+  function showAlert(kind, msg) {
+    var a = document.getElementById("mk-alert");
+    a.className = "mk-alert " + kind;
+    a.textContent = msg;
+    a.style.display = "block";
+  }
+
+  // -------- Config badge --------
+  async function loadConfig() {
+    var res = await fetch("/business/api/marketing/config", { headers: h() });
+    if (!res.ok) return;
+    var d = await res.json();
+    var el = document.getElementById("mk-send-status");
+    if (d.email_enabled) {
+      el.textContent = "Sending enabled";
+      el.className = "mk-badge on";
+    } else {
+      el.textContent = "Dry run only";
+      el.className = "mk-badge off";
+      showAlert("warn", "Email sending is disabled. Send buttons will only simulate. Ask a platform admin to configure Resend.");
+    }
+  }
+
+  // -------- Segments --------
+  var SEG_LABELS = {
+    "all": "All customers",
+    "past_bookers": "Past bookers",
+    "inactive_90d": "Inactive (90+ days)",
+    "high_value": "High value (top 20%)",
+    "new_30d": "New (30 days)",
+    "loyalty_gold_plus": "Loyalty gold+",
+  };
+
+  async function loadSegments() {
+    var wrap = document.getElementById("mk-segs");
+    wrap.innerHTML = '<div class="mk-loading">Loading…</div>';
+    var res = await fetch("/business/api/marketing/segments", { headers: h() });
+    if (!res.ok) { wrap.innerHTML = '<div class="mk-loading">Failed.</div>'; return; }
+    var d = await res.json();
+    var cards = d.segments.map(function(s){
+      var name = SEG_LABELS[s.name] || s.name;
+      var hint = s.name === "high_value" && s.top20_threshold_aed
+        ? ("Threshold: " + s.top20_threshold_aed + " AED+")
+        : (s.sample_emails && s.sample_emails.length ? (s.sample_emails.length + " shown") : "");
+      return '<div class="mk-seg" data-seg="' + esc(s.name) + '">' +
+        '<div class="mk-seg-name">' + esc(name) + '</div>' +
+        '<div class="mk-seg-count">' + s.count + '</div>' +
+        '<div class="mk-seg-hint">' + esc(hint) + '</div>' +
+      '</div>';
+    }).join("");
+    wrap.innerHTML = cards || '<div class="mk-loading">No segments.</div>';
+    wrap.querySelectorAll(".mk-seg").forEach(function(c){
+      c.addEventListener("click", function(){ loadSegmentUsers(c.getAttribute("data-seg")); });
+    });
+  }
+
+  async function loadSegmentUsers(seg) {
+    var box = document.getElementById("mk-seg-users");
+    box.style.display = "block";
+    box.innerHTML = '<div class="mk-out">Loading ' + esc(seg) + '…</div>';
+    var res = await fetch("/business/api/marketing/segments/" + encodeURIComponent(seg), { headers: h() });
+    if (!res.ok) {
+      var err = await res.json();
+      box.innerHTML = '<div class="mk-out">' + esc(err.detail || "Failed.") + '</div>';
+      return;
+    }
+    var d = await res.json();
+    var html = '<div class="mk-out"><strong>' + d.count + '</strong> customer(s) in <strong>' + esc(d.segment) + '</strong>';
+    if (d.emails.length) {
+      html += '<div class="mk-seg-users-list">' + d.emails.map(function(e){ return '<span>' + esc(e) + '</span>'; }).join("") + '</div>';
+    }
+    html += '</div>';
+    box.innerHTML = html;
+  }
+
+  // -------- Suggest campaigns --------
+  document.getElementById("mk-sug-btn").addEventListener("click", async function(){
+    var out = document.getElementById("mk-sug-out");
+    out.textContent = "Thinking…";
+    var res = await fetch("/business/api/marketing/campaigns/suggest", {
+      method: "POST", headers: h(),
+      body: JSON.stringify({ language: document.getElementById("mk-sug-lang").value }),
+    });
+    var d = await res.json();
+    if (!res.ok) { out.textContent = d.detail || "Failed."; return; }
+    out.innerHTML = '<div style="color:var(--adm-muted); font-size:12px; margin-bottom:6px;">Provider: ' + esc(d.provider) + '</div>' +
+      d.campaigns.map(renderCampaign).join("");
+  });
+
+  function renderCampaign(c) {
+    var reach = (c.estimated_reach != null) ? (c.estimated_reach + " customers") : "—";
+    return '<div class="mk-card-campaign">' +
+      '<h4>' + esc(c.name) + '</h4>' +
+      '<div class="mk-meta">' +
+        '<span>Target: <strong>' + esc(c.target_segment) + '</strong></span>' +
+        '<span>Channel: ' + esc(c.channel) + '</span>' +
+        '<span>Reach: ' + reach + '</span>' +
+      '</div>' +
+      (c.subject ? '<div class="mk-subject">' + esc(c.subject) + '</div>' : '') +
+      (c.body ? '<div class="mk-body">' + esc(c.body) + '</div>' : '') +
+      (c.rationale ? '<div class="mk-rationale">' + esc(c.rationale) + '</div>' : '') +
+    '</div>';
+  }
+
+  // -------- Generate targeted --------
+  document.getElementById("mk-gen-btn").addEventListener("click", async function(){
+    var out = document.getElementById("mk-gen-out");
+    out.textContent = "Generating…";
+    var seg = document.getElementById("mk-gen-seg").value;
+    var goal = document.getElementById("mk-gen-goal").value.trim();
+    if (!goal) { out.textContent = "Enter a goal first."; return; }
+    var res = await fetch("/business/api/marketing/campaigns/generate", {
+      method: "POST", headers: h(),
+      body: JSON.stringify({ segment: seg, goal: goal, language: "en" }),
+    });
+    var d = await res.json();
+    if (!res.ok) { out.textContent = d.detail || "Failed."; return; }
+    out.innerHTML = renderCampaign(d.campaign);
+  });
+
+  // -------- Discounts --------
+  document.getElementById("mk-disc-btn").addEventListener("click", async function(){
+    var out = document.getElementById("mk-disc-out");
+    out.textContent = "Analyzing…";
+    var res = await fetch("/business/api/marketing/discounts/suggest", {
+      method: "POST", headers: h(),
+      body: JSON.stringify({ language: "en" }),
+    });
+    var d = await res.json();
+    if (!res.ok) { out.textContent = d.detail || "Failed."; return; }
+    out.innerHTML = d.suggestions.map(function(s){
+      var imp = s.estimated_impact || {};
+      return '<div class="mk-card-campaign">' +
+        '<h4>' + esc(s.segment) + ' · ' + s.discount_pct + '% off for ' + s.duration_days + ' days</h4>' +
+        '<div class="mk-meta">' +
+          '<span>Audience: ' + s.estimated_audience + '</span>' +
+          '<span>Est. orders: ' + imp.expected_orders + '</span>' +
+          '<span>Est. discount: ' + imp.discount_value_aed + ' AED</span>' +
+          '<span>Est. net: ' + imp.net_after_discount_aed + ' AED</span>' +
+        '</div>' +
+        '<div class="mk-body">' + esc(s.reason) + '</div>' +
+      '</div>';
+    }).join("");
+  });
+
+  // -------- Send --------
+  document.getElementById("mk-send-btn").addEventListener("click", async function(){
+    var out = document.getElementById("mk-send-out");
+    out.textContent = "Sending…";
+    var seg = document.getElementById("mk-send-seg").value;
+    var subject = document.getElementById("mk-send-subject").value.trim();
+    var body = document.getElementById("mk-send-body").value.trim();
+    if (!subject || !body) { out.textContent = "Subject and body are required."; return; }
+    var res = await fetch("/business/api/marketing/campaigns/send", {
+      method: "POST", headers: h(),
+      body: JSON.stringify({ segment: seg, subject: subject, body: body, language: "en" }),
+    });
+    var d = await res.json();
+    if (!res.ok) { out.textContent = d.detail || "Failed."; return; }
+    out.innerHTML =
+      '<div><strong>Attempted:</strong> ' + d.attempted + '</div>' +
+      '<div><strong>Sent:</strong> ' + d.sent + '</div>' +
+      '<div><strong>Failed:</strong> ' + d.failed + '</div>' +
+      '<div><strong>Dry run:</strong> ' + (d.dry_run ? "yes" : "no") + '</div>' +
+      (d.note ? '<div style="color:var(--adm-warning); margin-top:6px;">' + esc(d.note) + '</div>' : '');
+  });
+
+  document.getElementById("mk-refresh-segs").addEventListener("click", loadSegments);
+
+  // -------- Boot --------
+  (async function(){
+    await resolveSlug();
+    if (!slug) return;
+    loadConfig();
+    loadSegments();
+  })();
+})();
+</script>
+{% endblock %}

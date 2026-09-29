@@ -653,6 +653,24 @@ def business_content_page(request: Request) -> HTMLResponse:
     )
 
 
+@router.get("/business/marketing", response_class=HTMLResponse)
+def business_marketing_page(request: Request) -> HTMLResponse:
+    """Marketing Copilot page for the current business."""
+    from app.services.ai import discount_suggester
+
+    return templates.TemplateResponse(
+        request,
+        "business/business_marketing.html",
+        {
+            "business_user": {"first_name": "Owner", "last_name": ""},
+            "tenant_name": "Business",
+            "tenant_slug": "trianon-hotel",
+            "active_nav": "marketing",
+            "max_discount_pct": discount_suggester.MAX_DISCOUNT_PCT,
+        },
+    )
+
+
 @router.get("/business/pricing", response_class=HTMLResponse)
 def business_pricing_page(request: Request) -> HTMLResponse:
     """Pricing Rules builder for the current business."""
