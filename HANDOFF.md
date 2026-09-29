@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.21.0-wave0 (Wave 0 part A in progress; goals + method documented)
+> Version: v0.21.0-wave0-part-a (Phases 0-7, 9, 11, 14, 18-23, 25-30 complete; 24 DEFERRED)
 
 Last updated: 2026-09-29
 
@@ -128,7 +128,7 @@ Last step: Step 10b — Gallery section on tenant page (2026-09-29 23:18)
 - [x] Step 9b — Extended filters in /search UI
 - [x] Step 10a — Service gallery API
 - [x] Step 10b — Gallery section on tenant page
-- [ ] Phase close — milestone tag + full HANDOFF update
+- [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
 - 3c872b7 Step 10b — Gallery section on tenant page
@@ -427,6 +427,41 @@ Tag: v0.19.0-reviews
   - Reviews section on tenant home page (5 most recent published)
 - 60+ tests, 12 smoke checks
 - Bug fix during smoke: missing {% endif %} broke tenant_home.html
+
+### Phase 30 — Wave 0 part A (Foundation, free): COMPLETE
+Tag: v0.21.0-wave0-part-a
+- Search: cross-tenant with dates, guests, filters, sort, currency
+  - GET /api/search (60/min)
+  - GET /search HTML page (client-side)
+  - Home hero search form
+- Availability:
+  - GET /api/availability/{tenant_slug}?days=N
+  - Calendar section on tenant page (14 days, colors, click-to-book)
+- Cancellation + Refund:
+  - Deterministic policy (>7d full, 3-7d partial, <72h none)
+  - GET /bookings/{id}/refund-preview
+  - POST /bookings/{id}/cancel-with-refund
+  - Cancel button + modal in account page
+- Multi-currency:
+  - Fixed rates AED/USD/EUR/GBP/SAR
+  - API + service integration
+  - Dropdown in /search
+- Booking receipt (print to PDF):
+  - GET /bookings/{id}/receipt
+  - Print/Save-as-PDF button
+- PWA:
+  - manifest.webmanifest, service worker, SVG icon
+  - Registered in base layout
+- Extended filters:
+  - min_rating, service_type, location
+  - UI in /search form
+- Service gallery:
+  - GET /services/{id}/gallery
+  - Gallery section on tenant page with lightbox
+
+**Not done (part B — needs purchases):**
+- VPS + Domain + Named Tunnel
+- Payment production (Telr/Stripe)
 
 ### Phase 14 — Public API + Webhooks + SDK: COMPLETE
 Tag: v0.20.0-public-api
@@ -937,7 +972,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: ~750 tests, all passing (+ 90 smoke checks)
+## 14. Test Count: 805 tests, all passing
 
 Test files:
 - test_health.py
