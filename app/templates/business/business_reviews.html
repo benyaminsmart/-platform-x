@@ -1,0 +1,310 @@
+{% extends "business/business_base.html" %}
+
+{% block title %}Reviews — Business Panel{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h2>Guest Reviews</h2>
+  <p class="admin-card-sub" style="margin-bottom: 0;">
+    Read guest feedback, respond with AI or manually, and hide reviews that
+    violate your policy.
+  </p>
+</div>
+
+<!-- ============ Summary ============ -->
+<div class="rv-kpis">
+  <div class="admin-card rv-kpi">
+    <div class="rv-kpi-label">Total reviews</div>
+    <div class="rv-kpi-value" id="rv-total">–</div>
+  </div>
+  <div class="admin-card rv-kpi">
+    <div class="rv-kpi-label">Average rating</div>
+    <div class="rv-kpi-value"><span id="rv-avg">–</span><span class="rv-kpi-unit">/5</span></div>
+  </div>
+  <div class="admin-card rv-kpi">
+    <div class="rv-kpi-label">Verified</div>
+    <div class="rv-kpi-value" id="rv-verified">–</div>
+  </div>
+  <div class="admin-card rv-kpi">
+    <div class="rv-kpi-label">Sentiment</div>
+    <div class="rv-kpi-sub" id="rv-sentiment">—</div>
+  </div>
+</div>
+
+<!-- ============ Filters ============ -->
+<div class="admin-card" style="margin-bottom: 16px;">
+  <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+    <label style="display:flex; align-items:center; gap:6px; font-size:13px; color:var(--adm-text-soft);">
+      <input type="checkbox" id="rv-include-hidden"> Include hidden
+    </label>
+    <button type="button" class="admin-btn" id="rv-refresh" style="background:var(--adm-surface-2); color:var(--adm-text);">Refresh</button>
+  </div>
+</div>
+
+<!-- ============ Reviews list ============ -->
+<div id="rv-list" class="rv-list">
+  <div class="rv-loading">Loading…</div>
+</div>
+
+<!-- ============ Response modal ============ -->
+<div id="rv-modal" class="rv-modal" style="display:none;">
+  <div class="rv-modal-card">
+    <div class="rv-modal-head">
+      <h3 id="rv-modal-title">Respond</h3>
+      <button type="button" class="admin-btn" id="rv-modal-close" style="background:var(--adm-surface-2); color:var(--adm-text);">Close</button>
+    </div>
+    <div class="rv-field">
+      <label>Language</label>
+      <select id="rv-lang">
+        <option value="en">EN</option>
+        <option value="ar">AR</option>
+        <option value="fil">FIL</option>
+        <option value="hi">HI</option>
+      </select>
+    </div>
+    <div class="rv-field">
+      <label>Tone</label>
+      <select id="rv-tone">
+        <option value="professional">Professional</option>
+        <option value="friendly">Friendly</option>
+        <option value="warm">Warm</option>
+      </select>
+    </div>
+    <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+      <button type="button" class="admin-btn" id="rv-ai-preview">AI preview</button>
+    </div>
+    <div class="rv-field">
+      <label>Response</label>
+      <textarea id="rv-response" rows="5" placeholder="Write your reply or use AI preview above"></textarea>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button type="button" class="admin-btn" id="rv-save">Save response</button>
+    </div>
+    <div id="rv-modal-msg" style="margin-top:10px; font-size:12.5px;"></div>
+  </div>
+</div>
+
+<style>
+.rv-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+@media (max-width: 900px) { .rv-kpis { grid-template-columns: repeat(2, 1fr); } }
+.rv-kpi { padding: 18px; }
+.rv-kpi-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--adm-muted); margin-bottom: 8px; }
+.rv-kpi-value { font-family: var(--adm-font-display); font-size: 30px; font-weight: 800; color: var(--adm-text); line-height: 1; }
+.rv-kpi-unit { font-size: 14px; color: var(--adm-muted); margin-left: 4px; }
+.rv-kpi-sub { font-size: 12.5px; color: var(--adm-text-soft); margin-top: 6px; line-height: 1.5; }
+.rv-list { display: flex; flex-direction: column; gap: 12px; }
+.rv-loading { color: var(--adm-muted); padding: 20px; }
+.rv-item {
+  padding: 16px 18px; border: 1px solid var(--adm-line); border-radius: 12px;
+  background: var(--adm-surface-2);
+}
+.rv-item.hidden { opacity: 0.55; }
+.rv-item-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; flex-wrap:wrap; margin-bottom:10px; }
+.rv-stars { color: var(--adm-accent); font-size: 16px; letter-spacing: 2px; }
+.rv-meta { font-size: 12px; color: var(--adm-muted); display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+.rv-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.rv-badge.positive { background: rgba(52,211,153,0.15); color: var(--adm-success); }
+.rv-badge.negative { background: rgba(248,113,113,0.15); color: var(--adm-error); }
+.rv-badge.neutral { background: var(--adm-bg); color: var(--adm-muted); border: 1px solid var(--adm-line); }
+.rv-badge.verified { background: rgba(99,102,241,0.15); color: var(--adm-brand); }
+.rv-badge.hidden-badge { background: rgba(251,191,36,0.15); color: var(--adm-warning); }
+.rv-content { font-size: 14px; color: var(--adm-text); line-height: 1.6; margin: 10px 0; white-space: pre-wrap; }
+.rv-response {
+  margin-top: 12px; padding: 10px 12px; border-left: 3px solid var(--adm-brand);
+  background: var(--adm-bg); border-radius: 6px; font-size: 13.5px; color: var(--adm-text-soft);
+  white-space: pre-wrap;
+}
+.rv-response-head { font-size: 11px; color: var(--adm-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.rv-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.rv-actions button {
+  padding: 6px 10px; font-size: 12px; border-radius: 6px;
+  border: 1px solid var(--adm-line-2); background: var(--adm-bg); color: var(--adm-text-soft);
+  cursor: pointer; font-family: inherit;
+}
+.rv-actions button:hover { border-color: var(--adm-brand); color: var(--adm-text); }
+.rv-actions button.danger:hover { border-color: var(--adm-error); color: var(--adm-error); }
+.rv-modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+}
+.rv-modal-card {
+  width: 100%; max-width: 600px; background: var(--adm-surface);
+  border: 1px solid var(--adm-line); border-radius: 16px; padding: 24px;
+  max-height: 90vh; overflow-y: auto;
+}
+.rv-modal-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom: 16px; }
+.rv-modal-head h3 { margin: 0; font-family: var(--adm-font-display); }
+.rv-field { margin-bottom: 12px; }
+.rv-field label { display:block; font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--adm-muted); margin-bottom:4px; }
+.rv-field select, .rv-field textarea {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--adm-line-2); border-radius: 8px;
+  font-size: 14px; font-family: inherit; background: var(--adm-surface-2);
+  color: var(--adm-text); outline: none; resize: vertical;
+}
+.rv-field select:focus, .rv-field textarea:focus { border-color: var(--adm-brand); }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login"; return; }
+  var slug = null;
+  var currentReviewId = null;
+
+  function h() { return { "Authorization": "Bearer " + token, "X-Tenant-Slug": slug, "Content-Type": "application/json" }; }
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  async function resolveSlug() {
+    var res = await fetch("/business/api/me", { headers: { "Authorization": "Bearer " + token } });
+    if (!res.ok) { try{ localStorage.removeItem("px_business_token"); }catch(e){}; window.location.href = "/business/login"; return; }
+    slug = (await res.json()).tenant_slug;
+  }
+
+  function stars(rating) {
+    var n = Math.max(0, Math.min(5, parseInt(rating, 10) || 0));
+    return "★".repeat(n) + "☆".repeat(5 - n);
+  }
+
+  async function loadSummary() {
+    var res = await fetch("/business/api/reviews/summary", { headers: h() });
+    if (!res.ok) return;
+    var d = await res.json();
+    document.getElementById("rv-total").textContent = d.total;
+    document.getElementById("rv-avg").textContent = d.avg_rating.toFixed(2);
+    document.getElementById("rv-verified").textContent = d.verified_count;
+    var sent = d.by_sentiment || {};
+    var parts = [];
+    ["positive", "neutral", "negative"].forEach(function(k){
+      if (sent[k]) parts.push('<span class="rv-badge ' + k + '">' + k + ': ' + sent[k] + '</span>');
+    });
+    document.getElementById("rv-sentiment").innerHTML = parts.join(" ") || "—";
+  }
+
+  async function loadReviews() {
+    var list = document.getElementById("rv-list");
+    list.innerHTML = '<div class="rv-loading">Loading…</div>';
+    var inc = document.getElementById("rv-include-hidden").checked ? "?include_hidden=true" : "";
+    var res = await fetch("/business/api/reviews" + inc, { headers: h() });
+    if (!res.ok) { list.innerHTML = '<div class="rv-loading">Failed to load.</div>'; return; }
+    var d = await res.json();
+    if (!d.items.length) {
+      list.innerHTML = '<div class="rv-loading">No reviews yet.</div>';
+      return;
+    }
+    list.innerHTML = d.items.map(renderReview).join("");
+    list.querySelectorAll("button[data-act]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var id = b.getAttribute("data-id");
+        var act = b.getAttribute("data-act");
+        if (act === "hide") hideReview(id);
+        if (act === "respond") openRespondModal(id);
+      });
+    });
+  }
+
+  function renderReview(r) {
+    var hidden = r.status === "hidden";
+    var badges = "";
+    if (r.sentiment) badges += '<span class="rv-badge ' + esc(r.sentiment) + '">' + esc(r.sentiment) + '</span> ';
+    if (r.verified) badges += '<span class="rv-badge verified">verified</span> ';
+    if (hidden) badges += '<span class="rv-badge hidden-badge">hidden</span>';
+
+    var responseHtml = "";
+    if (r.response_text) {
+      responseHtml =
+        '<div class="rv-response">' +
+          '<div class="rv-response-head">Your response · ' + esc(r.response_provider || "manual") + '</div>' +
+          esc(r.response_text) +
+        '</div>';
+    }
+
+    return '<div class="rv-item' + (hidden ? ' hidden' : '') + '">' +
+      '<div class="rv-item-head">' +
+        '<div>' +
+          '<div class="rv-stars">' + stars(r.rating) + '</div>' +
+          '<div class="rv-meta">' +
+            badges +
+            '<span>Lang: ' + esc(r.language) + '</span>' +
+            (r.created_at ? '<span>' + esc(r.created_at.slice(0,10)) + '</span>' : '') +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      (r.title ? '<div style="font-weight:600; color:var(--adm-text); margin-bottom:4px;">' + esc(r.title) + '</div>' : '') +
+      '<div class="rv-content">' + esc(r.content) + '</div>' +
+      responseHtml +
+      '<div class="rv-actions">' +
+        (!hidden ? '<button class="danger" data-id="' + esc(r.id) + '" data-act="hide">Hide</button>' : '') +
+        '<button data-id="' + esc(r.id) + '" data-act="respond">' + (r.response_text ? 'Edit response' : 'Respond') + '</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  async function hideReview(id) {
+    if (!confirm("Hide this review from the public page?")) return;
+    await fetch("/business/api/reviews/" + id + "/hide", { method: "POST", headers: h() });
+    loadReviews();
+    loadSummary();
+  }
+
+  function openRespondModal(id) {
+    currentReviewId = id;
+    document.getElementById("rv-response").value = "";
+    document.getElementById("rv-modal-msg").textContent = "";
+    document.getElementById("rv-modal").style.display = "flex";
+  }
+
+  document.getElementById("rv-modal-close").addEventListener("click", function(){
+    document.getElementById("rv-modal").style.display = "none";
+  });
+
+  document.getElementById("rv-ai-preview").addEventListener("click", async function(){
+    var msg = document.getElementById("rv-modal-msg");
+    msg.textContent = "Generating…";
+    var res = await fetch("/business/api/reviews/" + currentReviewId + "/respond/preview", {
+      method: "POST", headers: h(),
+      body: JSON.stringify({
+        language: document.getElementById("rv-lang").value,
+        tone: document.getElementById("rv-tone").value,
+      }),
+    });
+    var d = await res.json();
+    if (!res.ok) { msg.textContent = d.detail || "Failed."; return; }
+    document.getElementById("rv-response").value = d.content;
+    msg.textContent = "AI preview (" + d.provider + "). Edit before saving if needed.";
+  });
+
+  document.getElementById("rv-save").addEventListener("click", async function(){
+    var msg = document.getElementById("rv-modal-msg");
+    var text = document.getElementById("rv-response").value.trim();
+    if (!text) { msg.textContent = "Response is empty."; return; }
+    msg.textContent = "Saving…";
+    var res = await fetch("/business/api/reviews/" + currentReviewId + "/respond", {
+      method: "POST", headers: h(),
+      body: JSON.stringify({
+        response_text: text, language: "en", tone: "professional", use_ai: false,
+      }),
+    });
+    var d = await res.json();
+    if (!res.ok) { msg.textContent = d.detail || "Failed."; return; }
+    document.getElementById("rv-modal").style.display = "none";
+    loadReviews();
+  });
+
+  document.getElementById("rv-refresh").addEventListener("click", function(){ loadReviews(); loadSummary(); });
+  document.getElementById("rv-include-hidden").addEventListener("change", loadReviews);
+
+  (async function(){
+    await resolveSlug();
+    if (!slug) return;
+    loadSummary();
+    loadReviews();
+  })();
+})();
+</script>
+{% endblock %}
