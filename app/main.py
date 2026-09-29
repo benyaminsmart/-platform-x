@@ -11,6 +11,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.api import account_ai as account_ai_router
 from app.api import ai as ai_router
+from app.api import availability as availability_router
 from app.api import analytics as analytics_router
 from app.api import auth as auth_router
 from app.api import bookings as bookings_router
@@ -143,6 +144,7 @@ app.add_middleware(HTTPSRedirectMiddleware)
 # ---------- API routers ----------
 
 app.include_router(ai_router.router)
+app.include_router(availability_router.router)
 app.include_router(account_ai_router.router)
 app.include_router(ai_router.business_router)
 app.include_router(analytics_router.router)
