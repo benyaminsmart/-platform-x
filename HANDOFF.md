@@ -105,11 +105,11 @@ Persian only.
 
 ---
 
-## 0.5 Wave 0 Progress (auto-updated by step.sh)
+## 0.5 Wave 0 Progress (updated after every step)
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
-Last step: phase-30-step-9b-done (2026-09-29 23:10)
+Last step: phase-30-step-10a-done (2026-09-29 23:11)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -124,9 +124,18 @@ Last step: phase-30-step-9b-done (2026-09-29 23:10)
 - [x] Step 6c — Currency dropdown in /search UI
 - [x] Step 7 — Booking receipt (print to PDF)
 - [x] Step 8 — PWA (manifest + service worker + icon)
-- [ ] Step 9 — Filters + Sort (rating, location, service_type)
-- [ ] Step 10 — Room types + Gallery (enhanced)
+- [x] Step 9 — Extended search filters (rating, type, location)
+- [x] Step 9b — Extended filters in /search UI
+- [x] Step 10a — Service gallery API
+- [ ] Step 10b — Gallery section on tenant page (in progress)
 - [ ] Phase close — milestone tag + full HANDOFF update
+
+**Commits (recent):**
+- f2485ae feat(phase-30/step-10a): service gallery API
+- 02988b0 feat(phase-30/step-9b): extra filters in /search UI
+- ceb5351 feat(phase-30/step-9): extended search filters
+- 8345072 feat(phase-30/step-8): PWA
+- 7ec863b feat(phase-30/step-7): booking receipt HTML
 
 **Wave 0 part B (needs purchases):** VPS, Domain, Payment (Phase 31)
 
