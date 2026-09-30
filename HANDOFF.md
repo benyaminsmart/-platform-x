@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.33.0-price-alerts (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-43 complete; 24 DEFERRED)
+> Version: v0.34.0-loyalty-redeem (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-44 complete; 24 DEFERRED). TIER 1+2 = 100%.
 
 Last updated: 2026-09-30
 
@@ -368,6 +368,17 @@ Tag: v0.33.0-price-alerts
 - [x] Step 1 — PriceAlert model + service + API
 - [x] Step 2 — Price alerts UI + watch button
 - [x] Phase close — tag v0.33.0-price-alerts
+
+**Phase 44 — Loyalty redemption: COMPLETE**
+Tag: v0.34.0-loyalty-redeem
+- [x] Step 1 — Redeem service + API
+- [x] Step 2 — Redeem page UI
+- [x] Phase close — tag v0.34.0-loyalty-redeem
+
+**TIER 1+2 = 100% complete after Phase 44.**
+
+Temporary policy note: 3 default redeem options (500/1000/2000 pts -> 25/50/100 AED).
+To be replaced when the user provides the final Rewards + Referral plan (Phase 24).
 
 ---
 
@@ -849,6 +860,18 @@ Tag: v0.33.0-price-alerts
 - API: /me/price-alerts (GET, POST, DELETE, POST /check)
 - UI: /account/price-alerts page + "Watch" button on search results
 - Notified_at set on first trigger; no auto-scheduler (deferred to VPS)
+
+### Phase 44 — Loyalty Redemption: COMPLETE
+Tag: v0.34.0-loyalty-redeem
+- RedeemOption model (9 columns; catalog lives in DB)
+- Default catalog (TEMPORARY): 500/1000/2000 pts -> 25/50/100 AED credit
+- Redeem service: list + redeem (deducts points via reward_service)
+- API: GET /rewards/redeem-options + POST .../{id}/redeem
+- UI: /account/redeem page with live balance + Redeem buttons
+
+WARNING: This catalog is intentionally temporary. Final catalog will be
+defined by the user's Rewards + Referral business plan (Phase 24).
+Changing it = edit seed + re-run.
 
 ## 6. Data Models (19 tables)
 
