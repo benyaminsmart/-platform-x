@@ -49,3 +49,6 @@ logs/
 .pytest_cache/
 logs/
 *.url
+
+# Uploaded review photos (runtime data, not source)
+app/static/uploads/
