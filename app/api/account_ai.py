@@ -350,3 +350,36 @@ def account_ai_book(
         booking_created=bool(result.get("ok")),
         tokens_used=tokens,
     )
+
+
+# ---------- AI Trip Memory (Phase 46, Step 2) ----------
+
+
+class TripMemoryResponse(BaseModel):
+    profile: dict
+    recap: str
+    suggestions: list[dict] = []
+    provider: str
+
+
+@router.get("/memory", response_model=TripMemoryResponse)
+@limiter.limit("30/minute")
+def account_ai_memory(
+    request: Request,
+    language: str = "en",
+    tenant: Tenant = Depends(get_user_home_tenant),
+    user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+) -> TripMemoryResponse:
+    """Return the user's AI Trip Memory profile + personalized recap."""
+    if not settings.AI_ENABLED:
+        raise HTTPException(status_code=503, detail="AI disabled")
+    if language not in {"en", "ar", "fil", "hi"}:
+        raise HTTPException(status_code=422, detail="Unsupported language")
+
+    from app.services.ai import trip_memory
+    try:
+        out = trip_memory.summarize(db, user_id=user.id, language=language)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return TripMemoryResponse(**out)
