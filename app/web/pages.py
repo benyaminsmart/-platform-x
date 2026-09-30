@@ -183,6 +183,16 @@ def api_docs_page(request: Request) -> HTMLResponse:
     )
 
 
+@router.get("/account/price-alerts", response_class=HTMLResponse)
+def account_price_alerts_page(request: Request) -> HTMLResponse:
+    """User's price alerts."""
+    return templates.TemplateResponse(
+        request,
+        "pages/price_alerts.html",
+        {"active_nav": "account"},
+    )
+
+
 @router.get("/account/wishlist", response_class=HTMLResponse)
 def account_wishlist_page(request: Request) -> HTMLResponse:
     """User's saved wishlist (client-side fetch from /wishlist)."""

@@ -323,6 +323,7 @@
     return '<a class="sr-card" data-service-id="' + esc(i.service_id) + '" href="/' + esc(i.tenant_slug) + '/">' +
       '<button class="sr-heart" data-sid="' + esc(i.service_id) + '" type="button" title="Save">&#9829;</button>' +
       '<button class="sr-compare-btn" data-cmp="' + esc(i.service_id) + '" type="button">+ Compare</button>' +
+      '<button class="sr-watch-btn" data-watch="' + esc(i.service_id) + '" data-name="' + esc(i.service_name) + '" data-price="' + i.price + '" type="button" style="position:absolute; top:10px; right:52px; padding:4px 8px; border-radius:999px; background:rgba(255,255,255,0.95); border:none; font-size:11px; font-weight:600; cursor:pointer; color:var(--px-navy); box-shadow:0 2px 6px rgba(0,0,0,0.15);">Watch</button>' +
       '<div class="sr-thumb" ' + img + '></div>' +
       '<div class="sr-body">' +
         '<span class="sr-cat">' + esc(i.category) + '</span>' +
@@ -494,8 +495,41 @@
     }
   }
 
+  function bindWatches() {
+    document.querySelectorAll(".sr-watch-btn").forEach(function(b){
+      b.addEventListener("click", function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        openWatchModal(b.getAttribute("data-watch"), b.getAttribute("data-name"), parseFloat(b.getAttribute("data-price")));
+      });
+    });
+  }
+
+  function openWatchModal(sid, name, price) {
+    if (!sid) return;
+    var t = null;
+    try { t = localStorage.getItem("px_token") || localStorage.getItem("token"); } catch(e){}
+    if (!t) { alert("Please sign in to watch prices."); return; }
+    var suggested = Math.round(price * 0.85);
+    var val = prompt("Watch price for " + name + "\nCurrent price: " + price + "\nEnter your target price (must be below " + price + "):", suggested);
+    if (!val) return;
+    var target = parseFloat(val);
+    if (!target || target <= 0 || target >= price) { alert("Target must be below " + price + "."); return; }
+    fetch("/me/price-alerts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + t },
+      body: JSON.stringify({ service_id: sid, target_price: target }),
+    }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
+      .then(function(res){
+        if (!res.ok) { alert(res.d.detail || "Could not create alert."); return; }
+        alert("Alert created. We'll watch this price.");
+      })
+      .catch(function(){ alert("Network error."); });
+  }
+
   function bindHearts() {
     bindCompareButtons();
+    bindWatches();
     var btns = document.querySelectorAll(".sr-heart");
     btns.forEach(function(b){
       b.addEventListener("click", function(ev){

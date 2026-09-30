@@ -1,0 +1,114 @@
+{% extends "layouts/platform_base.html" %}
+{% block title %}Price Alerts — Platform-X{% endblock %}
+
+{% block content %}
+<section class="px-hero px-hero-compact">
+  <div class="px-container">
+    <div class="px-hero-content">
+      <div class="px-breadcrumb">
+        <a href="/">Home</a><span>/</span><a href="/account">Account</a><span>/</span><span>Price Alerts</span>
+      </div>
+      <h1 class="px-hero-title-sm">Price Alerts</h1>
+      <p class="px-hero-sub-sm">We'll watch the price of your chosen services.</p>
+    </div>
+  </div>
+</section>
+
+<section class="px-section">
+  <div class="px-container" style="max-width: 900px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <button type="button" id="pa-check-btn" class="px-btn px-btn-primary">Check now</button>
+    </div>
+    <div id="pa-body"><p class="px-muted">Loading…</p></div>
+  </div>
+</section>
+
+<style>
+.pa-item {
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  padding:14px 16px; background:#fff; border:1px solid var(--px-line);
+  border-radius:12px; margin-bottom:8px; flex-wrap:wrap;
+}
+.pa-item-main { flex:1; min-width:200px; }
+.pa-item-name { font-family:var(--px-font-display); font-size:15px; font-weight:700; color:var(--px-navy); margin-bottom:4px; }
+.pa-item-meta { font-size:12.5px; color:var(--px-muted); }
+.pa-item-meta strong { color:var(--px-navy); }
+.pa-badge {
+  display:inline-block; padding:3px 10px; border-radius:999px;
+  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+  background:#e5e7eb; color:#374151;
+}
+.pa-badge.triggered { background:#dcfce7; color:#166534; }
+.pa-actions { display:flex; gap:6px; }
+.pa-actions button {
+  padding:6px 12px; font-size:12px; border-radius:8px; cursor:pointer;
+  border:1px solid var(--px-line); background:#fff; font-family:inherit; color:var(--px-navy);
+}
+.pa-actions button.danger:hover { border-color:#991b1b; color:#991b1b; }
+.pa-empty { padding: 40px; text-align: center; color: var(--px-muted); }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_token") || localStorage.getItem("token"); } catch(e){}
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function h() {
+    var o = { "Content-Type": "application/json" };
+    if (token) o["Authorization"] = "Bearer " + token;
+    return o;
+  }
+  if (!token) {
+    document.getElementById("pa-body").innerHTML = '<div class="pa-empty">Sign in to view your alerts.</div>';
+    return;
+  }
+
+  async function load() {
+    var res = await fetch("/me/price-alerts", { headers: h() });
+    if (!res.ok) { document.getElementById("pa-body").innerHTML = '<div class="pa-empty">Failed to load.</div>'; return; }
+    var list = await res.json();
+    if (!list.length) {
+      document.getElementById("pa-body").innerHTML =
+        '<div class="pa-empty">No price alerts yet. Tap <strong>Watch price</strong> on any service in search results.</div>';
+      return;
+    }
+    // fetch current prices via check
+    var check = await fetch("/me/price-alerts/check", { method: "POST", headers: h() });
+    var details = check.ok ? await check.json() : [];
+    var byId = {};
+    details.forEach(function(d){ byId[d.id] = d; });
+    document.getElementById("pa-body").innerHTML = list.map(function(a){
+      var d = byId[a.id] || {};
+      var trig = d.triggered;
+      return '<div class="pa-item">' +
+        '<div class="pa-item-main">' +
+          '<div class="pa-item-name">' + esc(d.service_name || "Service") + '</div>' +
+          '<div class="pa-item-meta">' +
+            'Current: <strong>' + esc(d.current_price || "—") + '</strong> · ' +
+            'Target: <strong>' + esc(a.target_price) + ' ' + esc(d.currency || "") + '</strong>' +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex; gap:8px; align-items:center;">' +
+          '<span class="pa-badge ' + (trig ? "triggered" : "") + '">' + (trig ? "Target hit" : "Watching") + '</span>' +
+          '<div class="pa-actions"><button class="danger" data-rm="' + esc(a.id) + '">Remove</button></div>' +
+        '</div>' +
+      '</div>';
+    }).join("");
+    document.querySelectorAll("button[data-rm]").forEach(function(b){
+      b.addEventListener("click", async function(){
+        if (!confirm("Remove this alert?")) return;
+        await fetch("/me/price-alerts/" + encodeURIComponent(b.getAttribute("data-rm")), {
+          method: "DELETE", headers: h(),
+        });
+        load();
+      });
+    });
+  }
+
+  document.getElementById("pa-check-btn").addEventListener("click", load);
+  load();
+})();
+</script>
+{% endblock %}
