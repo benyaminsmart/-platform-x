@@ -20,6 +20,7 @@ from app.models.pricing_rule import PricingRule, PricingRuleApplication
 from app.models.promotion import Promotion
 from app.models.rate_plan import RatePlan
 from app.models.recent_search import RecentSearch
+from app.models.redeem_option import RedeemOption
 from app.models.referral import Referral
 from app.models.review import Review
 from app.models.review_photo import ReviewPhoto
@@ -55,6 +56,7 @@ __all__ = [
     "Promotion",
     "RatePlan",
     "RecentSearch",
+    "RedeemOption",
     "Referral",
     "Review",
     "Room",
