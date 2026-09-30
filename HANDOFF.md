@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.35.0-ai-location (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-45 complete; 24 DEFERRED). TIER 1+2 = 100%.
+> Version: v0.36.0-ai-trip-memory (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-46 complete; 24 DEFERRED). TIER 1+2 = 100%.
 
 Last updated: 2026-09-30
 
@@ -403,6 +403,21 @@ Tag: v0.35.0-ai-location
   - "✨ AI Recommend here" button in map controls
   - Panel showing AI advice + Nearby places + Nearby businesses
   - Uses current map center, else Dubai (25.2048, 55.2708) fallback
+
+### Phase 46 — AI Trip Memory (Wave 2): COMPLETE
+Tag: v0.36.0-ai-trip-memory
+- Step 1 — AI Trip Memory service (app/services/ai/trip_memory.py)
+  - Deterministic profile: total trips, favorite category, cities,
+    avg price + band, currency, avg guests, preferred months, top tenants
+  - Excludes cancelled bookings
+  - AI recap grounded in the profile (en/ar/fil/hi)
+  - Deterministic fallback when AI fails
+- Step 2 — API: GET /account/api/ai/memory (auth required, 30/min)
+  - Returns { profile, recap, suggestions, provider }
+  - 422 on unsupported language
+- Step 3 — UI on /account/ai
+  - "🧠 My Trip Memory" button reveals panel with recap + 6 profile pills
+    + "Most visited" list; lazy-loaded on first open
 
 Temporary policy note: 3 default redeem options (500/1000/2000 pts -> 25/50/100 AED).
 To be replaced when the user provides the final Rewards + Referral plan (Phase 24).
@@ -1077,6 +1092,7 @@ User (2026-09-29): do NOT start until explicitly told.
 
 **All AI-focused phases + Public API are COMPLETE.**
 **Phase 45 (AI Location Recommender) is COMPLETE — Wave 2 first deliverable.**
+**Phase 46 (AI Trip Memory) is COMPLETE — Wave 2 second deliverable.**
 
 Remaining phases all require user-side decisions or purchases:
 - Phase 10 (Payment Production / Telr) — needs business account
@@ -1349,7 +1365,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1046 tests, all passing
+## 14. Test Count: 1059 tests, all passing
 
 Test files:
 - test_health.py
