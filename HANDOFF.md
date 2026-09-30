@@ -131,6 +131,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 47 Step 4 — Lock price button on /search cards
 - [x] Phase 47 Step 3 — Price Locks UI page
 - [x] Phase 47 Step 2 — Price Locks API
 - [x] Phase 47 Step 1 — PriceLock model + service
@@ -193,7 +194,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 47 Step 3 — Price Locks UI page (2026-09-30 21:10)
+Last step: Phase 47 Step 4 — Lock price button on /search cards (2026-09-30 21:11)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -215,6 +216,7 @@ Last step: Phase 47 Step 3 — Price Locks UI page (2026-09-30 21:10)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 2e3f037 Phase 47 Step 4 — Lock price button on /search cards
 - 6e99700 Phase 47 Step 3 — Price Locks UI page
 - 2652047 Phase 47 Step 2 — Price Locks API
 - 5396c0c Phase 47 Step 1 — PriceLock model + service
