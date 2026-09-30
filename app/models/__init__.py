@@ -15,6 +15,7 @@ from app.models.partner_application import PartnerApplication
 from app.models.payment import Payment
 from app.models.password_reset import PasswordReset
 from app.models.platform_admin import PlatformAdmin
+from app.models.price_alert import PriceAlert
 from app.models.pricing_rule import PricingRule, PricingRuleApplication
 from app.models.promotion import Promotion
 from app.models.rate_plan import RatePlan
@@ -48,6 +49,7 @@ __all__ = [
     "Payment",
     "PasswordReset",
     "PlatformAdmin",
+    "PriceAlert",
     "PricingRule",
     "PricingRuleApplication",
     "Promotion",
