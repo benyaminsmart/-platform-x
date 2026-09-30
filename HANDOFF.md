@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.34.0-loyalty-redeem (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-44 complete; 24 DEFERRED). TIER 1+2 = 100%.
+> Version: v0.35.0-ai-location (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-45 complete; 24 DEFERRED). TIER 1+2 = 100%.
 
 Last updated: 2026-09-30
 
@@ -382,6 +382,21 @@ Tag: v0.34.0-loyalty-redeem
 - [x] Phase close — tag v0.34.0-loyalty-redeem
 
 **TIER 1+2 = 100% complete after Phase 44.**
+
+### Phase 45 — AI Location Recommender (Wave 2): COMPLETE
+Tag: v0.35.0-ai-location
+- Step 1 — AI Location Recommender service
+  - Deterministic layer: nearby attractions + nearby services via Haversine
+  - User preference inference from past bookings (top category)
+  - AI layer: short grounded recommendation (en/ar/fil/hi)
+  - Deterministic fallback if AI fails
+- Step 2 — Public API: POST /ai/location/recommend (15/min)
+  - Optional auth (best-effort user detection via Bearer token)
+  - Returns { attractions, services, advice, provider }
+- Step 3 — UI on /search
+  - "✨ AI Recommend here" button in map controls
+  - Panel showing AI advice + Nearby places + Nearby businesses
+  - Uses current map center, else Dubai (25.2048, 55.2708) fallback
 
 Temporary policy note: 3 default redeem options (500/1000/2000 pts -> 25/50/100 AED).
 To be replaced when the user provides the final Rewards + Referral plan (Phase 24).
@@ -1055,6 +1070,7 @@ All idempotent.
 User (2026-09-29): do NOT start until explicitly told.
 
 **All AI-focused phases + Public API are COMPLETE.**
+**Phase 45 (AI Location Recommender) is COMPLETE — Wave 2 first deliverable.**
 
 Remaining phases all require user-side decisions or purchases:
 - Phase 10 (Payment Production / Telr) — needs business account
@@ -1327,7 +1343,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1011 tests, all passing
+## 14. Test Count: 1046 tests, all passing
 
 Test files:
 - test_health.py
