@@ -203,6 +203,16 @@ def account_price_locks_page(request: Request) -> HTMLResponse:
     )
 
 
+@router.get("/account/waitlist", response_class=HTMLResponse)
+def account_waitlist_page(request: Request) -> HTMLResponse:
+    """User's waitlist entries."""
+    return templates.TemplateResponse(
+        request,
+        "pages/waitlist.html",
+        {"active_nav": "account"},
+    )
+
+
 @router.get("/account/redeem", response_class=HTMLResponse)
 def account_redeem_page(request: Request) -> HTMLResponse:
     """User's redeem page."""

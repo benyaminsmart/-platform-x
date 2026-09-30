@@ -1,0 +1,118 @@
+{% extends "layouts/platform_base.html" %}
+{% block title %}Waitlist — Platform-X{% endblock %}
+
+{% block content %}
+<section class="px-hero px-hero-compact">
+  <div class="px-container">
+    <div class="px-hero-content">
+      <div class="px-breadcrumb">
+        <a href="/">Home</a><span>/</span><a href="/account">Account</a><span>/</span><span>Waitlist</span>
+      </div>
+      <h1 class="px-hero-title-sm">⏳ Smart Waitlist</h1>
+      <p class="px-hero-sub-sm">When a slot frees up (a cancellation), the earliest person in line gets notified first.</p>
+    </div>
+  </div>
+</section>
+
+<section class="px-section">
+  <div class="px-container" style="max-width: 900px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px;">
+      <label style="font-size:13px; color:var(--px-muted); display:flex; align-items:center; gap:6px;">
+        <input type="checkbox" id="wl-show-all"> Show all (including left)
+      </label>
+      <button type="button" id="wl-refresh" class="px-btn px-btn-ghost">Refresh</button>
+    </div>
+    <div id="wl-body"><p class="px-muted">Loading…</p></div>
+  </div>
+</section>
+
+<style>
+.wl-item {
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  padding:14px 16px; background:#fff; border:1px solid var(--px-line);
+  border-radius:12px; margin-bottom:8px; flex-wrap:wrap;
+}
+.wl-item-main { flex:1; min-width:200px; }
+.wl-item-name { font-family:var(--px-font-display); font-size:15px; font-weight:700; color:var(--px-navy); margin-bottom:4px; }
+.wl-item-meta { font-size:12.5px; color:var(--px-muted); }
+.wl-item-meta strong { color:var(--px-navy); }
+.wl-badge {
+  display:inline-block; padding:3px 10px; border-radius:999px;
+  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+  background:#e5e7eb; color:#374151;
+}
+.wl-badge.waiting { background:#dbeafe; color:#1e40af; }
+.wl-badge.notified { background:#dcfce7; color:#166534; }
+.wl-actions { display:flex; gap:6px; }
+.wl-actions button {
+  padding:6px 12px; font-size:12px; border-radius:8px; cursor:pointer;
+  border:1px solid var(--px-line); background:#fff; font-family:inherit; color:var(--px-navy);
+}
+.wl-actions button.danger:hover { border-color:#991b1b; color:#991b1b; }
+.wl-empty { padding: 40px; text-align: center; color: var(--px-muted); }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_token") || localStorage.getItem("token"); } catch(e){}
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function h() {
+    var o = { "Content-Type": "application/json" };
+    if (token) o["Authorization"] = "Bearer " + token;
+    return o;
+  }
+  var body = document.getElementById("wl-body");
+  if (!token) {
+    body.innerHTML = '<div class="wl-empty">Sign in to view your waitlist.</div>';
+    return;
+  }
+
+  async function load() {
+    var showAll = document.getElementById("wl-show-all").checked;
+    var url = "/me/waitlist?active_only=" + (showAll ? "false" : "true");
+    var res = await fetch(url, { headers: h() });
+    if (!res.ok) { body.innerHTML = '<div class="wl-empty">Failed to load.</div>'; return; }
+    var list = await res.json();
+    if (!list.length) {
+      body.innerHTML = '<div class="wl-empty">No waitlist entries yet. When a service is fully booked, tap <strong>⏳ Waitlist</strong> on the results page.</div>';
+      return;
+    }
+    body.innerHTML = list.map(function(w){
+      var cls = w.notified_at ? "notified" : (w.active ? "waiting" : "");
+      var txt = w.notified_at ? "Notified" : (w.active ? "Waiting" : "Left");
+      var posTxt = (w.position != null && w.active && !w.notified_at) ? (' · Position #' + w.position) : '';
+      return '<div class="wl-item">' +
+        '<div class="wl-item-main">' +
+          '<div class="wl-item-name">' + esc(w.service_name) + '</div>' +
+          '<div class="wl-item-meta">' +
+            esc(w.check_in || "") + ' → ' + esc(w.check_out || "") +
+            ' · ' + esc(w.guests) + ' guest' + (w.guests === 1 ? '' : 's') +
+            posTxt +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex; gap:8px; align-items:center;">' +
+          '<span class="wl-badge ' + cls + '">' + txt + '</span>' +
+          '<div class="wl-actions"><button class="danger" data-rm="' + esc(w.id) + '">Leave</button></div>' +
+        '</div>' +
+      '</div>';
+    }).join("");
+    document.querySelectorAll("button[data-rm]").forEach(function(b){
+      b.addEventListener("click", async function(){
+        if (!confirm("Leave this waitlist?")) return;
+        await fetch("/me/waitlist/" + encodeURIComponent(b.getAttribute("data-rm")), {
+          method: "DELETE", headers: h(),
+        });
+        load();
+      });
+    });
+  }
+
+  document.getElementById("wl-refresh").addEventListener("click", load);
+  document.getElementById("wl-show-all").addEventListener("change", load);
+  load();
+})();
+</script>
+{% endblock %}
