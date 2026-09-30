@@ -42,6 +42,7 @@ from app.api import partners as partners_router
 from app.api import payments as payments_router
 from app.api import platform_admin as platform_admin_router
 from app.api import price_alerts as price_alerts_router
+from app.api import price_locks as price_locks_router
 from app.api import public_v1 as public_v1_router
 from app.api import receipts as receipts_router
 from app.api import recent_searches as recent_searches_router
@@ -197,6 +198,7 @@ app.include_router(partners_router.router)
 app.include_router(payments_router.router)
 app.include_router(platform_admin_router.router)
 app.include_router(price_alerts_router.router)
+app.include_router(price_locks_router.router)
 app.include_router(receipts_router.router)
 app.include_router(recent_searches_router.router)
 app.include_router(referrals_router.router)
