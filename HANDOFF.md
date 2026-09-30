@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.36.0-ai-trip-memory (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-46 complete; 24 DEFERRED). TIER 1+2 = 100%.
+> Version: v0.37.0-price-locks (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-47 complete; 24 DEFERRED). TIER 1+2 = 100%.
 
 Last updated: 2026-09-30
 
@@ -426,6 +426,27 @@ Tag: v0.36.0-ai-trip-memory
 - Step 3 — UI on /account/ai
   - "🧠 My Trip Memory" button reveals panel with recap + 6 profile pills
     + "Most visited" list; lazy-loaded on first open
+
+### Phase 47 — Predictive Price Locks (Wave 3, Blue-Ocean B7): COMPLETE
+Tag: v0.37.0-price-locks
+- Step 1 — PriceLock model + service
+  - Model: user_id + service_id (unique), locked_price, currency,
+    active, expires_at, consumed_at, consumed_booking_id
+  - Service: create_lock (replaces existing), get_active_lock,
+    list_locks (enriched), consume_lock, delete_lock
+  - Window bounds: 1..168 hours (default 48)
+  - Excludes inactive services; excludes cancelled/consumed locks
+- Step 2 — API under /me/price-locks
+  - GET /        list user's locks (active_only optional)
+  - POST /       create/replace a lock
+  - DELETE /{id} remove a lock
+  - POST /consume mark consumed by a booking
+  - 404 on missing service/booking, 409 on inactive lock, 422 on bad window
+- Step 3 — UI page /account/price-locks
+  - List with locked vs current price, "Saving" badge when live > locked
+  - Remaining-time formatter, "Show all" toggle, remove per lock
+- Step 4 — "🔒 Lock" button on each /search card
+  - Prompt for hours (1-168), calls POST /me/price-locks
 
 Temporary policy note: 3 default redeem options (500/1000/2000 pts -> 25/50/100 AED).
 To be replaced when the user provides the final Rewards + Referral plan (Phase 24).
@@ -1101,6 +1122,7 @@ User (2026-09-29): do NOT start until explicitly told.
 **All AI-focused phases + Public API are COMPLETE.**
 **Phase 45 (AI Location Recommender) is COMPLETE — Wave 2 first deliverable.**
 **Phase 46 (AI Trip Memory) is COMPLETE — Wave 2 second deliverable.**
+**Phase 47 (Predictive Price Locks) is COMPLETE — Wave 3 first deliverable.**
 
 Remaining phases all require user-side decisions or purchases:
 - Phase 10 (Payment Production / Telr) — needs business account
@@ -1373,7 +1395,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1059 tests, all passing
+## 14. Test Count: 1083 tests, all passing
 
 Test files:
 - test_health.py
