@@ -31,6 +31,15 @@
         <label style="font-size:12px; color:var(--px-muted); margin-left:12px;">Radius (km):</label>
         <input type="number" id="sr-radius" min="1" max="500" value="20" style="width:80px; padding:6px 8px; border:1px solid var(--px-line); border-radius:6px; font-family:inherit;">
         <button type="button" class="sr-map-btn" id="sr-clear-geo">Clear</button>
+        <button type="button" class="sr-map-btn" id="sr-ai-loc" style="margin-left:auto; background:var(--px-navy); color:#fff; border-color:var(--px-navy);">✨ AI Recommend here</button>
+      </div>
+      <div id="sr-ai-loc-panel" style="display:none; margin-top:12px; padding:14px 16px; background:#fff; border:1px solid var(--px-line); border-radius:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <div style="font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--px-muted);">AI Recommendation</div>
+          <button type="button" id="sr-ai-loc-close" style="background:none; border:none; font-size:18px; cursor:pointer; color:var(--px-muted); line-height:1;">&times;</button>
+        </div>
+        <div id="sr-ai-loc-advice" style="font-size:14px; line-height:1.6; color:var(--px-text); margin-bottom:12px;"></div>
+        <div id="sr-ai-loc-lists" style="display:grid; grid-template-columns:1fr 1fr; gap:14px;"></div>
       </div>
     </div>
 
@@ -699,6 +708,76 @@
   });
 
   loadRecent();
+
+  // ============ AI Location Recommend (Phase 45, Step 3) ============
+  function aiLocCenter() {
+    if (currentCenter && currentCenter.lat != null) {
+      return { lat: currentCenter.lat, lng: currentCenter.lng,
+               radius_km: currentCenter.radius_km || 20 };
+    }
+    return { lat: 25.2048, lng: 55.2708,
+             radius_km: parseFloat(document.getElementById("sr-radius").value) || 20 };
+  }
+
+  function aiLocList(title, items, renderFn) {
+    if (!items || !items.length) return "";
+    var rows = items.map(renderFn).join("");
+    return '<div><div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--px-muted); margin-bottom:6px;">' + title + '</div>' + rows + '</div>';
+  }
+
+  function aiLocServiceRow(s) {
+    var href = "/" + esc(s.tenant_slug) + "/";
+    var dist = (s.distance_km != null) ? (s.distance_km + " km") : "";
+    return '<a href="' + href + '" style="display:block; padding:6px 0; border-bottom:1px solid var(--px-line); text-decoration:none; color:inherit;">' +
+      '<div style="font-weight:600; font-size:13.5px; color:var(--px-navy);">' + esc(s.service_name) + '</div>' +
+      '<div style="font-size:12px; color:var(--px-muted);">' + esc(s.tenant_name) + (dist ? ' · ' + dist : '') + '</div>' +
+    '</a>';
+  }
+
+  function aiLocAttractionRow(a) {
+    return '<div style="padding:6px 0; border-bottom:1px solid var(--px-line);">' +
+      '<div style="font-weight:600; font-size:13.5px; color:var(--px-navy);">' + esc(a.name) + '</div>' +
+      '<div style="font-size:12px; color:var(--px-muted);">' + esc(a.category) + (a.distance_km != null ? ' · ' + a.distance_km + ' km' : '') + '</div>' +
+    '</div>';
+  }
+
+  async function runAiLocationRecommend() {
+    var center = aiLocCenter();
+    var panel = document.getElementById("sr-ai-loc-panel");
+    var adviceEl = document.getElementById("sr-ai-loc-advice");
+    var listsEl = document.getElementById("sr-ai-loc-lists");
+    panel.style.display = "block";
+    adviceEl.textContent = "Thinking…";
+    listsEl.innerHTML = "";
+    try {
+      var res = await fetch("/ai/location/recommend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lat: center.lat, lng: center.lng, radius_km: center.radius_km }),
+      });
+      if (!res.ok) { adviceEl.textContent = "AI is unavailable right now."; return; }
+      var d = await res.json();
+      adviceEl.textContent = d.advice || "No advice available.";
+      listsEl.innerHTML =
+        aiLocList("Nearby places", d.attractions, aiLocAttractionRow) +
+        aiLocList("Nearby businesses", d.services, aiLocServiceRow);
+    } catch(e) {
+      adviceEl.textContent = "Network error.";
+    }
+  }
+
+  document.getElementById("sr-ai-loc").addEventListener("click", function(){
+    var wrap = document.getElementById("sr-map-wrap");
+    if (wrap.style.display === "none") {
+      wrap.style.display = "block";
+      initMap();
+      setTimeout(function(){ map.invalidateSize(); }, 50);
+    }
+    runAiLocationRecommend();
+  });
+  document.getElementById("sr-ai-loc-close").addEventListener("click", function(){
+    document.getElementById("sr-ai-loc-panel").style.display = "none";
+  });
 
   runSearch(1);
 })();
