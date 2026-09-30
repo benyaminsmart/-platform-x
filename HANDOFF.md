@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.37.0-price-locks (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-47 complete; 24 DEFERRED). TIER 1+2 = 100%.
+> Version: v0.38.0-waitlist (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-48 complete; 24 DEFERRED). TIER 1+2 = 100%.
 
 Last updated: 2026-09-30
 
@@ -434,6 +434,27 @@ Tag: v0.36.0-ai-trip-memory
 - Step 3 — UI on /account/ai
   - "🧠 My Trip Memory" button reveals panel with recap + 6 profile pills
     + "Most visited" list; lazy-loaded on first open
+
+### Phase 48 — Smart Waitlist (Wave 3, Blue-Ocean B8): COMPLETE
+Tag: v0.38.0-waitlist
+- Step 1 — WaitlistEntry model + service
+  - Model: user_id + service_id + check_in + check_out (unique),
+    guests, active, notified_at, position_at_join
+  - Service: is_full (capacity vs overlapping active bookings),
+    join (FIFO position), list_entries (enriched with position),
+    leave, check_and_notify (FIFO first un-notified)
+- Step 2 — API under /me/waitlist
+  - GET /        list user's entries (active_only optional)
+  - POST /       join (409 if not full, 422 bad dates, 404 service)
+  - DELETE /{id} leave
+  - POST /check  on-demand FIFO notify if capacity freed
+- Step 3 — UI page /account/waitlist
+  - List with Waiting/Notified/Left badge, position, dates, guests
+  - "Show all" toggle, leave per entry
+- Step 4 — Auto-notify integration
+  - Hook in booking_service.cancel_booking
+  - Hook in cancellation_service.cancel_booking
+  - Best-effort try/except (never breaks cancellation)
 
 ### Phase 47 — Predictive Price Locks (Wave 3, Blue-Ocean B7): COMPLETE
 Tag: v0.37.0-price-locks
@@ -1131,6 +1152,7 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 45 (AI Location Recommender) is COMPLETE — Wave 2 first deliverable.**
 **Phase 46 (AI Trip Memory) is COMPLETE — Wave 2 second deliverable.**
 **Phase 47 (Predictive Price Locks) is COMPLETE — Wave 3 first deliverable.**
+**Phase 48 (Smart Waitlist) is COMPLETE — Wave 3 second deliverable.**
 
 Remaining phases all require user-side decisions or purchases:
 - Phase 10 (Payment Production / Telr) — needs business account
@@ -1403,7 +1425,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1083 tests, all passing
+## 14. Test Count: 1104 tests, all passing
 
 Test files:
 - test_health.py
