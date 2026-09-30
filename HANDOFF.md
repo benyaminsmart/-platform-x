@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.32.0-recent-searches (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-42 complete; 24 DEFERRED)
+> Version: v0.33.0-price-alerts (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-43 complete; 24 DEFERRED)
 
 Last updated: 2026-09-30
 
@@ -358,6 +358,12 @@ Tag: v0.32.0-recent-searches
 - [x] Step 1 — RecentSearch model + API
 - [x] Step 2 — Recent searches UI in /search
 - [x] Phase close — tag v0.32.0-recent-searches
+
+**Phase 43 — Price alerts: COMPLETE**
+Tag: v0.33.0-price-alerts
+- [x] Step 1 — PriceAlert model + service + API
+- [x] Step 2 — Price alerts UI + watch button
+- [x] Phase close — tag v0.33.0-price-alerts
 
 ---
 
@@ -831,6 +837,14 @@ Tag: v0.32.0-recent-searches
 - Auto-save on search with at least one meaningful filter
 - Dedupe by (check_in, check_out, category, location)
 - UI: recent chips above the /search form; click to restore
+
+### Phase 43 — Price Alerts: COMPLETE
+Tag: v0.33.0-price-alerts
+- PriceAlert model (11 columns; user-scoped)
+- Service: create/list/delete + on-demand check (current vs target)
+- API: /me/price-alerts (GET, POST, DELETE, POST /check)
+- UI: /account/price-alerts page + "Watch" button on search results
+- Notified_at set on first trigger; no auto-scheduler (deferred to VPS)
 
 ## 6. Data Models (19 tables)
 
