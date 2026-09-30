@@ -99,8 +99,20 @@ def cancel_booking(
     tag = f"[cancelled by {'business' if by_business else 'user'}; refund_policy={refund['policy_label']}; refund_amount={refund['refund_amount']}]"
     booking.notes = (note + "\n" + tag).strip() if note else tag
 
+    # capture service_id + dates BEFORE commit for waitlist hook
+    _svc_id = booking.service_id
+    _ci = booking.check_in
+    _co = booking.check_out
+
     db.add(booking)
     db.commit()
     db.refresh(booking)
+
+    # best-effort waitlist notify (Phase 48, Step 4)
+    try:
+        from app.services import waitlist_service as _wls
+        _wls.try_notify_after_cancel(db, service_id=_svc_id, check_in=_ci, check_out=_co)
+    except Exception:
+        pass
 
     return {"ok": True, "refund": refund, "booking_id": booking.id}

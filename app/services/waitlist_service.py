@@ -211,3 +211,18 @@ def check_and_notify(
         "check_out": first.check_out.isoformat(),
         "notified_at": first.notified_at.isoformat() if first.notified_at else None,
     }
+
+def try_notify_after_cancel(db: DBSession, *, service_id: str | None,
+                            check_in, check_out) -> dict | None:
+    """Best-effort notify after a booking was cancelled. Never raises.
+
+    Safe to call from cancellation paths; if anything fails, returns None.
+    """
+    if service_id is None or check_in is None or check_out is None:
+        return None
+    try:
+        return check_and_notify(
+            db, service_id=service_id, check_in=check_in, check_out=check_out
+        )
+    except Exception:
+        return None

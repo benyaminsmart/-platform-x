@@ -261,8 +261,21 @@ def cancel_booking(
         return None
     if booking.status not in _CANCELLABLE:
         raise ValueError(f"Booking in status '{booking.status}' cannot be cancelled")
+    # capture service_id + dates BEFORE commit for waitlist hook
+    _svc_id = booking.service_id
+    _ci = booking.check_in
+    _co = booking.check_out
+
     booking.status = "cancelled"
     booking.cancelled_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(booking)
+
+    # best-effort waitlist notify (Phase 48, Step 4)
+    try:
+        from app.services import waitlist_service as _wls
+        _wls.try_notify_after_cancel(db, service_id=_svc_id, check_in=_ci, check_out=_co)
+    except Exception:
+        pass
+
     return booking
