@@ -34,6 +34,7 @@ from app.models.tenant import Tenant
 from app.models.user import User
 from app.models.webhook import Webhook, WebhookDelivery
 from app.models.wishlist import Wishlist
+from app.models.waitlist_entry import WaitlistEntry
 
 __all__ = [
     "AnalyticsEvent",
@@ -72,4 +73,5 @@ __all__ = [
     "Webhook",
     "WebhookDelivery",
     "Wishlist",
+    "WaitlistEntry",
 ]
