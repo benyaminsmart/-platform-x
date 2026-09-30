@@ -1,0 +1,129 @@
+{% extends "layouts/platform_base.html" %}
+{% block title %}Price Locks — Platform-X{% endblock %}
+
+{% block content %}
+<section class="px-hero px-hero-compact">
+  <div class="px-container">
+    <div class="px-hero-content">
+      <div class="px-breadcrumb">
+        <a href="/">Home</a><span>/</span><a href="/account">Account</a><span>/</span><span>Price Locks</span>
+      </div>
+      <h1 class="px-hero-title-sm">🔒 Price Locks</h1>
+      <p class="px-hero-sub-sm">Lock a price now, book at that price before the lock expires — even if the live price goes up.</p>
+    </div>
+  </div>
+</section>
+
+<section class="px-section">
+  <div class="px-container" style="max-width: 900px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px;">
+      <label style="font-size:13px; color:var(--px-muted); display:flex; align-items:center; gap:6px;">
+        <input type="checkbox" id="pl-show-all"> Show all (including expired)
+      </label>
+      <button type="button" id="pl-refresh" class="px-btn px-btn-ghost">Refresh</button>
+    </div>
+    <div id="pl-body"><p class="px-muted">Loading…</p></div>
+  </div>
+</section>
+
+<style>
+.pl-item {
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  padding:14px 16px; background:#fff; border:1px solid var(--px-line);
+  border-radius:12px; margin-bottom:8px; flex-wrap:wrap;
+}
+.pl-item-main { flex:1; min-width:200px; }
+.pl-item-name { font-family:var(--px-font-display); font-size:15px; font-weight:700; color:var(--px-navy); margin-bottom:4px; }
+.pl-item-meta { font-size:12.5px; color:var(--px-muted); }
+.pl-item-meta strong { color:var(--px-navy); }
+.pl-badge {
+  display:inline-block; padding:3px 10px; border-radius:999px;
+  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+  background:#e5e7eb; color:#374151;
+}
+.pl-badge.active { background:#dcfce7; color:#166534; }
+.pl-badge.saving { background:#fef3c7; color:#92400e; }
+.pl-actions { display:flex; gap:6px; }
+.pl-actions button {
+  padding:6px 12px; font-size:12px; border-radius:8px; cursor:pointer;
+  border:1px solid var(--px-line); background:#fff; font-family:inherit; color:var(--px-navy);
+}
+.pl-actions button.danger:hover { border-color:#991b1b; color:#991b1b; }
+.pl-empty { padding: 40px; text-align: center; color: var(--px-muted); }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_token") || localStorage.getItem("token"); } catch(e){}
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function h() {
+    var o = { "Content-Type": "application/json" };
+    if (token) o["Authorization"] = "Bearer " + token;
+    return o;
+  }
+  var body = document.getElementById("pl-body");
+  if (!token) {
+    body.innerHTML = '<div class="pl-empty">Sign in to view your price locks.</div>';
+    return;
+  }
+
+  function fmtRemaining(iso) {
+    if (!iso) return "—";
+    var ms = new Date(iso).getTime() - Date.now();
+    if (ms <= 0) return "expired";
+    var hrs = Math.floor(ms / 3600000);
+    var min = Math.floor((ms % 3600000) / 60000);
+    if (hrs >= 24) return Math.floor(hrs/24) + "d " + (hrs % 24) + "h";
+    if (hrs > 0) return hrs + "h " + min + "m";
+    return min + "m";
+  }
+
+  async function load() {
+    var showAll = document.getElementById("pl-show-all").checked;
+    var url = "/me/price-locks?active_only=" + (showAll ? "false" : "true");
+    var res = await fetch(url, { headers: h() });
+    if (!res.ok) { body.innerHTML = '<div class="pl-empty">Failed to load.</div>'; return; }
+    var list = await res.json();
+    if (!list.length) {
+      body.innerHTML = '<div class="pl-empty">No price locks yet. Tap <strong>🔒 Lock price</strong> on any service in search results.</div>';
+      return;
+    }
+    body.innerHTML = list.map(function(l){
+      var saving = (l.current_price != null && l.current_price > l.locked_price);
+      var badgeCls = l.active ? (saving ? "saving" : "active") : "";
+      var badgeTxt = l.active ? (saving ? "Saving" : "Locked") : "Expired";
+      return '<div class="pl-item">' +
+        '<div class="pl-item-main">' +
+          '<div class="pl-item-name">' + esc(l.service_name) + '</div>' +
+          '<div class="pl-item-meta">' +
+            'Locked: <strong>' + esc(l.locked_price) + ' ' + esc(l.currency) + '</strong>' +
+            (l.current_price != null ? ' · Current: <strong>' + esc(l.current_price) + ' ' + esc(l.currency) + '</strong>' : '') +
+            (l.active ? ' · Expires in ' + esc(fmtRemaining(l.expires_at)) : '') +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex; gap:8px; align-items:center;">' +
+          '<span class="pl-badge ' + badgeCls + '">' + badgeTxt + '</span>' +
+          '<div class="pl-actions"><button class="danger" data-rm="' + esc(l.id) + '">Remove</button></div>' +
+        '</div>' +
+      '</div>';
+    }).join("");
+    document.querySelectorAll("button[data-rm]").forEach(function(b){
+      b.addEventListener("click", async function(){
+        if (!confirm("Remove this lock?")) return;
+        await fetch("/me/price-locks/" + encodeURIComponent(b.getAttribute("data-rm")), {
+          method: "DELETE", headers: h(),
+        });
+        load();
+      });
+    });
+  }
+
+  document.getElementById("pl-refresh").addEventListener("click", load);
+  document.getElementById("pl-show-all").addEventListener("change", load);
+  load();
+})();
+</script>
+{% endblock %}

@@ -193,6 +193,16 @@ def account_price_alerts_page(request: Request) -> HTMLResponse:
     )
 
 
+@router.get("/account/price-locks", response_class=HTMLResponse)
+def account_price_locks_page(request: Request) -> HTMLResponse:
+    """User's price locks."""
+    return templates.TemplateResponse(
+        request,
+        "pages/price_locks.html",
+        {"active_nav": "account"},
+    )
+
+
 @router.get("/account/redeem", response_class=HTMLResponse)
 def account_redeem_page(request: Request) -> HTMLResponse:
     """User's redeem page."""
