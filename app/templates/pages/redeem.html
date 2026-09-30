@@ -1,0 +1,132 @@
+{% extends "layouts/platform_base.html" %}
+{% block title %}Redeem Rewards — Platform-X{% endblock %}
+
+{% block content %}
+<section class="px-hero px-hero-compact">
+  <div class="px-container">
+    <div class="px-hero-content">
+      <div class="px-breadcrumb">
+        <a href="/">Home</a><span>/</span><a href="/account">Account</a><span>/</span><span>Redeem</span>
+      </div>
+      <h1 class="px-hero-title-sm">Redeem your points</h1>
+      <p class="px-hero-sub-sm">Use your hard-earned points for real rewards.</p>
+    </div>
+  </div>
+</section>
+
+<section class="px-section">
+  <div class="px-container" style="max-width: 900px;">
+    <div id="rd-balance" class="rd-balance">Loading balance…</div>
+    <div id="rd-list" class="rd-list"><p class="px-muted">Loading…</p></div>
+  </div>
+</section>
+
+<style>
+.rd-balance {
+  background: linear-gradient(135deg, #0f3d5c 0%, #1e5a7d 100%);
+  color: #fff; padding: 20px 24px; border-radius: 14px; margin-bottom: 24px;
+  font-family: var(--px-font-display);
+}
+.rd-balance .rd-b-label { font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; opacity: 0.85; }
+.rd-balance .rd-b-value { font-size: 40px; font-weight: 800; margin-top: 6px; line-height: 1; }
+.rd-balance .rd-b-tier { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+.rd-list { display: flex; flex-direction: column; gap: 12px; }
+.rd-card {
+  display: flex; justify-content: space-between; align-items: center; gap: 14px;
+  padding: 16px 20px; background: #fff; border: 1px solid var(--px-line);
+  border-radius: 14px; transition: box-shadow 0.15s;
+}
+.rd-card:hover { box-shadow: 0 8px 20px rgba(15,61,92,0.06); }
+.rd-card.disabled { opacity: 0.55; }
+.rd-name { font-family: var(--px-font-display); font-size: 16px; font-weight: 700; color: var(--px-navy); margin-bottom: 4px; }
+.rd-desc { font-size: 13px; color: var(--px-muted); margin-bottom: 6px; }
+.rd-cost { font-size: 14px; font-weight: 700; color: var(--px-navy); }
+.rd-cost small { font-weight: 500; font-size: 11px; color: var(--px-muted); }
+.rd-redeem-btn {
+  padding: 10px 18px; border-radius: 10px; border: none; cursor: pointer;
+  background: var(--px-navy); color: #fff; font-family: inherit; font-size: 14px; font-weight: 600;
+}
+.rd-redeem-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+.rd-empty { padding: 40px; text-align: center; color: var(--px-muted); }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_token") || localStorage.getItem("token"); } catch(e){}
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function h() {
+    var o = { "Content-Type": "application/json" };
+    if (token) o["Authorization"] = "Bearer " + token;
+    return o;
+  }
+  if (!token) {
+    document.getElementById("rd-list").innerHTML = '<div class="rd-empty">Sign in to redeem.</div>';
+    document.getElementById("rd-balance").style.display = "none";
+    return;
+  }
+
+  var points = 0;
+  var tier = "welcome";
+
+  async function loadBalance() {
+    try {
+      var res = await fetch("/rewards/me", { headers: h() });
+      if (!res.ok) return;
+      var d = await res.json();
+      points = d.points || 0;
+      tier = d.tier || "welcome";
+      document.getElementById("rd-balance").innerHTML =
+        '<div class="rd-b-label">Your points</div>' +
+        '<div class="rd-b-value">' + points + '</div>' +
+        '<div class="rd-b-tier">Tier: ' + esc(tier) + '</div>';
+    } catch(e) {}
+  }
+
+  async function loadOptions() {
+    try {
+      var res = await fetch("/rewards/redeem-options");
+      if (!res.ok) { document.getElementById("rd-list").innerHTML = '<div class="rd-empty">Failed to load.</div>'; return; }
+      var list = await res.json();
+      if (!list.length) { document.getElementById("rd-list").innerHTML = '<div class="rd-empty">No options yet.</div>'; return; }
+      document.getElementById("rd-list").innerHTML = list.map(function(o){
+        var disabled = (points < o.points_cost) ? "disabled" : "";
+        var btn = disabled ? 'disabled' : '';
+        var extra = disabled ? '<div style="font-size:11px; color:#991b1b; margin-top:4px;">Need ' + (o.points_cost - points) + ' more</div>' : '';
+        return '<div class="rd-card ' + disabled + '">' +
+          '<div style="flex:1;">' +
+            '<div class="rd-name">' + esc(o.name) + '</div>' +
+            (o.description ? '<div class="rd-desc">' + esc(o.description) + '</div>' : '') +
+            '<div class="rd-cost">' + o.points_cost + ' <small>points</small></div>' + extra +
+          '</div>' +
+          '<button class="rd-redeem-btn" data-opt="' + esc(o.id) + '" ' + btn + '>Redeem</button>' +
+        '</div>';
+      }).join("");
+      document.querySelectorAll(".rd-redeem-btn").forEach(function(b){
+        b.addEventListener("click", async function(){
+          if (b.disabled) return;
+          if (!confirm("Redeem this reward?")) return;
+          var res = await fetch("/rewards/redeem-options/" + encodeURIComponent(b.getAttribute("data-opt")) + "/redeem", {
+            method: "POST", headers: h(),
+          });
+          var d = await res.json();
+          if (!res.ok) { alert(d.detail || "Failed."); return; }
+          alert(d.message || "Redeemed!");
+          await loadBalance();
+          loadOptions();
+        });
+      });
+    } catch(e) {
+      document.getElementById("rd-list").innerHTML = '<div class="rd-empty">Network error.</div>';
+    }
+  }
+
+  (async function(){
+    await loadBalance();
+    loadOptions();
+  })();
+})();
+</script>
+{% endblock %}

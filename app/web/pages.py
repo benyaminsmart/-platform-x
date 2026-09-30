@@ -193,6 +193,16 @@ def account_price_alerts_page(request: Request) -> HTMLResponse:
     )
 
 
+@router.get("/account/redeem", response_class=HTMLResponse)
+def account_redeem_page(request: Request) -> HTMLResponse:
+    """User's redeem page."""
+    return templates.TemplateResponse(
+        request,
+        "pages/redeem.html",
+        {"active_nav": "account"},
+    )
+
+
 @router.get("/account/wishlist", response_class=HTMLResponse)
 def account_wishlist_page(request: Request) -> HTMLResponse:
     """User's saved wishlist (client-side fetch from /wishlist)."""
