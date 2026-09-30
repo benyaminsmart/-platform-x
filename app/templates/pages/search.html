@@ -34,6 +34,14 @@
       </div>
     </div>
 
+    <div id="sr-recent" class="sr-recent" style="display:none; margin-bottom: 14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+        <div style="font-size:12px; font-weight:600; color:var(--px-muted); text-transform:uppercase; letter-spacing:.05em;">Recent searches</div>
+        <button type="button" id="sr-recent-clear" style="font-size:12px; background:none; border:none; color:var(--px-navy); cursor:pointer; padding:4px;">Clear</button>
+      </div>
+      <div id="sr-recent-list" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+    </div>
+
     <form id="sr-form" class="sr-form" method="get" action="/search">
       <div class="sr-field">
         <label>Check-in</label>
@@ -104,6 +112,13 @@
 </section>
 
 <style>
+.sr-recent-chip {
+  display: inline-block; padding: 6px 12px; border-radius: 999px;
+  background: #fff; border: 1px solid var(--px-line); cursor: pointer;
+  font-size: 12.5px; color: var(--px-navy); font-family: inherit;
+  transition: border-color 0.1s;
+}
+.sr-recent-chip:hover { border-color: var(--px-navy); }
 .sr-form {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -566,6 +581,90 @@
     };
     document.getElementById("sr-radius").value = currentCenter.radius_km;
   }
+
+  // ============ Recent searches ============
+  function authHeaders() {
+    var t = null;
+    try { t = localStorage.getItem("px_token") || localStorage.getItem("token"); } catch(e){}
+    var h = { "Content-Type": "application/json" };
+    if (t) h["Authorization"] = "Bearer " + t;
+    return h;
+  }
+
+  async function saveRecent(p) {
+    if (!p.check_in && !p.category && !p.location) return;
+    try {
+      await fetch("/me/recent-searches", {
+        method: "POST", headers: authHeaders(),
+        body: JSON.stringify({
+          check_in: p.check_in || null,
+          check_out: p.check_out || null,
+          guests: parseInt(p.guests, 10) || 1,
+          category: p.category || null,
+          location: p.location || null,
+          currency: p.currency || null,
+          sort: p.sort || null,
+        }),
+      });
+    } catch(e) {}
+  }
+
+  function describeRecent(r) {
+    var parts = [];
+    if (r.category) parts.push(r.category);
+    if (r.location) parts.push(r.location);
+    if (r.check_in && r.check_out) parts.push(r.check_in + " → " + r.check_out);
+    if (r.guests && r.guests > 1) parts.push(r.guests + " guests");
+    return parts.join(" · ") || "search";
+  }
+
+  async function loadRecent() {
+    try {
+      var res = await fetch("/me/recent-searches", { headers: authHeaders() });
+      if (!res.ok) return;
+      var list = await res.json();
+      var wrap = document.getElementById("sr-recent");
+      var container = document.getElementById("sr-recent-list");
+      if (!list.length) { wrap.style.display = "none"; return; }
+      wrap.style.display = "block";
+      container.innerHTML = list.map(function(r, i){
+        return '<button type="button" class="sr-recent-chip" data-idx="' + i + '">' + esc(describeRecent(r)) + '</button>';
+      }).join("");
+      container.querySelectorAll(".sr-recent-chip").forEach(function(b){
+        b.addEventListener("click", function(){
+          var idx = parseInt(b.getAttribute("data-idx"), 10);
+          var r = list[idx];
+          writeForm({
+            check_in: r.check_in || "",
+            check_out: r.check_out || "",
+            guests: r.guests || "1",
+            category: r.category || "",
+            sort: r.sort || "popular",
+            currency: r.currency || "AED",
+            location: r.location || "",
+            min_rating: "",
+          });
+          var qs = new URLSearchParams(readForm());
+          history.replaceState(null, "", "/search?" + qs.toString());
+          runSearch(1);
+        });
+      });
+    } catch(e) {}
+  }
+
+  var _origRunSearch = runSearch;
+  runSearch = async function(page) {
+    var p = readForm();
+    if (!page || page === 1) saveRecent(p);
+    return _origRunSearch(page);
+  };
+
+  document.getElementById("sr-recent-clear").addEventListener("click", async function(){
+    await fetch("/me/recent-searches", { method: "DELETE", headers: authHeaders() });
+    loadRecent();
+  });
+
+  loadRecent();
 
   runSearch(1);
 })();
