@@ -84,7 +84,7 @@ def test_cancellation_service_triggers_waitlist_notify(db):
     assert st == "ok"
 
     # Cancel via cancellation_service
-    out = cs.cancel_with_refund(db, booking=b)
+    out = cs.cancel_booking(db, booking=b)
     assert out["ok"] is True
 
     db.refresh(entry)
