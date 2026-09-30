@@ -333,6 +333,7 @@
       '<button class="sr-heart" data-sid="' + esc(i.service_id) + '" type="button" title="Save">&#9829;</button>' +
       '<button class="sr-compare-btn" data-cmp="' + esc(i.service_id) + '" type="button">+ Compare</button>' +
       '<button class="sr-watch-btn" data-watch="' + esc(i.service_id) + '" data-name="' + esc(i.service_name) + '" data-price="' + i.price + '" type="button" style="position:absolute; top:10px; right:52px; padding:4px 8px; border-radius:999px; background:rgba(255,255,255,0.95); border:none; font-size:11px; font-weight:600; cursor:pointer; color:var(--px-navy); box-shadow:0 2px 6px rgba(0,0,0,0.15);">Watch</button>' +
+      '<button class="sr-lock-btn" data-lock="' + esc(i.service_id) + '" data-name="' + esc(i.service_name) + '" data-price="' + i.price + '" type="button" style="position:absolute; top:10px; right:110px; padding:4px 8px; border-radius:999px; background:rgba(255,255,255,0.95); border:none; font-size:11px; font-weight:600; cursor:pointer; color:var(--px-navy); box-shadow:0 2px 6px rgba(0,0,0,0.15);">🔒 Lock</button>' +
       '<div class="sr-thumb" ' + img + '></div>' +
       '<div class="sr-body">' +
         '<span class="sr-cat">' + esc(i.category) + '</span>' +
@@ -512,6 +513,34 @@
         openWatchModal(b.getAttribute("data-watch"), b.getAttribute("data-name"), parseFloat(b.getAttribute("data-price")));
       });
     });
+    document.querySelectorAll(".sr-lock-btn").forEach(function(b){
+      b.addEventListener("click", function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        openLockModal(b.getAttribute("data-lock"), b.getAttribute("data-name"), parseFloat(b.getAttribute("data-price")));
+      });
+    });
+  }
+
+  function openLockModal(sid, name, price) {
+    if (!sid) return;
+    var t = null;
+    try { t = localStorage.getItem("px_token") || localStorage.getItem("token"); } catch(e){}
+    if (!t) { alert("Please sign in to lock a price."); return; }
+    var hours = prompt("Lock price for " + name + "\nCurrent price: " + price + "\nLock window in hours (1-168, default 48):", "48");
+    if (hours === null) return;
+    var hh = parseInt(hours, 10);
+    if (!hh || hh < 1 || hh > 168) { alert("Window must be between 1 and 168 hours."); return; }
+    fetch("/me/price-locks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + t },
+      body: JSON.stringify({ service_id: sid, window_hours: hh }),
+    }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
+      .then(function(res){
+        if (!res.ok) { alert(res.d.detail || "Could not lock price."); return; }
+        alert("Price locked at " + res.d.locked_price + " " + res.d.currency + " for " + hh + "h.\nView in your account → Price Locks.");
+      })
+      .catch(function(){ alert("Network error."); });
   }
 
   function openWatchModal(sid, name, price) {
