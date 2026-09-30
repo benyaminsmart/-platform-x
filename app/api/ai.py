@@ -424,3 +424,56 @@ def business_content_import_create(
         user_id=user.id,
     )
     return ImportBulkCreateResponse(**out)
+
+# ---------- AI Location Recommender (Phase 45, Step 2) ----------
+
+
+class LocationRecommendRequest(BaseModel):
+    lat: float = Field(ge=-90, le=90)
+    lng: float = Field(ge=-180, le=180)
+    radius_km: float = Field(default=10.0, ge=0.1, le=200)
+    category: str | None = Field(default=None, max_length=50)
+    language: str = Field(default="en", pattern="^(en|ar|fil|hi)$")
+
+
+class LocationRecommendResponse(BaseModel):
+    attractions: list[dict]
+    services: list[dict]
+    advice: str
+    provider: str
+
+
+@router.post("/location/recommend", response_model=LocationRecommendResponse)
+@limiter.limit("15/minute")
+def ai_location_recommend(
+    request: Request,
+    payload: LocationRecommendRequest,
+    db=Depends(get_db),
+) -> LocationRecommendResponse:
+    """AI-powered location recommendation (public)."""
+    from app.services.ai import location_recommender
+    from app.api.deps import get_current_user as _gcu
+    _require_ai_enabled()
+
+    # Optional: detect authenticated user via header (best-effort, no dependency)
+    user_id = None
+    auth = request.headers.get("authorization", "")
+    if auth.lower().startswith("bearer "):
+        try:
+            from app.core.security import decode_access_token
+            token = auth.split(" ", 1)[1].strip()
+            data = decode_access_token(token)
+            user_id = data.get("sub")
+        except Exception:
+            user_id = None
+
+    try:
+        out = location_recommender.recommend(
+            db,
+            lat=payload.lat, lng=payload.lng, radius_km=payload.radius_km,
+            category=payload.category, user_id=user_id, language=payload.language,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return LocationRecommendResponse(**out)
+
