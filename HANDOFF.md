@@ -131,6 +131,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 43 Step 1 — Price alerts model + service + API
 - [x] Phase 42 Step 2 — Recent searches UI
 - [x] Phase 42 Step 1 — Recent searches model + API
 - [x] Phase 41 Step 3 — Nearby attractions UI
@@ -180,7 +181,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 42 Step 2 — Recent searches UI (2026-09-30 14:02)
+Last step: Phase 43 Step 1 — Price alerts model + service + API (2026-09-30 14:07)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -202,6 +203,7 @@ Last step: Phase 42 Step 2 — Recent searches UI (2026-09-30 14:02)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- aa87779 Phase 43 Step 1 — Price alerts model + service + API
 - c016471 Phase 42 Step 2 — Recent searches UI
 - a91a427 Phase 42 Step 1 — Recent searches model + API
 - cf6bbac Phase 41 Step 3 — Nearby attractions UI
