@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.31.0-nearby (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-41 complete; 24 DEFERRED). WAVE 1 COMPLETE.
+> Version: v0.32.0-recent-searches (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-42 complete; 24 DEFERRED)
 
 Last updated: 2026-09-30
 
@@ -348,6 +348,12 @@ Tag: v0.31.0-nearby
 - [x] Step 2 — Attraction service + public API
 - [x] Step 3 — Nearby attractions UI on tenant page
 - [x] Phase close — tag v0.31.0-nearby
+
+**Phase 42 — Recent searches: COMPLETE**
+Tag: v0.32.0-recent-searches
+- [x] Step 1 — RecentSearch model + API
+- [x] Step 2 — Recent searches UI in /search
+- [x] Phase close — tag v0.32.0-recent-searches
 
 ---
 
@@ -813,6 +819,14 @@ Wave 1 (Competitive Parity) is COMPLETE:
 - 10 phases, 1011 tests, all green.
 
 NEXT: Wave 2 (AI depth — connects AI to the Wave 1 foundation).
+
+### Phase 42 — Recent Searches: COMPLETE
+Tag: v0.32.0-recent-searches
+- RecentSearch model (12 columns; user-scoped, max 10 kept)
+- API: /me/recent-searches (GET, POST, DELETE)
+- Auto-save on search with at least one meaningful filter
+- Dedupe by (check_in, check_out, category, location)
+- UI: recent chips above the /search form; click to restore
 
 ## 6. Data Models (19 tables)
 
