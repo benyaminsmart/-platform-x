@@ -39,8 +39,12 @@ def _booking(db, t, u, amount=500):
     return b
 
 
-def _login(client, email, password="Pass1234"):
-    r = client.post("/auth/login", json={"email": email, "password": password})
+def _login(client, email, password="Pass1234", tenant_slug=None):
+    headers = {}
+    if tenant_slug:
+        headers["X-Tenant-Slug"] = tenant_slug
+    r = client.post("/auth/login", json={"email": email, "password": password},
+                    headers=headers)
     assert r.status_code == 200, r.text
     return r.json()["access_token"]
 
@@ -53,7 +57,7 @@ def test_memory_requires_auth(client: TestClient) -> None:
 def test_memory_empty(client: TestClient, db: Session) -> None:
     t = _tenant(db, "mem-empty")
     u = _user(db, t, "empty@x.com")
-    token = _login(client, u.email)
+    token = _login(client, u.email, tenant_slug=t.slug)
     r = client.get("/account/api/ai/memory",
                    headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 200, r.text
@@ -68,7 +72,7 @@ def test_memory_with_bookings(client: TestClient, db: Session) -> None:
     u = _user(db, t, "full@x.com")
     _booking(db, t, u, 500)
     _booking(db, t, u, 700)
-    token = _login(client, u.email)
+    token = _login(client, u.email, tenant_slug=t.slug)
     r = client.get("/account/api/ai/memory",
                    headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 200, r.text
@@ -81,7 +85,7 @@ def test_memory_with_bookings(client: TestClient, db: Session) -> None:
 def test_memory_invalid_language(client: TestClient, db: Session) -> None:
     t = _tenant(db, "mem-lang")
     u = _user(db, t, "lang@x.com")
-    token = _login(client, u.email)
+    token = _login(client, u.email, tenant_slug=t.slug)
     r = client.get("/account/api/ai/memory?language=xx",
                    headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 422
