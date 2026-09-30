@@ -59,9 +59,20 @@
         <button type="button" id="generate-plan-btn" class="px-btn px-btn-primary px-btn-block">Generate plan</button>
       </div>
 
-      <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+      <div id="trip-memory-panel" style="display: none; background: white; border: 1px solid var(--px-line); border-radius: 16px; padding: 20px; margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="margin: 0; font-family: var(--px-font-display);">🧠 Your Trip Memory</h3>
+          <button type="button" id="close-memory" style="background: transparent; border: none; font-size: 18px; cursor: pointer; color: var(--px-muted);">✕</button>
+        </div>
+        <div id="memory-recap" style="font-size: 14.5px; line-height: 1.7; color: var(--px-text); margin-bottom: 16px;">Loading…</div>
+        <div id="memory-profile" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;"></div>
+        <div id="memory-top-tenants" style="margin-top: 16px;"></div>
+      </div>
+
+      <div style="display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
         <button type="button" id="open-planner" class="px-btn px-btn-outline" style="flex: 1;">✨ Plan a trip</button>
         <button type="button" id="suggest-btn" class="px-btn px-btn-outline" style="flex: 1;">💡 What should I do?</button>
+        <button type="button" id="open-memory" class="px-btn px-btn-outline" style="flex: 1;">🧠 My Trip Memory</button>
       </div>
 
       <form id="ai-chat-form" class="px-ai-full-form">
@@ -269,6 +280,65 @@
     var msg = "Based on my profile, what do you recommend I book next on Platform-X?";
     input.value = msg;
     form.dispatchEvent(new Event("submit"));
+  });
+
+  // ============ Trip Memory (Phase 46, Step 3) ============
+  var memoryPanel = document.getElementById("trip-memory-panel");
+  var memoryLoaded = false;
+
+  function pill(label, value) {
+    return '<div style="background:#faf8f5; border:1px solid var(--px-line); border-radius:12px; padding:12px;">' +
+      '<div style="font-size:11px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:var(--px-muted); margin-bottom:4px;">' + esc(label) + '</div>' +
+      '<div style="font-size:15px; font-weight:600; color:var(--px-navy);">' + esc(value) + '</div>' +
+    '</div>';
+  }
+
+  async function loadMemory() {
+    var recap = document.getElementById("memory-recap");
+    var profEl = document.getElementById("memory-profile");
+    var topEl = document.getElementById("memory-top-tenants");
+    recap.textContent = "Loading…";
+    profEl.innerHTML = "";
+    topEl.innerHTML = "";
+    try {
+      var res = await fetch("/account/api/ai/memory", {
+        headers: PX.authHeaders(PX.getTenantSlug() || "trianon-hotel"),
+      });
+      if (!res.ok) { recap.textContent = "Could not load your trip memory right now."; return; }
+      var d = await res.json();
+      var p = d.profile || {};
+      recap.textContent = d.recap || "—";
+
+      var cards = [];
+      cards.push(pill("Total trips", p.total_bookings || 0));
+      cards.push(pill("Favorite", p.favorite_category || "—"));
+      cards.push(pill("Avg group", p.avg_guests != null ? p.avg_guests : "—"));
+      cards.push(pill("Cities", (p.cities && p.cities.length) ? p.cities.join(", ") : "—"));
+      cards.push(pill("Preferred months", (p.preferred_months && p.preferred_months.length) ? p.preferred_months.join(", ") : "—"));
+      cards.push(pill("Price band", (p.price_band && p.currency) ? (p.price_band[0] + "–" + p.price_band[1] + " " + p.currency) : "—"));
+      profEl.innerHTML = cards.join("");
+
+      if (p.top_tenants && p.top_tenants.length) {
+        topEl.innerHTML = '<div style="font-size:11px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:var(--px-muted); margin-bottom:8px;">Most visited</div>' +
+          p.top_tenants.map(function(t){
+            return '<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--px-line); font-size:13.5px;">' +
+              '<span style="color:var(--px-navy); font-weight:600;">' + esc(t.name) + '</span>' +
+              '<span style="color:var(--px-muted);">' + esc(t.count) + '×</span>' +
+            '</div>';
+          }).join("");
+      }
+      memoryLoaded = true;
+    } catch(e) {
+      recap.textContent = "Network error.";
+    }
+  }
+
+  document.getElementById("open-memory").addEventListener("click", function() {
+    memoryPanel.style.display = "block";
+    if (!memoryLoaded) loadMemory();
+  });
+  document.getElementById("close-memory").addEventListener("click", function() {
+    memoryPanel.style.display = "none";
   });
 })();
 </script>
