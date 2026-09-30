@@ -18,6 +18,7 @@ from app.models.platform_admin import PlatformAdmin
 from app.models.pricing_rule import PricingRule, PricingRuleApplication
 from app.models.promotion import Promotion
 from app.models.rate_plan import RatePlan
+from app.models.recent_search import RecentSearch
 from app.models.referral import Referral
 from app.models.review import Review
 from app.models.review_photo import ReviewPhoto
@@ -51,6 +52,7 @@ __all__ = [
     "PricingRuleApplication",
     "Promotion",
     "RatePlan",
+    "RecentSearch",
     "Referral",
     "Review",
     "Room",
