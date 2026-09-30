@@ -131,6 +131,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 47 Step 2 — Price Locks API
 - [x] Phase 47 Step 1 — PriceLock model + service
 - [x] Phase 46 Step 3 — AI Trip Memory UI
 - [x] Phase 46 Step 2 — AI Trip Memory API
@@ -191,7 +192,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 47 Step 1 — PriceLock model + service (2026-09-30 21:07)
+Last step: Phase 47 Step 2 — Price Locks API (2026-09-30 21:09)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -213,6 +214,7 @@ Last step: Phase 47 Step 1 — PriceLock model + service (2026-09-30 21:07)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 2652047 Phase 47 Step 2 — Price Locks API
 - 5396c0c Phase 47 Step 1 — PriceLock model + service
 - 80cd9ee Phase 46 Step 3 — AI Trip Memory UI
 - 2ee3a85 Phase 46 Step 2 — AI Trip Memory API
