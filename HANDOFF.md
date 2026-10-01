@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.50.0-auto-repricing (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-60 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
+> Version: v0.51.0-voice-booking (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-64 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
 
 Last updated: 2026-10-01
 
@@ -573,6 +573,37 @@ Tag: v0.36.0-ai-trip-memory
 - Step 3 — UI on /account/ai
   - "🧠 My Trip Memory" button reveals panel with recap + 6 profile pills
     + "Most visited" list; lazy-loaded on first open
+
+### Phase 61 — Lessons Learned batch update: COMPLETE
+Tag: phase-1-lessons (lightweight)
+- Lessons 10-17 appended to AI-PLAYBOOK §15 (9 → 17 total)
+
+### Phase 62 — Expand /docs/api: COMPLETE
+- /docs/api expanded from 166 → 282 lines
+- Covers all 50+ endpoints across 12 sections (public, auth, guest,
+  booking, rewards, extras, discovery, ai-public, business, business-ai,
+  webhooks, errors)
+
+### Phase 63 — UI consistency guard: COMPLETE
+- New regression test suite for business panel templates
+- Two rules: no hardcoded light backgrounds; every template references
+  --adm-* token (with Phase 65 exemption list for placeholders)
+
+### Phase 64 — AI Voice Booking (Wave 3, Blue-Ocean B1): COMPLETE
+Tag: v0.51.0-voice-booking
+- Step 1 — AI Voice Booking service (app/services/ai/voice_booking.py)
+  - Mock/text-first: transcript → deterministic intent parse
+    (category, city, dates, guests)
+  - Date parser supports ISO, month names, and relative phrases
+    (tonight, tomorrow, this/next weekend, next week)
+  - Live matches via search_service (never raises)
+  - AI polishes a spoken-style reply, grounded only in parsed fields
+  - Deterministic fallback always available
+  - status: ok | empty | unrecognized
+- Step 2 — User API: POST /account/api/ai/voice (15/min, auth required)
+- Step 3 — UI panel on /account/ai
+  - Textarea + Parse button, intent pills, AI reply, live matches
+  - Real voice→text integration deferred to VPS/payment phase
 
 ### Phase 60 — AI Auto-Repricing Live (Wave 3, Blue-Ocean B2): COMPLETE
 Tag: v0.50.0-auto-repricing
@@ -1534,6 +1565,8 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 58 (Multi-property Dashboard) is COMPLETE — Wave 4 second deliverable.**
 **Phase 59 (AI Group Coordinator) is COMPLETE — Wave 3 Blue-Ocean.**
 **Phase 60 (AI Auto-Repricing Live) is COMPLETE — Wave 3 Blue-Ocean.**
+**Phase 61 (Lessons) / 62 (Docs) / 63 (UI guard) / 64 (Voice Booking) COMPLETE.**
+**Stage 1 free work remaining: Live Local Experiences (Phase 65 — with mock).**
 
 ## WAVE 2 COMPLETE (v0.43.0-ai-receptionist)
 
@@ -1819,7 +1852,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1299 tests, all passing
+## 14. Test Count: 1315 tests, all passing
 
 Test files:
 - test_health.py
