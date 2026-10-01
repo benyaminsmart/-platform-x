@@ -131,6 +131,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 57 Step 1 — Installment plan + service
 - [x] Phase 56 Step 3 — AI Upsell UI on tenant book page
 - [x] Phase 56 Step 2 — AI Upsell API
 - [x] Phase 56 Step 1 — AI Upsell Engine service
@@ -221,7 +222,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 56 Step 3 — AI Upsell UI on tenant book page (2026-10-01 18:21)
+Last step: Phase 57 Step 1 — Installment plan + service (2026-10-01 18:24)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -243,6 +244,7 @@ Last step: Phase 56 Step 3 — AI Upsell UI on tenant book page (2026-10-01 18:2
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- f0ec7f5 Phase 57 Step 1 — Installment plan + service
 - 8a22263 Phase 56 Step 3 — AI Upsell UI on tenant book page
 - 4593870 Phase 56 Step 2 — AI Upsell API
 - 0b5c2d8 Phase 56 Step 1 — AI Upsell Engine service
