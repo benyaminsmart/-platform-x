@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.46.0-upsell-engine (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-56 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
+> Version: v0.47.0-installments (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-57 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
 
 Last updated: 2026-10-01
 
@@ -488,6 +488,30 @@ Tag: v0.36.0-ai-trip-memory
 - Step 3 — UI on /account/ai
   - "🧠 My Trip Memory" button reveals panel with recap + 6 profile pills
     + "Most visited" list; lazy-loaded on first open
+
+### Phase 57 — Split Payment / Installments (Wave 4): COMPLETE
+Tag: v0.47.0-installments
+- Step 1 — InstallmentPlan + Installment models + service
+  - One plan per booking (unique). 2 or 3 installments.
+  - Down-payment share: 2 → 50%, 3 → 40% (first gets biggest)
+  - Remaining split evenly; last installment absorbs rounding diff
+  - Due dates: first today, subsequent +30d each, capped at check_in
+  - status: draft | active | completed | cancelled
+  - mark_paid auto-completes the plan when all installments are paid
+- Step 2 — API under /me/installment-plans
+  - GET  /                            list user's plans
+  - POST /                            create plan
+  - GET  /{plan_id}                   detail
+  - POST /installments/{id}/pay       pay one installment
+  - DELETE /{plan_id}                 cancel plan
+  - Cross-user isolation tested
+- Step 3 — UI page /account/installments
+  - Plan list with status badge, per-installment cards
+  - "Pay now" button on pending installments
+  - Completed plans show a green Completed badge
+
+NOTE: Real payment execution deferred to Phase 10 (Telr/Stripe).
+Installment reminders (email/SMS) deferred to Phase 11.
 
 ### Phase 56 — AI Upsell Engine (Wave 3, Blue-Ocean B13): COMPLETE
 Tag: v0.46.0-upsell-engine
@@ -1359,6 +1383,7 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 54 (Instant Refund AI) is COMPLETE — Wave 3 Blue-Ocean.**
 **Phase 55 (Family & Kids Mode) is COMPLETE — Wave 3 Blue-Ocean.**
 **Phase 56 (AI Upsell Engine) is COMPLETE — Wave 3 Blue-Ocean.**
+**Phase 57 (Split Payment / Installments) is COMPLETE — Wave 4 first free deliverable.**
 
 ## WAVE 2 COMPLETE (v0.43.0-ai-receptionist)
 
@@ -1644,7 +1669,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1222 tests, all passing
+## 14. Test Count: 1245 tests, all passing
 
 Test files:
 - test_health.py
