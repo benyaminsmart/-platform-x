@@ -53,6 +53,7 @@ from app.api import rewards_redeem as rewards_redeem_router
 from app.api import search as search_router
 from app.api import services as services_router
 from app.api import tenants as tenants_router
+from app.api import trust_score as trust_score_router
 from app.api import wishlist as wishlist_router
 from app.api import waitlist as waitlist_router
 from app.core.config import settings
@@ -211,6 +212,7 @@ app.include_router(search_router.router)
 app.include_router(services_router.router)
 app.include_router(tenants_router.router)
 app.include_router(wishlist_router.router)
+app.include_router(trust_score_router.router)
 app.include_router(waitlist_router.router)
 
 
