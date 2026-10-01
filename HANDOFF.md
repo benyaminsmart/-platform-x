@@ -71,6 +71,61 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
 
 ---
 
+## 0.1.5 STRATEGIC ROADMAP TO SALE (user directive, 2026-10-01)
+
+> **User's plan:** finish the platform, then sell it.
+> This section tracks the 4-phase plan to production-ready sale.
+> Every completed item is ticked here so any new AI session picks up
+> exactly where we left off.
+
+### The 4-phase plan
+
+**Phase 1 — Free work (features + quality)**
+- [ ] Finish all remaining FREE features
+  - [ ] AI Voice Booking (B1) — with mock provider (real integration deferred)
+  - [ ] Live Local Experiences (B14) — with mock data source
+  - [ ] (any other free items user requests)
+- [ ] Lessons Learned batch update in AI-PLAYBOOK
+- [ ] Polish remaining UIs (quality pass, not new features)
+- [ ] Expand /docs/api where thin
+
+**Phase 2 — Rewards + Referral plan (user-provided)**
+- [ ] User provides final Rewards + Referral business plan
+- [ ] Phase 8 — Rewards + Referral Complete (replace TEMP catalog)
+- [ ] Phase 24 — Cross-Business Rewards (deferred item, unlock now)
+- [ ] Phase 44 — Loyalty Redemption: replace TEMP catalog with real one
+- [ ] Full HANDOFF update for new rewards model
+
+**Phase 3 — Production readiness audit**
+- [ ] Full bug sweep across the codebase
+- [ ] Fix all findings (bugs, edge cases, race conditions)
+- [ ] Verify all tests green (target: 100% pass, no skips on critical paths)
+- [ ] Security review (rate limits, auth, CORS, secrets)
+- [ ] Performance review (N+1 queries, indexes, payload sizes)
+- [ ] Prepare deploy scripts (scripts/deploy/*.sh)
+- [ ] Prepare production env config (DATABASE_URL, secrets, CORS_ORIGINS)
+- [ ] PostgreSQL migration dry-run + edge-case doc
+- [ ] Smoke test each critical flow end-to-end
+- [ ] Prepare SELLING-PITCH + TECH-OVERVIEW docs
+
+**Phase 4 — VPS + Domain + Production**
+- [ ] User purchases VPS + Domain
+- [ ] Phase 12 — VPS Deploy + Domain + Named Tunnel
+- [ ] Phase 10 — Payment Production (Telr/Stripe)
+- [ ] Phase 13 — Business Onboarding Tools
+- [ ] Phase 15 — Trianon Migration (first real customer)
+- [ ] Sale-ready
+
+### Rules for this plan
+1. Phase 1 and Phase 2 can run in either order if user decides.
+2. Phase 3 MUST be complete before Phase 4 begins.
+3. Phase 4 requires user purchases; AI cannot start it.
+4. Every ticked item here must also be reflected in Section 0.5 and
+   the relevant Phase's section (5).
+5. Any new AI session: read this section first to know where we are.
+
+---
+
 ## 0.2 Working Method (fast + safe)
 
 Fast, safe, AI-driven loop:
