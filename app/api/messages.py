@@ -38,6 +38,17 @@ class SendRequest(BaseModel):
     body: str = Field(min_length=1, max_length=4000)
 
 
+class DraftRequest(BaseModel):
+    language: str = Field(default="en", pattern="^(en|ar|fil|hi)$")
+    tone: str = Field(default="professional", pattern="^(professional|friendly|concise)$")
+
+
+class DraftResponse(BaseModel):
+    reply: str
+    provider: str
+    status: str
+
+
 class ThreadItem(BaseModel):
     thread_id: str
     booking_id: str | None
@@ -166,3 +177,35 @@ def business_send(
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return _ser(m)
+
+# ---------- AI Receptionist draft (Phase 53, Step 2) ----------
+
+
+@business_router.post("/{thread_id}/draft", response_model=DraftResponse)
+@limiter.limit("15/minute")
+def business_draft_reply(
+    request: Request,
+    thread_id: str,
+    payload: DraftRequest,
+    user: User = Depends(get_current_business_user),
+    tenant: Tenant = Depends(get_business_tenant),
+    db: DBSession = Depends(get_db),
+) -> DraftResponse:
+    """AI-drafted reply for a guest message in this thread.
+
+    The owner can preview, edit, then send via POST /{thread_id}.
+    """
+    from app.core.config import settings
+    if not settings.AI_ENABLED:
+        raise HTTPException(status_code=503, detail="AI disabled")
+
+    from app.services.ai import receptionist as rec
+    try:
+        out = rec.draft_reply(
+            db, tenant=tenant, thread_id=thread_id,
+            language=payload.language, tone=payload.tone,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return DraftResponse(**out)
+
