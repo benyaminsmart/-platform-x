@@ -187,6 +187,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 64 Step 3 — AI Voice Booking UI
 - [x] Phase 64 Step 2 — AI Voice Booking API
 - [x] Phase 64 Step 1 — AI Voice Booking service (mock)
 - [x] Phase 63 Step 1 — UI consistency guard
@@ -294,7 +295,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 64 Step 2 — AI Voice Booking API (2026-10-01 22:29)
+Last step: Phase 64 Step 3 — AI Voice Booking UI (2026-10-01 22:30)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -316,6 +317,7 @@ Last step: Phase 64 Step 2 — AI Voice Booking API (2026-10-01 22:29)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 1e1369f Phase 64 Step 3 — AI Voice Booking UI
 - 41f4052 Phase 64 Step 2 — AI Voice Booking API
 - 83cb521 Phase 64 Step 1 — AI Voice Booking service (mock)
 - 7e37b76 Phase 63 Step 1 — UI consistency guard
