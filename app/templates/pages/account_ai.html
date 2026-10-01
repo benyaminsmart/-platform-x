@@ -59,6 +59,40 @@
         <button type="button" id="generate-plan-btn" class="px-btn px-btn-primary px-btn-block">Generate plan</button>
       </div>
 
+      <div id="budget-panel" style="display: none; background: white; border: 1px solid var(--px-line); border-radius: 16px; padding: 20px; margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="margin: 0; font-family: var(--px-font-display);">💸 Budget Optimizer</h3>
+          <button type="button" id="close-budget" style="background: transparent; border: none; font-size: 18px; cursor: pointer; color: var(--px-muted);">✕</button>
+        </div>
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+          <div>
+            <label style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--px-muted); display: block; margin-bottom: 4px;">City (optional)</label>
+            <input type="text" id="bud-city" placeholder="Dubai, Abu Dhabi..." style="width: 100%; padding: 10px; border: 1px solid var(--px-line); border-radius: 8px; font-size: 14px; font-family: inherit; outline: none;">
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--px-muted); display: block; margin-bottom: 4px;">Days</label>
+            <input type="number" id="bud-days" value="3" min="1" max="30" style="width: 100%; padding: 10px; border: 1px solid var(--px-line); border-radius: 8px; font-size: 14px; font-family: inherit; outline: none;">
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--px-muted); display: block; margin-bottom: 4px;">Guests</label>
+            <input type="number" id="bud-guests" value="2" min="1" max="50" style="width: 100%; padding: 10px; border: 1px solid var(--px-line); border-radius: 8px; font-size: 14px; font-family: inherit; outline: none;">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+          <div>
+            <label style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--px-muted); display: block; margin-bottom: 4px;">Budget</label>
+            <input type="number" id="bud-budget" value="5000" min="1" style="width: 100%; padding: 10px; border: 1px solid var(--px-line); border-radius: 8px; font-size: 14px; font-family: inherit; outline: none;">
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--px-muted); display: block; margin-bottom: 4px;">Currency</label>
+            <input type="text" id="bud-currency" value="AED" style="width: 100%; padding: 10px; border: 1px solid var(--px-line); border-radius: 8px; font-size: 14px; font-family: inherit; outline: none;">
+          </div>
+        </div>
+        <button type="button" id="bud-run" class="px-btn px-btn-primary px-btn-block">Optimize my budget</button>
+        <div id="bud-advice" style="font-size: 14.5px; line-height: 1.7; color: var(--px-text); margin-top: 16px;"></div>
+        <div id="bud-package" style="margin-top: 12px;"></div>
+      </div>
+
       <div id="trip-memory-panel" style="display: none; background: white; border: 1px solid var(--px-line); border-radius: 16px; padding: 20px; margin-bottom: 16px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
           <h3 style="margin: 0; font-family: var(--px-font-display);">🧠 Your Trip Memory</h3>
@@ -73,6 +107,7 @@
         <button type="button" id="open-planner" class="px-btn px-btn-outline" style="flex: 1;">✨ Plan a trip</button>
         <button type="button" id="suggest-btn" class="px-btn px-btn-outline" style="flex: 1;">💡 What should I do?</button>
         <button type="button" id="open-memory" class="px-btn px-btn-outline" style="flex: 1;">🧠 My Trip Memory</button>
+        <button type="button" id="open-budget" class="px-btn px-btn-outline" style="flex: 1;">💸 Budget Optimizer</button>
       </div>
 
       <form id="ai-chat-form" class="px-ai-full-form">
@@ -340,6 +375,74 @@
   document.getElementById("close-memory").addEventListener("click", function() {
     memoryPanel.style.display = "none";
   });
+
+  // ============ Budget Optimizer (Phase 50, Step 3) ============
+  var budgetPanel = document.getElementById("budget-panel");
+
+  function budEsc(s){ return esc(s); }
+
+  function budItem(it) {
+    var href = it.tenant_slug ? ("/" + budEsc(it.tenant_slug) + "/") : "#";
+    return '<div style="padding:8px 0; border-bottom:1px solid var(--px-line); display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">' +
+      '<div>' +
+        '<div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--px-muted);">' + budEsc(it.category) + '</div>' +
+        '<a href="' + href + '" style="font-size:14px; font-weight:600; color:var(--px-navy); text-decoration:none;">' + budEsc(it.service_name || "") + '</a>' +
+        '<div style="font-size:12.5px; color:var(--px-muted);">' + budEsc(it.tenant_name || "") + (it.location ? ' · ' + budEsc(it.location) : '') + '</div>' +
+      '</div>' +
+      '<div style="text-align:right;">' +
+        '<div style="font-size:14px; font-weight:700; color:var(--px-navy);">' + budEsc(it.price) + ' ' + budEsc(it.currency) + '</div>' +
+        '<div style="font-size:12px; color:var(--px-muted);">est. ' + budEsc(it.estimated_total) + ' ' + budEsc(it.currency) + '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  async function runBudget() {
+    var city = document.getElementById("bud-city").value.trim();
+    var days = parseInt(document.getElementById("bud-days").value, 10) || 3;
+    var guests = parseInt(document.getElementById("bud-guests").value, 10) || 2;
+    var budget = parseFloat(document.getElementById("bud-budget").value) || 0;
+    var currency = document.getElementById("bud-currency").value.trim() || "AED";
+    var adviceEl = document.getElementById("bud-advice");
+    var pkgEl = document.getElementById("bud-package");
+
+    if (budget <= 0) { alert("Please enter a budget greater than 0."); return; }
+
+    adviceEl.textContent = "Optimizing…";
+    pkgEl.innerHTML = "";
+    try {
+      var res = await fetch("/api/budget-optimize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ city: city || null, days: days, guests: guests,
+                               budget: budget, currency: currency }),
+      });
+      if (!res.ok) {
+        var err = await res.json().catch(function(){ return { detail: "Request failed" }; });
+        adviceEl.textContent = err.detail || "Could not optimize.";
+        return;
+      }
+      var d = await res.json();
+      adviceEl.textContent = d.advice || "";
+      if (d.package && d.package.length) {
+        pkgEl.innerHTML =
+          '<div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--px-muted); margin-bottom:6px;">Recommended package</div>' +
+          d.package.map(budItem).join("") +
+          '<div style="margin-top:10px; font-size:13px; color:var(--px-muted);">Estimated total: <strong style="color:var(--px-navy);">' +
+            budEsc(d.total_estimated) + ' ' + budEsc(d.currency) + '</strong> of ' + budEsc(d.budget) + ' ' + budEsc(d.currency) +
+            ' · remaining ' + budEsc(d.remaining) + ' ' + budEsc(d.currency) + '</div>';
+      }
+    } catch(e) {
+      adviceEl.textContent = "Network error.";
+    }
+  }
+
+  document.getElementById("open-budget").addEventListener("click", function() {
+    budgetPanel.style.display = "block";
+  });
+  document.getElementById("close-budget").addEventListener("click", function() {
+    budgetPanel.style.display = "none";
+  });
+  document.getElementById("bud-run").addEventListener("click", runBudget);
 })();
 </script>
 {% endblock %}
