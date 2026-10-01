@@ -1,0 +1,158 @@
+{% extends "layouts/platform_base.html" %}
+{% block title %}Installments — Platform-X{% endblock %}
+
+{% block content %}
+<section class="px-hero px-hero-compact">
+  <div class="px-container">
+    <div class="px-hero-content">
+      <div class="px-breadcrumb">
+        <a href="/">Home</a><span>/</span><a href="/account">Account</a><span>/</span><span>Installments</span>
+      </div>
+      <h1 class="px-hero-title-sm">💳 Installment Plans</h1>
+      <p class="px-hero-sub-sm">Pay for your bookings in 2 or 3 installments — the first is a down payment.</p>
+    </div>
+  </div>
+</section>
+
+<section class="px-section">
+  <div class="px-container" style="max-width: 900px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <div style="font-size:13px; color:var(--px-muted);">Create a plan from any pending booking.</div>
+      <button type="button" id="ins-refresh" class="px-btn px-btn-ghost">Refresh</button>
+    </div>
+    <div id="ins-body"><p class="px-muted">Loading…</p></div>
+  </div>
+</section>
+
+<style>
+.ins-plan {
+  padding:16px; background:#fff; border:1px solid var(--px-line);
+  border-radius:14px; margin-bottom:14px;
+}
+.ins-plan-head {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:12px; flex-wrap:wrap; gap:8px;
+}
+.ins-plan-title { font-family:var(--px-font-display); font-size:16px; font-weight:700; color:var(--px-navy); }
+.ins-plan-meta { font-size:12.5px; color:var(--px-muted); }
+.ins-badge {
+  display:inline-block; padding:3px 10px; border-radius:999px;
+  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+  background:#e5e7eb; color:#374151;
+}
+.ins-badge.active { background:#dbeafe; color:#1e40af; }
+.ins-badge.completed { background:#dcfce7; color:#166534; }
+.ins-badge.cancelled { background:#fee2e2; color:#991b1b; }
+.ins-inst {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 12px; border:1px solid var(--px-line); border-radius:10px;
+  margin-bottom:6px; background:#faf8f5;
+}
+.ins-inst.paid { background:#f0fdf4; border-color:#bbf7d0; }
+.ins-inst.pending { background:#fef3c7; border-color:#fde68a; }
+.ins-inst.cancelled { opacity:0.5; text-decoration:line-through; }
+.ins-inst-main { flex:1; }
+.ins-inst-seq { font-size:13px; font-weight:700; color:var(--px-navy); }
+.ins-inst-due { font-size:11.5px; color:var(--px-muted); }
+.ins-inst-side { display:flex; gap:10px; align-items:center; }
+.ins-inst-amount { font-size:14px; font-weight:700; color:var(--px-navy); }
+.ins-pay-btn {
+  padding:6px 12px; font-size:12px; border-radius:8px;
+  background:var(--px-navy); color:#fff; border:none; cursor:pointer;
+  font-family:inherit;
+}
+.ins-pay-btn:hover { opacity:0.9; }
+.ins-pay-btn:disabled { opacity:0.4; cursor:default; }
+.ins-empty { padding: 40px; text-align: center; color: var(--px-muted); }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_token") || localStorage.getItem("token"); } catch(e){}
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function h() {
+    var o = { "Content-Type": "application/json" };
+    if (token) o["Authorization"] = "Bearer " + token;
+    return o;
+  }
+  var body = document.getElementById("ins-body");
+  if (!token) {
+    body.innerHTML = '<div class="ins-empty">Sign in to view your installment plans.</div>';
+    return;
+  }
+
+  async function payInstallment(id) {
+    if (!confirm("Mark this installment as paid?")) return;
+    var res = await fetch("/me/installment-plans/installments/" + encodeURIComponent(id) + "/pay",
+                          { method: "POST", headers: h() });
+    if (res.ok) {
+      var d = await res.json();
+      if (d.plan_completed) {
+        alert("All installments paid — plan completed.");
+      }
+      load();
+    } else {
+      var e = await res.json().catch(function(){ return {}; });
+      alert(e.detail || "Could not mark as paid.");
+    }
+  }
+
+  function renderInstallment(inst) {
+    var cls = inst.status === "paid" ? "paid" : (inst.status === "pending" ? "pending" : "cancelled");
+    var payBtn = (inst.status === "pending")
+      ? '<button class="ins-pay-btn" data-inst="' + esc(inst.id) + '">Pay now</button>'
+      : '';
+    return '<div class="ins-inst ' + cls + '">' +
+      '<div class="ins-inst-main">' +
+        '<div class="ins-inst-seq">#' + inst.sequence + ' — ' + esc(inst.status) + '</div>' +
+        (inst.due_date ? '<div class="ins-inst-due">Due ' + esc(inst.due_date) + '</div>' : '') +
+        (inst.paid_at ? '<div class="ins-inst-due">Paid ' + esc(inst.paid_at.slice(0,10)) + '</div>' : '') +
+      '</div>' +
+      '<div class="ins-inst-side">' +
+        '<div class="ins-inst-amount">' + esc(inst.amount) + ' ' + esc(inst.currency) + '</div>' +
+        payBtn +
+      '</div>' +
+    '</div>';
+  }
+
+  function renderPlan(p) {
+    var badgeCls = p.status;
+    var badgeTxt = p.status.charAt(0).toUpperCase() + p.status.slice(1);
+    return '<div class="ins-plan">' +
+      '<div class="ins-plan-head">' +
+        '<div>' +
+          '<div class="ins-plan-title">Booking ' + esc(p.booking_id.slice(0, 8)) + '…</div>' +
+          '<div class="ins-plan-meta">' + esc(p.n_installments) + ' installments · total ' +
+            esc(p.total_amount) + ' ' + esc(p.currency) + '</div>' +
+        '</div>' +
+        '<div><span class="ins-badge ' + badgeCls + '">' + esc(badgeTxt) + '</span></div>' +
+      '</div>' +
+      p.installments.map(renderInstallment).join("") +
+    '</div>';
+  }
+
+  async function load() {
+    body.innerHTML = '<p class="px-muted">Loading…</p>';
+    var res = await fetch("/me/installment-plans", { headers: h() });
+    if (!res.ok) { body.innerHTML = '<div class="ins-empty">Failed to load.</div>'; return; }
+    var list = await res.json();
+    if (!list.length) {
+      body.innerHTML = '<div class="ins-empty">No installment plans yet. Open a pending booking from your account and choose "Split payment".</div>';
+      return;
+    }
+    body.innerHTML = list.map(renderPlan).join("");
+    document.querySelectorAll(".ins-pay-btn").forEach(function(b){
+      b.addEventListener("click", function(){
+        payInstallment(b.getAttribute("data-inst"));
+      });
+    });
+  }
+
+  document.getElementById("ins-refresh").addEventListener("click", load);
+  load();
+})();
+</script>
+{% endblock %}

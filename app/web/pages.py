@@ -213,6 +213,16 @@ def account_waitlist_page(request: Request) -> HTMLResponse:
     )
 
 
+@router.get("/account/installments", response_class=HTMLResponse)
+def account_installments_page(request: Request) -> HTMLResponse:
+    """User's installment plans."""
+    return templates.TemplateResponse(
+        request,
+        "pages/installments.html",
+        {"active_nav": "account"},
+    )
+
+
 @router.get("/account/redeem", response_class=HTMLResponse)
 def account_redeem_page(request: Request) -> HTMLResponse:
     """User's redeem page."""
