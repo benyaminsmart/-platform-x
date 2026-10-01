@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.39.0-trust-score (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-49 complete; 24 DEFERRED). TIER 1+2 = 100%.
+> Version: v0.40.0-budget-optimizer (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-50 complete; 24 DEFERRED). TIER 1+2 = 100%.
 
 Last updated: 2026-10-01
 
@@ -446,6 +446,28 @@ Tag: v0.36.0-ai-trip-memory
 - Step 3 — UI on /account/ai
   - "🧠 My Trip Memory" button reveals panel with recap + 6 profile pills
     + "Most visited" list; lazy-loaded on first open
+
+### Phase 50 — AI Budget Optimizer (Wave 2, AI depth): COMPLETE
+Tag: v0.40.0-budget-optimizer
+- Step 1 — AI Budget Optimizer service (app/services/ai/budget_optimizer.py)
+  - Deterministic allocation policy (fixed, transparent):
+      hotels 50%, restaurants 25%, entertainment 15%, travel 10%
+  - Categories with no candidates are skipped; their allocation is
+    redistributed proportionally among present categories
+  - Per-category heuristic: highest-rated service whose estimated
+    total cost fits the allocation; fallback to cheapest
+  - Estimated total uses days (hotels) or min(days,3) (others), and
+    guests only for hotels
+  - AI writes rationale grounded ONLY in the chosen package (4 langs)
+  - Deterministic fallback always available
+- Step 2 — Public API: POST /api/budget-optimize (15/min)
+  - Validates budget, days, guests, language
+  - Returns { package[], total_estimated, budget, currency, remaining,
+    advice, provider }
+- Step 3 — UI on /account/ai
+  - "💸 Budget Optimizer" button reveals panel with city/days/guests/
+    budget/currency + Optimize button
+  - Renders advice + recommended package list + totals
 
 ### Phase 49 — Trust Score per Business (Wave 3, Blue-Ocean B11): COMPLETE
 Tag: v0.39.0-trust-score
@@ -1186,6 +1208,7 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 47 (Predictive Price Locks) is COMPLETE — Wave 3 first deliverable.**
 **Phase 48 (Smart Waitlist) is COMPLETE — Wave 3 second deliverable.**
 **Phase 49 (Trust Score per Business) is COMPLETE — Wave 3 third deliverable.**
+**Phase 50 (AI Budget Optimizer) is COMPLETE — Wave 2 continuation.**
 
 Remaining phases all require user-side decisions or purchases:
 - Phase 10 (Payment Production / Telr) — needs business account
@@ -1458,7 +1481,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1122 tests, all passing
+## 14. Test Count: 1139 tests, all passing
 
 Test files:
 - test_health.py
