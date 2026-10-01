@@ -99,7 +99,7 @@ Do NOT ask the user. If anything is stale, the AI fixes it in the same
 command sequence, commits, then tags.
 After every Phase (milestone), before tagging, verify HANDOFF is fresh:
   - Version line matches the new tag
-  - Test Count matches the real `pytest tests/` output
+  - Test Count matches the real `pytest tests/` output (use `pytest tests/ -n auto` for speed — same results, ~2.5x faster)
   - Section 0.5 checklist has no stale [ ] for finished Steps
   - Phase appears in Section 5 (Phases Status)
   - "Last updated" is today
@@ -2060,7 +2060,9 @@ that import.
 
 - Live URL: check `~/platform-x/logs/tunnel.url` (changes on restart)
 - Restart command: `cd ~/platform-x && sv up platform-x-api && sv up platform-x-tunnel && sleep 20 && bash start-platform.sh`
-- Test suite: `cd ~/platform-x && source venv/bin/activate && pytest tests/`
+- Test suite (full, sequential): `cd ~/platform-x && source venv/bin/activate && pytest tests/`
+- Test suite (full, parallel — Phase close default): `pytest tests/ -n auto`  (~2.5x faster, same results)
+- Test suite (single file, during steps): `pytest tests/test_<name>.py`
 - HANDOFF: `cat ~/platform-x/HANDOFF.md`
 
 
