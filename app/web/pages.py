@@ -786,6 +786,16 @@ def business_insights_page(request: Request) -> HTMLResponse:
     )
 
 
+@router.get("/business/auto-repricing", response_class=HTMLResponse)
+def business_auto_repricing_page(request: Request) -> HTMLResponse:
+    """Business AI Auto-Repricing page."""
+    return templates.TemplateResponse(
+        request,
+        "business/business_auto_repricing.html",
+        {"active_nav": "auto_repricing"},
+    )
+
+
 @router.get("/business/group", response_class=HTMLResponse)
 def business_group_page(request: Request) -> HTMLResponse:
     """Business multi-property group dashboard."""

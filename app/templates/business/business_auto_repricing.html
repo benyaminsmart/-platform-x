@@ -1,0 +1,153 @@
+{% extends "business/business_base.html" %}
+
+{% block title %}Auto-Repricing — Business Panel{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h2>AI Auto-Repricing</h2>
+  <p class="admin-card-sub" style="margin-bottom: 12px;">
+    Get a live price suggestion per service, based on occupancy, recent
+    demand, urgency, and peer benchmarks. You decide whether to apply it.
+  </p>
+  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+    <span id="ar-status-badge" style="font-size:12px; padding:4px 10px; border-radius:999px; background:#e5e7eb; color:#374151; font-weight:700; text-transform:uppercase; letter-spacing:.04em;">—</span>
+    <button type="button" class="admin-btn" id="ar-toggle">Toggle</button>
+  </div>
+</div>
+
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div class="coach-head">
+    <h3>Preview a live price</h3>
+  </div>
+  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
+    <input type="text" id="ar-service-id" class="mk-input" placeholder="Service ID" style="padding:8px 10px; min-width:280px;">
+    <input type="date" id="ar-target-date" class="mk-input" style="padding:8px 10px;">
+    <select id="ar-lang" class="mk-input" style="padding:8px 10px;">
+      <option value="en">EN</option>
+      <option value="ar">AR</option>
+      <option value="fil">FIL</option>
+      <option value="hi">HI</option>
+    </select>
+    <button type="button" class="admin-btn" id="ar-preview">Preview</button>
+  </div>
+
+  <div id="ar-result" style="display:none; padding:14px 16px; background:var(--adm-surface-2); border:1px solid var(--adm-line); border-radius:12px;">
+    <div id="ar-price-line" style="font-family:var(--adm-font-display); font-size:18px; font-weight:700; color:var(--adm-text); margin-bottom:8px;"></div>
+    <div id="ar-signals" style="font-size:12.5px; color:var(--adm-muted); margin-bottom:10px;"></div>
+    <div id="ar-rationale" style="font-size:14px; line-height:1.6; color:var(--adm-text); margin-bottom:12px;"></div>
+    <button type="button" class="admin-btn" id="ar-apply" style="background:var(--adm-brand); color:#fff;">Apply this price</button>
+    <span id="ar-apply-msg" style="font-size:12.5px; margin-left:10px;"></span>
+  </div>
+</div>
+
+<style>
+.mk-input { background:var(--adm-surface-2); color:var(--adm-text); border:1px solid var(--adm-line-2); border-radius:8px; font-family:inherit; font-size:13px; outline:none; }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login"; return; }
+  var slug = null;
+
+  function h() { return { "Authorization": "Bearer " + token, "X-Tenant-Slug": slug, "Content-Type": "application/json" }; }
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  async function resolveSlug() {
+    var res = await fetch("/business/api/me", { headers: { "Authorization": "Bearer " + token } });
+    if (!res.ok) { window.location.href = "/business/login"; return; }
+    slug = (await res.json()).tenant_slug;
+  }
+
+  function setBadge(on) {
+    var b = document.getElementById("ar-status-badge");
+    b.textContent = on ? "Enabled" : "Disabled";
+    b.style.background = on ? "#dcfce7" : "#e5e7eb";
+    b.style.color = on ? "#166534" : "#374151";
+  }
+
+  async function loadStatus() {
+    var res = await fetch("/business/api/auto-repricing/status", { headers: h() });
+    if (!res.ok) return;
+    var d = await res.json();
+    setBadge(d.enabled);
+  }
+
+  document.getElementById("ar-toggle").addEventListener("click", async function(){
+    var current = document.getElementById("ar-status-badge").textContent.trim() === "Enabled";
+    var res = await fetch("/business/api/auto-repricing/toggle", {
+      method: "POST", headers: h(),
+      body: JSON.stringify({ enabled: !current }),
+    });
+    if (!res.ok) { alert("Could not toggle."); return; }
+    var d = await res.json();
+    setBadge(d.enabled);
+  });
+
+  var currentSuggested = null;
+
+  document.getElementById("ar-preview").addEventListener("click", async function(){
+    var sid = document.getElementById("ar-service-id").value.trim();
+    var td = document.getElementById("ar-target-date").value;
+    var lang = document.getElementById("ar-lang").value;
+    if (!sid) { alert("Enter a service ID."); return; }
+
+    var payload = { service_id: sid, language: lang };
+    if (td) payload.target_date = td;
+
+    var res = await fetch("/business/api/auto-repricing/preview", {
+      method: "POST", headers: h(), body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      var e = await res.json().catch(function(){ return {}; });
+      alert(e.detail || "Preview failed.");
+      return;
+    }
+    var d = await res.json();
+    if (d.status !== "ok" || d.suggested_price == null) {
+      alert(d.rationale || "No suggestion available.");
+      return;
+    }
+    currentSuggested = d.suggested_price;
+    document.getElementById("ar-result").style.display = "block";
+    document.getElementById("ar-price-line").textContent =
+      d.base_price + " → " + d.suggested_price + " " + (d.currency || "");
+    document.getElementById("ar-signals").textContent =
+      "Occupancy: " + (d.signals.occupancy_pct || 0) + "% · " +
+      "Bookings(7d): " + (d.signals.bookings_7d || 0) + " · " +
+      "Days until: " + (d.signals.days_until || 0) + " · " +
+      "Delta: " + (d.signals.delta_pct || 0) + "%";
+    document.getElementById("ar-rationale").textContent = d.rationale || "";
+    document.getElementById("ar-apply-msg").textContent = "";
+  });
+
+  document.getElementById("ar-apply").addEventListener("click", async function(){
+    var sid = document.getElementById("ar-service-id").value.trim();
+    if (!sid || currentSuggested == null) { alert("Preview first."); return; }
+    var res = await fetch("/business/api/auto-repricing/apply", {
+      method: "POST", headers: h(),
+      body: JSON.stringify({ service_id: sid, new_price: currentSuggested }),
+    });
+    var msg = document.getElementById("ar-apply-msg");
+    if (!res.ok) {
+      var e = await res.json().catch(function(){ return {}; });
+      msg.textContent = e.detail || "Could not apply.";
+      msg.style.color = "#991b1b";
+      return;
+    }
+    var d = await res.json();
+    msg.textContent = "Applied: new price " + d.new_price + " " + d.currency;
+    msg.style.color = "#166534";
+  });
+
+  (async function(){
+    await resolveSlug();
+    if (!slug) return;
+    loadStatus();
+  })();
+})();
+</script>
+{% endblock %}
