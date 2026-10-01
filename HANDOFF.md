@@ -131,6 +131,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 60 Step 3 — Auto-Repricing UI page + sidebar
 - [x] Phase 60 Step 2 — Business Auto-Repricing API
 - [x] Phase 60 Step 1 — AI Auto-Repricing service
 - [x] Phase 59 Step 3 — AI Coordinate button in group modal
@@ -232,7 +233,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 60 Step 2 — Business Auto-Repricing API (2026-10-01 19:35)
+Last step: Phase 60 Step 3 — Auto-Repricing UI page + sidebar (2026-10-01 19:37)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -254,6 +255,7 @@ Last step: Phase 60 Step 2 — Business Auto-Repricing API (2026-10-01 19:35)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 75e69df Phase 60 Step 3 — Auto-Repricing UI page + sidebar
 - c419e04 Phase 60 Step 2 — Business Auto-Repricing API
 - dd4198b Phase 60 Step 1 — AI Auto-Repricing service
 - 4a289ef Phase 59 Step 3 — AI Coordinate button in group modal
