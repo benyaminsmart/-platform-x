@@ -83,7 +83,7 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
 **STAGE 1 — Free work (Phases 61+)**
 - [ ] Phase 61 — Lessons Learned batch update ✅ done
       (tag: phase-1-lessons; commits 47ff760 + bba0cf3)
-- [x] Phase 62 — Expand /docs/api
+- [x] Phase 62 — Expand /docs/api (commit 3970313 + 4d6c042)
 - [ ] Phase 63 — UI polish pass (quality, no new features)
 - [ ] Phase 64 — AI Voice Booking (B1) — mock provider
 - [ ] Phase 65 — Live Local Experiences (B14) — mock data source
