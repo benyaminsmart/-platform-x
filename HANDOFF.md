@@ -131,6 +131,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 50 Step 2 — Budget Optimizer API
 - [x] Phase 50 Step 1 — AI Budget Optimizer service
 - [x] Phase 49 Step 3 — Trust Score in search + UI badge
 - [x] Phase 49 Step 2 — Trust Score API
@@ -202,7 +203,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 50 Step 1 — AI Budget Optimizer service (2026-10-01 15:35)
+Last step: Phase 50 Step 2 — Budget Optimizer API (2026-10-01 15:36)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -224,6 +225,7 @@ Last step: Phase 50 Step 1 — AI Budget Optimizer service (2026-10-01 15:35)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 9409822 Phase 50 Step 2 — Budget Optimizer API
 - 16667f7 Phase 50 Step 1 — AI Budget Optimizer service
 - 2a590cf Phase 49 Step 3 — Trust Score in search + UI badge
 - 50b3fb4 Phase 49 Step 2 — Trust Score API
