@@ -32,6 +32,15 @@
         <input type="number" id="sr-radius" min="1" max="500" value="20" style="width:80px; padding:6px 8px; border:1px solid var(--px-line); border-radius:6px; font-family:inherit;">
         <button type="button" class="sr-map-btn" id="sr-clear-geo">Clear</button>
         <button type="button" class="sr-map-btn" id="sr-ai-loc" style="margin-left:auto; background:var(--px-navy); color:#fff; border-color:var(--px-navy);">✨ AI Recommend here</button>
+        <button type="button" class="sr-map-btn" id="sr-bundle" style="background:var(--px-navy); color:#fff; border-color:var(--px-navy);">🎁 Bundle this trip</button>
+      </div>
+      <div id="sr-bundle-panel" style="display:none; margin-top:12px; padding:14px 16px; background:#fff; border:1px solid var(--px-line); border-radius:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <div style="font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--px-muted);">Bundle Deal</div>
+          <button type="button" id="sr-bundle-close" style="background:none; border:none; font-size:18px; cursor:pointer; color:var(--px-muted); line-height:1;">&times;</button>
+        </div>
+        <div id="sr-bundle-advice" style="font-size:14px; line-height:1.6; color:var(--px-text); margin-bottom:12px;"></div>
+        <div id="sr-bundle-items"></div>
       </div>
       <div id="sr-ai-loc-panel" style="display:none; margin-top:12px; padding:14px 16px; background:#fff; border:1px solid var(--px-line); border-radius:12px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -812,6 +821,69 @@
   });
   document.getElementById("sr-ai-loc-close").addEventListener("click", function(){
     document.getElementById("sr-ai-loc-panel").style.display = "none";
+  });
+
+  // ============ Bundle Deals (Phase 51, Step 3) ============
+  function bundleItemRow(it) {
+    var href = it.tenant_slug ? ("/" + esc(it.tenant_slug) + "/") : "#";
+    return '<div style="display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px solid var(--px-line); flex-wrap:wrap;">' +
+      '<div>' +
+        '<div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--px-muted);">' + esc(it.category) + '</div>' +
+        '<a href="' + href + '" style="font-size:14px; font-weight:600; color:var(--px-navy); text-decoration:none;">' + esc(it.service_name || "") + '</a>' +
+        '<div style="font-size:12.5px; color:var(--px-muted);">' + esc(it.tenant_name || "") + (it.location ? ' · ' + esc(it.location) : '') + '</div>' +
+      '</div>' +
+      '<div style="text-align:right;">' +
+        '<div style="font-size:14px; font-weight:700; color:var(--px-navy);">' + esc(it.price) + ' ' + esc(it.currency) + '</div>' +
+        '<div style="font-size:12px; color:var(--px-muted);">est. ' + esc(it.estimated_total) + '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  async function runBundle() {
+    var p = readForm();
+    var city = p.location || "";
+    var days = 3;
+    if (p.check_in && p.check_out) {
+      var d1 = new Date(p.check_in), d2 = new Date(p.check_out);
+      if (!isNaN(d1) && !isNaN(d2) && d2 > d1) {
+        days = Math.max(1, Math.min(30, Math.round((d2 - d1) / 86400000)));
+      }
+    }
+    var guests = parseInt(p.guests, 10) || 2;
+
+    var panel = document.getElementById("sr-bundle-panel");
+    var adviceEl = document.getElementById("sr-bundle-advice");
+    var itemsEl = document.getElementById("sr-bundle-items");
+    panel.style.display = "block";
+    adviceEl.textContent = "Building bundle…";
+    itemsEl.innerHTML = "";
+
+    try {
+      var res = await fetch("/api/bundle-deals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ city: city || null, days: days, guests: guests }),
+      });
+      if (!res.ok) { adviceEl.textContent = "Could not build a bundle."; return; }
+      var d = await res.json();
+      adviceEl.textContent = d.advice || "";
+      if (d.items && d.items.length) {
+        itemsEl.innerHTML =
+          d.items.map(bundleItemRow).join("") +
+          '<div style="margin-top:10px; font-size:13px; color:var(--px-muted);">' +
+            'Subtotal: <strong style="color:var(--px-navy);">' + esc(d.subtotal) + ' ' + esc(d.currency) + '</strong>' +
+            ' · Discount: <strong style="color:#166534;">' + esc(d.discount_percent) + '%</strong>' +
+            ' · Total: <strong style="color:var(--px-navy);">' + esc(d.total) + ' ' + esc(d.currency) + '</strong>' +
+          '</div>';
+      }
+    } catch(e) {
+      adviceEl.textContent = "Network error.";
+    }
+  }
+
+  document.getElementById("sr-bundle").addEventListener("click", runBundle);
+  document.getElementById("sr-bundle-close").addEventListener("click", function(){
+    document.getElementById("sr-bundle-panel").style.display = "none";
   });
 
   runSearch(1);
