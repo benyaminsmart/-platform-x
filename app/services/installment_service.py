@@ -5,7 +5,7 @@ Phase 57, Step 1.
 
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal, ROUND_HALF_UP
 
 from sqlalchemy.orm import Session as DBSession
@@ -101,7 +101,7 @@ def create_plan(
     parts = _split(total, n_installments)
     today = date.today()
     for i, amount in enumerate(parts, start=1):
-        due = today if i == 1 else today + (DUE_GAP_DAYS * (i - 1))
+        due = today if i == 1 else today + timedelta(days=DUE_GAP_DAYS * (i - 1))
         # make due date relative to booking.check_in if it's near
         if b.check_in:
             # ensure last due is at most on check_in
