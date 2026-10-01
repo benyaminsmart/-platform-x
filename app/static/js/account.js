@@ -628,6 +628,13 @@ function openGroupModal(bookingId) {
           '<input type="number" id="' + modalId + '-share" placeholder="Share amount (AED)" min="0" step="0.01" style="width:100%; padding:8px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px; margin-bottom:8px;">' +
           '<button id="' + modalId + '-add" class="px-btn px-btn-primary" style="font-size:13px;">Add</button>' +
         '</div>' +
+        '<div style="margin-bottom:14px;">' +
+          '<button type="button" id="' + modalId + '-ai" class="px-btn px-btn-ghost" style="font-size:13px;">✨ AI Coordinate</button>' +
+          '<div id="' + modalId + '-ai-panel" style="display:none; margin-top:10px; padding:12px; background:#f8f6f1; border:1px solid #e5e7eb; border-radius:10px;">' +
+            '<div id="' + modalId + '-ai-plan" style="font-size:13.5px; line-height:1.6; color:#374151; white-space:pre-wrap;"></div>' +
+            '<div id="' + modalId + '-ai-acts" style="margin-top:10px;"></div>' +
+          '</div>' +
+        '</div>' +
         '<div style="display:flex; justify-content:flex-end;">' +
           '<button id="' + modalId + '-no" class="px-btn px-btn-ghost">Close</button>' +
         '</div>' +
@@ -706,6 +713,50 @@ function openGroupModal(bookingId) {
     document.getElementById(modalId + "-email").value = "";
     document.getElementById(modalId + "-share").value = "";
     refresh();
+  });
+
+  // ---------- AI Group Coordinator (Phase 59, Step 3) ----------
+  document.getElementById(modalId + "-ai").addEventListener("click", async function(){
+    var btn = this;
+    var panel = document.getElementById(modalId + "-ai-panel");
+    var planEl = document.getElementById(modalId + "-ai-plan");
+    var actsEl = document.getElementById(modalId + "-ai-acts");
+    if (panel.dataset.loaded === "1") {
+      panel.style.display = (panel.style.display === "none") ? "block" : "none";
+      btn.textContent = (panel.style.display === "none") ? "✨ AI Coordinate" : "Hide AI plan";
+      return;
+    }
+    btn.disabled = true; btn.textContent = "Coordinating…";
+    panel.style.display = "block";
+    planEl.textContent = "Thinking…";
+    actsEl.innerHTML = "";
+    try {
+      var r = await fetch("/bookings/" + encodeURIComponent(bookingId) + "/group/coordinate",
+                          { method: "POST", headers: headers() });
+      if (!r.ok) {
+        var err = await r.json().catch(function(){ return {}; });
+        planEl.textContent = err.detail || "Could not coordinate.";
+        btn.disabled = false; btn.textContent = "✨ AI Coordinate";
+        return;
+      }
+      var d = await r.json();
+      if (d.status === "not_group") { planEl.textContent = "Not a group booking."; }
+      else if (d.status === "too_small") { planEl.textContent = "Group too small (need 10+ members)."; }
+      else { planEl.textContent = d.plan || "—"; }
+      if (d.activity_suggestions && d.activity_suggestions.length) {
+        actsEl.innerHTML = '<div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">Suggested activities</div>' +
+          d.activity_suggestions.map(function(a){
+            return '<div style="font-size:13px; padding:4px 0;">• <strong>' + esc(a.service_name) + '</strong> · ' + esc(a.price) + ' ' + esc(a.currency) + '</div>';
+          }).join("");
+      }
+      panel.dataset.loaded = "1";
+      btn.textContent = "Hide AI plan";
+    } catch(e) {
+      planEl.textContent = "Network error.";
+      btn.textContent = "✨ AI Coordinate";
+    } finally {
+      btn.disabled = false;
+    }
   });
 
   document.getElementById(modalId + "-no").addEventListener("click", function(){
