@@ -64,12 +64,17 @@ else:
 # 3. Prepend to "Commits (recent)" block
 commit_line = f"- {sha} {marker}"
 if "**Commits (recent):**" in src:
-    # insert right after the marker line
-    src = re.sub(
-        r"(\*\*Commits \(recent\):\*\*\n)",
-        r"\1" + commit_line + "\n",
-        src, count=1,
+    # Skip if this exact commit line is already present (idempotent)
+    existing_commit = re.compile(
+        r"^- " + re.escape(sha) + r" " + re.escape(marker) + r"\s*$",
+        re.MULTILINE,
     )
+    if not existing_commit.search(src):
+        src = re.sub(
+            r"(\*\*Commits \(recent\):\*\*\n)",
+            r"\1" + commit_line + "\n",
+            src, count=1,
+        )
 
 open(path, "w", encoding="utf-8").write(src)
 print("HANDOFF updated:", marker)

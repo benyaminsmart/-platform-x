@@ -253,7 +253,6 @@ Last step: Phase 58 Step 3 — Business Group dashboard page + sidebar (2026-10-
 - 779eb05 Phase 58 Step 2 — Business Group API
 - d41206d Phase 58 Step 1 — BusinessGroup model + service
 - 1923bc9 Phase 57 Step 3 — Installments UI page
-- 1923bc9 Phase 57 Step 3 — Installments UI page
 - 9277076 Phase 57 Step 2 — Installment API
 - f0ec7f5 Phase 57 Step 1 — Installment plan + service
 - 8a22263 Phase 56 Step 3 — AI Upsell UI on tenant book page
