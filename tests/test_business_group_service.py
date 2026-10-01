@@ -22,7 +22,8 @@ def _tenant(db, slug, typ="hotel", rating=4.5, currency="AED"):
 
 
 def _owner(db, tenant, email="owner@x.com"):
-    rc = ("OWN" + email.split("@")[0].upper())[:30]
+    # referral_code must be globally unique — mix tenant slug
+    rc = ("OWN" + email.split("@")[0].upper() + "-" + tenant.slug.upper())[:30]
     u = User(tenant_id=tenant.id, email=email,
              password_hash=hash_password("Pass1234"),
              first_name="O", last_name="X", business_role="owner",

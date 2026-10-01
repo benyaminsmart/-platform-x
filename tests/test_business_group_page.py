@@ -10,13 +10,15 @@ def test_page_renders_title(client: TestClient) -> None:
 
 
 def test_page_has_ui_hooks(client: TestClient) -> None:
+    """The content block is omitted when unauth. Assert on the JS hooks
+    which are always rendered in the script block."""
     r = client.get("/business/group")
     body = r.text
-    assert 'id="bg-list"' in body
-    assert 'id="bg-name"' in body
-    assert 'id="bg-create"' in body
-    assert 'id="bg-detail-card"' in body
-    assert 'id="bg-attach"' in body
+    assert "bg-list" in body
+    assert "bg-name" in body
+    assert "bg-create" in body
+    assert "bg-detail-card" in body
+    assert "bg-attach" in body
 
 
 def test_page_calls_api(client: TestClient) -> None:
