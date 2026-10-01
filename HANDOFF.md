@@ -131,6 +131,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 55 Step 1 — Family & Kids Mode filter in search
 - [x] Phase 54 Step 3 — AI Refund preview in cancel modal
 - [x] Phase 54 Step 2 — Instant Refund AI preview API
 - [x] Phase 54 Step 1 — Instant Refund AI service
@@ -216,7 +217,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 54 Step 3 — AI Refund preview in cancel modal (2026-10-01 18:11)
+Last step: Phase 55 Step 1 — Family & Kids Mode filter in search (2026-10-01 18:14)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -238,6 +239,7 @@ Last step: Phase 54 Step 3 — AI Refund preview in cancel modal (2026-10-01 18:
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 6075963 Phase 55 Step 1 — Family & Kids Mode filter in search
 - 1111ef4 Phase 54 Step 3 — AI Refund preview in cancel modal
 - 984cf8f Phase 54 Step 2 — Instant Refund AI preview API
 - 7c40133 Phase 54 Step 1 — Instant Refund AI service
