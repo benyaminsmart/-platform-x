@@ -59,6 +59,22 @@
         <button type="button" id="generate-plan-btn" class="px-btn px-btn-primary px-btn-block">Generate plan</button>
       </div>
 
+      <div id="voice-panel" style="display: none; background: white; border: 1px solid var(--px-line); border-radius: 16px; padding: 20px; margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="margin: 0; font-family: var(--px-font-display);">🎤 Voice Booking (mock)</h3>
+          <button type="button" id="close-voice" style="background: transparent; border: none; font-size: 18px; cursor: pointer; color: var(--px-muted);">✕</button>
+        </div>
+        <p style="margin: 0 0 12px; font-size: 13px; color: var(--px-muted);">
+          Type what you'd say. The parser will extract destination, dates, and guests, then the AI replies.
+          <em>(Real voice input arrives after the VPS phase.)</em>
+        </p>
+        <textarea id="voice-transcript" placeholder="e.g. Book a hotel in Dubai next weekend for 2" rows="3" style="width: 100%; padding: 12px; border: 1px solid var(--px-line); border-radius: 8px; font-size: 14px; font-family: inherit; outline: none; resize: vertical; margin-bottom: 12px;"></textarea>
+        <button type="button" id="voice-run" class="px-btn px-btn-primary px-btn-block">Parse &amp; reply</button>
+        <div id="voice-intent" style="display:none; margin-top: 14px; padding: 12px; background:#faf8f5; border:1px solid var(--px-line); border-radius: 10px;"></div>
+        <div id="voice-reply" style="margin-top: 12px; font-size: 14.5px; line-height: 1.6; color: var(--px-text);"></div>
+        <div id="voice-matches" style="margin-top: 12px;"></div>
+      </div>
+
       <div id="budget-panel" style="display: none; background: white; border: 1px solid var(--px-line); border-radius: 16px; padding: 20px; margin-bottom: 16px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
           <h3 style="margin: 0; font-family: var(--px-font-display);">💸 Budget Optimizer</h3>
@@ -108,6 +124,7 @@
         <button type="button" id="suggest-btn" class="px-btn px-btn-outline" style="flex: 1;">💡 What should I do?</button>
         <button type="button" id="open-memory" class="px-btn px-btn-outline" style="flex: 1;">🧠 My Trip Memory</button>
         <button type="button" id="open-budget" class="px-btn px-btn-outline" style="flex: 1;">💸 Budget Optimizer</button>
+        <button type="button" id="open-voice" class="px-btn px-btn-outline" style="flex: 1;">🎤 Voice Booking</button>
       </div>
 
       <form id="ai-chat-form" class="px-ai-full-form">
@@ -443,6 +460,71 @@
     budgetPanel.style.display = "none";
   });
   document.getElementById("bud-run").addEventListener("click", runBudget);
+
+  // ============ Voice Booking (Phase 64, Step 3) ============
+  var voicePanel = document.getElementById("voice-panel");
+
+  function pill(label, value) {
+    if (value === null || value === undefined || value === "") return "";
+    return '<div style="display:inline-block; margin:0 6px 6px 0; padding:4px 10px; background:#fff; border:1px solid var(--px-line); border-radius:999px; font-size:12.5px;">' +
+      '<span style="color:var(--px-muted);">' + esc(label) + ':</span> <strong style="color:var(--px-navy);">' + esc(value) + '</strong>' +
+    '</div>';
+  }
+
+  async function runVoice() {
+    var transcript = document.getElementById("voice-transcript").value.trim();
+    var intentEl = document.getElementById("voice-intent");
+    var replyEl = document.getElementById("voice-reply");
+    var matchEl = document.getElementById("voice-matches");
+    if (!transcript) { alert("Please write something."); return; }
+
+    intentEl.style.display = "none";
+    replyEl.textContent = "Parsing…";
+    matchEl.innerHTML = "";
+
+    try {
+      var res = await fetch("/account/api/ai/voice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+        body: JSON.stringify({ transcript: transcript }),
+      });
+      if (!res.ok) {
+        var e = await res.json().catch(function(){ return {}; });
+        replyEl.textContent = e.detail || "Could not parse.";
+        return;
+      }
+      var d = await res.json();
+      var i = d.intent || {};
+      var pills = pill("Category", i.category) + pill("City", i.city) +
+                  pill("Check-in", i.check_in) + pill("Check-out", i.check_out) +
+                  pill("Guests", i.guests);
+      if (pills) {
+        intentEl.style.display = "block";
+        intentEl.innerHTML = '<div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--px-muted); margin-bottom:6px;">Parsed intent</div>' + pills;
+      }
+      replyEl.textContent = d.reply || "—";
+      if (d.matches && d.matches.length) {
+        matchEl.innerHTML = '<div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--px-muted); margin-bottom:6px;">Live matches</div>' +
+          d.matches.map(function(m){
+            var href = "/" + esc(m.tenant_slug) + "/";
+            return '<div style="padding:8px 0; border-bottom:1px solid var(--px-line);">' +
+              '<a href="' + href + '" style="font-weight:600; color:var(--px-navy); text-decoration:none;">' + esc(m.service_name) + '</a>' +
+              '<div style="font-size:12.5px; color:var(--px-muted);">' + esc(m.tenant_name) + ' · ' + esc(m.price) + ' ' + esc(m.currency) + '</div>' +
+            '</div>';
+          }).join("");
+      }
+    } catch(e) {
+      replyEl.textContent = "Network error.";
+    }
+  }
+
+  document.getElementById("open-voice").addEventListener("click", function(){
+    voicePanel.style.display = "block";
+  });
+  document.getElementById("close-voice").addEventListener("click", function(){
+    voicePanel.style.display = "none";
+  });
+  document.getElementById("voice-run").addEventListener("click", runVoice);
 })();
 </script>
 {% endblock %}
