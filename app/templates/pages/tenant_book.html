@@ -57,6 +57,15 @@
             </select>
           </div>
 
+          <div id="upsell-panel" style="display:none; margin-bottom: 20px; padding:14px 16px; background:#faf8f5; border:1px solid var(--px-line); border-radius:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--px-muted);">✨ Recommended add-ons</div>
+              <button type="button" id="upsell-close" style="background:none; border:none; font-size:16px; cursor:pointer; color:var(--px-muted); line-height:1;">&times;</button>
+            </div>
+            <div id="upsell-rationale" style="font-size:13.5px; line-height:1.55; color:#374151; margin-bottom:10px;"></div>
+            <div id="upsell-list"></div>
+          </div>
+
           {% if tenant.config.type == 'hotel' %}
             <div class="px-field-row" style="margin-bottom: 20px;">
               <div class="px-field">
@@ -180,5 +189,62 @@
 
 {% block scripts %}
 <script src="/static/js/booking.js"></script>
-<script>PX.initBooking("{{ tenant.slug }}");</script>
+<script>PX.initBooking("{{ tenant.slug }}");
+// ============ AI Upsell Engine (Phase 56, Step 3) ============
+(function(){
+  var serviceSelect = document.getElementById("service_id");
+  var panel = document.getElementById("upsell-panel");
+  var rationaleEl = document.getElementById("upsell-rationale");
+  var listEl = document.getElementById("upsell-list");
+  if (!serviceSelect || !panel) return;
+
+  var lastFetched = null;
+
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  function renderSuggestions(items) {
+    if (!items || !items.length) { panel.style.display = "none"; return; }
+    listEl.innerHTML = items.map(function(it){
+      var kindLabel = it.kind === "upgrade" ? "⬆ Upgrade" : "✨ Add-on";
+      return '<div style="display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid var(--px-line);">' +
+        '<div style="flex:1;">' +
+          '<div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--px-muted);">' + kindLabel + '</div>' +
+          '<div style="font-weight:600; color:var(--px-navy); font-size:14px;">' + esc(it.service_name) + '</div>' +
+          (it.description ? '<div style="font-size:12px; color:var(--px-muted);">' + esc(it.description) + '</div>' : '') +
+        '</div>' +
+        '<div style="text-align:right;">' +
+          '<div style="font-size:14px; font-weight:700; color:var(--px-navy);">' + esc(it.price) + ' ' + esc(it.currency) + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join("");
+  }
+
+  async function loadUpsell(serviceId) {
+    if (!serviceId || serviceId === lastFetched) return;
+    lastFetched = serviceId;
+    panel.style.display = "none";
+    try {
+      var res = await fetch("/services/" + encodeURIComponent(serviceId) + "/upsell");
+      if (!res.ok) return;
+      var d = await res.json();
+      if (!d.suggestions || !d.suggestions.length) return;
+      rationaleEl.textContent = d.rationale || "";
+      renderSuggestions(d.suggestions);
+      panel.style.display = "block";
+    } catch(e) {}
+  }
+
+  serviceSelect.addEventListener("change", function(){
+    var sid = serviceSelect.value;
+    if (sid) loadUpsell(sid);
+    else panel.style.display = "none";
+  });
+
+  var closeBtn = document.getElementById("upsell-close");
+  if (closeBtn) closeBtn.addEventListener("click", function(){ panel.style.display = "none"; });
+
+  // Boot: if a service is preselected, fetch its upsell
+  if (serviceSelect.value) loadUpsell(serviceSelect.value);
+})();
+</script>
 {% endblock %}
