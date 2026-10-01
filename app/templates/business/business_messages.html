@@ -22,6 +22,7 @@
     <div id="msg-body" class="msg-body"></div>
     <form id="msg-form" class="msg-form" style="display:none;">
       <input type="text" id="msg-input" placeholder="Type your reply..." autocomplete="off" maxlength="4000">
+      <button type="button" id="msg-ai-draft" class="admin-btn" style="background:var(--adm-surface-2); color:var(--adm-text);">✨ AI Draft</button>
       <button type="submit" class="admin-btn">Send</button>
     </form>
   </div>
@@ -127,6 +128,45 @@
   });
 
   document.getElementById("msg-refresh").addEventListener("click", loadThreads);
+
+  // ---------- AI Receptionist draft (Phase 53, Step 3) ----------
+  var aiDraftBtn = document.getElementById("msg-ai-draft");
+  if (aiDraftBtn) {
+    aiDraftBtn.addEventListener("click", async function(){
+      if (!currentThread) { alert("Open a thread first."); return; }
+      var inp = document.getElementById("msg-input");
+      var original = inp.value;
+      aiDraftBtn.disabled = true;
+      aiDraftBtn.textContent = "Drafting…";
+      inp.value = "";
+      try {
+        var res = await fetch("/business/api/messages/" + encodeURIComponent(currentThread) + "/draft", {
+          method: "POST", headers: h(),
+          body: JSON.stringify({ language: "en", tone: "professional" }),
+        });
+        if (!res.ok) {
+          var err = await res.json().catch(function(){ return { detail: "Draft failed" }; });
+          inp.value = original;
+          alert(err.detail || "Could not draft a reply.");
+          return;
+        }
+        var d = await res.json();
+        if (d.status !== "ok" || !d.reply) {
+          inp.value = original;
+          alert("No draft available for this thread.");
+          return;
+        }
+        inp.value = d.reply;
+        inp.focus();
+      } catch(e) {
+        inp.value = original;
+        alert("Network error.");
+      } finally {
+        aiDraftBtn.disabled = false;
+        aiDraftBtn.textContent = "✨ AI Draft";
+      }
+    });
+  }
 
   (async function(){
     await resolveSlug();
