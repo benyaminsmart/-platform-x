@@ -131,6 +131,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 59 Step 1 — AI Group Coordinator service
 - [x] Phase 58 Step 3 — Business Group dashboard page + sidebar
 - [x] Phase 58 Step 2 — Business Group API
 - [x] Phase 58 Step 1 — BusinessGroup model + service
@@ -227,7 +228,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 58 Step 3 — Business Group dashboard page + sidebar (2026-10-01 18:35)
+Last step: Phase 59 Step 1 — AI Group Coordinator service (2026-10-01 19:28)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -249,6 +250,7 @@ Last step: Phase 58 Step 3 — Business Group dashboard page + sidebar (2026-10-
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 3bcd68e Phase 59 Step 1 — AI Group Coordinator service
 - b55efc4 Phase 58 Step 3 — Business Group dashboard page + sidebar
 - 779eb05 Phase 58 Step 2 — Business Group API
 - d41206d Phase 58 Step 1 — BusinessGroup model + service
