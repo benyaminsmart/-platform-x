@@ -131,6 +131,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 49 Step 2 — Trust Score API
 - [x] Phase 49 Step 1 — Trust Score service
 - [x] Phase 48 Step 4 — Waitlist auto-notify on cancellation
 - [x] Phase 48 Step 3 — Waitlist UI page
@@ -199,7 +200,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 49 Step 1 — Trust Score service (2026-10-01 15:21)
+Last step: Phase 49 Step 2 — Trust Score API (2026-10-01 15:22)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -221,6 +222,7 @@ Last step: Phase 49 Step 1 — Trust Score service (2026-10-01 15:21)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 50b3fb4 Phase 49 Step 2 — Trust Score API
 - b743a19 Phase 49 Step 1 — Trust Score service
 - df87c83 Phase 48 Step 4 — Waitlist auto-notify on cancellation
 - f7bd6b4 Phase 48 Step 3 — Waitlist UI page
