@@ -243,6 +243,14 @@ def search_services(
         if display_currency != currency.BASE_CURRENCY:
             currency_note = f"Converted from AED to {display_currency} at an approximate rate."
 
+    # Batch compute trust scores for the page's tenants (Phase 49, Step 3)
+    try:
+        from app.services import trust_score_service as _tss
+        _page_tenant_ids = list({t.id for _, t in page_rows})
+        _trust = _tss.compute_many(db, tenant_ids=_page_tenant_ids) if _page_tenant_ids else {}
+    except Exception:
+        _trust = {}
+
     for s, t in page_rows:
         cfg = t.config or {}
         price_value = float(s.price)
@@ -270,6 +278,7 @@ def search_services(
             "cover_image": cfg.get("cover_image"),
             "coordinates": (cfg.get("coordinates") or None),
             "distance_km": getattr(s, "_px_distance_km", None),
+            "trust_score": (_trust.get(t.id) or {}).get("score"),
         })
 
     return {
