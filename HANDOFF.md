@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.49.0-group-coordinator (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-59 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
+> Version: v0.50.0-auto-repricing (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-60 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
 
 Last updated: 2026-10-01
 
@@ -504,6 +504,30 @@ Tag: v0.36.0-ai-trip-memory
 - Step 3 — UI on /account/ai
   - "🧠 My Trip Memory" button reveals panel with recap + 6 profile pills
     + "Most visited" list; lazy-loaded on first open
+
+### Phase 60 — AI Auto-Repricing Live (Wave 3, Blue-Ocean B2): COMPLETE
+Tag: v0.50.0-auto-repricing
+- Step 1 — AI Auto-Repricing service (app/services/ai/auto_repricing.py)
+  - Only runs when Tenant.config.auto_repricing_enabled == True
+  - Deterministic signals: occupancy on target date, bookings last 7d,
+    days until check-in, peer median price in same category
+  - Deterministic delta with reasons (high/low occupancy, demand,
+    urgency, peer position)
+  - Bounds: -20% down, +30% up
+  - AI writes a short rationale (en/ar/fil/hi)
+  - Deterministic fallback rationale always available
+  - Never applied automatically; owner previews and applies manually
+  - status: ok | disabled | not_found
+- Step 2 — Business API under /business/api/auto-repricing
+  - GET  /status          read the enabled flag
+  - POST /toggle          enable/disable (owner/manager only)
+  - POST /preview         live price suggestion (30/min)
+  - POST /apply           apply a specific new price (owner/manager, 15/min)
+  - Cross-tenant 404 tested
+- Step 3 — UI page /business/auto-repricing + sidebar 📈
+  - Status badge, Toggle button
+  - Preview form (service ID + target date + language)
+  - Price line (base → suggested), signals, rationale, "Apply this price"
 
 ### Phase 59 — AI Group Coordinator (Wave 3, Blue-Ocean B6): COMPLETE
 Tag: v0.49.0-group-coordinator
@@ -1440,6 +1464,7 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 57 (Split Payment / Installments) is COMPLETE — Wave 4 first free deliverable.**
 **Phase 58 (Multi-property Dashboard) is COMPLETE — Wave 4 second deliverable.**
 **Phase 59 (AI Group Coordinator) is COMPLETE — Wave 3 Blue-Ocean.**
+**Phase 60 (AI Auto-Repricing Live) is COMPLETE — Wave 3 Blue-Ocean.**
 
 ## WAVE 2 COMPLETE (v0.43.0-ai-receptionist)
 
@@ -1725,7 +1750,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1281 tests, all passing
+## 14. Test Count: 1299 tests, all passing
 
 Test files:
 - test_health.py
