@@ -54,6 +54,47 @@ def _tenant_category(t: Tenant) -> str:
     return CATEGORY_FROM_TYPE.get((cfg.get("type") or "").lower(), "other")
 
 
+# ---------- Family & Kids Mode (Phase 55) ----------
+
+_FAMILY_KEYWORDS = (
+    "family", "kids", "kid", "child", "children", "toddler",
+    "playground", "play area", "playarea", "baby", "infant",
+)
+
+
+def _service_is_family_friendly(s: Service) -> bool:
+    """A service is family-friendly if it says so explicitly, or if
+    family keywords appear in its name or description."""
+    attrs = s.attributes or {}
+    v = attrs.get("family_friendly")
+    if isinstance(v, bool):
+        return v
+    if isinstance(v, str) and v.strip().lower() in ("true", "yes", "1"):
+        return True
+    haystack = " ".join(filter(None, [
+        (s.name or "").lower(),
+        (s.description or "").lower(),
+    ]))
+    return any(k in haystack for k in _FAMILY_KEYWORDS)
+
+
+def _tenant_is_family_friendly(t: Tenant) -> bool:
+    """A tenant is family-friendly if it says so in config, or if any
+    family keyword appears in its amenities list."""
+    cfg = t.config or {}
+    v = cfg.get("family_friendly")
+    if isinstance(v, bool):
+        return v
+    if isinstance(v, str) and v.strip().lower() in ("true", "yes", "1"):
+        return True
+    amenities = cfg.get("amenities") or []
+    if isinstance(amenities, list):
+        joined = " ".join(str(a).lower() for a in amenities)
+        if any(k in joined for k in _FAMILY_KEYWORDS):
+            return True
+    return False
+
+
 def _free_capacity_on_day(
     db: DBSession,
     service: Service,
@@ -94,6 +135,7 @@ def search_services(
     lat: float | None = None,
     lng: float | None = None,
     radius_km: float | None = None,
+    family_friendly: bool | None = None,
 ) -> dict[str, Any]:
     """Return paginated search results.
 
@@ -153,6 +195,13 @@ def search_services(
                 loc = ((t.config or {}).get("location") or "").lower()
                 return needle in loc
             rows = [(s, t) for (s, t) in rows if _has_loc(t)]
+
+    # Family & Kids Mode (Phase 55): filter to family-friendly rows
+    if family_friendly:
+        rows = [
+            (s, t) for (s, t) in rows
+            if _tenant_is_family_friendly(t) or _service_is_family_friendly(s)
+        ]
 
     # Geographic filter
     if lat is not None and lng is not None and radius_km is not None and radius_km > 0:
@@ -279,6 +328,9 @@ def search_services(
             "coordinates": (cfg.get("coordinates") or None),
             "distance_km": getattr(s, "_px_distance_km", None),
             "trust_score": (_trust.get(t.id) or {}).get("score"),
+            "family_friendly": bool(
+                _tenant_is_family_friendly(t) or _service_is_family_friendly(s)
+            ),
         })
 
     return {

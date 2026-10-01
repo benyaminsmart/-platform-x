@@ -45,6 +45,7 @@ class SearchItem(BaseModel):
     coordinates: dict | None = None
     distance_km: float | None = None
     trust_score: float | None = None
+    family_friendly: bool = False
 
 
 class SearchResponse(BaseModel):
@@ -83,6 +84,7 @@ def search(
     lat: float | None = Query(default=None, ge=-90, le=90),
     lng: float | None = Query(default=None, ge=-180, le=180),
     radius_km: float | None = Query(default=None, ge=0.1, le=500),
+    family_friendly: bool | None = Query(default=None),
     db: DBSession = Depends(get_db),
 ) -> SearchResponse:
     """Search services across all active tenants."""
@@ -105,5 +107,6 @@ def search(
         lat=lat,
         lng=lng,
         radius_km=radius_km,
+        family_friendly=family_friendly,
     )
     return SearchResponse(**out)
