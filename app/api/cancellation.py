@@ -46,6 +46,21 @@ class CancelResult(BaseModel):
     message: str
 
 
+class AIRefundPreview(BaseModel):
+    booking_id: str
+    status: str
+    currency: str
+    base_pct: int
+    base_amount: str
+    suggested_pct: int
+    suggested_amount: str
+    delta_pp: int
+    policy_label: str
+    rationale: str
+    provider: str
+    signals: dict
+
+
 def _get_owned_booking(db: DBSession, *, user_id: str, booking_id: str) -> Booking:
     b = (
         db.query(Booking)
@@ -102,3 +117,49 @@ def cancel_with_refund(
         policy_label=out["refund"]["policy_label"],
         message="Booking cancelled. Refund will be processed per policy.",
     )
+
+# ---------- AI Instant Refund (Phase 54, Step 2) ----------
+
+
+@router.get("/{booking_id}/ai-refund", response_model=AIRefundPreview)
+@limiter.limit("15/minute")
+def ai_refund_preview(
+    request: Request,
+    booking_id: str,
+    language: str = "en",
+    user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+) -> AIRefundPreview:
+    """Return the base policy + AI-adjusted refund recommendation.
+
+    The recommendation is informational only. It is NOT applied
+    automatically to the booking. Cancellation still uses the base policy.
+    """
+    from app.core.config import settings
+    if not settings.AI_ENABLED:
+        raise HTTPException(status_code=503, detail="AI disabled")
+    if language not in {"en", "ar", "fil", "hi"}:
+        raise HTTPException(status_code=422, detail="Unsupported language")
+
+    b = _get_owned_booking(db, user_id=user.id, booking_id=booking_id)
+    from app.services.ai import instant_refund
+    try:
+        out = instant_refund.evaluate(db, booking=b, user=user, language=language)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    return AIRefundPreview(
+        booking_id=b.id,
+        status=b.status,
+        currency=out["currency"],
+        base_pct=out["base_pct"],
+        base_amount=out["base_amount"],
+        suggested_pct=out["suggested_pct"],
+        suggested_amount=out["suggested_amount"],
+        delta_pp=out["delta_pp"],
+        policy_label=out["policy_label"],
+        rationale=out["rationale"],
+        provider=out["provider"],
+        signals=out["signals"],
+    )
+
