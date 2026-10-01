@@ -81,8 +81,7 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
 ### The 4-stage plan
 
 **STAGE 1 — Free work (Phases 61+)**
-- [ ] Phase 61 — Lessons Learned batch update ✅ done
-      (tag: phase-1-lessons; commits 47ff760 + bba0cf3)
+- [x] Phase 61 — Lessons Learned batch update (commits 47ff760 + bba0cf3)
 - [x] Phase 62 — Expand /docs/api (commit 3970313 + 4d6c042)
 - [x] Phase 63 — UI consistency guard (Phase 63 test, commits 7e37b76 + next)
 - [x] Phase 64 — AI Voice Booking (B1) — mock provider (commit 1e1369f)
