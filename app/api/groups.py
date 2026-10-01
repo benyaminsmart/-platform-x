@@ -158,3 +158,57 @@ def remove_member(
     if not ok:
         raise HTTPException(status_code=404, detail="Member not found")
     return {"deleted": True, "member_id": member_id}
+
+# ---------- AI Group Coordinator (Phase 59, Step 2) ----------
+
+
+class ActivitySuggestion(BaseModel):
+    service_id: str
+    service_name: str
+    service_type: str
+    price: float
+    currency: str
+
+
+class CoordinateResponse(BaseModel):
+    status: str
+    plan: str
+    stats: dict
+    activity_suggestions: list[ActivitySuggestion] = []
+    provider: str
+
+
+@router.post("/coordinate", response_model=CoordinateResponse)
+@limiter.limit("15/minute")
+def coordinate_group(
+    request: Request,
+    booking_id: str,
+    language: str = "en",
+    user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+) -> CoordinateResponse:
+    """Return an AI coordination plan for a group booking (10+ members).
+
+    Read-only: does not modify the booking or create reservations.
+    """
+    from app.core.config import settings
+    if not settings.AI_ENABLED:
+        raise HTTPException(status_code=503, detail="AI disabled")
+    if language not in {"en", "ar", "fil", "hi"}:
+        raise HTTPException(status_code=422, detail="Unsupported language")
+
+    booking = (
+        db.query(Booking)
+        .filter(Booking.id == booking_id, Booking.user_id == user.id)
+        .one_or_none()
+    )
+    if booking is None:
+        raise HTTPException(status_code=404, detail="Booking not found")
+
+    from app.services.ai import group_coordinator
+    try:
+        out = group_coordinator.coordinate(db, booking=booking, language=language)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return CoordinateResponse(**out)
+
