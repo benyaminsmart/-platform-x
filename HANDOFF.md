@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.41.0-bundle-deals (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-51 complete; 24 DEFERRED). TIER 1+2 = 100%.
+> Version: v0.42.0-peer-benchmark (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-52 complete; 24 DEFERRED). TIER 1+2 = 100%.
 
 Last updated: 2026-10-01
 
@@ -458,6 +458,22 @@ Tag: v0.36.0-ai-trip-memory
 - Step 3 — UI on /account/ai
   - "🧠 My Trip Memory" button reveals panel with recap + 6 profile pills
     + "Most visited" list; lazy-loaded on first open
+
+### Phase 52 — Deep Peer Benchmark (Wave 2, Blue-Ocean B12): COMPLETE
+Tag: v0.42.0-peer-benchmark
+- Step 1 — Deep Peer Benchmark service (app/services/ai/peer_benchmark.py)
+  - Cohort = active tenants in same category (config.type), excluding self
+  - 5 metrics: avg_price (currency), rating (stars), occupancy_30d (%),
+    bookings_30d (count), services_count (count)
+  - Per metric: self value, peer median, delta_pct, sample_size, unit
+  - Never exposes peer identity (regression test asserts peer slug
+    does not appear anywhere in the output)
+  - AI writes 2-4 grounded bullets (en/ar/fil/hi)
+  - Deterministic fallback always available
+- Step 2 — Business API: GET /business/api/peer-benchmark (30/min)
+- Step 3 — UI page /business/peer-benchmark + sidebar link
+  - Comparison table (metric / you / peer median / delta)
+  - Language picker + refresh; AI interpretation rendered below
 
 ### Phase 51 — Multi-Business Bundle Deals (Wave 2, Blue-Ocean B3): COMPLETE
 Tag: v0.41.0-bundle-deals
@@ -1238,6 +1254,7 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 49 (Trust Score per Business) is COMPLETE — Wave 3 third deliverable.**
 **Phase 50 (AI Budget Optimizer) is COMPLETE — Wave 2 continuation.**
 **Phase 51 (Multi-Business Bundle Deals) is COMPLETE — Wave 2 Blue-Ocean.**
+**Phase 52 (Deep Peer Benchmark) is COMPLETE — Wave 2 Blue-Ocean.**
 
 Remaining phases all require user-side decisions or purchases:
 - Phase 10 (Payment Production / Telr) — needs business account
@@ -1510,7 +1527,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1154 tests, all passing
+## 14. Test Count: 1168 tests, all passing
 
 Test files:
 - test_health.py
