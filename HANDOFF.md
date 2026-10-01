@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.51.0-voice-booking (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-64 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
+> Version: v0.52.0-local-experiences (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-65 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
 
 Last updated: 2026-10-01
 
@@ -85,8 +85,8 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
       (tag: phase-1-lessons; commits 47ff760 + bba0cf3)
 - [x] Phase 62 — Expand /docs/api (commit 3970313 + 4d6c042)
 - [x] Phase 63 — UI consistency guard (Phase 63 test, commits 7e37b76 + next)
-- [ ] Phase 64 — AI Voice Booking (B1) — mock provider
-- [ ] Phase 65 — Live Local Experiences (B14) — mock data source
+- [x] Phase 64 — AI Voice Booking (B1) — mock provider (commit 1e1369f)
+- [x] Phase 65 — Live Local Experiences (B14) — mock data source (commit 748539b)
 - [ ] Any additional free items user requests
 
 **STAGE 2 — Rewards + Referral plan (user-provided)**
@@ -594,6 +594,22 @@ Tag: phase-1-lessons (lightweight)
 - New regression test suite for business panel templates
 - Two rules: no hardcoded light backgrounds; every template references
   --adm-* token (with Phase 65 exemption list for placeholders)
+
+### Phase 65 — Live Local Experiences (Wave 3, Blue-Ocean B14): COMPLETE
+Tag: v0.52.0-local-experiences
+- Step 1 — LocalEvent model + service (app/services/local_experiences.py)
+  - Platform-scoped events, mock data source (real integration deferred)
+  - Service: list_events (city + date range), nearby (Haversine + on_date
+    overlap filter), recommend (grounded AI advice)
+  - Deterministic fallback always available
+  - Seed script: app/scripts/seed_local_events.py (6 Dubai/Abu Dhabi events)
+- Step 2 — Public API under /api/local-events
+  - GET  /                    list with city/date filters
+  - GET  /nearby              Haversine + optional on_date
+  - POST /recommend           AI-curated events (15/min)
+- Step 3 — UI on tenant page (after Nearby Attractions)
+  - "What's happening nearby" section with event cards (category, venue,
+    distance, date)
 
 ### Phase 64 — AI Voice Booking (Wave 3, Blue-Ocean B1): COMPLETE
 Tag: v0.51.0-voice-booking
@@ -1572,7 +1588,19 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 59 (AI Group Coordinator) is COMPLETE — Wave 3 Blue-Ocean.**
 **Phase 60 (AI Auto-Repricing Live) is COMPLETE — Wave 3 Blue-Ocean.**
 **Phase 61 (Lessons) / 62 (Docs) / 63 (UI guard) / 64 (Voice Booking) COMPLETE.**
-**Stage 1 free work remaining: Live Local Experiences (Phase 65 — with mock).**
+**Phase 65 (Live Local Experiences — mock) COMPLETE. STAGE 1 FREE WORK FINISHED.**
+
+## STAGE 1 COMPLETE (v0.52.0-local-experiences)
+
+All free work done:
+- 61: Lessons Learned (17 total)
+- 62: Expand /docs/api
+- 63: UI consistency guard
+- 64: AI Voice Booking (mock)
+- 65: Live Local Experiences (mock)
+Remaining before Stage 2: nothing.
+NEXT: Stage 2 — awaiting user Guest Rewards + Referral plan.
+STAGE 3 (Production Readiness Audit) can also begin any time (free).
 
 ## WAVE 2 COMPLETE (v0.43.0-ai-receptionist)
 
@@ -1858,7 +1886,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1315 tests, all passing
+## 14. Test Count: 1334 tests, all passing
 
 Test files:
 - test_health.py
