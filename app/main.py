@@ -55,6 +55,7 @@ from app.api import services as services_router
 from app.api import tenants as tenants_router
 from app.api import trust_score as trust_score_router
 from app.api import budget_optimizer as budget_optimizer_router
+from app.api import bundle_deals as bundle_deals_router
 from app.api import wishlist as wishlist_router
 from app.api import waitlist as waitlist_router
 from app.core.config import settings
@@ -215,6 +216,7 @@ app.include_router(tenants_router.router)
 app.include_router(wishlist_router.router)
 app.include_router(trust_score_router.router)
 app.include_router(budget_optimizer_router.router)
+app.include_router(bundle_deals_router.router)
 app.include_router(waitlist_router.router)
 
 
