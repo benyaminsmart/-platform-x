@@ -14,10 +14,12 @@ def _tenant_with_owner(db, slug, typ="hotel", rating=4.5):
     t = Tenant(slug=slug, name=f"N-{slug}", tier="starter", status="active",
                config={"type": typ, "rating": rating, "location": "Dubai"})
     db.add(t); db.commit(); db.refresh(t)
+    # referral_code must be globally unique — use full slug
+    rc = ("OWN" + slug.upper().replace("-", ""))[:30]
     u = User(tenant_id=t.id, email=f"owner@{slug}.com",
              password_hash=hash_password("OwnerPass123"),
              first_name="O", last_name="X", business_role="owner",
-             referral_code=f"OWN{slug[:6].upper()}", status="active")
+             referral_code=rc, status="active")
     db.add(u); db.commit(); db.refresh(u)
     return t, u
 
