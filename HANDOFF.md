@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.45.0-family-mode (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-55 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
+> Version: v0.46.0-upsell-engine (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-56 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
 
 Last updated: 2026-10-01
 
@@ -480,6 +480,22 @@ Tag: v0.36.0-ai-trip-memory
 - Step 3 — UI on /account/ai
   - "🧠 My Trip Memory" button reveals panel with recap + 6 profile pills
     + "Most visited" list; lazy-loaded on first open
+
+### Phase 56 — AI Upsell Engine (Wave 3, Blue-Ocean B13): COMPLETE
+Tag: v0.46.0-upsell-engine
+- Step 1 — AI Upsell Engine service (app/services/ai/upsell_engine.py)
+  - Deterministic candidates from the SAME tenant:
+      upgrades: same type, price ≤ 3× base
+      ancillaries: matched by keyword (spa, breakfast, transfer, tour, ...)
+  - Max 3 suggestions (2 ancillaries + 1 upgrade)
+  - AI writes short pitch grounded ONLY in the suggestions
+  - Deterministic fallback rationale always available
+  - status: ok | no_base | empty
+- Step 2 — Public API: GET /services/{id}/upsell (30/min)
+- Step 3 — UI on /{tenant}/book page
+  - "✨ Recommended add-ons" panel appears when a service is selected
+  - Live-fetches the upsell endpoint (cached per service id)
+  - Renders kind (⬆ Upgrade | ✨ Add-on), name, description, price
 
 ### Phase 55 — Family & Kids Mode (Wave 3, Blue-Ocean B15): COMPLETE
 Tag: v0.45.0-family-mode
@@ -1334,6 +1350,7 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 53 (Business AI Receptionist) is COMPLETE — Wave 2 COMPLETE.**
 **Phase 54 (Instant Refund AI) is COMPLETE — Wave 3 Blue-Ocean.**
 **Phase 55 (Family & Kids Mode) is COMPLETE — Wave 3 Blue-Ocean.**
+**Phase 56 (AI Upsell Engine) is COMPLETE — Wave 3 Blue-Ocean.**
 
 ## WAVE 2 COMPLETE (v0.43.0-ai-receptionist)
 
@@ -1619,7 +1636,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1209 tests, all passing
+## 14. Test Count: 1222 tests, all passing
 
 Test files:
 - test_health.py
