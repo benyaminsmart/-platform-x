@@ -349,7 +349,14 @@ function showCancelModal(bid, p) {
       '<div style="background:#fff; border-radius:16px; padding:24px; max-width:440px; width:100%;">' +
         '<h3 style="font-family:var(--px-font-display); margin:0 0 12px; color:var(--px-navy);">Cancel this booking?</h3>' +
         '<p style="margin:0 0 10px; font-size:14px; color:#374151;">Check-in in <strong>' + p.days_until_check_in + ' day(s)</strong>. ' + refundLine + '</p>' +
-        '<p style="margin:0 0 18px; font-size:13px; color:var(--px-muted);">' + p.reason + '</p>' +
+        '<p style="margin:0 0 12px; font-size:13px; color:var(--px-muted);">' + p.reason + '</p>' +
+        '<div style="margin:0 0 14px; padding:10px 12px; background:#f8f6f1; border:1px solid var(--px-line); border-radius:10px;">' +
+          '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+            '<div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--px-muted);">✨ AI Refund Preview</div>' +
+            '<button type="button" id="' + modalId + '-ai" class="px-btn px-btn-ghost" style="padding:4px 10px; font-size:12px;">Show</button>' +
+          '</div>' +
+          '<div id="' + modalId + '-ai-body" style="display:none; margin-top:10px; font-size:13px; line-height:1.6; color:#374151;"></div>' +
+        '</div>' +
         '<div style="display:flex; gap:8px; justify-content:flex-end;">' +
           '<button id="' + modalId + '-no" class="px-btn px-btn-ghost">Keep booking</button>' +
           '<button id="' + modalId + '-yes" class="px-btn px-btn-primary">Cancel booking</button>' +
@@ -359,6 +366,43 @@ function showCancelModal(bid, p) {
   document.body.insertAdjacentHTML("beforeend", html);
   document.getElementById(modalId + "-no").addEventListener("click", function(){
     document.getElementById(modalId).remove();
+  });
+  document.getElementById(modalId + "-ai").addEventListener("click", async function(){
+    var btn = this;
+    var body = document.getElementById(modalId + "-ai-body");
+    if (body.dataset.loaded === "1") {
+      body.style.display = (body.style.display === "none") ? "block" : "none";
+      btn.textContent = (body.style.display === "none") ? "Show" : "Hide";
+      return;
+    }
+    btn.disabled = true; btn.textContent = "…";
+    var headers2 = window.PX_AUTH ? window.PX_AUTH.headers() : {};
+    try {
+      var r = await fetch("/bookings/" + encodeURIComponent(bid) + "/ai-refund", { headers: headers2 });
+      if (!r.ok) {
+        body.textContent = "AI preview is unavailable right now.";
+        body.style.display = "block"; btn.textContent = "Hide";
+        body.dataset.loaded = "1"; btn.disabled = false;
+        return;
+      }
+      var d = await r.json();
+      var deltaTxt = d.delta_pp > 0 ? ("+" + d.delta_pp + "pp goodwill")
+                   : (d.delta_pp < 0 ? (d.delta_pp + "pp adjustment") : "no adjustment");
+      body.innerHTML =
+        '<div style="font-weight:600; color:var(--px-navy);">Suggested: ' + PX.esc(d.suggested_amount) + ' ' + PX.esc(d.currency) + ' (' + PX.esc(d.suggested_pct) + '%)</div>' +
+        '<div style="font-size:12px; color:var(--px-muted); margin:2px 0 6px;">Base policy: ' + PX.esc(d.base_pct) + '% · ' + PX.esc(deltaTxt) + '</div>' +
+        '<div>' + PX.esc(d.rationale) + '</div>' +
+        '<div style="font-size:11px; color:var(--px-muted); margin-top:6px;">Informational only. Cancellation uses the base policy unless the business approves.</div>';
+      body.style.display = "block";
+      body.dataset.loaded = "1";
+      btn.textContent = "Hide";
+    } catch(e) {
+      body.textContent = "Network error.";
+      body.style.display = "block";
+      btn.textContent = "Hide";
+    } finally {
+      btn.disabled = false;
+    }
   });
   document.getElementById(modalId + "-yes").addEventListener("click", function(){
     var headers = window.PX_AUTH ? window.PX_AUTH.headers() : {};
