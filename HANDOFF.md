@@ -83,7 +83,7 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
 **STAGE 1 — Free work (Phases 61+)**
 - [ ] Phase 61 — Lessons Learned batch update ✅ done
       (tag: phase-1-lessons; commits 47ff760 + bba0cf3)
-- [ ] Phase 62 — Expand /docs/api
+- [x] Phase 62 — Expand /docs/api
 - [ ] Phase 63 — UI polish pass (quality, no new features)
 - [ ] Phase 64 — AI Voice Booking (B1) — mock provider
 - [ ] Phase 65 — Live Local Experiences (B14) — mock data source
@@ -291,7 +291,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 61 Step 2 — Fix Stage plan numbering (Phase 61+) (2026-10-01 22:21)
+Last step: Phase 62 Step 1 — Expand /docs/api (2026-10-01 22:22)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -313,6 +313,7 @@ Last step: Phase 61 Step 2 — Fix Stage plan numbering (Phase 61+) (2026-10-01 
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 3970313 Phase 62 Step 1 — Expand /docs/api
 - ffffff Phase 61 Step 2 — Fix Stage plan numbering (Phase 61+)
 - 47ff760 Phase 1 — Lessons Learned batch update
 - 75e69df Phase 60 Step 3 — Auto-Repricing UI page + sidebar
