@@ -311,6 +311,72 @@ k{% extends "layouts/platform_base.html" %}
 })();
 </script>
 
+<!-- Local Experiences (Phase 65, Step 3) -->
+<section class="px-section px-tenant-events" data-tenant="{{ tenant.slug }}">
+  <div class="px-container">
+    <div class="px-section-head">
+      <h2>What's happening nearby</h2>
+      <p class="px-section-sub">Local events curated for your stay.</p>
+    </div>
+    <div id="te-body" class="px-tn-body"><div class="px-tn-loading">Loading…</div></div>
+  </div>
+</section>
+
+<style>
+.px-tenant-events { padding: 40px 0; }
+.px-te-card {
+  background: #fff; border: 1px solid var(--px-line); border-radius: 14px;
+  overflow: hidden; padding: 14px 16px;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.px-te-card:hover { box-shadow: 0 8px 22px rgba(15,61,92,0.08); transform: translateY(-2px); }
+.px-te-cat {
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  background: #fef3c7; color: #92400e; font-size: 10.5px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.px-te-name { font-family: var(--px-font-display); font-size: 15px; font-weight: 700; color: var(--px-navy); margin: 6px 0 4px; }
+.px-te-meta { font-size: 12px; color: var(--px-muted); margin-top: 2px; }
+.px-te-when { font-size: 12px; color: var(--px-navy); margin-top: 4px; font-weight: 600; }
+</style>
+
+<script>
+(function(){
+  var lat = {{ (tenant.config.coordinates.lat if tenant.config and tenant.config.coordinates else 25.2048) }};
+  var lng = {{ (tenant.config.coordinates.lng if tenant.config and tenant.config.coordinates else 55.2708) }};
+  var root = document.currentScript.parentElement.querySelector("#te-body");
+  if (!root) return;
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function fmtDate(iso) {
+    if (!iso) return "";
+    try {
+      var d = new Date(iso);
+      return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    } catch (e) { return iso.slice(0, 10); }
+  }
+  fetch("/api/local-events/nearby?lat=" + lat + "&lng=" + lng + "&radius_km=20&limit=6")
+    .then(function(r){ return r.ok ? r.json() : []; })
+    .then(function(list){
+      if (!list.length) {
+        root.innerHTML = '<div class="px-tn-loading">No events nearby right now.</div>';
+        return;
+      }
+      root.innerHTML = list.map(function(e){
+        var href = e.ticket_url ? e.ticket_url : "#";
+        var when = fmtDate(e.start_at);
+        var where = e.venue || e.city || "";
+        return '<a class="px-te-card" href="' + esc(href) + '" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;">' +
+          '<span class="px-te-cat">' + esc(e.category) + '</span>' +
+          '<div class="px-te-name">' + esc(e.name) + '</div>' +
+          (where ? '<div class="px-te-meta">' + esc(where) + ' · ' + e.distance_km + ' km</div>' : '') +
+          (when ? '<div class="px-te-when">' + esc(when) + '</div>' : '') +
+        '</a>';
+      }).join("");
+    })
+    .catch(function(){ root.innerHTML = '<div class="px-tn-loading">Could not load events.</div>'; });
+})();
+</script>
+
 <section class="px-section px-tenant-availability" data-tenant="{{ tenant.slug }}">
   <div class="px-container">
     <div class="px-section-head">
