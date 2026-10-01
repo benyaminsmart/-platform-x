@@ -186,6 +186,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 1 — Lessons Learned batch update
 - [x] Phase 60 Step 3 — Auto-Repricing UI page + sidebar
 - [x] Phase 60 Step 2 — Business Auto-Repricing API
 - [x] Phase 60 Step 1 — AI Auto-Repricing service
@@ -288,7 +289,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 60 Step 3 — Auto-Repricing UI page + sidebar (2026-10-01 19:37)
+Last step: Phase 1 — Lessons Learned batch update (2026-10-01 22:19)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -310,6 +311,7 @@ Last step: Phase 60 Step 3 — Auto-Repricing UI page + sidebar (2026-10-01 19:3
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 47ff760 Phase 1 — Lessons Learned batch update
 - 75e69df Phase 60 Step 3 — Auto-Repricing UI page + sidebar
 - c419e04 Phase 60 Step 2 — Business Auto-Repricing API
 - dd4198b Phase 60 Step 1 — AI Auto-Repricing service
