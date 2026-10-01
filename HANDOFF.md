@@ -135,7 +135,6 @@ Started: 2026-09-29
 - [x] Phase 58 Step 2 — Business Group API
 - [x] Phase 58 Step 1 — BusinessGroup model + service
 - [x] Phase 57 Step 3 — Installments UI page
-- [x] Phase 57 Step 3 — Installments UI page
 - [x] Phase 57 Step 2 — Installment API
 - [x] Phase 57 Step 1 — Installment plan + service
 - [x] Phase 56 Step 3 — AI Upsell UI on tenant book page

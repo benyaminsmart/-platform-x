@@ -50,13 +50,16 @@ pattern_flip = re.compile(r"^- \[ \] (.*" + re.escape(text_for_match) + r".*)$",
 if pattern_flip.search(src):
     src = pattern_flip.sub(lambda m: "- [x] " + m.group(1), src)
 else:
-    # Add a new [x] line right after the "Started:" line
-    add_line = f"- [x] {marker}"
-    src = re.sub(
-        r"(Started: \d{4}-\d{2}-\d{2}\n)",
-        r"\1" + add_line + "\n",
-        src, count=1,
-    )
+    # Skip if an identical "- [x] <marker>" line already exists (idempotent)
+    existing = re.compile(r"^- \[x\] " + re.escape(marker) + r"\s*$", re.MULTILINE)
+    if not existing.search(src):
+        # Add a new [x] line right after the "Started:" line
+        add_line = f"- [x] {marker}"
+        src = re.sub(
+            r"(Started: \d{4}-\d{2}-\d{2}\n)",
+            r"\1" + add_line + "\n",
+            src, count=1,
+        )
 
 # 3. Prepend to "Commits (recent)" block
 commit_line = f"- {sha} {marker}"
