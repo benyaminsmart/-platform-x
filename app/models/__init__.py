@@ -6,6 +6,7 @@ from app.models.api_key import APIKey
 from app.models.ai_chat import AIChatMessage
 from app.models.audit_log import AuditLog
 from app.models.booking import Booking
+from app.models.business_group import BusinessGroup
 from app.models.business_score import BusinessScore
 from app.models.group_member import GroupMember
 from app.models.installment import Installment, InstallmentPlan
@@ -46,6 +47,7 @@ __all__ = [
     "AIChatMessage",
     "AuditLog",
     "Booking",
+    "BusinessGroup",
     "BusinessScore",
     "GroupMember",
     "Message",
