@@ -8,6 +8,7 @@ from app.models.audit_log import AuditLog
 from app.models.booking import Booking
 from app.models.business_score import BusinessScore
 from app.models.group_member import GroupMember
+from app.models.installment import Installment, InstallmentPlan
 from app.models.message import Message
 from app.models.notification import Notification
 from app.models.order import Order
@@ -40,6 +41,8 @@ __all__ = [
     "AnalyticsEvent",
     "Attraction",
     "APIKey",
+    "Installment",
+    "InstallmentPlan",
     "AIChatMessage",
     "AuditLog",
     "Booking",
