@@ -1,6 +1,6 @@
 {% extends "layouts/platform_base.html" %}
 {% block title %}API Documentation — Platform-X{% endblock %}
-{% block description %}Public API for Platform-X businesses: read services, bookings, reviews, and analytics.{% endblock %}
+{% block description %}Complete API reference for Platform-X: public API, business panel, guest endpoints, webhooks.{% endblock %}
 
 {% block content %}
 <section class="px-hero px-hero-compact">
@@ -9,40 +9,58 @@
       <div class="px-breadcrumb">
         <a href="/">Home</a><span>/</span><span>API Docs</span>
       </div>
-      <h1 class="px-hero-title-sm">Public API</h1>
+      <h1 class="px-hero-title-sm">Platform-X API</h1>
       <p class="px-hero-sub-sm">
-        Read your own business data from Platform-X using a secure, scoped API key.
+        Complete reference: Public API, Business Panel, Guest endpoints, Webhooks, and AI features.
       </p>
     </div>
   </div>
 </section>
 
 <section class="px-section">
-  <div class="px-container" style="max-width: 900px;">
+  <div class="px-container" style="max-width: 960px;">
 
-    <h2>Authentication</h2>
+    <div class="api-toc">
+      <strong>Contents</strong>
+      <ul>
+        <li><a href="#public">Public API (X-API-Key)</a></li>
+        <li><a href="#auth">Authentication &amp; Sessions</a></li>
+        <li><a href="#guest">Guest Endpoints</a></li>
+        <li><a href="#booking">Bookings &amp; Payments</a></li>
+        <li><a href="#rewards">Rewards, Referral &amp; Loyalty</a></li>
+        <li><a href="#extras">Extras: Wishlist, Compare, Price Locks, Waitlist, Installments</a></li>
+        <li><a href="#discovery">Discovery: Search, Attractions, Leaderboard, Trust Score</a></li>
+        <li><a href="#ai-public">AI Endpoints (Public)</a></li>
+        <li><a href="#business">Business Panel API</a></li>
+        <li><a href="#business-ai">Business AI Endpoints</a></li>
+        <li><a href="#webhooks">Webhooks</a></li>
+        <li><a href="#errors">Error Codes &amp; Rate Limits</a></li>
+      </ul>
+    </div>
+
+    <!-- ============ PUBLIC API ============ -->
+    <h2 id="public">Public API (X-API-Key)</h2>
     <p>
-      Send your API key in the <code>X-API-Key</code> header with every request.
+      Read your own business data from Platform-X using a secure, scoped API key.
       Keys are tenant-scoped: they only read the tenant they belong to.
-      Create keys in the business panel under
-      <a href="/business/api-keys">API &amp; Webhooks</a>.
+      Create keys in <a href="/business/api-keys">Business Panel → API &amp; Webhooks</a>.
     </p>
     <pre class="api-code">X-API-Key: pk_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</pre>
 
-    <h2>Scopes</h2>
-    <p>Each key carries scopes. Missing scope yields <code>403</code>.</p>
+    <h3>Scopes</h3>
     <table class="api-table">
       <thead><tr><th>Scope</th><th>Allows</th></tr></thead>
       <tbody>
-        <tr><td><code>read:services</code></td><td>GET /api/v1/services and /services/{id}</td></tr>
-        <tr><td><code>read:bookings</code></td><td>GET /api/v1/bookings and /bookings/{id}</td></tr>
+        <tr><td><code>read:services</code></td><td>GET /api/v1/services, /services/{id}</td></tr>
+        <tr><td><code>read:bookings</code></td><td>GET /api/v1/bookings, /bookings/{id}</td></tr>
+        <tr><td><code>read:orders</code></td><td>GET /api/v1/orders</td></tr>
         <tr><td><code>read:reviews</code></td><td>GET /api/v1/reviews</td></tr>
         <tr><td><code>read:analytics</code></td><td>GET /api/v1/analytics/summary</td></tr>
-        <tr><td><code>write:webhooks</code></td><td>Reserved for future write operations</td></tr>
+        <tr><td><code>write:webhooks</code></td><td>Manage webhooks (future)</td></tr>
       </tbody>
     </table>
 
-    <h2>Endpoints</h2>
+    <h3>Endpoints</h3>
     <table class="api-table">
       <thead><tr><th>Method</th><th>Path</th><th>Scope</th></tr></thead>
       <tbody>
@@ -51,116 +69,256 @@
         <tr><td>GET</td><td>/api/v1/services/{id}</td><td>read:services</td></tr>
         <tr><td>GET</td><td>/api/v1/bookings?page=1&amp;page_size=20&amp;status=confirmed</td><td>read:bookings</td></tr>
         <tr><td>GET</td><td>/api/v1/bookings/{id}</td><td>read:bookings</td></tr>
+        <tr><td>GET</td><td>/api/v1/orders?page=1&amp;page_size=20</td><td>read:orders</td></tr>
         <tr><td>GET</td><td>/api/v1/reviews?page=1&amp;page_size=20</td><td>read:reviews</td></tr>
         <tr><td>GET</td><td>/api/v1/analytics/summary?days=30</td><td>read:analytics</td></tr>
       </tbody>
     </table>
 
-    <h2>Example — Python</h2>
-    <pre class="api-code">import requests
-
-API_KEY = "pk_live_..."
-BASE = "https://your-platform-x.example"
-
-r = requests.get(
-    f"{BASE}/api/v1/analytics/summary",
-    params={"days": 30},
-    headers={"X-API-Key": API_KEY},
-    timeout=10,
-)
-r.raise_for_status()
-print(r.json())</pre>
-
-    <h2>Example — JavaScript (fetch)</h2>
-    <pre class="api-code">const API_KEY = "pk_live_...";
-const BASE = "https://your-platform-x.example";
-
-const res = await fetch(`${BASE}/api/v1/services?page=1&amp;page_size=20`, {
-  headers: { "X-API-Key": API_KEY },
-});
-const data = await res.json();
-console.log(data.items);</pre>
-
-    <h2>Example — cURL</h2>
-    <pre class="api-code">curl -sS \
-  -H "X-API-Key: pk_live_..." \
-  "https://your-platform-x.example/api/v1/reviews?page_size=5"</pre>
-
-    <h2>Webhooks</h2>
+    <!-- ============ AUTH ============ -->
+    <h2 id="auth">Authentication &amp; Sessions</h2>
     <p>
-      Register a URL in <a href="/business/api-keys">API &amp; Webhooks</a>.
-      Platform-X sends signed POST requests for the events you select.
+      Guest auth uses JWT. Every request must send the tenant via
+      <code>X-Tenant-Slug</code> header (except platform-admin endpoints).
     </p>
-    <p><strong>Headers sent:</strong></p>
-    <pre class="api-code">X-PlatformX-Event: booking.created
-X-PlatformX-Signature: sha256=&lt;hmac_sha256_hex&gt;
-Content-Type: application/json</pre>
-    <p><strong>Signature verification (Python):</strong></p>
-    <pre class="api-code">import hmac, hashlib, json
-
-def verify(raw_body: bytes, signature_header: str, secret: str) -> bool:
-    expected = "sha256=" + hmac.new(
-        secret.encode(), raw_body, hashlib.sha256
-    ).hexdigest()
-    return hmac.compare_digest(expected, signature_header)</pre>
-
-    <h2>Errors</h2>
     <table class="api-table">
-      <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+      <thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead>
       <tbody>
-        <tr><td>401</td><td>Missing or invalid API key</td></tr>
-        <tr><td>403</td><td>Key is valid but missing required scope</td></tr>
-        <tr><td>404</td><td>Resource not found (or belongs to another tenant)</td></tr>
-        <tr><td>429</td><td>Rate limit exceeded (100/min read)</td></tr>
+        <tr><td>POST</td><td>/auth/register</td><td>Create a guest account</td></tr>
+        <tr><td>POST</td><td>/auth/login</td><td>Obtain access + refresh tokens</td></tr>
+        <tr><td>POST</td><td>/auth/refresh</td><td>Rotate the access token</td></tr>
+        <tr><td>POST</td><td>/auth/logout</td><td>Revoke the current session</td></tr>
+        <tr><td>GET</td><td>/auth/me</td><td>Current user profile</td></tr>
+        <tr><td>POST</td><td>/auth/forgot-password</td><td>Send reset email</td></tr>
+        <tr><td>POST</td><td>/auth/reset-password</td><td>Reset via token</td></tr>
       </tbody>
     </table>
 
-    <p style="margin-top: 30px;">
-      Interactive OpenAPI (Swagger UI) is available at
-      <a href="/docs">/docs</a>.
+    <!-- ============ GUEST ============ -->
+    <h2 id="guest">Guest Endpoints</h2>
+    <table class="api-table">
+      <thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>GET</td><td>/tenants</td><td>List active tenants</td></tr>
+        <tr><td>GET</td><td>/tenants/{slug}</td><td>Public tenant profile</td></tr>
+        <tr><td>GET</td><td>/services?tenant=X</td><td>Services of a tenant</td></tr>
+        <tr><td>GET</td><td>/services/{id}</td><td>Service detail</td></tr>
+        <tr><td>GET</td><td>/services/{id}/rate-plans</td><td>Active rate plans</td></tr>
+        <tr><td>GET</td><td>/services/{id}/gallery</td><td>Service gallery</td></tr>
+        <tr><td>GET</td><td>/services/{id}/upsell</td><td>AI-generated add-ons</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ============ BOOKING ============ -->
+    <h2 id="booking">Bookings &amp; Payments</h2>
+    <table class="api-table">
+      <thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>POST</td><td>/bookings</td><td>Create a booking</td></tr>
+        <tr><td>GET</td><td>/bookings</td><td>List my bookings (?all=true for all tenants)</td></tr>
+        <tr><td>GET</td><td>/bookings/{id}</td><td>Booking detail</td></tr>
+        <tr><td>POST</td><td>/bookings/{id}/cancel</td><td>Cancel booking</td></tr>
+        <tr><td>GET</td><td>/bookings/{id}/refund-preview</td><td>Refund policy preview</td></tr>
+        <tr><td>POST</td><td>/bookings/{id}/cancel-with-refund</td><td>Cancel with policy refund</td></tr>
+        <tr><td>GET</td><td>/bookings/{id}/ai-refund</td><td>AI-adjusted refund preview</td></tr>
+        <tr><td>GET</td><td>/bookings/{id}/receipt</td><td>Printable receipt (HTML → PDF)</td></tr>
+        <tr><td>GET</td><td>/bookings/{id}/group</td><td>Group booking members</td></tr>
+        <tr><td>POST</td><td>/bookings/{id}/group</td><td>Add a group member</td></tr>
+        <tr><td>POST</td><td>/bookings/{id}/group/coordinate</td><td>AI coordination plan</td></tr>
+        <tr><td>POST</td><td>/bookings/{id}/modify</td><td>Modify dates/guests</td></tr>
+        <tr><td>POST</td><td>/bookings/{id}/no-show</td><td>Mark as no-show</td></tr>
+        <tr><td>GET</td><td>/availability/{slug}?days=14</td><td>Availability calendar</td></tr>
+        <tr><td>POST</td><td>/payments/intent</td><td>Create payment intent</td></tr>
+        <tr><td>GET</td><td>/payments/{id}</td><td>Payment detail</td></tr>
+        <tr><td>POST</td><td>/payments/webhook/{provider}</td><td>Provider callback</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ============ REWARDS ============ -->
+    <h2 id="rewards">Rewards, Referral &amp; Loyalty</h2>
+    <table class="api-table">
+      <thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>GET</td><td>/rewards/me</td><td>Points, tier, next milestone</td></tr>
+        <tr><td>GET</td><td>/rewards/history</td><td>Earn/redeem history</td></tr>
+        <tr><td>POST</td><td>/rewards/redeem</td><td>Redeem points</td></tr>
+        <tr><td>GET</td><td>/rewards/redeem-options</td><td>Available redeem catalog</td></tr>
+        <tr><td>POST</td><td>/rewards/redeem-options/{id}/redeem</td><td>Redeem an option</td></tr>
+        <tr><td>GET</td><td>/referrals/me</td><td>My referral code + list</td></tr>
+        <tr><td>POST</td><td>/referrals/apply</td><td>Apply a referral code</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ============ EXTRAS ============ -->
+    <h2 id="extras">Extras: Wishlist, Compare, Price Locks, Waitlist, Installments</h2>
+    <table class="api-table">
+      <thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>GET / POST / DELETE</td><td>/wishlist[/{service_id}]</td><td>Saved services</td></tr>
+        <tr><td>GET</td><td>/compare?ids=a,b,c</td><td>Compare up to 4 services</td></tr>
+        <tr><td>GET / POST / DELETE</td><td>/me/price-locks[/{id}]</td><td>Predictive Price Locks</td></tr>
+        <tr><td>POST</td><td>/me/price-locks/consume</td><td>Consume a lock on a booking</td></tr>
+        <tr><td>GET / POST / DELETE</td><td>/me/waitlist[/{id}]</td><td>Smart Waitlist</td></tr>
+        <tr><td>POST</td><td>/me/waitlist/check</td><td>FIFO notify if capacity freed</td></tr>
+        <tr><td>GET / POST / DELETE</td><td>/me/installment-plans[/{id}]</td><td>Split payment plans</td></tr>
+        <tr><td>POST</td><td>/me/installment-plans/installments/{id}/pay</td><td>Pay one installment</td></tr>
+        <tr><td>GET / POST / DELETE</td><td>/me/price-alerts[/{id}]</td><td>Price watch</td></tr>
+        <tr><td>GET / POST / DELETE</td><td>/me/recent-searches</td><td>Recent searches</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ============ DISCOVERY ============ -->
+    <h2 id="discovery">Discovery: Search, Attractions, Leaderboard, Trust Score</h2>
+    <table class="api-table">
+      <thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>GET</td><td>/api/search?check_in=&amp;check_out=&amp;guests=&amp;category=&amp;family_friendly=</td><td>Cross-tenant search</td></tr>
+        <tr><td>GET</td><td>/api/attractions</td><td>List attractions</td></tr>
+        <tr><td>GET</td><td>/api/attractions/nearby?lat=&amp;lng=&amp;radius_km=</td><td>Nearby attractions (Haversine)</td></tr>
+        <tr><td>GET</td><td>/api/leaderboard</td><td>Business leaderboard (JSON)</td></tr>
+        <tr><td>GET</td><td>/api/leaderboard/categories</td><td>Categories with leaderboard</td></tr>
+        <tr><td>GET</td><td>/api/trust-score/{tenant_slug}</td><td>Composite trust score</td></tr>
+        <tr><td>POST</td><td>/api/trust-score/bulk</td><td>Bulk trust scores (max 50)</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ============ AI PUBLIC ============ -->
+    <h2 id="ai-public">AI Endpoints (Public)</h2>
+    <p>All AI endpoints are rate-limited (10–30/min) and gracefully fall back to a deterministic response when the provider is unavailable.</p>
+    <table class="api-table">
+      <thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>GET</td><td>/ai/health</td><td>Provider availability</td></tr>
+        <tr><td>POST</td><td>/ai/chat</td><td>Public concierge chat</td></tr>
+        <tr><td>POST</td><td>/ai/location/recommend</td><td>Nearby places + AI advice</td></tr>
+        <tr><td>POST</td><td>/api/budget-optimize</td><td>Budget → optimal package</td></tr>
+        <tr><td>POST</td><td>/api/bundle-deals</td><td>Cross-category bundle + discount</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ============ BUSINESS ============ -->
+    <h2 id="business">Business Panel API</h2>
+    <p>All require a business JWT (owner/manager/staff) and <code>X-Tenant-Slug</code>.</p>
+    <table class="api-table">
+      <thead><tr><th>Group</th><th>Key Paths</th></tr></thead>
+      <tbody>
+        <tr><td>Auth</td><td>/business/api/login, /business/api/me</td></tr>
+        <tr><td>Services</td><td>/business/api/services (CRUD)</td></tr>
+        <tr><td>Rooms</td><td>/business/api/rooms (CRUD)</td></tr>
+        <tr><td>Rate plans</td><td>/business/api/rate-plans (CRUD)</td></tr>
+        <tr><td>Promotions</td><td>/business/api/promotions (CRUD) + /validate</td></tr>
+        <tr><td>Pricing rules</td><td>/business/api/pricing/rules (CRUD) + /preview</td></tr>
+        <tr><td>Bookings</td><td>/business/api/bookings, /bookings/{id}/no-show</td></tr>
+        <tr><td>Customers</td><td>/business/api/customers</td></tr>
+        <tr><td>Analytics</td><td>/business/api/analytics</td></tr>
+        <tr><td>Insights</td><td>/business/api/insights/occupancy, /heatmap, /revenue/forecast, /capacity</td></tr>
+        <tr><td>Reviews</td><td>/business/api/reviews, /{id}/respond, /{id}/hide</td></tr>
+        <tr><td>Messages</td><td>/business/api/messages, /{thread_id}/draft (AI)</td></tr>
+        <tr><td>API Keys &amp; Webhooks</td><td>/business/api/api-keys, /business/api/webhooks</td></tr>
+        <tr><td>Reports</td><td>/business/api/reports (CSV/PDF)</td></tr>
+        <tr><td>Multi-property</td><td>/business/api/groups, /{id}/attach</td></tr>
+        <tr><td>Auto-Repricing</td><td>/business/api/auto-repricing/status, /toggle, /preview, /apply</td></tr>
+        <tr><td>Peer Benchmark</td><td>/business/api/peer-benchmark</td></tr>
+        <tr><td>Market Insights</td><td>/business/api/market/summary, /position, /region, /insights, /insights/ai</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ============ BUSINESS AI ============ -->
+    <h2 id="business-ai">Business AI Endpoints</h2>
+    <table class="api-table">
+      <thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>POST</td><td>/business/api/ai/chat</td><td>Business-scoped chat</td></tr>
+        <tr><td>POST</td><td>/business/api/ai/pricing/analyze</td><td>Pricing analysis</td></tr>
+        <tr><td>POST</td><td>/business/api/ai/pricing/suggest</td><td>Pricing suggestions</td></tr>
+        <tr><td>POST</td><td>/business/api/ai/demand/forecast</td><td>7–90 day demand</td></tr>
+        <tr><td>POST</td><td>/business/api/ai/insights</td><td>Anonymized market insights</td></tr>
+        <tr><td>POST</td><td>/business/api/ai/content/service/{id}</td><td>AI description</td></tr>
+        <tr><td>POST</td><td>/business/api/ai/content/import/preview</td><td>Parse free text → services</td></tr>
+        <tr><td>POST</td><td>/business/api/marketing/campaigns/suggest</td><td>Campaign ideas</td></tr>
+        <tr><td>POST</td><td>/business/api/marketing/discounts/suggest</td><td>Discount proposals (policy-bounded)</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ============ WEBHOOKS ============ -->
+    <h2 id="webhooks">Webhooks</h2>
+    <p>Platform-X can POST to your endpoint when events happen. Every request carries an HMAC-SHA256 signature header.</p>
+    <pre class="api-code">X-PlatformX-Signature: sha256=&lt;hex&gt;</pre>
+    <p>Events emitted:</p>
+    <ul>
+      <li><code>booking.created</code></li>
+      <li><code>booking.confirmed</code></li>
+      <li><code>booking.cancelled</code></li>
+      <li><code>payment.paid</code></li>
+      <li><code>review.created</code></li>
+      <li><code>review.responded</code></li>
+    </ul>
+    <p>Verify signature in Python:</p>
+    <pre class="api-code">import hmac, hashlib
+expected = hmac.new(secret, request.body, hashlib.sha256).hexdigest()
+assert hmac.compare_digest("sha256=" + expected, request.headers["X-PlatformX-Signature"])</pre>
+
+    <!-- ============ ERRORS ============ -->
+    <h2 id="errors">Error Codes &amp; Rate Limits</h2>
+    <table class="api-table">
+      <thead><tr><th>Code</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>400</td><td>Bad request (validation or business rule)</td></tr>
+        <tr><td>401</td><td>Missing or invalid token</td></tr>
+        <tr><td>403</td><td>Missing scope or role</td></tr>
+        <tr><td>404</td><td>Not found (or cross-tenant isolation)</td></tr>
+        <tr><td>409</td><td>Conflict (state change not allowed)</td></tr>
+        <tr><td>422</td><td>Schema violation</td></tr>
+        <tr><td>429</td><td>Rate limited</td></tr>
+        <tr><td>503</td><td>AI disabled or upstream unavailable</td></tr>
+      </tbody>
+    </table>
+    <p>
+      Rate limits are enforced per authenticated user (or per IP for public endpoints).
+      Typical limits: 60/min reads, 30/min writes, 10–15/min AI.
+    </p>
+
+    <h2>OpenAPI / Swagger</h2>
+    <p>
+      The auto-generated OpenAPI schema is available at
+      <a href="/docs">/docs</a> (Swagger UI) and
+      <a href="/redoc">/redoc</a>.
     </p>
 
   </div>
 </section>
 
 <style>
+.api-toc {
+  background: #faf8f5; border: 1px solid var(--px-line); border-radius: 12px;
+  padding: 14px 18px; margin-bottom: 24px;
+}
+.api-toc strong { font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: var(--px-muted); }
+.api-toc ul { margin: 8px 0 0; padding-left: 18px; }
+.api-toc li { margin: 4px 0; font-size: 13.5px; }
+.api-toc a { color: var(--px-navy); text-decoration: none; }
+.api-toc a:hover { text-decoration: underline; }
+
+h2 { margin-top: 32px; font-family: var(--px-font-display); color: var(--px-navy); }
+h3 { margin-top: 20px; font-size: 15px; color: var(--px-navy); }
+
 .api-code {
-  background: #0f1424;
-  color: #e5e7eb;
-  padding: 14px 16px;
-  border-radius: 10px;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 13px;
-  line-height: 1.6;
-  overflow-x: auto;
-  white-space: pre;
-  margin: 12px 0 24px;
+  display: block; background: #0f172a; color: #e2e8f0;
+  padding: 12px 16px; border-radius: 10px; font-family: var(--px-font-mono, monospace);
+  font-size: 12.5px; overflow-x: auto; margin: 10px 0;
 }
 .api-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 12px 0 24px;
-  font-size: 14px;
+  width: 100%; border-collapse: collapse; margin: 12px 0;
+  font-size: 13.5px;
 }
 .api-table th, .api-table td {
-  text-align: left;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--px-line);
+  border: 1px solid var(--px-line); padding: 8px 10px; text-align: left;
+  vertical-align: top;
 }
-.api-table th {
-  color: var(--px-muted);
-  font-weight: 600;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
+.api-table th { background: #faf8f5; font-weight: 700; color: var(--px-navy); }
 .api-table code {
-  font-family: "JetBrains Mono", monospace;
-  background: #f3f4f6;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 12.5px;
+  background: #f0ede7; padding: 1px 5px; border-radius: 4px;
+  font-family: var(--px-font-mono, monospace); font-size: 12.5px;
 }
-h2 { font-family: var(--px-font-display); margin-top: 36px; }
 </style>
 {% endblock %}
