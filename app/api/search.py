@@ -44,6 +44,7 @@ class SearchItem(BaseModel):
     cover_image: str | None
     coordinates: dict | None = None
     distance_km: float | None = None
+    trust_score: float | None = None
 
 
 class SearchResponse(BaseModel):
