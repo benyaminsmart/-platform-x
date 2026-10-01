@@ -60,6 +60,7 @@ from app.api import business_peer_benchmark as business_peer_benchmark_router
 from app.api import upsell as upsell_router
 from app.api import installments as installments_router
 from app.api import business_groups as business_groups_router
+from app.api import business_auto_repricing as business_auto_repricing_router
 from app.api import wishlist as wishlist_router
 from app.api import waitlist as waitlist_router
 from app.core.config import settings
@@ -225,6 +226,7 @@ app.include_router(business_peer_benchmark_router.router)
 app.include_router(upsell_router.router)
 app.include_router(installments_router.router)
 app.include_router(business_groups_router.router)
+app.include_router(business_auto_repricing_router.router)
 app.include_router(waitlist_router.router)
 
 
