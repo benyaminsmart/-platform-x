@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.47.0-installments (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-57 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
+> Version: v0.48.0-business-groups (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-58 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
 
 Last updated: 2026-10-01
 
@@ -494,6 +494,27 @@ Tag: v0.36.0-ai-trip-memory
 - Step 3 — UI on /account/ai
   - "🧠 My Trip Memory" button reveals panel with recap + 6 profile pills
     + "Most visited" list; lazy-loaded on first open
+
+### Phase 58 — Multi-property Dashboard (Wave 4): COMPLETE
+Tag: v0.48.0-business-groups
+- Step 1 — BusinessGroup model + Tenant.group_id + service
+  - BusinessGroup: slug, name, owner_user_id
+  - Tenant.group_id (nullable FK) — attached to a group
+  - Service: create/list/attach/detach/delete + aggregate_metrics
+  - Ownership check on attach: same-email owner OR owner.tenant_id
+  - aggregate_metrics: members_count, services_count, bookings_30d,
+    revenue_30d, avg_rating, currency
+- Step 2 — Business API under /business/api/groups
+  - GET  /                            list owner's groups
+  - POST /                            create group
+  - GET  /{id}                        detail + metrics
+  - POST /{id}/attach                 attach tenant by slug (owner check)
+  - DELETE /{id}/members/{slug}       detach
+  - DELETE /{id}                      delete (detaches members first)
+  - Cross-owner isolation tested
+- Step 3 — UI page /business/group + sidebar link 🏢
+  - Group list, create form, detail panel with metric cards
+  - Members list with detach; attach form by slug
 
 ### Phase 57 — Split Payment / Installments (Wave 4): COMPLETE
 Tag: v0.47.0-installments
@@ -1390,6 +1411,7 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 55 (Family & Kids Mode) is COMPLETE — Wave 3 Blue-Ocean.**
 **Phase 56 (AI Upsell Engine) is COMPLETE — Wave 3 Blue-Ocean.**
 **Phase 57 (Split Payment / Installments) is COMPLETE — Wave 4 first free deliverable.**
+**Phase 58 (Multi-property Dashboard) is COMPLETE — Wave 4 second deliverable.**
 
 ## WAVE 2 COMPLETE (v0.43.0-ai-receptionist)
 
@@ -1675,7 +1697,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1245 tests, all passing
+## 14. Test Count: 1266 tests, all passing
 
 Test files:
 - test_health.py
