@@ -131,6 +131,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 56 Step 1 — AI Upsell Engine service
 - [x] Phase 55 Step 2 — Family & Kids Mode UI on /search
 - [x] Phase 55 Step 1 — Family & Kids Mode filter in search
 - [x] Phase 54 Step 3 — AI Refund preview in cancel modal
@@ -218,7 +219,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 55 Step 2 — Family & Kids Mode UI on /search (2026-10-01 18:15)
+Last step: Phase 56 Step 1 — AI Upsell Engine service (2026-10-01 18:18)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -240,6 +241,7 @@ Last step: Phase 55 Step 2 — Family & Kids Mode UI on /search (2026-10-01 18:1
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 0b5c2d8 Phase 56 Step 1 — AI Upsell Engine service
 - 67c21e0 Phase 55 Step 2 — Family & Kids Mode UI on /search
 - 6075963 Phase 55 Step 1 — Family & Kids Mode filter in search
 - 1111ef4 Phase 54 Step 3 — AI Refund preview in cancel modal
