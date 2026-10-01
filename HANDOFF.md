@@ -131,6 +131,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 54 Step 1 — Instant Refund AI service
 - [x] Phase 53 Step 3 — AI Draft button in business messages
 - [x] Phase 53 Step 2 — AI Receptionist draft API
 - [x] Phase 53 Step 1 — AI Receptionist service
@@ -213,7 +214,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 53 Step 3 — AI Draft button in business messages (2026-10-01 16:08)
+Last step: Phase 54 Step 1 — Instant Refund AI service (2026-10-01 18:09)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -235,6 +236,7 @@ Last step: Phase 53 Step 3 — AI Draft button in business messages (2026-10-01 
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 7c40133 Phase 54 Step 1 — Instant Refund AI service
 - 901bc74 Phase 53 Step 3 — AI Draft button in business messages
 - e6eba6f Phase 53 Step 2 — AI Receptionist draft API
 - 7845de7 Phase 53 Step 1 — AI Receptionist service
