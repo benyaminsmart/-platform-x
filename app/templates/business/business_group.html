@@ -1,0 +1,179 @@
+{% extends "business/business_base.html" %}
+
+{% block title %}Group Dashboard — Business Panel{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h2>Group Dashboard</h2>
+  <p class="admin-card-sub" style="margin-bottom: 0;">
+    Aggregate metrics across every property you own. Each tenant keeps
+    its own data; only you can see the combined view.
+  </p>
+</div>
+
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div class="coach-head">
+    <h3>Your groups</h3>
+    <div style="display:flex; gap:6px; align-items:center;">
+      <input type="text" id="bg-name" class="mk-input" placeholder="New group name" style="padding:8px 10px; width:auto; flex:0 0 auto; min-width:180px;">
+      <button type="button" class="admin-btn" id="bg-create">Create group</button>
+    </div>
+  </div>
+  <div id="bg-list" class="mk-summary">Loading…</div>
+</div>
+
+<div class="admin-card" id="bg-detail-card" style="display:none; margin-bottom: 24px;">
+  <div class="coach-head">
+    <h3 id="bg-detail-title">Group detail</h3>
+    <div style="display:flex; gap:6px; align-items:center;">
+      <input type="text" id="bg-attach-slug" class="mk-input" placeholder="Tenant slug to attach" style="padding:8px 10px; width:auto; flex:0 0 auto; min-width:200px;">
+      <button type="button" class="admin-btn" id="bg-attach">Attach</button>
+    </div>
+  </div>
+  <div id="bg-metrics" class="mk-grid" style="margin-bottom:16px;"></div>
+  <div id="bg-members"></div>
+</div>
+
+<style>
+.bg-group {
+  padding:12px 14px; background:var(--adm-surface-2); border:1px solid var(--adm-line);
+  border-radius:10px; margin-bottom:8px; cursor:pointer;
+}
+.bg-group:hover { border-color:var(--adm-brand); }
+.bg-group.active { border-color:var(--adm-brand); }
+.bg-group-title { font-weight:600; color:var(--adm-text); font-size:14px; }
+.bg-group-meta { font-size:12px; color:var(--adm-muted); margin-top:4px; }
+.bg-member {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:8px 12px; border:1px solid var(--adm-line); border-radius:8px;
+  margin-bottom:6px; background:var(--adm-surface-2);
+}
+.bg-member-name { font-weight:600; color:var(--adm-text); font-size:13.5px; }
+.bg-member-slug { font-size:11.5px; color:var(--adm-muted); }
+.bg-member-actions button {
+  padding:4px 10px; font-size:12px; border-radius:6px; cursor:pointer;
+  border:1px solid var(--adm-line); background:transparent; color:var(--adm-muted);
+  font-family:inherit;
+}
+.bg-member-actions button:hover { color:#e11d48; border-color:#e11d48; }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login"; return; }
+
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function h() { return { "Authorization": "Bearer " + token, "Content-Type": "application/json" }; }
+
+  var currentGroupId = null;
+
+  async function loadGroups() {
+    var wrap = document.getElementById("bg-list");
+    wrap.innerHTML = "Loading…";
+    var res = await fetch("/business/api/groups", { headers: h() });
+    if (!res.ok) { wrap.innerHTML = "Failed to load."; return; }
+    var list = await res.json();
+    if (!list.length) {
+      wrap.innerHTML = '<div style="color:var(--adm-muted); font-size:13px;">No groups yet. Create one above.</div>';
+      return;
+    }
+    wrap.innerHTML = list.map(function(g){
+      var cls = (g.id === currentGroupId) ? "active" : "";
+      return '<div class="bg-group ' + cls + '" data-gid="' + esc(g.id) + '">' +
+        '<div class="bg-group-title">' + esc(g.name) + '</div>' +
+        '<div class="bg-group-meta">' + esc(g.members_count) + ' propert' + (g.members_count === 1 ? 'y' : 'ies') + '</div>' +
+      '</div>';
+    }).join("");
+    wrap.querySelectorAll(".bg-group").forEach(function(el){
+      el.addEventListener("click", function(){ openGroup(el.getAttribute("data-gid")); });
+    });
+  }
+
+  function metricCard(label, value) {
+    return '<div class="admin-card mk-card">' +
+      '<div class="mk-card-label">' + esc(label) + '</div>' +
+      '<div class="mk-card-value">' + esc(value) + '</div>' +
+    '</div>';
+  }
+
+  async function openGroup(gid) {
+    currentGroupId = gid;
+    loadGroups();
+    var res = await fetch("/business/api/groups/" + encodeURIComponent(gid), { headers: h() });
+    if (!res.ok) return;
+    var d = await res.json();
+    document.getElementById("bg-detail-card").style.display = "block";
+    document.getElementById("bg-detail-title").textContent = d.name;
+
+    var m = d.metrics;
+    document.getElementById("bg-metrics").innerHTML =
+      metricCard("Properties", m.members_count) +
+      metricCard("Active services", m.services_count) +
+      metricCard("Bookings (30d)", m.bookings_30d) +
+      metricCard("Revenue (30d)", m.revenue_30d + " " + (m.currency || ""));
+
+    var mem = document.getElementById("bg-members");
+    if (!d.members.length) {
+      mem.innerHTML = '<div style="color:var(--adm-muted); font-size:13px;">No properties in this group yet. Attach one by slug above.</div>';
+      return;
+    }
+    mem.innerHTML = d.members.map(function(t){
+      return '<div class="bg-member">' +
+        '<div>' +
+          '<div class="bg-member-name">' + esc(t.name) + '</div>' +
+          '<div class="bg-member-slug">' + esc(t.slug) + (t.category ? ' · ' + esc(t.category) : '') + '</div>' +
+        '</div>' +
+        '<div class="bg-member-actions">' +
+          '<button type="button" data-detach="' + esc(t.slug) + '">Detach</button>' +
+        '</div>' +
+      '</div>';
+    }).join("");
+    mem.querySelectorAll("button[data-detach]").forEach(function(b){
+      b.addEventListener("click", async function(){
+        if (!confirm("Detach this property from the group?")) return;
+        await fetch("/business/api/groups/" + encodeURIComponent(gid) + "/members/" + encodeURIComponent(b.getAttribute("data-detach")), {
+          method: "DELETE", headers: h(),
+        });
+        openGroup(gid);
+      });
+    });
+  }
+
+  document.getElementById("bg-create").addEventListener("click", async function(){
+    var name = document.getElementById("bg-name").value.trim();
+    if (!name) { alert("Enter a group name."); return; }
+    var res = await fetch("/business/api/groups", {
+      method: "POST", headers: h(), body: JSON.stringify({ name: name }),
+    });
+    if (!res.ok) { alert("Could not create group."); return; }
+    document.getElementById("bg-name").value = "";
+    var g = await res.json();
+    currentGroupId = g.id;
+    loadGroups();
+    openGroup(g.id);
+  });
+
+  document.getElementById("bg-attach").addEventListener("click", async function(){
+    if (!currentGroupId) { alert("Select a group first."); return; }
+    var slug = document.getElementById("bg-attach-slug").value.trim();
+    if (!slug) { alert("Enter a tenant slug."); return; }
+    var res = await fetch("/business/api/groups/" + encodeURIComponent(currentGroupId) + "/attach", {
+      method: "POST", headers: h(), body: JSON.stringify({ tenant_slug: slug }),
+    });
+    if (!res.ok) {
+      var e = await res.json().catch(function(){ return {}; });
+      alert(e.detail || "Could not attach.");
+      return;
+    }
+    document.getElementById("bg-attach-slug").value = "";
+    openGroup(currentGroupId);
+  });
+
+  loadGroups();
+})();
+</script>
+{% endblock %}

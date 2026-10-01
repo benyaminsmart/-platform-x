@@ -786,6 +786,16 @@ def business_insights_page(request: Request) -> HTMLResponse:
     )
 
 
+@router.get("/business/group", response_class=HTMLResponse)
+def business_group_page(request: Request) -> HTMLResponse:
+    """Business multi-property group dashboard."""
+    return templates.TemplateResponse(
+        request,
+        "business/business_group.html",
+        {"active_nav": "group"},
+    )
+
+
 @router.get("/business/peer-benchmark", response_class=HTMLResponse)
 def business_peer_benchmark_page(request: Request) -> HTMLResponse:
     """Business peer benchmark page."""
