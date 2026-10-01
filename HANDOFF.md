@@ -131,6 +131,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 51 Step 2 — Bundle Deals API
 - [x] Phase 51 Step 1 — Multi-Business Bundle Deals service
 - [x] Phase 50 Step 3 — Budget Optimizer UI on /account/ai
 - [x] Phase 50 Step 2 — Budget Optimizer API
@@ -205,7 +206,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 51 Step 1 — Multi-Business Bundle Deals service (2026-10-01 15:46)
+Last step: Phase 51 Step 2 — Bundle Deals API (2026-10-01 15:47)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -227,6 +228,7 @@ Last step: Phase 51 Step 1 — Multi-Business Bundle Deals service (2026-10-01 1
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 73ac6ac Phase 51 Step 2 — Bundle Deals API
 - e5a76df Phase 51 Step 1 — Multi-Business Bundle Deals service
 - 3d32f41 Phase 50 Step 3 — Budget Optimizer UI on /account/ai
 - 9409822 Phase 50 Step 2 — Budget Optimizer API
