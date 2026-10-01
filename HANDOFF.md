@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.44.0-instant-refund (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-54 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
+> Version: v0.45.0-family-mode (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-55 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
 
 Last updated: 2026-10-01
 
@@ -474,6 +474,23 @@ Tag: v0.36.0-ai-trip-memory
 - Step 3 — UI on /account/ai
   - "🧠 My Trip Memory" button reveals panel with recap + 6 profile pills
     + "Most visited" list; lazy-loaded on first open
+
+### Phase 55 — Family & Kids Mode (Wave 3, Blue-Ocean B15): COMPLETE
+Tag: v0.45.0-family-mode
+- Step 1 — Family filter in search_service
+  - Detection (deterministic): tenant.config.family_friendly, OR
+    amenities contain family keywords, OR service.attributes.family_friendly,
+    OR service name/description contains family keywords
+  - Keywords: family, kids/kid, child/children, toddler, playground,
+    play area, baby, infant
+  - search_services accepts family_friendly=True and filters rows
+  - Every item in the payload exposes family_friendly (bool)
+  - API: GET /api/search?family_friendly=true
+- Step 2 — UI on /search
+  - New "Family & Kids" select in the search form
+  - readForm / writeForm / boot URL-param propagation
+  - 👨‍👩‍👧 badge next to rating on each card
+  - Yellow badge styling
 
 ### Phase 54 — Instant Refund AI (Wave 3, Blue-Ocean B5): COMPLETE
 Tag: v0.44.0-instant-refund
@@ -1310,6 +1327,7 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 52 (Deep Peer Benchmark) is COMPLETE — Wave 2 Blue-Ocean.**
 **Phase 53 (Business AI Receptionist) is COMPLETE — Wave 2 COMPLETE.**
 **Phase 54 (Instant Refund AI) is COMPLETE — Wave 3 Blue-Ocean.**
+**Phase 55 (Family & Kids Mode) is COMPLETE — Wave 3 Blue-Ocean.**
 
 ## WAVE 2 COMPLETE (v0.43.0-ai-receptionist)
 
@@ -1595,7 +1613,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1199 tests, all passing
+## 14. Test Count: 1209 tests, all passing
 
 Test files:
 - test_health.py
