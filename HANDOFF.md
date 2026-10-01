@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.42.0-peer-benchmark (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-52 complete; 24 DEFERRED). TIER 1+2 = 100%.
+> Version: v0.43.0-ai-receptionist (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-53 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
 
 Last updated: 2026-10-01
 
@@ -464,6 +464,23 @@ Tag: v0.36.0-ai-trip-memory
 - Step 3 — UI on /account/ai
   - "🧠 My Trip Memory" button reveals panel with recap + 6 profile pills
     + "Most visited" list; lazy-loaded on first open
+
+### Phase 53 — Business AI Receptionist (Wave 2, Blue-Ocean B10): COMPLETE
+Tag: v0.43.0-ai-receptionist
+- Step 1 — AI Receptionist service (app/services/ai/receptionist.py)
+  - Grounded on real tenant facts: services, price range, recent thread
+  - Anchor = guest's most recent message
+  - Tones: professional | friendly | concise (fixed enum)
+  - AI never invents prices / availability / discounts
+  - Enforces < 100 words; 4 languages
+  - Deterministic fallback always available
+  - status: ok | empty_thread | no_guest_message
+- Step 2 — Business API: POST /business/api/messages/{thread_id}/draft
+  - 15/min, requires business auth
+  - Returns { reply, provider, status }
+- Step 3 — UI on /business/messages
+  - "✨ AI Draft" button next to Send
+  - Fills the input with the draft; owner can edit then send
 
 ### Phase 52 — Deep Peer Benchmark (Wave 2, Blue-Ocean B12): COMPLETE
 Tag: v0.42.0-peer-benchmark
@@ -1261,6 +1278,20 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 50 (AI Budget Optimizer) is COMPLETE — Wave 2 continuation.**
 **Phase 51 (Multi-Business Bundle Deals) is COMPLETE — Wave 2 Blue-Ocean.**
 **Phase 52 (Deep Peer Benchmark) is COMPLETE — Wave 2 Blue-Ocean.**
+**Phase 53 (Business AI Receptionist) is COMPLETE — Wave 2 COMPLETE.**
+
+## WAVE 2 COMPLETE (v0.43.0-ai-receptionist)
+
+Wave 2 (AI depth) is fully delivered:
+- 45: AI Location Recommender
+- 46: AI Trip Memory
+- 50: AI Budget Optimizer
+- 51: Multi-Business Bundle Deals
+- 52: Deep Peer Benchmark
+- 53: Business AI Receptionist
+Plus (Wave 3, early deliers): 47 Price Locks, 48 Smart Waitlist, 49 Trust Score.
+NEXT WAVE: Wave 3 — Blue-Ocean innovations (remaining) or Wave 0 part B
+(pending purchases: VPS, Domain, Payment).
 
 Remaining phases all require user-side decisions or purchases:
 - Phase 10 (Payment Production / Telr) — needs business account
@@ -1533,7 +1564,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1168 tests, all passing
+## 14. Test Count: 1183 tests, all passing
 
 Test files:
 - test_health.py
