@@ -383,3 +383,66 @@ def account_ai_memory(
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     return TripMemoryResponse(**out)
+
+# ---------- AI Voice Booking (Phase 64, Step 2) ----------
+
+
+class VoiceRequest(BaseModel):
+    transcript: str = Field(min_length=1, max_length=4000)
+    language: str = Field(default="en", pattern="^(en|ar|fil|hi)$")
+
+
+class VoiceIntent(BaseModel):
+    category: str | None = None
+    city: str | None = None
+    check_in: str | None = None
+    check_out: str | None = None
+    guests: int | None = None
+    raw: str = ""
+
+
+class VoiceMatch(BaseModel):
+    service_id: str
+    service_name: str
+    tenant_slug: str
+    tenant_name: str
+    price: float
+    currency: str
+    category: str | None = None
+    rating: float | None = None
+
+
+class VoiceResponse(BaseModel):
+    status: str
+    intent: dict
+    matches: list[dict] = []
+    reply: str
+    provider: str
+
+
+@router.post("/voice", response_model=VoiceResponse)
+@limiter.limit("15/minute")
+def account_ai_voice(
+    request: Request,
+    payload: VoiceRequest,
+    tenant: Tenant = Depends(get_user_home_tenant),
+    user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+) -> VoiceResponse:
+    """Parse a spoken (transcribed) booking request.
+
+    Mock integration: user sends text. Real voice→text is deferred.
+    Read-only: does not create a Booking.
+    """
+    if not settings.AI_ENABLED:
+        raise HTTPException(status_code=503, detail="AI disabled")
+
+    from app.services.ai import voice_booking
+    try:
+        out = voice_booking.voice_request(
+            db, transcript=payload.transcript, language=payload.language,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return VoiceResponse(**out)
+
