@@ -115,6 +115,13 @@
           <option value="SAR">SAR</option>
         </select>
       </div>
+      <div class="sr-field">
+        <label>Family &amp; Kids</label>
+        <select name="family_friendly" id="sr-family">
+          <option value="">Any</option>
+          <option value="true">👨‍👩‍👧 Family-friendly only</option>
+        </select>
+      </div>
       <button type="submit" class="sr-submit">Update</button>
       <button type="button" class="sr-submit" id="sr-toggle-map" style="background:var(--px-muted);">Map</button>
     </form>
@@ -254,6 +261,11 @@
   background:#dcfce7; color:#166534; border-radius:6px;
   font-size:11px; font-weight:700;
 }
+.sr-family {
+  display:inline-block; margin-left:6px; padding:1px 6px;
+  background:#fef3c7; color:#92400e; border-radius:6px;
+  font-size:11px; font-weight:700;
+}
 .sr-map-btn.on { background: var(--px-navy); color: #fff; border-color: var(--px-navy); }
 </style>
 {% endblock %}
@@ -280,6 +292,7 @@
       currency: document.getElementById("sr-cur").value || "AED",
       location: document.getElementById("sr-loc").value || "",
       min_rating: document.getElementById("sr-rating").value || "",
+      family_friendly: document.getElementById("sr-family").value || "",
     };
   }
 
@@ -292,6 +305,7 @@
     document.getElementById("sr-cur").value = p.currency || "AED";
     document.getElementById("sr-loc").value = p.location || "";
     document.getElementById("sr-rating").value = p.min_rating || "";
+    document.getElementById("sr-family").value = p.family_friendly || "";
   }
 
   async function runSearch(page) {
@@ -344,6 +358,7 @@
     var img = i.cover_image ? ('style="background-image:url(' + esc(i.cover_image) + ')"') : "";
     var rating = i.rating ? ('★ ' + i.rating + ' · ' + i.reviews_count + ' reviews') : "";
     var trust = (i.trust_score != null) ? ('<span class="sr-trust" title="Trust Score">🛡️ ' + i.trust_score + '</span>') : "";
+    var family = i.family_friendly ? ('<span class="sr-family" title="Family-friendly">👨‍👩‍👧</span>') : "";
     return '<a class="sr-card" data-service-id="' + esc(i.service_id) + '" href="/' + esc(i.tenant_slug) + '/">' +
       '<button class="sr-heart" data-sid="' + esc(i.service_id) + '" type="button" title="Save">&#9829;</button>' +
       '<button class="sr-compare-btn" data-cmp="' + esc(i.service_id) + '" type="button">+ Compare</button>' +
@@ -354,7 +369,7 @@
         '<span class="sr-cat">' + esc(i.category) + '</span>' +
         '<h3 class="sr-name">' + esc(i.service_name) + '</h3>' +
         '<div class="sr-loc">' + esc(i.tenant_name) + (i.location ? ' · ' + esc(i.location) : '') + '</div>' +
-        (rating ? '<div class="sr-rating">' + esc(rating) + ' ' + trust + '</div>' : '') +
+        (rating ? '<div class="sr-rating">' + esc(rating) + ' ' + trust + ' ' + family + '</div>' : '') +
         '<div class="sr-price">' + i.price + ' ' + esc(i.currency) + '<small>/night</small></div>' +
       '</div>' +
     '</a>';
@@ -370,7 +385,7 @@
 
   // ---- boot: read query params ----
   var u = new URLSearchParams(window.location.search);
-  if (u.has("check_in") || u.has("check_out") || u.has("category") || u.has("guests") || u.has("sort") || u.has("currency") || u.has("location") || u.has("min_rating")) {
+  if (u.has("check_in") || u.has("check_out") || u.has("category") || u.has("guests") || u.has("sort") || u.has("currency") || u.has("location") || u.has("min_rating") || u.has("family_friendly")) {
     writeForm({
       check_in: u.get("check_in") || "",
       check_out: u.get("check_out") || "",
@@ -380,6 +395,7 @@
       currency: u.get("currency") || "AED",
       location: u.get("location") || "",
       min_rating: u.get("min_rating") || "",
+      family_friendly: u.get("family_friendly") || "",
     });
   } else {
     // set defaults
