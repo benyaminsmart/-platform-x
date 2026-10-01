@@ -776,6 +776,16 @@ def business_insights_page(request: Request) -> HTMLResponse:
     )
 
 
+@router.get("/business/peer-benchmark", response_class=HTMLResponse)
+def business_peer_benchmark_page(request: Request) -> HTMLResponse:
+    """Business peer benchmark page."""
+    return templates.TemplateResponse(
+        request,
+        "business/business_peer_benchmark.html",
+        {"active_nav": "peer_benchmark"},
+    )
+
+
 @router.get("/business/market", response_class=HTMLResponse)
 def business_market_page(request: Request) -> HTMLResponse:
     """Market Insights page for the current business."""
