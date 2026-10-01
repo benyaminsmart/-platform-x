@@ -11,6 +11,7 @@ from app.models.business_score import BusinessScore
 from app.models.group_member import GroupMember
 from app.models.installment import Installment, InstallmentPlan
 from app.models.message import Message
+from app.models.local_event import LocalEvent
 from app.models.notification import Notification
 from app.models.order import Order
 from app.models.partner_application import PartnerApplication
@@ -50,6 +51,7 @@ __all__ = [
     "BusinessGroup",
     "BusinessScore",
     "GroupMember",
+    "LocalEvent",
     "Message",
     "Notification",
     "Order",
