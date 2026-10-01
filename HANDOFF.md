@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.43.0-ai-receptionist (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-53 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
+> Version: v0.44.0-instant-refund (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-54 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
 
 Last updated: 2026-10-01
 
@@ -470,6 +470,26 @@ Tag: v0.36.0-ai-trip-memory
 - Step 3 — UI on /account/ai
   - "🧠 My Trip Memory" button reveals panel with recap + 6 profile pills
     + "Most visited" list; lazy-loaded on first open
+
+### Phase 54 — Instant Refund AI (Wave 3, Blue-Ocean B5): COMPLETE
+Tag: v0.44.0-instant-refund
+- Step 1 — Instant Refund AI service (app/services/ai/instant_refund.py)
+  - Base policy from cancellation_service.compute_refund_policy (unchanged)
+  - Deterministic delta (percentage points) from real signals:
+      + tier bonus (royal +15, platinum +10, gold +7, silver +4)
+      + tenure (>=10 past completed: +5, >=3: +2)
+      − recent cancellations 90d (>=3: -10, >=1: -4)
+      − same-day or overdue check-in: -5
+  - Platform caps: ±25pp; final suggested_pct clamped to [0, 100]
+  - AI writes a short rationale ONLY (4 languages)
+  - Deterministic fallback rationale always available
+  - Recommendation is informational only — never applied automatically
+- Step 2 — User API: GET /bookings/{id}/ai-refund (15/min, owner only)
+  - Returns base + suggested + delta + signals + rationale + provider
+- Step 3 — UI in cancel modal (app/static/js/account.js)
+  - "✨ AI Refund Preview" collapsible section
+  - Shows suggested amount, base policy, delta, AI rationale
+  - Clear note: informational only; cancellation uses base policy
 
 ### Phase 53 — Business AI Receptionist (Wave 2, Blue-Ocean B10): COMPLETE
 Tag: v0.43.0-ai-receptionist
@@ -1285,6 +1305,7 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 51 (Multi-Business Bundle Deals) is COMPLETE — Wave 2 Blue-Ocean.**
 **Phase 52 (Deep Peer Benchmark) is COMPLETE — Wave 2 Blue-Ocean.**
 **Phase 53 (Business AI Receptionist) is COMPLETE — Wave 2 COMPLETE.**
+**Phase 54 (Instant Refund AI) is COMPLETE — Wave 3 Blue-Ocean.**
 
 ## WAVE 2 COMPLETE (v0.43.0-ai-receptionist)
 
@@ -1570,7 +1591,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1183 tests, all passing
+## 14. Test Count: 1199 tests, all passing
 
 Test files:
 - test_health.py
