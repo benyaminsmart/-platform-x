@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.38.0-waitlist (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-48 complete; 24 DEFERRED). TIER 1+2 = 100%.
+> Version: v0.39.0-trust-score (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-49 complete; 24 DEFERRED). TIER 1+2 = 100%.
 
 Last updated: 2026-09-30
 
@@ -440,6 +440,26 @@ Tag: v0.36.0-ai-trip-memory
 - Step 3 — UI on /account/ai
   - "🧠 My Trip Memory" button reveals panel with recap + 6 profile pills
     + "Most visited" list; lazy-loaded on first open
+
+### Phase 49 — Trust Score per Business (Wave 3, Blue-Ocean B11): COMPLETE
+Tag: v0.39.0-trust-score
+- Step 1 — Trust Score service (deterministic, no AI, no new table)
+  - Composite 0..100 from 4 components:
+      Rating 40% (avg review rating), Volume 20% (30-day paid bookings,
+      log-scaled), Verification 20% (verified / published reviews),
+      Responsiveness 20% (responded / published reviews)
+  - Neutral 50 baseline for rating/verification/responsiveness when
+    no reviews exist; volume falls to 0
+  - Excludes hidden reviews and cancelled bookings from volume
+  - Helpers: compute, get_by_slug, compute_many, tier_label
+- Step 2 — Public API
+  - GET  /api/trust-score/{tenant_slug}    (60/min)
+  - POST /api/trust-score/bulk             (30/min, max 50 ids)
+  - 404 on unknown tenant, 422 on bad bulk request
+- Step 3 — Search integration + UI badge
+  - search_service enriches each item with "trust_score"
+  - SearchItem schema exposes trust_score (float | None)
+  - search.html renders 🛡️ badge next to rating
 
 ### Phase 48 — Smart Waitlist (Wave 3, Blue-Ocean B8): COMPLETE
 Tag: v0.38.0-waitlist
@@ -1159,6 +1179,7 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 46 (AI Trip Memory) is COMPLETE — Wave 2 second deliverable.**
 **Phase 47 (Predictive Price Locks) is COMPLETE — Wave 3 first deliverable.**
 **Phase 48 (Smart Waitlist) is COMPLETE — Wave 3 second deliverable.**
+**Phase 49 (Trust Score per Business) is COMPLETE — Wave 3 third deliverable.**
 
 Remaining phases all require user-side decisions or purchases:
 - Phase 10 (Payment Production / Telr) — needs business account
@@ -1431,7 +1452,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1104 tests, all passing
+## 14. Test Count: 1122 tests, all passing
 
 Test files:
 - test_health.py
