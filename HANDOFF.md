@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.40.0-budget-optimizer (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-50 complete; 24 DEFERRED). TIER 1+2 = 100%.
+> Version: v0.41.0-bundle-deals (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-51 complete; 24 DEFERRED). TIER 1+2 = 100%.
 
 Last updated: 2026-10-01
 
@@ -452,6 +452,22 @@ Tag: v0.36.0-ai-trip-memory
 - Step 3 — UI on /account/ai
   - "🧠 My Trip Memory" button reveals panel with recap + 6 profile pills
     + "Most visited" list; lazy-loaded on first open
+
+### Phase 51 — Multi-Business Bundle Deals (Wave 2, Blue-Ocean B3): COMPLETE
+Tag: v0.41.0-bundle-deals
+- Step 1 — Bundle Deals service (app/services/ai/bundle_deals.py)
+  - Fixed composition: 1 hotel + 2 restaurants + 1 entertainment + 1 travel
+    (capped at 5 items); categories with no candidates are skipped
+  - Per-category pick: highest rating, then lowest price
+  - Bundle discount tiers (transparent):
+      3 items → 10%, 4 items → 15%, 5+ items → 20%
+  - Estimated totals: days for hotels, min(days,3) for others; guests only for hotels
+  - AI writes marketing pitch grounded ONLY in the bundle
+  - Deterministic fallback always available
+- Step 2 — Public API: POST /api/bundle-deals (15/min)
+- Step 3 — UI on /search
+  - "🎁 Bundle this trip" button in map controls
+  - Panel shows AI pitch + item list + subtotal/discount/total
 
 ### Phase 50 — AI Budget Optimizer (Wave 2, AI depth): COMPLETE
 Tag: v0.40.0-budget-optimizer
@@ -1215,6 +1231,7 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 48 (Smart Waitlist) is COMPLETE — Wave 3 second deliverable.**
 **Phase 49 (Trust Score per Business) is COMPLETE — Wave 3 third deliverable.**
 **Phase 50 (AI Budget Optimizer) is COMPLETE — Wave 2 continuation.**
+**Phase 51 (Multi-Business Bundle Deals) is COMPLETE — Wave 2 Blue-Ocean.**
 
 Remaining phases all require user-side decisions or purchases:
 - Phase 10 (Payment Production / Telr) — needs business account
@@ -1487,7 +1504,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1139 tests, all passing
+## 14. Test Count: 1154 tests, all passing
 
 Test files:
 - test_health.py
