@@ -230,7 +230,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 59 Step 3 — AI Coordinate button in group modal (2026-10-01 19:30)
+Last step: Phase 59 Step 3 — AI Coordinate button in group modal (2026-10-01 19:32)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
