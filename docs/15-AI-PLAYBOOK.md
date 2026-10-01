@@ -230,4 +230,78 @@ without conflict, do it, then `alembic stamp head` to mark it done.
 
 ---
 
+### Lesson 10 — `date + int` is a TypeError
+`datetime.date + int` raises TypeError; you must use `timedelta`.
+Hit in Phase 57 (installments): `today + (DUE_GAP_DAYS * (i-1))` was
+wrong; the fix is `today + timedelta(days=DUE_GAP_DAYS * (i-1))`.
+Moral: whenever adding days/seconds to a date/datetime, always go
+through `timedelta`. Unit tests that only exercised the i=1 branch
+missed it; include i>=2 cases.
+
+### Lesson 11 — Pydantic schemas must expose every field the service returns
+If the service payload has a key that is not declared on the Pydantic
+response model, FastAPI's `Model(**payload)` will silently DROP it.
+Hit in Phase 49: `search_service` added `trust_score`, but
+`SearchItem` did not declare it, so `/api/search` never returned it.
+Moral: whenever you add a new key to a service dict that is wrapped by
+a Pydantic response model, add the corresponding field on the schema
+in the same commit.
+
+### Lesson 12 — `users.referral_code` is unique globally
+Every test fixture that creates multiple User rows MUST give each one
+a distinct `referral_code`, or SQLite will raise
+`UNIQUE constraint failed: users.referral_code`. Hit in Phases 52 and
+58 with helper functions that derived the code from email or slug alone.
+Pattern: combine email local-part + tenant slug (truncated to 30 chars).
+This bug only appears when 2+ users are created in the same test session;
+single-user tests pass. Always test with two users.
+
+### Lesson 13 — handoff.sh must be idempotent
+Running `handoff.sh` twice for the same marker used to append a
+duplicate checklist line and a duplicate commit line. Fix (Phase 58):
+before appending, regex-check whether an identical `- [x] <marker>` or
+`- <sha> <marker>` line already exists. Do the same for any future
+sync script.
+
+### Lesson 14 — business_base.html hides the content block when unauth
+When a visitor is not logged in (client-side token check), the business
+base layout omits `{% block content %}` entirely. Only `<title>` and
+the `{% block scripts %}` JS render. Tests for business pages must
+therefore assert on the page title and script content — never on HTML
+element ids inside the content block — unless they log in first.
+Hit in Phases 52 and 58.
+
+### Lesson 15 — Test fixtures and xdist: keep them globally unique
+With `pytest -n auto`, each worker runs in a separate process but they
+share the same SQLite file (schema created once per session). Fixtures
+that rely on hardcoded slugs/emails across files can collide under
+xdist even though they pass sequentially. Rule: every fixture-created
+row must have globally unique identifiers (slug, email, referral_code).
+Add a short uniqueness suffix when generating them (index, uuid4 hex,
+or the test module name).
+
+### Lesson 16 — Monkeypatching the AI provider in tests
+To test an AI feature without a real provider, patch the top-level
+entry point the service calls:
+    from app.services.ai import service as ai_service
+    monkeypatch.setattr(ai_service, "chat",
+        lambda *a, **kw: {"content": "AI", "provider": "x",
+                          "model": "x", "tokens_used": 0})
+Do not patch the provider factory directly — services call `chat(...)`
+on `ai_service`, so patching there is stable across provider changes.
+Always include a fallback test that makes `chat` raise and asserts
+`provider == "fallback"`.
+
+### Lesson 17 — Batch-compute aggregates on the search page, not per-row
+When enriching every search result with a derived value (trust score,
+family flag, etc.), compute it once for the whole page's tenant ids,
+not inside the per-row loop. Hit in Phase 49: putting the trust-score
+call inside the for-loop caused N+1 DB queries per result. Fix:
+    _page_tenant_ids = list({t.id for _, t in page_rows})
+    _trust = _tss.compute_many(db, tenant_ids=_page_tenant_ids)
+Wrap the batch call in try/except so an unrelated failure never breaks
+the search response.
+
+---
+
 END OF PLAYBOOK

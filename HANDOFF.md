@@ -85,7 +85,7 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
   - [ ] AI Voice Booking (B1) — with mock provider (real integration deferred)
   - [ ] Live Local Experiences (B14) — with mock data source
   - [ ] (any other free items user requests)
-- [ ] Lessons Learned batch update in AI-PLAYBOOK
+- [x] Lessons Learned batch update in AI-PLAYBOOK (17 lessons total)
 - [ ] Polish remaining UIs (quality pass, not new features)
 - [ ] Expand /docs/api where thin
 
