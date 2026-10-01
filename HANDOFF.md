@@ -71,35 +71,36 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
 
 ---
 
-## 0.1.5 STRATEGIC ROADMAP TO SALE (user directive, 2026-10-01)
+## 0.1.5 STRATEGIC ROADMAP TO SALE (4 STAGES, user directive 2026-10-01)
 
 > **User's plan:** finish the platform, then sell it.
 > This section tracks the 4-phase plan to production-ready sale.
 > Every completed item is ticked here so any new AI session picks up
 > exactly where we left off.
 
-### The 4-phase plan
+### The 4-stage plan
 
-**Phase 1 — Free work (features + quality)**
-- [ ] Finish all remaining FREE features
-  - [ ] AI Voice Booking (B1) — with mock provider (real integration deferred)
-  - [ ] Live Local Experiences (B14) — with mock data source
-  - [ ] (any other free items user requests)
-- [x] Lessons Learned batch update in AI-PLAYBOOK (17 lessons total)
-- [ ] Polish remaining UIs (quality pass, not new features)
-- [ ] Expand /docs/api where thin
+**STAGE 1 — Free work (Phases 61+)**
+- [ ] Phase 61 — Lessons Learned batch update ✅ done
+      (tag: phase-1-lessons; commits 47ff760 + bba0cf3)
+- [ ] Phase 62 — Expand /docs/api
+- [ ] Phase 63 — UI polish pass (quality, no new features)
+- [ ] Phase 64 — AI Voice Booking (B1) — mock provider
+- [ ] Phase 65 — Live Local Experiences (B14) — mock data source
+- [ ] Any additional free items user requests
 
-**Phase 2 — Rewards + Referral plan (user-provided)**
-- [ ] User provides final Rewards + Referral business plan
-- [ ] Phase 8 — Rewards + Referral Complete (replace TEMP catalog)
-- [ ] Phase 24 — Cross-Business Rewards (deferred item, unlock now)
+**STAGE 2 — Rewards + Referral plan (user-provided)**
+- [ ] User provides final Guest Rewards + Referral plan
+- [ ] Phase 8 — Guest Rewards + Referral Complete (replace TEMP catalog)
+- [ ] Phase 24 — Cross-Business Rewards (Guest) — unlock
 - [ ] Phase 44 — Loyalty Redemption: replace TEMP catalog with real one
-- [ ] Full HANDOFF update for new rewards model
+- [ ] Then: user provides Business Loyalty plan (separate layer)
+- [ ] Phase 66+ — Business Loyalty Program + B2B Referral
 
-**Phase 3 — Production readiness audit**
+**STAGE 3 — Production readiness audit**
 - [ ] Full bug sweep across the codebase
 - [ ] Fix all findings (bugs, edge cases, race conditions)
-- [ ] Verify all tests green (target: 100% pass, no skips on critical paths)
+- [ ] Verify all tests green (100% pass, no skips on critical paths)
 - [ ] Security review (rate limits, auth, CORS, secrets)
 - [ ] Performance review (N+1 queries, indexes, payload sizes)
 - [ ] Prepare deploy scripts (scripts/deploy/*.sh)
@@ -108,7 +109,7 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
 - [ ] Smoke test each critical flow end-to-end
 - [ ] Prepare SELLING-PITCH + TECH-OVERVIEW docs
 
-**Phase 4 — VPS + Domain + Production**
+**STAGE 4 — VPS + Domain + Production**
 - [ ] User purchases VPS + Domain
 - [ ] Phase 12 — VPS Deploy + Domain + Named Tunnel
 - [ ] Phase 10 — Payment Production (Telr/Stripe)
@@ -186,6 +187,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 61 Step 2 — Fix Stage plan numbering (Phase 61+)
 - [x] Phase 1 — Lessons Learned batch update
 - [x] Phase 60 Step 3 — Auto-Repricing UI page + sidebar
 - [x] Phase 60 Step 2 — Business Auto-Repricing API
@@ -289,7 +291,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 1 — Lessons Learned batch update (2026-10-01 22:19)
+Last step: Phase 61 Step 2 — Fix Stage plan numbering (Phase 61+) (2026-10-01 22:21)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -311,6 +313,7 @@ Last step: Phase 1 — Lessons Learned batch update (2026-10-01 22:19)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- ffffff Phase 61 Step 2 — Fix Stage plan numbering (Phase 61+)
 - 47ff760 Phase 1 — Lessons Learned batch update
 - 75e69df Phase 60 Step 3 — Auto-Repricing UI page + sidebar
 - c419e04 Phase 60 Step 2 — Business Auto-Repricing API
