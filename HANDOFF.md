@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.48.0-business-groups (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-58 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
+> Version: v0.49.0-group-coordinator (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-59 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
 
 Last updated: 2026-10-01
 
@@ -498,6 +498,23 @@ Tag: v0.36.0-ai-trip-memory
 - Step 3 — UI on /account/ai
   - "🧠 My Trip Memory" button reveals panel with recap + 6 profile pills
     + "Most visited" list; lazy-loaded on first open
+
+### Phase 59 — AI Group Coordinator (Wave 3, Blue-Ocean B6): COMPLETE
+Tag: v0.49.0-group-coordinator
+- Step 1 — AI Group Coordinator service (app/services/ai/group_coordinator.py)
+  - Only for group bookings (is_group=True) with >= 10 members
+  - Deterministic stats: members, paid/unpaid, remaining_to_allocate,
+    suggested per-unpaid member, rooms_needed (capacity-aware),
+    check-in/out, guests
+  - Activity suggestions: ancillary services from the same tenant
+  - AI writes a 4-paragraph coordination plan grounded ONLY in numbers
+  - Deterministic fallback plan always available
+  - status: ok | not_group | too_small
+- Step 2 — User API: POST /bookings/{id}/group/coordinate (15/min)
+  - Owner only; cross-user 404
+- Step 3 — UI: "✨ AI Coordinate" button in the group modal
+  - Shows AI plan + suggested activities
+  - Handles not_group and too_small statuses
 
 ### Phase 58 — Multi-property Dashboard (Wave 4): COMPLETE
 Tag: v0.48.0-business-groups
@@ -1416,6 +1433,7 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 56 (AI Upsell Engine) is COMPLETE — Wave 3 Blue-Ocean.**
 **Phase 57 (Split Payment / Installments) is COMPLETE — Wave 4 first free deliverable.**
 **Phase 58 (Multi-property Dashboard) is COMPLETE — Wave 4 second deliverable.**
+**Phase 59 (AI Group Coordinator) is COMPLETE — Wave 3 Blue-Ocean.**
 
 ## WAVE 2 COMPLETE (v0.43.0-ai-receptionist)
 
@@ -1701,7 +1719,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1266 tests, all passing
+## 14. Test Count: 1281 tests, all passing
 
 Test files:
 - test_health.py
