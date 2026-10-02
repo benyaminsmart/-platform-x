@@ -2,7 +2,9 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
+
+from app.core.rate_limit import limiter
 from sqlalchemy.orm import Session as DBSession
 
 from app.api.deps import get_current_tenant, get_current_user
@@ -16,8 +18,10 @@ from app.services import order_service
 router = APIRouter(prefix="/orders", tags=["orders"])
 
 
+@limiter.limit("30/minute")
 @router.post("", response_model=OrderPublic, status_code=status.HTTP_201_CREATED)
 def create_order(
+    request: Request,
     payload: OrderCreate,
     tenant: Tenant = Depends(get_current_tenant),
     user: User = Depends(get_current_user),
@@ -30,8 +34,10 @@ def create_order(
     return OrderPublic.model_validate(order)
 
 
+@limiter.limit("60/minute")
 @router.get("", response_model=PaginatedResponse[OrderPublic])
 def list_my_orders(
+    request: Request,
     status_filter: Annotated[str | None, Query(alias="status")] = None,
     page: Annotated[int, Query(ge=1)] = 1,
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
@@ -57,8 +63,10 @@ def list_my_orders(
     )
 
 
+@limiter.limit("60/minute")
 @router.get("/{order_id}", response_model=OrderPublic)
 def get_order(
+    request: Request,
     order_id: str,
     tenant: Tenant = Depends(get_current_tenant),
     user: User = Depends(get_current_user),
@@ -73,8 +81,10 @@ def get_order(
     return OrderPublic.model_validate(order)
 
 
+@limiter.limit("10/minute")
 @router.post("/{order_id}/cancel", response_model=OrderPublic)
 def cancel_order(
+    request: Request,
     order_id: str,
     tenant: Tenant = Depends(get_current_tenant),
     user: User = Depends(get_current_user),

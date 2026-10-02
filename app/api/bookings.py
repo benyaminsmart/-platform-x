@@ -3,7 +3,9 @@
 from datetime import date
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
+
+from app.core.rate_limit import limiter
 from sqlalchemy.orm import Session as DBSession
 
 from app.api.deps import get_current_tenant, get_current_user
@@ -17,8 +19,10 @@ from app.services import booking_service
 router = APIRouter(prefix="/bookings", tags=["bookings"])
 
 
+@limiter.limit("30/minute")
 @router.post("", response_model=BookingPublic, status_code=status.HTTP_201_CREATED)
 def create_booking(
+    request: Request,
     payload: BookingCreate,
     tenant: Tenant = Depends(get_current_tenant),
     user: User = Depends(get_current_user),
@@ -34,8 +38,10 @@ def create_booking(
     return BookingPublic.model_validate(booking)
 
 
+@limiter.limit("60/minute")
 @router.get("", response_model=PaginatedResponse[BookingPublic])
 def list_my_bookings(
+    request: Request,
     status_filter: Annotated[str | None, Query(alias="status")] = None,
     from_date: Annotated[date | None, Query()] = None,
     to_date: Annotated[date | None, Query()] = None,
@@ -68,8 +74,10 @@ def list_my_bookings(
     )
 
 
+@limiter.limit("60/minute")
 @router.get("/{booking_id}", response_model=BookingPublic)
 def get_booking(
+    request: Request,
     booking_id: str,
     tenant: Tenant = Depends(get_current_tenant),
     user: User = Depends(get_current_user),
@@ -84,8 +92,10 @@ def get_booking(
     return BookingPublic.model_validate(booking)
 
 
+@limiter.limit("10/minute")
 @router.post("/{booking_id}/cancel", response_model=BookingPublic)
 def cancel_booking(
+    request: Request,
     booking_id: str,
     tenant: Tenant = Depends(get_current_tenant),
     user: User = Depends(get_current_user),

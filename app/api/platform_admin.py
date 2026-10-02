@@ -3,7 +3,9 @@
 from datetime import datetime, timezone
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
+
+from app.core.rate_limit import limiter
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session as DBSession
 
@@ -34,8 +36,10 @@ router = APIRouter(prefix="/platform", tags=["platform-admin"])
 # ---------- Auth ----------
 
 
+@limiter.limit("10/minute")
 @router.post("/auth/login", response_model=AdminTokenResponse)
 def admin_login(
+    request: Request,
     payload: AdminLoginRequest,
     db: DBSession = Depends(get_db),
 ) -> AdminTokenResponse:
@@ -64,8 +68,12 @@ def admin_login(
     )
 
 
+@limiter.limit("60/minute")
 @router.get("/me", response_model=AdminPublic)
-def admin_me(admin: PlatformAdmin = Depends(get_current_admin)) -> AdminPublic:
+def admin_me(
+    request: Request,
+    admin: PlatformAdmin = Depends(get_current_admin),
+) -> AdminPublic:
     """Return the current admin's profile."""
     return AdminPublic.model_validate(admin)
 
@@ -73,8 +81,10 @@ def admin_me(admin: PlatformAdmin = Depends(get_current_admin)) -> AdminPublic:
 # ---------- Tenants ----------
 
 
+@limiter.limit("60/minute")
 @router.get("/tenants", response_model=list[TenantPublic])
 def list_all_tenants(
+    request: Request,
     admin: PlatformAdmin = Depends(get_current_admin),
     db: DBSession = Depends(get_db),
 ) -> list[TenantPublic]:
@@ -83,8 +93,10 @@ def list_all_tenants(
     return [TenantPublic.model_validate(t) for t in tenants]
 
 
+@limiter.limit("30/minute")
 @router.patch("/tenants/{tenant_id}/status", response_model=TenantPublic)
 def update_tenant_status(
+    request: Request,
     tenant_id: str,
     new_status: str,
     admin: PlatformAdmin = Depends(require_role("super_admin", "admin")),
@@ -120,8 +132,10 @@ def update_tenant_status(
 # ---------- Analytics ----------
 
 
+@limiter.limit("60/minute")
 @router.get("/analytics")
 def platform_analytics(
+    request: Request,
     admin: PlatformAdmin = Depends(get_current_admin),
     db: DBSession = Depends(get_db),
 ) -> dict:
@@ -144,8 +158,10 @@ def platform_analytics(
 # ---------- Subscriptions ----------
 
 
+@limiter.limit("60/minute")
 @router.get("/subscriptions", response_model=list[SubscriptionPublic])
 def list_subscriptions(
+    request: Request,
     admin: PlatformAdmin = Depends(get_current_admin),
     db: DBSession = Depends(get_db),
 ) -> list[SubscriptionPublic]:
@@ -156,12 +172,14 @@ def list_subscriptions(
     return [SubscriptionPublic.model_validate(s) for s in subs]
 
 
+@limiter.limit("30/minute")
 @router.post(
     "/subscriptions",
     response_model=SubscriptionPublic,
     status_code=status.HTTP_201_CREATED,
 )
 def create_subscription(
+    request: Request,
     payload: SubscriptionCreate,
     admin: PlatformAdmin = Depends(require_role("super_admin", "admin")),
     db: DBSession = Depends(get_db),

@@ -8,6 +8,8 @@ from datetime import date, timedelta
 from decimal import Decimal
 
 from fastapi import APIRouter, Depends, Query, Request
+
+from app.core.rate_limit import limiter
 from fastapi.responses import HTMLResponse
 from sqlalchemy import func
 from sqlalchemy.orm import Session as DBSession
@@ -108,6 +110,7 @@ def _table(headers: list[str], rows: list[list]) -> str:
     return f"<table><thead>{head}</thead><tbody>{body}</tbody></table>"
 
 
+@limiter.limit("30/minute")
 @router.get("/print", response_class=HTMLResponse)
 def business_report_print(
     request: Request,

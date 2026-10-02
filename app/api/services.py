@@ -2,7 +2,9 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
+
+from app.core.rate_limit import limiter
 from sqlalchemy.orm import Session as DBSession
 
 from app.api.deps import get_current_tenant
@@ -16,8 +18,10 @@ from app.services import service_service
 router = APIRouter(prefix="/services", tags=["services"])
 
 
+@limiter.limit("60/minute")
 @router.get("", response_model=PaginatedResponse[ServicePublic])
 def list_services(
+    request: Request,
     type_filter: Annotated[str | None, Query(alias="type")] = None,
     page: Annotated[int, Query(ge=1)] = 1,
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
@@ -41,8 +45,10 @@ def list_services(
     )
 
 
+@limiter.limit("60/minute")
 @router.get("/{service_id}", response_model=ServicePublic)
 def get_service(
+    request: Request,
     service_id: str,
     tenant: Tenant = Depends(get_current_tenant),
     db: DBSession = Depends(get_db),
@@ -54,6 +60,7 @@ def get_service(
     return ServicePublic.model_validate(svc)
 
 
+@limiter.limit("30/minute")
 @router.post(
     "",
     response_model=ServicePublic,
@@ -61,6 +68,7 @@ def get_service(
     dependencies=[Depends(require_role("super_admin", "admin"))],
 )
 def create_service(
+    request: Request,
     payload: ServiceCreate,
     tenant: Tenant = Depends(get_current_tenant),
     db: DBSession = Depends(get_db),
@@ -70,12 +78,14 @@ def create_service(
     return ServicePublic.model_validate(svc)
 
 
+@limiter.limit("30/minute")
 @router.patch(
     "/{service_id}",
     response_model=ServicePublic,
     dependencies=[Depends(require_role("super_admin", "admin"))],
 )
 def update_service(
+    request: Request,
     service_id: str,
     payload: ServiceUpdate,
     tenant: Tenant = Depends(get_current_tenant),
@@ -90,12 +100,14 @@ def update_service(
     return ServicePublic.model_validate(svc)
 
 
+@limiter.limit("30/minute")
 @router.delete(
     "/{service_id}",
     response_model=MessageResponse,
     dependencies=[Depends(require_role("super_admin", "admin"))],
 )
 def delete_service(
+    request: Request,
     service_id: str,
     tenant: Tenant = Depends(get_current_tenant),
     db: DBSession = Depends(get_db),
@@ -106,8 +118,10 @@ def delete_service(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
     return MessageResponse(message="Service deactivated")
 
+@limiter.limit("60/minute")
 @router.get("/{service_id}/gallery")
 def service_gallery(
+    request: Request,
     service_id: str,
     tenant: Tenant = Depends(get_current_tenant),
     db: DBSession = Depends(get_db),
@@ -136,8 +150,10 @@ def service_gallery(
 
 
 
+@limiter.limit("60/minute")
 @router.get("/{service_id}/rate-plans")
 def service_rate_plans(
+    request: Request,
     service_id: str,
     tenant: Tenant = Depends(get_current_tenant),
     db: DBSession = Depends(get_db),

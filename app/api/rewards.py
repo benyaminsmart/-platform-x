@@ -2,7 +2,9 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
+
+from app.core.rate_limit import limiter
 from sqlalchemy.orm import Session as DBSession
 
 from app.api.deps import get_current_tenant, get_current_user
@@ -16,8 +18,10 @@ from app.services import reward_service
 router = APIRouter(prefix="/rewards", tags=["rewards"])
 
 
+@limiter.limit("60/minute")
 @router.get("/me", response_model=RewardsSummary)
 def get_my_summary(
+    request: Request,
     user: User = Depends(get_current_user),
     db: DBSession = Depends(get_db),
 ) -> RewardsSummary:
@@ -25,8 +29,10 @@ def get_my_summary(
     return reward_service.get_summary(db, user=user)
 
 
+@limiter.limit("60/minute")
 @router.get("/history", response_model=PaginatedResponse[RewardPublic])
 def get_my_history(
+    request: Request,
     page: Annotated[int, Query(ge=1)] = 1,
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
     tenant: Tenant = Depends(get_current_tenant),
@@ -45,8 +51,10 @@ def get_my_history(
     )
 
 
+@limiter.limit("10/minute")
 @router.post("/redeem", response_model=RewardPublic)
 def redeem_reward(
+    request: Request,
     payload: RedeemRequest,
     tenant: Tenant = Depends(get_current_tenant),
     user: User = Depends(get_current_user),

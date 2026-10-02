@@ -1,6 +1,8 @@
 """Referral endpoints (auth required)."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
+
+from app.core.rate_limit import limiter
 from sqlalchemy.orm import Session as DBSession
 
 from app.api.deps import get_current_tenant, get_current_user
@@ -13,8 +15,10 @@ from app.services import referral_service
 router = APIRouter(prefix="/referrals", tags=["referrals"])
 
 
+@limiter.limit("60/minute")
 @router.get("/me", response_model=ReferralsMe)
 def get_my_referrals(
+    request: Request,
     tenant: Tenant = Depends(get_current_tenant),
     user: User = Depends(get_current_user),
     db: DBSession = Depends(get_db),
@@ -34,8 +38,10 @@ def get_my_referrals(
     )
 
 
+@limiter.limit("10/minute")
 @router.post("/apply", response_model=ReferralPublic, status_code=status.HTTP_201_CREATED)
 def apply_referral(
+    request: Request,
     payload: ApplyReferralRequest,
     tenant: Tenant = Depends(get_current_tenant),
     user: User = Depends(get_current_user),

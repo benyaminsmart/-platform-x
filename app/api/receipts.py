@@ -1,5 +1,7 @@
 """Receipt HTML endpoint (Phase 30, Step 7 — Wave 0 part A)."""
 from fastapi import APIRouter, Depends, HTTPException, Request
+
+from app.core.rate_limit import limiter
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session as DBSession
 
@@ -45,6 +47,7 @@ th{{color:#6b7280;font-weight:600;font-size:11px;text-transform:uppercase;letter
 </body></html>"""
 
 
+@limiter.limit("30/minute")
 @router.get("/{booking_id}/receipt", response_class=HTMLResponse)
 def booking_receipt(
     request: Request,

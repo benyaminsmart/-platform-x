@@ -2,7 +2,9 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
+
+from app.core.rate_limit import limiter
 from sqlalchemy.orm import Session as DBSession
 
 from app.api.deps import get_current_tenant, get_current_user
@@ -16,8 +18,10 @@ from app.services import notification_service
 router = APIRouter(prefix="/notifications", tags=["notifications"])
 
 
+@limiter.limit("60/minute")
 @router.get("", response_model=PaginatedResponse[NotificationPublic])
 def list_my_notifications(
+    request: Request,
     unread_only: Annotated[bool, Query()] = False,
     page: Annotated[int, Query(ge=1)] = 1,
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
@@ -42,8 +46,10 @@ def list_my_notifications(
     )
 
 
+@limiter.limit("60/minute")
 @router.get("/unread-count", response_model=UnreadCount)
 def get_unread_count(
+    request: Request,
     tenant: Tenant = Depends(get_current_tenant),
     user: User = Depends(get_current_user),
     db: DBSession = Depends(get_db),
@@ -52,8 +58,10 @@ def get_unread_count(
     return UnreadCount(unread=notification_service.unread_count(db, tenant_id=tenant.id, user_id=user.id))
 
 
+@limiter.limit("30/minute")
 @router.post("/{notification_id}/read", response_model=NotificationPublic)
 def mark_notification_read(
+    request: Request,
     notification_id: str,
     tenant: Tenant = Depends(get_current_tenant),
     user: User = Depends(get_current_user),

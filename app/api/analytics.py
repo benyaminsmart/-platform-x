@@ -5,6 +5,8 @@ GET  /analytics/summary — tenant admin view (platform admin for now)
 """
 
 from fastapi import APIRouter, Depends, Request, status
+
+from app.core.rate_limit import limiter
 from sqlalchemy.orm import Session as DBSession
 
 from app.api.deps import get_current_tenant
@@ -18,14 +20,15 @@ from app.services import analytics_service
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
 
+@limiter.limit("30/minute")
 @router.post(
     "/events",
     response_model=AnalyticsEventPublic,
     status_code=status.HTTP_201_CREATED,
 )
 def track_event(
-    payload: AnalyticsEventCreate,
     request: Request,
+    payload: AnalyticsEventCreate,
     tenant: Tenant = Depends(get_current_tenant),
     db: DBSession = Depends(get_db),
 ) -> AnalyticsEventPublic:
@@ -47,8 +50,10 @@ def track_event(
     return AnalyticsEventPublic.model_validate(event)
 
 
+@limiter.limit("60/minute")
 @router.get("/summary")
 def tenant_summary(
+    request: Request,
     tenant: Tenant = Depends(get_current_tenant),
     admin: PlatformAdmin = Depends(get_current_admin),
     db: DBSession = Depends(get_db),
