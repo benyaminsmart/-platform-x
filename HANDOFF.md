@@ -245,6 +245,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 75 Step 1 — reward ledger + wallet + rules
 - [x] Phase 69 Step 1 — N+1 fix + admin limit
 - [x] Phase 68 Step 2 — add rate limits to all routes
 - [x] Phase 67 Step 3 — add indexes on all FK columns
@@ -365,7 +366,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 69 Step 1 — N+1 fix + admin limit (2026-10-02 15:47)
+Last step: Phase 75 Step 1 — reward ledger + wallet + rules (2026-10-02 15:56)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -387,6 +388,7 @@ Last step: Phase 69 Step 1 — N+1 fix + admin limit (2026-10-02 15:47)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- f6b3889 Phase 75 Step 1 — reward ledger + wallet + rules
 - f8f3e6a Phase 69 Step 1 — N+1 fix + admin limit
 - 64b9913 Phase 68 Step 2 — add rate limits to all routes
 - 8d2d947 Phase 67 Step 3 — add indexes on all FK columns
