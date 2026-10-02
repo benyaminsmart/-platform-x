@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.54.0-bug-sweep (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-67 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. STAGE 3 IN PROGRESS.
+> Version: v0.55.0-security (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-68 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. STAGE 3 IN PROGRESS.
 
 Last updated: 2026-10-02
 
@@ -100,7 +100,7 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
 - [x] Full bug sweep across the codebase (Phase 67)
 - [x] Fix all findings (bugs, edge cases, race conditions) (Phase 67)
 - [x] Verify all tests green (100% pass, no skips on critical paths) (Phase 67)
-- [ ] Security review (rate limits, auth, CORS, secrets) ← NEXT (Phase 68)
+- [x] Security review (rate limits, auth, CORS, secrets) (Phase 68)
 - [x] Performance review (N+1 queries, indexes, payload sizes) (Phase 67)
 - [ ] Prepare deploy scripts (scripts/deploy/*.sh)
 - [ ] Prepare production env config (DATABASE_URL, secrets, CORS_ORIGINS)
@@ -609,6 +609,21 @@ Tag: phase-1-lessons (lightweight)
 - New regression test suite for business panel templates
 - Two rules: no hardcoded light backgrounds; every template references
   --adm-* token (with Phase 65 exemption list for placeholders)
+
+### Phase 68 — Security Review (Stage 3): COMPLETE
+Tag: v0.55.0-security
+- Step 1 — Security scan (no code change)
+  - Confirmed healthy: CORS restricted, SecurityHeaders + HTTPSRedirect
+    middlewares active, JWT fail-fast on weak secret in production,
+    bcrypt password hashing with truncation, no secrets leaked to repo
+  - Found: 11 API modules with routes but zero rate limits
+- Step 2 — Add rate limits to all public + business routes
+  - 17 routes in bookings/orders/services/tenants
+  - 19 routes in rewards/referrals/analytics/notifications/
+    platform_admin/receipts/business_reports
+  - All ~50 routes now have @limiter.limit decorators
+  - Guard test test_rate_limit_coverage.py asserts every future module
+    keeps a rate limit — regressions prevented
 
 ### Phase 67 — Full Bug Sweep (Stage 3): COMPLETE
 Tag: v0.54.0-bug-sweep
@@ -1649,8 +1664,9 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 65 (Live Local Experiences — mock) COMPLETE. STAGE 1 FREE WORK FINISHED.**
 **Phase 66 (Business Panel Polish) COMPLETE — STAGE 3 first phase done.**
 **Phase 67 (Full Bug Sweep) COMPLETE — logging, N+1, FK indexes.**
-**STAGE 3 remaining: 68 Security, 69 Performance, 70 Deploy Scripts,
-71 PostgreSQL Dry-run, 72 Prod Env Config, 73 Smoke Test, 74 Sales docs.**
+**Phase 68 (Security Review) COMPLETE — rate limits on all routes.**
+**STAGE 3 remaining: 69 Performance, 70 Deploy Scripts, 71 PostgreSQL Dry-run,
+72 Prod Env Config, 73 Smoke Test, 74 Sales docs.**
 
 ## STAGE 1 COMPLETE (v0.52.0-local-experiences)
 
@@ -1948,7 +1964,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1347 tests, all passing
+## 14. Test Count: 1349 tests, all passing
 
 Test files:
 - test_health.py
