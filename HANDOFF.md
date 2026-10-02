@@ -245,6 +245,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 75 Step 3 — tier migration + wallet backfill
 - [x] Phase 75 Step 2 — Reward Engine service
 - [x] Phase 75 Step 1 — reward ledger + wallet + rules
 - [x] Phase 69 Step 1 — N+1 fix + admin limit
@@ -367,7 +368,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 75 Step 2 — Reward Engine service (2026-10-02 15:57)
+Last step: Phase 75 Step 3 — tier migration + wallet backfill (2026-10-02 15:58)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -389,6 +390,7 @@ Last step: Phase 75 Step 2 — Reward Engine service (2026-10-02 15:57)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- d455b90 Phase 75 Step 3 — tier migration + wallet backfill
 - 7b90c3d Phase 75 Step 2 — Reward Engine service
 - f6b3889 Phase 75 Step 1 — reward ledger + wallet + rules
 - f8f3e6a Phase 69 Step 1 — N+1 fix + admin limit
