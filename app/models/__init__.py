@@ -26,6 +26,10 @@ from app.models.rate_plan import RatePlan
 from app.models.recent_search import RecentSearch
 from app.models.redeem_option import RedeemOption
 from app.models.referral import Referral
+from app.models.referral_code import ReferralCode
+from app.models.referral_event import ReferralEvent
+from app.models.referral_relationship import ReferralRelationship
+from app.models.referral_reward import ReferralReward
 from app.models.review import Review
 from app.models.review_photo import ReviewPhoto
 from app.models.room import Room
@@ -70,6 +74,10 @@ __all__ = [
     "RecentSearch",
     "RedeemOption",
     "Referral",
+    "ReferralCode",
+    "ReferralEvent",
+    "ReferralRelationship",
+    "ReferralReward",
     "Review",
     "Room",
     "ReviewPhoto",
