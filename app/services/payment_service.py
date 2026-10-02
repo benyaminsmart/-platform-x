@@ -160,18 +160,57 @@ def mark_success(
                     # Never fail the payment because of room assignment issues.
                     pass
 
-            # Award points: 1 point per 10 currency units (min 5 points)
-            from app.services import reward_service
-            points = max(5, int(float(booking.total_amount) / 10))
-            reward_service.add_points(
-                db,
-                tenant_id=payment.tenant_id,
-                user_id=payment.user_id,
-                points=points,
-                reward_type="earn",
-                description=f"Booking: {booking.service_name}",
-                reference_id=booking.id,
-            )
+            # Award reward via the new Rewards Engine (Phase 76).
+            # Falls back to the legacy reward_service if the engine
+            # fails, so a booking is never left unrewarded due to a
+            # soft error.
+            try:
+                from app.models.tenant import Tenant as _RT
+                from app.models.user import User as _RU
+                from app.services import reward_eligibility as _re
+                from app.services import reward_engine as _reng
+                _tenant = db.query(_RT).filter(_RT.id == payment.tenant_id).one_or_none()
+                _user = db.query(_RU).filter(_RU.id == payment.user_id).one_or_none()
+                if _tenant is not None and _user is not None:
+                    calc = _re.calculate_reward(
+                        db, tenant=_tenant, user=_user,
+                        booking=booking, payment=payment,
+                    )
+                    if calc.qualifies and calc.final_reward > 0:
+                        from datetime import datetime as _dt, timedelta as _td, timezone as _tz
+                        from app.core.rewards_config import EXPIRATION_DEFAULT_DAYS
+                        now = _dt.now(_tz.utc)
+                        _reng.create_ledger_entry(
+                            db,
+                            tenant=_tenant,
+                            user=_user,
+                            reward_type="PLATFORM_EARN",
+                            amount=calc.final_reward,
+                            currency=booking.currency or "AED",
+                            funding_source="PLATFORM",
+                            platform_cost=calc.final_reward,
+                            status="AVAILABLE",
+                            available_at=now,
+                            expires_at=now + _td(days=EXPIRATION_DEFAULT_DAYS),
+                            transaction_id=booking.id,
+                            description=f"Booking: {booking.service_name} ({calc.category})",
+                        )
+            except Exception as _e:
+                # Legacy fallback — never fail the payment for rewards
+                from app.services import reward_service
+                try:
+                    points = max(5, int(float(booking.total_amount) / 10))
+                    reward_service.add_points(
+                        db,
+                        tenant_id=payment.tenant_id,
+                        user_id=payment.user_id,
+                        points=points,
+                        reward_type="earn",
+                        description=f"Booking: {booking.service_name}",
+                        reference_id=booking.id,
+                    )
+                except Exception:
+                    pass
 
             # Record booking notification + send email (both non-blocking)
             try:
@@ -230,18 +269,54 @@ def mark_success(
         ).scalar_one_or_none()
         if order is not None:
             order.payment_status = "paid"
-            # Award points for orders too
-            from app.services import reward_service
-            points = max(3, int(float(order.amount) / 10))
-            reward_service.add_points(
-                db,
-                tenant_id=payment.tenant_id,
-                user_id=payment.user_id,
-                points=points,
-                reward_type="earn",
-                description=f"Order: {order.service_name}",
-                reference_id=order.id,
-            )
+            # Award reward via the Rewards Engine (Phase 76).
+            # Orders currently use a flat 1% platform rate since they do
+            # not carry a category. Legacy fallback protects against
+            # engine errors.
+            try:
+                from app.models.tenant import Tenant as _OT
+                from app.models.user import User as _OU
+                from app.services import reward_engine as _oreng
+                from datetime import datetime as _odt, timedelta as _otd, timezone as _otz
+                from app.core.rewards_config import EXPIRATION_DEFAULT_DAYS
+                _tenant = db.query(_OT).filter(_OT.id == payment.tenant_id).one_or_none()
+                _user = db.query(_OU).filter(_OU.id == payment.user_id).one_or_none()
+                if _tenant is not None and _user is not None:
+                    amount = Decimal(str(order.amount or 0))
+                    if amount > 0:
+                        reward_amt = (amount * Decimal("0.01")).quantize(Decimal("0.01"))
+                        if reward_amt > 0:
+                            now = _odt.now(_otz.utc)
+                            _oreng.create_ledger_entry(
+                                db,
+                                tenant=_tenant,
+                                user=_user,
+                                reward_type="PLATFORM_EARN",
+                                amount=reward_amt,
+                                currency=order.currency or "AED",
+                                funding_source="PLATFORM",
+                                platform_cost=reward_amt,
+                                status="AVAILABLE",
+                                available_at=now,
+                                expires_at=now + _otd(days=EXPIRATION_DEFAULT_DAYS),
+                                transaction_id=order.id,
+                                description=f"Order: {order.service_name}",
+                            )
+            except Exception:
+                from app.services import reward_service
+                try:
+                    points = max(3, int(float(order.amount) / 10))
+                    reward_service.add_points(
+                        db,
+                        tenant_id=payment.tenant_id,
+                        user_id=payment.user_id,
+                        points=points,
+                        reward_type="earn",
+                        description=f"Order: {order.service_name}",
+                        reference_id=order.id,
+                    )
+                except Exception:
+                    pass
 
     db.commit()
     db.refresh(payment)
