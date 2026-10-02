@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.56.0-performance (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-69 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. STAGE 3 IN PROGRESS.
+> Version: v0.57.0-rewards-foundation (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-75 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. STAGE 2 IN PROGRESS. STAGE 3 PAUSED AT 69/74.
 
 Last updated: 2026-10-02
 
@@ -96,7 +96,7 @@ referral lifecycle, expiration, campaigns, AI-ready).
 
 User-side only. Business Loyalty remains a separate future layer.
 
-- [ ] Phase 75 — Rewards Foundation (Ledger + Wallet + Tier migration)
+- [x] Phase 75 — Rewards Foundation (Ledger + Wallet + Tier migration) — tag v0.57.0
       * Extend Reward into an immutable ledger with funding_source,
         status, available_at, expires_at, transaction_id, referral_id,
         campaign_id, metadata
@@ -676,6 +676,34 @@ Tag: phase-1-lessons (lightweight)
 - New regression test suite for business panel templates
 - Two rules: no hardcoded light backgrounds; every template references
   --adm-* token (with Phase 65 exemption list for placeholders)
+
+### Phase 75 — Rewards Foundation (Stage 2): COMPLETE
+Tag: v0.57.0-rewards-foundation
+- Step 1 — Reward ledger + wallet + rules foundation
+  - Reward model extended into an immutable ledger with funding_source,
+    status (PENDING/LOCKED/AVAILABLE/PARTIALLY_USED/USED/EXPIRED/
+    REVERSED/CANCELLED), amount, currency, platform_cost,
+    partner_contribution, available_at, expires_at, transaction_id,
+    referral_id, campaign_id, source_type, source_id, extra
+  - New RewardWallet projection model (available/locked/expiring/
+    referral/experience/bonus + platform_cost/partner_cost balances)
+  - New RewardRule model (per-category config: rate, max, min)
+  - New app/core/rewards_config.py (single source of truth for
+    category rates, tiers, referral limits, expiration, economics)
+  - Migration 2d0c88d97959 (hand-written; SQLite-safe)
+- Step 2 — Reward Engine service (app/services/reward_engine.py)
+  - create_ledger_entry() with idempotency on (user, transaction,
+    reward_type)
+  - Wallet projection applied automatically on each ledger append
+  - rebuild_wallet() full rebuild from the ledger (auditable)
+  - wallet_summary(), list_ledger(), find_existing_reward()
+  - Referral / experience / bonus funding sources credited to
+    separate wallet buckets
+- Step 3 — Tier migration + wallet backfill
+  - app/scripts/migrate_rewards_v1.py (idempotent)
+  - Legacy tier map: welcome→EXPLORER, silver→TRAVELER,
+    gold→INSIDER, platinum→VIP, royal→VIP
+  - Backfilled wallets for all existing users
 
 ### Phase 69 — Performance Review (Stage 3): COMPLETE
 Tag: v0.56.0-performance
@@ -2041,7 +2069,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1349 tests, all passing
+## 14. Test Count: 1374 tests, all passing
 
 Test files:
 - test_health.py
