@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.55.0-security (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-68 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. STAGE 3 IN PROGRESS.
+> Version: v0.56.0-performance (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-69 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. STAGE 3 IN PROGRESS.
 
 Last updated: 2026-10-02
 
@@ -611,6 +611,15 @@ Tag: phase-1-lessons (lightweight)
 - New regression test suite for business panel templates
 - Two rules: no hardcoded light backgrounds; every template references
   --adm-* token (with Phase 65 exemption list for placeholders)
+
+### Phase 69 — Performance Review (Stage 3): COMPLETE
+Tag: v0.56.0-performance
+- Step 1 — N+1 fix + payload caps
+  - business_group_service.list_groups: batch-fetch group members
+  - platform_admin.list_all_tenants: cap to 200 by default (max 1000)
+  - Audit: all list endpoints either paginate or are inherently small
+  - Audit: all payload limits ≤ 100 for list endpoints
+  - Audit: 55 modules already have rate limits (Phase 68 guard)
 
 ### Phase 68 — Security Review (Stage 3): COMPLETE
 Tag: v0.55.0-security
@@ -1667,7 +1676,8 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 66 (Business Panel Polish) COMPLETE — STAGE 3 first phase done.**
 **Phase 67 (Full Bug Sweep) COMPLETE — logging, N+1, FK indexes.**
 **Phase 68 (Security Review) COMPLETE — rate limits on all routes.**
-**STAGE 3 remaining: 69 Performance, 70 Deploy Scripts, 71 PostgreSQL Dry-run,
+**Phase 69 (Performance Review) COMPLETE — N+1, payload caps, index audit.**
+**STAGE 3 remaining: 70 Deploy Scripts, 71 PostgreSQL Dry-run,
 72 Prod Env Config, 73 Smoke Test, 74 Sales docs.**
 
 ## STAGE 1 COMPLETE (v0.52.0-local-experiences)
