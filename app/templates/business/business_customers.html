@@ -8,42 +8,104 @@
 </div>
 
 <div class="admin-card">
+  <div class="coach-head">
+    <h3>Guest list</h3>
+    <button type="button" class="admin-btn" id="cu-refresh"
+            style="background:var(--adm-surface-2); color:var(--adm-text);">Refresh</button>
+  </div>
   <div id="customers-list">Loading…</div>
 </div>
+
+<style>
+.cu-table {
+  width: 100%; border-collapse: collapse; font-size: 13.5px;
+  color: var(--adm-text);
+}
+.cu-table th, .cu-table td {
+  border-bottom: 1px solid var(--adm-line); padding: 10px 12px;
+  text-align: left; vertical-align: middle;
+}
+.cu-table th {
+  background: var(--adm-surface-2); font-weight: 700; color: var(--adm-muted);
+  font-size: 11px; letter-spacing: .05em; text-transform: uppercase;
+}
+.cu-table tbody tr:hover { background: var(--adm-surface-2); }
+.cu-tier {
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  background: var(--adm-surface-2); color: var(--adm-text);
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.cu-tier.gold { background: #fef3c7; color: #92400e; }
+.cu-tier.platinum { background: #e0e7ff; color: #3730a3; }
+.cu-tier.royal { background: #ede9fe; color: #6d28d9; }
+.cu-tier.silver { background: #e5e7eb; color: #374151; }
+.cu-empty { padding: 30px; text-align: center; color: var(--adm-muted); }
+</style>
 
 {% endblock %}
 {% block scripts %}
 <script>
 (function(){
-  var token = null; try { token = localStorage.getItem("px_business_token"); } catch(e){}
-  if (!token) { window.location.href = "/business/login?tenant=trianon-hotel"; return; }
-  var lo = document.getElementById("business-logout");
-  if (lo) lo.addEventListener("click", function(){ try{localStorage.removeItem("px_business_token");}catch(e){}; window.location.href = "/business/login?tenant=trianon-hotel"; });
-  var headers = {"Authorization": "Bearer " + token, "X-Tenant-Slug": "trianon-hotel", "Content-Type": "application/json"};
-  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login"; return; }
+  var slug = null;
 
-  fetch("/business/api/customers", {headers: headers})
-    .then(function(r){ if (r.status === 401) { window.location.href = "/business/login?tenant=trianon-hotel"; return null; } return r.json(); })
-    .then(function(items){
-      if (!items) return;
-      var el = document.getElementById("customers-list");
-      if (!items.length) { el.innerHTML = '<p class="admin-card-sub">No customers yet.</p>'; return; }
-      var html = '<table class="admin-table"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Language</th><th>Tier</th><th>Points</th><th>Bookings</th></tr></thead><tbody>';
-      items.forEach(function(c){
-        html += "<tr>" +
-          "<td><strong>" + esc(c.name || "—") + "</strong></td>" +
-          "<td>" + esc(c.email || "—") + "</td>" +
-          "<td>" + esc(c.phone || "—") + "</td>" +
-          "<td>" + esc(c.language || "—") + "</td>" +
-          "<td><span class='admin-badge admin-badge-info'>" + esc(c.tier || "—") + "</span></td>" +
-          "<td>" + (c.points || 0) + "</td>" +
-          "<td><strong>" + (c.bookings_count || 0) + "</strong></td>" +
-          "</tr>";
-      });
-      html += "</tbody></table>";
-      el.innerHTML = html;
-    })
-    .catch(function(){});
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function h() { return { "Authorization": "Bearer " + token, "X-Tenant-Slug": slug, "Content-Type": "application/json" }; }
+
+  async function resolveSlug() {
+    var res = await fetch("/business/api/me", { headers: { "Authorization": "Bearer " + token } });
+    if (!res.ok) { window.location.href = "/business/login"; return; }
+    slug = (await res.json()).tenant_slug;
+  }
+
+  function tierClass(t) {
+    var x = String(t || "").toLowerCase();
+    if (x === "gold" || x === "platinum" || x === "royal" || x === "silver") return x;
+    return "";
+  }
+
+  async function load() {
+    var el = document.getElementById("customers-list");
+    el.innerHTML = "Loading…";
+    var res = await fetch("/business/api/customers", { headers: h() });
+    if (!res.ok) {
+      el.innerHTML = '<div class="cu-empty">Failed to load customers.</div>';
+      return;
+    }
+    var items = await res.json();
+    if (!items.length) {
+      el.innerHTML = '<div class="cu-empty">No customers yet.</div>';
+      return;
+    }
+    var html = '<table class="cu-table"><thead><tr>' +
+      '<th>Name</th><th>Email</th><th>Phone</th><th>Language</th>' +
+      '<th>Tier</th><th>Points</th><th>Bookings</th>' +
+      '</tr></thead><tbody>';
+    items.forEach(function(c){
+      html += "<tr>" +
+        "<td><strong>" + esc(c.name || "—") + "</strong></td>" +
+        "<td>" + esc(c.email || "—") + "</td>" +
+        "<td>" + esc(c.phone || "—") + "</td>" +
+        "<td>" + esc(c.language || "—") + "</td>" +
+        '<td><span class="cu-tier ' + tierClass(c.tier) + '">' + esc(c.tier || "—") + "</span></td>" +
+        "<td>" + (c.points || 0) + "</td>" +
+        "<td><strong>" + (c.bookings_count || 0) + "</strong></td>" +
+        "</tr>";
+    });
+    html += "</tbody></table>";
+    el.innerHTML = html;
+  }
+
+  document.getElementById("cu-refresh").addEventListener("click", load);
+
+  (async function(){
+    await resolveSlug();
+    if (!slug) return;
+    load();
+  })();
 })();
 </script>
 {% endblock %}
