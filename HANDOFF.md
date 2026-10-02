@@ -186,6 +186,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 66 Step 1 — Business Settings API + UI
 - [x] Phase 65 Step 3 — Local Experiences UI on tenant page
 - [x] Phase 65 Step 2 — Local Experiences API
 - [x] Phase 65 Step 1 — Local Experiences service + mock seed
@@ -297,7 +298,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 65 Step 3 — Local Experiences UI on tenant page (2026-10-01 22:46)
+Last step: Phase 66 Step 1 — Business Settings API + UI (2026-10-02 15:08)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -319,6 +320,7 @@ Last step: Phase 65 Step 3 — Local Experiences UI on tenant page (2026-10-01 2
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 632a9f9 Phase 66 Step 1 — Business Settings API + UI
 - 748539b Phase 65 Step 3 — Local Experiences UI on tenant page
 - 5e2ff54 Phase 65 Step 2 — Local Experiences API
 - bebb9b7 Phase 65 Step 1 — Local Experiences service + mock seed
