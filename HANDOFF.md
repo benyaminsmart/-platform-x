@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.52.0-local-experiences (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-65 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE.
+> Version: v0.53.0-business-polish (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-66 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. STAGE 3 IN PROGRESS.
 
 Last updated: 2026-10-01
 
@@ -96,7 +96,7 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
 - [ ] Then: user provides Business Loyalty plan (separate layer)
 - [ ] Phase 66+ — Business Loyalty Program + B2B Referral
 
-**STAGE 3 — Production readiness audit**
+**STAGE 3 — Production readiness audit (Phase 66 DONE, 67-74 remaining)**
 - [ ] Full bug sweep across the codebase
 - [ ] Fix all findings (bugs, edge cases, race conditions)
 - [ ] Verify all tests green (100% pass, no skips on critical paths)
@@ -601,6 +601,25 @@ Tag: phase-1-lessons (lightweight)
 - New regression test suite for business panel templates
 - Two rules: no hardcoded light backgrounds; every template references
   --adm-* token (with Phase 65 exemption list for placeholders)
+
+### Phase 66 — Business Panel Polish (Stage 3): COMPLETE
+Tag: v0.53.0-business-polish
+- Step 1 — Business Settings API + UI
+  - GET/PATCH /business/api/settings (owner/manager write)
+  - Editable: tagline, location, currency, default_language,
+    languages, amenities, branding colors, contact (phone/email/website)
+  - Full rewrite of business_settings.html with --adm-* tokens
+- Step 2 — Business Customers polish
+  - Full rewrite with --adm-* tokens + tier badges
+  - Refresh button, hover states
+- Step 3 — Business Analytics dashboard
+  - Full rewrite with --adm-* tokens
+  - KPI cards from insights API: occupancy, forecast, trend, min capacity
+  - Revenue forecast, near-full days, capacity summary
+  - Days selector (30/90/180)
+- Step 4 — Empty the Phase 63 exemption list
+  - All business templates now use --adm-* tokens
+  - Regression guard remains active
 
 ### Phase 65 — Live Local Experiences (Wave 3, Blue-Ocean B14): COMPLETE
 Tag: v0.52.0-local-experiences
@@ -1596,6 +1615,7 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 60 (AI Auto-Repricing Live) is COMPLETE — Wave 3 Blue-Ocean.**
 **Phase 61 (Lessons) / 62 (Docs) / 63 (UI guard) / 64 (Voice Booking) COMPLETE.**
 **Phase 65 (Live Local Experiences — mock) COMPLETE. STAGE 1 FREE WORK FINISHED.**
+**Phase 66 (Business Panel Polish) COMPLETE — STAGE 3 first phase done.**
 
 ## STAGE 1 COMPLETE (v0.52.0-local-experiences)
 
@@ -1893,7 +1913,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1334 tests, all passing
+## 14. Test Count: 1347 tests, all passing
 
 Test files:
 - test_health.py
