@@ -39,14 +39,8 @@ def test_no_hardcoded_light_backgrounds() -> None:
     assert not offenders, "Hardcoded light backgrounds:\n" + "\n".join(offenders)
 
 
-# Templates that are placeholders (analytics/settings) or use only shared
-# base classes (customers). They are scheduled for full --adm-* adoption
-# in Phase 65 (Business Panel Polish).
-_ADM_TOKEN_EXEMPT = {
-    "app/templates/business/business_analytics.html",
-    "app/templates/business/business_customers.html",
-    "app/templates/business/business_settings.html",
-}
+# Empty since Phase 66 — all business templates now reference --adm-* tokens.
+_ADM_TOKEN_EXEMPT: set[str] = set()
 
 
 def test_every_business_template_uses_adm_tokens() -> None:
