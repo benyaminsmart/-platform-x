@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.53.0-business-polish (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-66 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. STAGE 3 IN PROGRESS.
+> Version: v0.54.0-bug-sweep (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-67 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. STAGE 3 IN PROGRESS.
 
 Last updated: 2026-10-01
 
@@ -607,6 +607,30 @@ Tag: phase-1-lessons (lightweight)
 - New regression test suite for business panel templates
 - Two rules: no hardcoded light backgrounds; every template references
   --adm-* token (with Phase 65 exemption list for placeholders)
+
+### Phase 67 — Full Bug Sweep (Stage 3): COMPLETE
+Tag: v0.54.0-bug-sweep
+- Step 1 — Core logging + replace silent excepts
+  - New module: app/core/logging_config.py (configure_logging + get_logger)
+  - configure_logging() called once at app startup (app/main.py)
+  - Replaced ~10 silent `except: pass` blocks with logger.warning/debug
+    across auth, booking, payment, waitlist, AI providers, importer,
+    campaign writer, market analyst, content importer, review photos,
+    cancellation, business_group, voice_booking
+  - Verified: 0 silent excepts remaining in app/
+- Step 2 — N+1 query fixes
+  - location_recommender._user_pref_category: batch-fetch tenants
+  - price_alert_service.check_alerts: batch-fetch services
+  - price_lock_service.list_locks: batch-fetch services
+  - waitlist_service.list_entries: batch-fetch services + tenants
+- Step 3 — Indexes on all FK columns
+  - Added index=True to 10 FK columns:
+    api_keys.created_by_user_id, installment_plans.booking_id,
+    payments.booking_id, payments.order_id, price_alerts.service_id,
+    price_locks.service_id, pricing_rules.created_by_user_id,
+    users.referred_by, webhooks.created_by_user_id, wishlists.service_id
+  - Migration a6ca5215e333 (hand-written; skips SQLite-incompatible FK ops)
+  - Verified: 0 FK columns without index
 
 ### Phase 66 — Business Panel Polish (Stage 3): COMPLETE
 Tag: v0.53.0-business-polish
@@ -1622,6 +1646,9 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 61 (Lessons) / 62 (Docs) / 63 (UI guard) / 64 (Voice Booking) COMPLETE.**
 **Phase 65 (Live Local Experiences — mock) COMPLETE. STAGE 1 FREE WORK FINISHED.**
 **Phase 66 (Business Panel Polish) COMPLETE — STAGE 3 first phase done.**
+**Phase 67 (Full Bug Sweep) COMPLETE — logging, N+1, FK indexes.**
+**STAGE 3 remaining: 68 Security, 69 Performance, 70 Deploy Scripts,
+71 PostgreSQL Dry-run, 72 Prod Env Config, 73 Smoke Test, 74 Sales docs.**
 
 ## STAGE 1 COMPLETE (v0.52.0-local-experiences)
 
