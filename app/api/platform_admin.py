@@ -85,11 +85,22 @@ def admin_me(
 @router.get("/tenants", response_model=list[TenantPublic])
 def list_all_tenants(
     request: Request,
+    limit: int = 200,
     admin: PlatformAdmin = Depends(get_current_admin),
     db: DBSession = Depends(get_db),
 ) -> list[TenantPublic]:
-    """List all tenants (including suspended) for admin."""
-    tenants = db.execute(select(Tenant).order_by(Tenant.created_at.desc())).scalars().all()
+    """List all tenants (including suspended) for admin.
+
+    Capped at `limit` (default 200, max 1000) to bound the payload.
+    """
+    limit = max(1, min(int(limit), 1000))
+    tenants = (
+        db.execute(
+            select(Tenant).order_by(Tenant.created_at.desc()).limit(limit)
+        )
+        .scalars()
+        .all()
+    )
     return [TenantPublic.model_validate(t) for t in tenants]
 
 

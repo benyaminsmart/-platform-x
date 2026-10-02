@@ -62,9 +62,19 @@ def list_groups(db: DBSession, *, owner_user_id: str) -> list[dict]:
         .order_by(BusinessGroup.created_at.desc())
         .all()
     )
+    # Batch-fetch all members in one query (avoids N+1)
+    group_ids = [g.id for g in rows]
+    all_members = (
+        db.query(Tenant).filter(Tenant.group_id.in_(group_ids)).all()
+        if group_ids else []
+    )
+    members_by_group: dict[str, list] = {}
+    for t in all_members:
+        members_by_group.setdefault(t.group_id, []).append(t)
+
     out = []
     for g in rows:
-        members = db.query(Tenant).filter(Tenant.group_id == g.id).all()
+        members = members_by_group.get(g.id, [])
         out.append({
             "id": g.id,
             "slug": g.slug,
