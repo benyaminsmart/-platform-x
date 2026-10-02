@@ -113,9 +113,17 @@ def list_locks(db: DBSession, *, user_id: str, active_only: bool = True) -> list
     rows = q.order_by(PriceLock.created_at.desc()).all()
 
     now = _now()
+    # Batch-fetch services once (avoids N+1)
+    service_ids = list({row.service_id for row in rows if row.service_id})
+    services = (
+        db.query(Service).filter(Service.id.in_(service_ids)).all()
+        if service_ids else []
+    )
+    service_map = {s.id: s for s in services}
+
     out: list[dict] = []
     for row in rows:
-        s = db.query(Service).filter(Service.id == row.service_id).one_or_none()
+        s = service_map.get(row.service_id)
         current_price = float(s.price) if s is not None else None
         out.append({
             "id": row.id,

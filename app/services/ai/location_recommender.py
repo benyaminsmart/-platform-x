@@ -29,21 +29,31 @@ _LANGUAGE_NAMES = {
 def _user_pref_category(db: DBSession, user_id: str) -> str | None:
     """Infer user's preferred category from their past bookings."""
     rows = (
-        db.query(Booking.booking_type, Booking.tenant_id)
+        db.query(Booking.tenant_id)
         .filter(Booking.user_id == user_id)
         .all()
     )
     if not rows:
         return None
+
+    # Batch-fetch tenants once (avoids N+1)
+    tenant_ids = list({tid for (tid,) in rows if tid})
+    tenants = (
+        db.query(Tenant)
+        .filter(Tenant.id.in_(tenant_ids))
+        .all()
+    )
+    tenant_map = {t.id: t for t in tenants}
+
+    cat_map = {"hotel": "hotels", "restaurant": "restaurants",
+               "travel_agency": "travel", "entertainment": "entertainment"}
     counts: dict[str, int] = {}
-    for _bt, tid in rows:
-        t = db.query(Tenant).filter(Tenant.id == tid).one_or_none()
+    for (tid,) in rows:
+        t = tenant_map.get(tid)
         if t is None:
             continue
         cfg = t.config or {}
         typ = (cfg.get("type") or "").lower()
-        cat_map = {"hotel": "hotels", "restaurant": "restaurants",
-                   "travel_agency": "travel", "entertainment": "entertainment"}
         cat = cat_map.get(typ)
         if cat:
             counts[cat] = counts.get(cat, 0) + 1

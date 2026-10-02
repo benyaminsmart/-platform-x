@@ -132,10 +132,24 @@ def list_entries(db: DBSession, *, user_id: str, active_only: bool = True) -> li
         q = q.filter(WaitlistEntry.active == True)  # noqa: E712
     rows = q.order_by(WaitlistEntry.created_at.desc()).all()
 
+    # Batch-fetch services + tenants once (avoids N+1)
+    service_ids = list({r.service_id for r in rows if r.service_id})
+    tenant_ids = list({r.tenant_id for r in rows if r.tenant_id})
+    services = (
+        db.query(Service).filter(Service.id.in_(service_ids)).all()
+        if service_ids else []
+    )
+    tenants = (
+        db.query(Tenant).filter(Tenant.id.in_(tenant_ids)).all()
+        if tenant_ids else []
+    )
+    service_map = {s.id: s for s in services}
+    tenant_map = {t.id: t for t in tenants}
+
     out: list[dict] = []
     for r in rows:
-        s = db.query(Service).filter(Service.id == r.service_id).one_or_none()
-        t = db.query(Tenant).filter(Tenant.id == r.tenant_id).one_or_none()
+        s = service_map.get(r.service_id)
+        t = tenant_map.get(r.tenant_id)
         pos = None
         if r.active:
             pos = (

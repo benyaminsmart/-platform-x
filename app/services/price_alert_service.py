@@ -96,9 +96,17 @@ def check_alerts(db: DBSession, *, user_id: str) -> list[dict]:
         .filter(PriceAlert.user_id == user_id, PriceAlert.active.is_(True))
         .all()
     )
+    # Batch-fetch services once (avoids N+1)
+    service_ids = list({a.service_id for a in rows if a.service_id})
+    services = (
+        db.query(Service).filter(Service.id.in_(service_ids)).all()
+        if service_ids else []
+    )
+    service_map = {s.id: s for s in services}
+
     out: list[dict] = []
     for a in rows:
-        s = db.query(Service).filter(Service.id == a.service_id).one_or_none()
+        s = service_map.get(a.service_id)
         if s is None:
             continue
         current = Decimal(str(s.price))
