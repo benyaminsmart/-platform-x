@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.57.0-rewards-foundation (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-75 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. STAGE 2 IN PROGRESS. STAGE 3 PAUSED AT 69/74.
+> Version: v0.58.0-rewards-eligibility (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-76 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. STAGE 2 IN PROGRESS. STAGE 3 PAUSED AT 69/74.
 
 Last updated: 2026-10-02
 
@@ -107,7 +107,7 @@ User-side only. Business Loyalty remains a separate future layer.
       * Tier model replaces current (EXPLORER/TRAVELER/INSIDER/VIP
         with 1.0x/1.25x/1.5x/2.0x multipliers)
       * Migration from welcome/silver/gold/platinum/royal
-- [ ] Phase 76 — Eligibility + Calculation Engine
+- [x] Phase 76 — Eligibility + Calculation Engine — tag v0.58.0
       * is_qualifying_transaction() (payment, category, min amount,
         not cancelled, not refunded, not already rewarded)
       * base_reward = amount × category_rate
@@ -680,6 +680,26 @@ Tag: phase-1-lessons (lightweight)
 - New regression test suite for business panel templates
 - Two rules: no hardcoded light backgrounds; every template references
   --adm-* token (with Phase 65 exemption list for placeholders)
+
+### Phase 76 — Eligibility + Calculation Engine (Stage 2): COMPLETE
+Tag: v0.58.0-rewards-eligibility
+- Step 1 — Reward eligibility + calculation service
+  - app/services/reward_eligibility.py
+  - category_for(tenant, booking): maps booking_type / tenant type
+    to HOTEL / FLIGHT / EXPERIENCE / DINING
+  - is_qualifying_transaction(): paid, confirmed, not cancelled, not
+    reversed, above category minimum, category enabled
+  - calculate_reward(): base = amount × category_rate; tier bonus =
+    base × (multiplier − 1); category cap; economic cap
+    (reward ≤ 50% of the 6% platform commission estimate)
+  - Returns a full breakdown WITHOUT writing to the ledger
+- Step 2 — Wire into payment flow
+  - payment_service.mark_success now awards through reward_engine
+    (create_ledger_entry with idempotency on transaction_id)
+  - Orders get a flat 1% platform reward
+  - Both paths keep the legacy reward_service as fallback so a
+    payment is never left unrewarded by a soft engine error
+  - Idempotent: a double mark_success does not double-reward
 
 ### Phase 75 — Rewards Foundation (Stage 2): COMPLETE
 Tag: v0.57.0-rewards-foundation
@@ -2073,7 +2093,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1374 tests, all passing
+## 14. Test Count: 1390 tests, all passing
 
 Test files:
 - test_health.py
