@@ -36,7 +36,7 @@ class PriceLock(UUIDMixin, TimestampMixin, Base):
         String(36), ForeignKey("tenants.id"), index=True, nullable=False
     )
     service_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("services.id"), nullable=False
+        String(36), ForeignKey("services.id"), index=True, nullable=False
     )
 
     locked_price: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)

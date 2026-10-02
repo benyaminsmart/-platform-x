@@ -42,7 +42,7 @@ class InstallmentPlan(UUIDMixin, TimestampMixin, Base):
         String(36), ForeignKey("users.id"), index=True, nullable=False
     )
     booking_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("bookings.id"), nullable=False
+        String(36), ForeignKey("bookings.id"), index=True, nullable=False
     )
 
     total_amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)

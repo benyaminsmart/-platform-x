@@ -26,10 +26,10 @@ class Payment(UUIDMixin, TimestampMixin, Base):
         String(36), ForeignKey("users.id"), index=True, nullable=False
     )
     booking_id: Mapped[str | None] = mapped_column(
-        String(36), ForeignKey("bookings.id"), nullable=True
+        String(36), ForeignKey("bookings.id"), index=True, nullable=True
     )
     order_id: Mapped[str | None] = mapped_column(
-        String(36), ForeignKey("orders.id"), nullable=True
+        String(36), ForeignKey("orders.id"), index=True, nullable=True
     )
     amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     currency: Mapped[str] = mapped_column(String(10), default="AED", nullable=False)

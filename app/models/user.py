@@ -36,7 +36,7 @@ class User(UUIDMixin, TimestampMixin, Base):
     tier: Mapped[str] = mapped_column(String(50), default="welcome", nullable=False)
     business_role: Mapped[str | None] = mapped_column(String(30), nullable=True)  # owner / manager / staff (null = guest)
     referral_code: Mapped[str] = mapped_column(String(50), index=True, nullable=False)
-    referred_by: Mapped[str | None] = mapped_column(String(36), ForeignKey("users.id"), nullable=True)
+    referred_by: Mapped[str | None] = mapped_column(String(36), ForeignKey("users.id"), index=True, nullable=True)
     room_number: Mapped[str | None] = mapped_column(String(20), nullable=True)
     failed_login_attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

@@ -37,7 +37,7 @@ class Wishlist(UUIDMixin, TimestampMixin, Base):
         String(36), ForeignKey("users.id"), index=True, nullable=False
     )
     service_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("services.id"), nullable=False
+        String(36), ForeignKey("services.id"), index=True, nullable=False
     )
     tenant_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("tenants.id"), index=True, nullable=False

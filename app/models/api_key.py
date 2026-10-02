@@ -39,7 +39,7 @@ class APIKey(UUIDMixin, TimestampMixin, Base):
     expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     created_by_user_id: Mapped[str | None] = mapped_column(
-        String(36), ForeignKey("users.id"), nullable=True
+        String(36), ForeignKey("users.id"), index=True, nullable=True
     )
     extra: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
 

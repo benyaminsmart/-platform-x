@@ -74,7 +74,7 @@ class PricingRule(UUIDMixin, TimestampMixin, Base):
     valid_to: Mapped[date | None] = mapped_column(Date, nullable=True)
 
     created_by_user_id: Mapped[str | None] = mapped_column(
-        String(36), ForeignKey("users.id"), nullable=True
+        String(36), ForeignKey("users.id"), index=True, nullable=True
     )
 
     def __repr__(self) -> str:

@@ -42,7 +42,7 @@ class Webhook(UUIDMixin, TimestampMixin, Base):
     failure_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
     created_by_user_id: Mapped[str | None] = mapped_column(
-        String(36), ForeignKey("users.id"), nullable=True
+        String(36), ForeignKey("users.id"), index=True, nullable=True
     )
     extra: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
 
