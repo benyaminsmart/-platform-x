@@ -88,13 +88,72 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
 - [x] Phase 65 — Live Local Experiences (B14) — mock data source (commit 748539b)
 - [ ] Any additional free items user requests
 
-**STAGE 2 — Rewards + Referral plan (user-provided)**
-- [ ] User provides final Guest Rewards + Referral plan
-- [ ] Phase 8 — Guest Rewards + Referral Complete (replace TEMP catalog)
-- [ ] Phase 24 — Cross-Business Rewards (Guest) — unlock
-- [ ] Phase 44 — Loyalty Redemption: replace TEMP catalog with real one
-- [ ] Then: user provides Business Loyalty plan (separate layer)
-- [ ] Phase 66+ — Business Loyalty Program + B2B Referral
+**STAGE 2 — User Rewards & Referral Engine (plan received 2026-10-02)**
+
+Plan: "USER REWARDS & REFERRAL ENGINE — Technical Implementation
+Specification" (24 sections, immutable ledger, economic guardrails,
+referral lifecycle, expiration, campaigns, AI-ready).
+
+User-side only. Business Loyalty remains a separate future layer.
+
+- [ ] Phase 75 — Rewards Foundation (Ledger + Wallet + Tier migration)
+      * Extend Reward into an immutable ledger with funding_source,
+        status, available_at, expires_at, transaction_id, referral_id,
+        campaign_id, metadata
+      * RewardWallet projection (available/locked/expiring/referral/
+        experience/bonus balances)
+      * reward_rules config (category rates: HOTEL 1.0%, FLIGHT 0.5%,
+        EXPERIENCE 1.5%, DINING 1.2%; caps; min transaction)
+      * Tier model replaces current (EXPLORER/TRAVELER/INSIDER/VIP
+        with 1.0x/1.25x/1.5x/2.0x multipliers)
+      * Migration from welcome/silver/gold/platinum/royal
+- [ ] Phase 76 — Eligibility + Calculation Engine
+      * is_qualifying_transaction() (payment, category, min amount,
+        not cancelled, not refunded, not already rewarded)
+      * base_reward = amount × category_rate
+      * Final reward <= transaction cap and <= economic budget
+      * Tier multipliers apply only to eligible bonus/referral
+        components (not blindly to all platform-funded rewards)
+- [ ] Phase 77 — Referral Engine (New)
+      * ReferralCode + ReferralRelationship + ReferralEvent +
+        ReferralReward
+      * Lifecycle: INVITED → REGISTERED → VERIFIED → QUALIFIED →
+        REWARDED → REVERSED → EXPIRED
+      * Reward: referrer AED 20, new user AED 15 (first qualifying
+        transaction, min AED 300)
+      * Limits: max AED 100 referral credit per user/month
+      * Fraud checks (same phone/IP/device, velocity, cancellations,
+        circular) — flag as REVIEW, do not auto-pay
+- [ ] Phase 78 — Expiration + Reversal
+      * Expiration windows 30/60/90 days (configurable)
+      * Automated job: AVAILABLE + expires_at <= now → EXPIRED
+      * Pre-expiry notifications (7/3/1 days before)
+      * Cancellation/refund → PENDING→CANCELLED, AVAILABLE→REVERSED
+      * Spent reward → negative compensating ledger entry (never delete)
+- [ ] Phase 79 — Redemption + Wallet API
+      * Server-authoritative redemption (never trust client balance)
+      * Validation: ownership, expiration, booking/category eligibility,
+        max redemption, duplicate check
+      * Replace the Phase 44 TEMP catalog with a real catalog
+        (platform_cost + funding_source per item)
+      * Endpoints: wallet, history, available, expiring, redeem,
+        tiers, campaigns (aligned with existing conventions)
+- [ ] Phase 80 — Campaigns + AI-ready + Analytics
+      * Campaign engine (conditions, budget, usage/user limits,
+        economic_cap)
+      * Economic guardrails (6% commission assumption; track
+        gross_booking_value, platform_commission, reward_cost,
+        referral_cost, net_platform_value)
+      * AI Reward Decision interface (recommendation only — MUST NOT
+        bypass deterministic economic limits)
+      * Analytics: user, financial, campaign metrics
+      * Admin config + audit log
+
+**SUPERSEDED by the plan above:**
+- Phase 8 (Rewards + Referral Complete) — never started; replaced
+- Phase 24 (Cross-Business Rewards) — never started; replaced
+- Phase 44 catalog portion — Phase 44 itself stays COMPLETE; its
+  TEMP catalog is replaced in Phase 79
 
 **STAGE 3 — Production readiness audit (Phase 66 DONE, 67-74 remaining)**
 - [x] Full bug sweep across the codebase (Phase 67)
