@@ -3,7 +3,7 @@
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
 > Version: v0.54.0-bug-sweep (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-67 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. STAGE 3 IN PROGRESS.
 
-Last updated: 2026-10-01
+Last updated: 2026-10-02
 
 ---
 
@@ -97,11 +97,11 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
 - [ ] Phase 66+ — Business Loyalty Program + B2B Referral
 
 **STAGE 3 — Production readiness audit (Phase 66 DONE, 67-74 remaining)**
-- [ ] Full bug sweep across the codebase
-- [ ] Fix all findings (bugs, edge cases, race conditions)
-- [ ] Verify all tests green (100% pass, no skips on critical paths)
-- [ ] Security review (rate limits, auth, CORS, secrets)
-- [ ] Performance review (N+1 queries, indexes, payload sizes)
+- [x] Full bug sweep across the codebase (Phase 67)
+- [x] Fix all findings (bugs, edge cases, race conditions) (Phase 67)
+- [x] Verify all tests green (100% pass, no skips on critical paths) (Phase 67)
+- [ ] Security review (rate limits, auth, CORS, secrets) ← NEXT (Phase 68)
+- [x] Performance review (N+1 queries, indexes, payload sizes) (Phase 67)
 - [ ] Prepare deploy scripts (scripts/deploy/*.sh)
 - [ ] Prepare production env config (DATABASE_URL, secrets, CORS_ORIGINS)
 - [ ] PostgreSQL migration dry-run + edge-case doc
