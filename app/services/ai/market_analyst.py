@@ -12,6 +12,7 @@ from typing import Any
 from sqlalchemy.orm import Session as DBSession
 
 from app.models.tenant import Tenant
+from app.core.logging_config import get_logger
 from app.services import market_insights as mi
 from app.services.ai import service as ai_service
 
@@ -32,6 +33,9 @@ _POSITION_LABELS = {
     "bookings_last_30d": "bookings in the last 30 days",
 }
 
+
+
+logger = get_logger(__name__)
 
 def _safe_ai(prompt: str) -> str | None:
     try:
@@ -217,7 +221,7 @@ def interpret_market(
             try:
                 return _json.loads(s)
             except Exception:
-                pass
+                logger.warning("Market analyst JSON extraction failed", exc_info=True)
             start = s.find("{")
             if start == -1:
                 return None

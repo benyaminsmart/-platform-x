@@ -14,6 +14,7 @@ from pathlib import Path
 from sqlalchemy.orm import Session as DBSession
 
 from app.models.review import Review
+from app.core.logging_config import get_logger
 from app.models.review_photo import ReviewPhoto
 
 
@@ -27,6 +28,9 @@ ALLOWED_MIME = {
     "image/webp": "webp",
 }
 
+
+
+logger = get_logger(__name__)
 
 def count_photos(db: DBSession, review_id: str) -> int:
     return db.query(ReviewPhoto).filter(ReviewPhoto.review_id == review_id).count()
@@ -97,7 +101,7 @@ def delete_photo(db: DBSession, *, review_id: str, photo_id: str) -> bool:
         filename = row.url.rsplit("/", 1)[-1]
         (UPLOAD_DIR / filename).unlink(missing_ok=True)
     except Exception:
-        pass
+        logger.warning("Review photo cleanup failed", exc_info=True)
     db.delete(row)
     db.commit()
     return True

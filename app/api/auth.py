@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session as DBSession
 
 from app.api.deps import get_current_tenant, get_current_user
 from app.core.config import settings
+from app.core.logging_config import get_logger
 from app.core.rate_limit import LIMITS, limiter
 from app.core.security import create_access_token, create_refresh_token, decode_refresh_token
 from app.db.session import get_db
@@ -21,6 +22,9 @@ from app.schemas.auth import (
     TokenResponse,
 )
 from app.services import session_service, user_service
+
+logger = get_logger(__name__)
+
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -90,7 +94,7 @@ def register(
             home_url=base_url,
         )
     except Exception:
-        pass
+        logger.warning("Failed to send welcome email to %s", user.email, exc_info=True)
 
     return TokenResponse(
         access_token=access,
@@ -150,7 +154,7 @@ def login(
             home_url=base_url,
         )
     except Exception:
-        pass
+        logger.warning("Failed to send welcome email (register/login)", exc_info=True)
 
     return TokenResponse(
         access_token=access,
@@ -267,7 +271,7 @@ def forgot_password(
                 reset_url=reset_url,
             )
         except Exception:
-            pass
+            logger.warning("Failed to send password reset email", exc_info=True)
 
     return MessageResponse(
         message="If this email is registered, a reset link has been sent."
@@ -312,6 +316,6 @@ def reset_password(
             content="Your Platform-X password was successfully changed.",
         )
     except Exception:
-        pass
+        logger.warning("Failed to send password-changed email", exc_info=True)
 
     return MessageResponse(message="Password updated. You can now sign in.")

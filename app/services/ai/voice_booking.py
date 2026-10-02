@@ -26,6 +26,7 @@ from typing import Any
 from sqlalchemy.orm import Session as DBSession
 
 from app.services import search_service
+from app.core.logging_config import get_logger
 from app.services.ai import service as ai_service
 
 
@@ -56,6 +57,9 @@ _CITIES = ("dubai", "abu dhabi", "sharjah", "ajman", "fujairah",
            "rome", "barcelona", "new york", "bangkok", "singapore",
            "mumbai", "delhi", "karachi", "lahore", "tehran")
 
+
+
+logger = get_logger(__name__)
 
 def _round2(x: float) -> float:
     return round(x, 2)
@@ -129,7 +133,7 @@ def _detect_explicit_dates(text: str) -> tuple[date | None, date | None]:
                 return ci, co
             return ci, ci + timedelta(days=1)
         except ValueError:
-            pass
+            logger.debug("Voice date parse failed (expected, skipping)", exc_info=True)
 
     # "March 15" or "15 March"
     for name, num in _MONTHS.items():
@@ -141,7 +145,7 @@ def _detect_explicit_dates(text: str) -> tuple[date | None, date | None]:
                     ci = date(current_year + 1, num, int(m1.group(1)))
                 return ci, ci + timedelta(days=1)
             except ValueError:
-                pass
+                logger.debug("Voice date parse failed (expected, skipping)", exc_info=True)
         m2 = re.search(rf"(\d{{1,2}})\s+{name}", low)
         if m2:
             try:
@@ -150,7 +154,7 @@ def _detect_explicit_dates(text: str) -> tuple[date | None, date | None]:
                     ci = date(current_year + 1, num, int(m2.group(1)))
                 return ci, ci + timedelta(days=1)
             except ValueError:
-                pass
+                logger.debug("Voice date parse failed (expected, skipping)", exc_info=True)
 
     return None, None
 

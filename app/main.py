@@ -73,6 +73,9 @@ from app.web.templates import templates  # noqa: F401  (kept for future direct u
 
 BASE_DIR = Path(__file__).resolve().parent
 
+from app.core.logging_config import configure_logging as _configure_logging
+_configure_logging()
+
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,

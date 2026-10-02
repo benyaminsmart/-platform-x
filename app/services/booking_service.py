@@ -7,9 +7,13 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session as DBSession
 
 from app.models.booking import Booking
+from app.core.logging_config import get_logger
 from app.models.service import Service
 from app.schemas.booking import BookingCreate
 from app.services import pricing_rules as pricing_rules_service
+
+logger = get_logger(__name__)
+
 
 # Statuses a user may still cancel
 _CANCELLABLE = {"pending", "confirmed"}
@@ -171,7 +175,7 @@ def create_booking(
             if p_row is not None:
                 promotion_service.increment_usage(db, p_row)
         except Exception:
-            pass
+            logger.warning("Promotion usage increment failed for code %s", promotion_code, exc_info=True)
 
     # Audit each applied rule against this booking (best-effort; must not
     # break the booking if it fails).
@@ -276,6 +280,6 @@ def cancel_booking(
         from app.services import waitlist_service as _wls
         _wls.try_notify_after_cancel(db, service_id=_svc_id, check_in=_ci, check_out=_co)
     except Exception:
-        pass
+        logger.warning("Waitlist auto-notify failed", exc_info=True)
 
     return booking

@@ -7,10 +7,14 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session as DBSession
 
 from app.models.booking import Booking
+from app.core.logging_config import get_logger
 from app.models.order import Order
 from app.models.payment import Payment
 from app.schemas.payment import PaymentIntentRequest
 from app.services.payment_provider import get_payment_provider
+
+logger = get_logger(__name__)
+
 
 
 def _get_owned_booking(
@@ -217,9 +221,9 @@ def mark_success(
                                 content=f"{_user.first_name} {_user.last_name} booked {booking.service_name} for {booking.check_in}.",
                             )
                     except Exception:
-                        pass
+                        logger.warning("Failed to notify business about new booking", exc_info=True)
             except Exception:
-                pass
+                logger.warning("Business notification hook failed", exc_info=True)
     if payment.order_id:
         order = db.execute(
             select(Order).where(Order.id == payment.order_id)

@@ -19,12 +19,16 @@ from typing import Any
 from sqlalchemy.orm import Session as DBSession
 
 from app.models.booking import Booking
+from app.core.logging_config import get_logger
 from app.models.tenant import Tenant
 from app.models.user import User
 
 
 CANCELLABLE_STATUSES = {"pending", "confirmed"}
 
+
+
+logger = get_logger(__name__)
 
 def _round2(d: Decimal) -> Decimal:
     return d.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
@@ -113,6 +117,6 @@ def cancel_booking(
         from app.services import waitlist_service as _wls
         _wls.try_notify_after_cancel(db, service_id=_svc_id, check_in=_ci, check_out=_co)
     except Exception:
-        pass
+        logger.warning("Waitlist hook failed after cancellation", exc_info=True)
 
     return {"ok": True, "refund": refund, "booking_id": booking.id}

@@ -17,6 +17,7 @@ from typing import Any
 from sqlalchemy.orm import Session as DBSession
 
 from app.models.service import Service
+from app.core.logging_config import get_logger
 from app.models.tenant import Tenant
 from app.services.ai import service as ai_service
 
@@ -32,6 +33,9 @@ MAX_TEXT_LEN = 8000
 
 # ---------- Helpers ----------
 
+
+
+logger = get_logger(__name__)
 
 def _safe_ai(prompt: str) -> str | None:
     try:
@@ -164,7 +168,7 @@ def _extract_json(s: str) -> dict[str, Any] | None:
     try:
         return json.loads(s)
     except Exception:
-        pass
+        logger.warning("Content importer parse failed", exc_info=True)
     # Find balanced braces
     start = s.find("{")
     if start == -1:

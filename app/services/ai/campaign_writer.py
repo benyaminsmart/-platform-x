@@ -16,6 +16,7 @@ from typing import Any
 from sqlalchemy.orm import Session as DBSession
 
 from app.models.tenant import Tenant
+from app.core.logging_config import get_logger
 from app.services import marketing as marketing_service
 from app.services.ai import service as ai_service
 from app.services.ai.business_context import build_business_context, context_to_prompt
@@ -35,6 +36,9 @@ _LANGUAGE_NAMES = {
 # ---------- Helpers ----------
 
 
+
+logger = get_logger(__name__)
+
 def _safe_ai(prompt: str) -> str | None:
     try:
         result = ai_service.chat(prompt, history=[])
@@ -47,7 +51,7 @@ def _extract_json(s: str) -> dict[str, Any] | None:
     try:
         return json.loads(s)
     except Exception:
-        pass
+        logger.warning("Campaign writer parse failed", exc_info=True)
     start = s.find("{")
     if start == -1:
         return None

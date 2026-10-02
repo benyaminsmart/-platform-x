@@ -13,6 +13,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session as DBSession
 
 from app.models.booking import Booking
+from app.core.logging_config import get_logger
 from app.models.business_group import BusinessGroup
 from app.models.service import Service
 from app.models.tenant import Tenant
@@ -21,6 +22,9 @@ from app.models.user import User
 
 _PAID_STATUSES = ("confirmed", "paid")
 
+
+
+logger = get_logger(__name__)
 
 def _slugify(name: str) -> str:
     import re
@@ -214,7 +218,7 @@ def aggregate_metrics(db: DBSession, *, group_id: str, window_days: int = 30) ->
             if r is not None:
                 ratings.append(float(r))
         except (TypeError, ValueError):
-            pass
+            logger.warning("Skipped invalid rating value during aggregation", exc_info=True)
     avg_rating = round(sum(ratings) / len(ratings), 2) if ratings else None
 
     return {

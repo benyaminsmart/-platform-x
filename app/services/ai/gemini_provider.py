@@ -4,7 +4,11 @@ import json
 import requests
 
 from app.core.config import settings
+from app.core.logging_config import get_logger
 from app.services.ai.provider import AIProvider, AIMessage, AIResponse
+
+logger = get_logger(__name__)
+
 
 
 class GeminiProvider(AIProvider):
@@ -69,7 +73,7 @@ class GeminiProvider(AIProvider):
                 try:
                     body = exc.response.text[:300]
                 except Exception:
-                    pass
+                    logger.warning("Gemini chat attempt failed", exc_info=True)
             raise RuntimeError(f"Gemini request failed: {exc} | {body}") from exc
 
         return data
@@ -154,5 +158,5 @@ class GeminiProvider(AIProvider):
                 try:
                     body = exc.response.text[:300]
                 except Exception:
-                    pass
+                    logger.warning("Gemini JSON retry failed", exc_info=True)
             raise RuntimeError(f"Gemini continue failed: {exc} | {body}") from exc

@@ -7,9 +7,13 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session as DBSession
 
 from app.models.booking import Booking
+from app.core.logging_config import get_logger
 from app.models.service import Service
 from app.models.tenant import Tenant
 from app.models.user import User
+
+logger = get_logger(__name__)
+
 
 
 # Gemini tool definition
@@ -160,7 +164,7 @@ def execute_book_service(
                 content=f"{user.first_name} {user.last_name} booked {svc.name} for {ci}.",
             )
     except Exception:
-        pass
+        logger.warning("Booking confirmation email failed", exc_info=True)
 
     return {
         "ok": True,
