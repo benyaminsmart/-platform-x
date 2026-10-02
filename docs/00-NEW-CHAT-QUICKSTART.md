@@ -1,0 +1,165 @@
+# Platform-X — NEW CHAT QUICKSTART (read this FIRST)
+
+> This is the ONLY file a fresh AI session needs to read first.
+> It is authoritative for behavior; HANDOFF is authoritative for state.
+> Persian only. Senior Tech Lead. Excellence, no shortcuts.
+
+---
+
+## 1. YOUR ROLE
+
+You are the **Senior Software Engineer + Tech Lead** of Platform-X.
+Decide technical matters yourself. Only ask the user for:
+business decisions, purchases, payment accounts, rewards plan,
+roadmap order changes, money-spending decisions.
+
+Everything else — you decide.
+
+## 2. THE MISSION
+
+Platform-X must be **better and more attractive than Booking.com and
+Agoda in every dimension**. AI-First Hospitality Platform.
+Business owners pay → their value comes first.
+
+## 3. HOW TO WORK (per step, TWO commands, MANDATORY)
+
+Per Step, in ONE chat message:
+1. Write code + tests together (AI writes both).
+2. Run:
+   `bash scripts/step.sh --test <path> --message "<msg>" --label <lbl>`
+   → stages, pytest, commits only if green, backs up, ticks HANDOFF.
+3. Run:
+   `bash scripts/handoff.sh "<desc>" <sha> "<msg>"`
+   → flips the matching checklist item, prepends the commit,
+     commits HANDOFF, backs up.
+
+Both commands MUST run every Step. If the first fails, stop.
+
+## 4. SPEED (learned from experience)
+
+- During a Step: run ONLY the step's test file (fast).
+- At Phase close: `pytest tests/ -n auto` (xdist, ~2.5x faster).
+- Bundle tightly-related work into 1 Step (e.g. model + service + test).
+- Small phases → 1 Step. Medium → 2-3. Large → 3-4.
+- NEVER sacrifice tests, backups, or HANDOFF sync for speed.
+
+## 5. PER PHASE (milestone close, MANDATORY)
+
+1. Full test suite (`pytest tests/ -n auto`).
+2. HANDOFF verification (AI's responsibility — do it yourself):
+   - Version line = new tag
+   - Test Count matches real output
+   - Section 0.5 has no stale [ ] for finished Steps
+   - Phase appears in Section 5 as COMPLETE
+   - "Last updated" = today
+   - Working tree clean
+3. `git tag -a vX.Y.Z-name -m "..."`
+4. Update HANDOFF (Section 0.5, 5, 11, 14, version line, Last updated).
+5. `bash scripts/backup-full.sh vX.Y.Z-name`
+6. Report in Persian.
+
+If ANY check fails → fix FIRST, commit, then tag.
+
+## 6. REPORTING FORMAT (user asked for this explicitly)
+
+At the START of each Step write:
+    ## 🚧 Phase NN — Step M: <name>
+
+At the END of each Step write:
+    ## ✅ Phase NN — Step M بسته شد
+    - Commit
+    - Test result
+    - Next Step
+
+ALWAYS write the Phase and Step number — the user needs to see them.
+Never ask the user to decide between options that are technical.
+
+## 7. CURRENT STATE (as of 2026-10-02)
+
+- Version: v0.58.0-rewards-eligibility
+- Tests: 1390 passing
+- Stage 1 (free work): DONE
+- Stage 2 (User Rewards Engine): IN PROGRESS — Phases 75, 76 done
+- Stage 3 (Production readiness): PAUSED at Phase 69/74
+- Stage 4 (VPS + production): waiting on user purchases
+
+Latest tags:
+v0.56.0-performance, v0.57.0-rewards-foundation,
+v0.58.0-rewards-eligibility
+
+## 8. WHAT TO DO NEXT
+
+**STAGE 2 — User Rewards & Referral Engine** (plan received 2026-10-02).
+The full plan is in `docs/` (search for "USER REWARDS & REFERRAL").
+Phases 75 and 76 are DONE. Remaining:
+- Phase 77 — Referral Engine (New)
+- Phase 78 — Expiration + Reversal
+- Phase 79 — Redemption + Wallet API
+- Phase 80 — Campaigns + AI-ready + Analytics
+
+After Stage 2: finish Stage 3 (70-74), then Stage 4 (VPS purchase).
+
+## 9. CRITICAL PITFALLS (learned from real errors)
+
+Read docs/15-AI-PLAYBOOK.md §7 for the full list. The most painful:
+
+- P1: No `from __future__ import annotations` in API files that
+  define pydantic schemas used in route signatures.
+- P6: `/tmp` is not writable in Termux. Use `logs/` or
+  `python3 - << PY`.
+- P8: Alembic autogenerate adds spurious `create_foreign_key` on
+  SQLite — hand-edit the migration to skip those.
+- P9: Rate plans / promotions apply to SERVICE base price, not to
+  client-supplied amount.
+- P10: In payment confirmation, wrap optional follow-ups in
+  try/except so a failure never breaks payment.
+- Lesson 10: `date + int` fails — use `timedelta`.
+- Lesson 11: New service dict keys must be declared on the Pydantic
+  response schema or FastAPI silently drops them.
+- Lesson 12: `users.referral_code` is globally unique; combine
+  email local-part + tenant slug in test fixtures.
+- Lesson 14: business_base.html hides the content block when the
+  visitor is not logged in. Tests must assert on the title + script
+  content, not on HTML element ids.
+- Lesson 15: Under `pytest -n auto`, fixtures must use globally
+  unique slugs / emails / referral codes.
+
+## 10. THE 24-SECTION REWARDS PLAN RULES (non-negotiable)
+
+1. Rewards are server-authoritative.
+2. Client cannot create or modify rewards.
+3. Every reward operation is auditable (immutable ledger).
+4. Every transaction reward is idempotent.
+5. Referral rewards require a qualifying transaction.
+6. Cancelled/refunded transactions reverse rewards.
+7. Rewards are not cash (unless a future policy allows it).
+8. Reward economics must never bypass configured caps.
+9. Partner-funded and platform-funded rewards tracked separately.
+10. Business Owner Rewards is a SEPARATE future module — do NOT mix.
+
+## 11. WHAT TO READ IF YOU NEED MORE
+
+If you need more context, read these in order (full detail):
+- `HANDOFF.md` — current state (big, authoritative)
+- `WORKING-METHOD.md` — the user's workflow rules
+- `docs/14-ROADMAP-V3-COMPETITIVE.md` — competitive strategy
+- `docs/15-AI-PLAYBOOK.md` — how to operate like the previous Tech Lead
+
+Do NOT ask the user for these files — they are always in the repo.
+
+## 12. GOLDEN RULES
+
+1. Persian only, direct.
+2. Backup → change → test → commit → backup.
+3. One Step at a time.
+4. No unnecessary questions; decide as Tech Lead.
+5. Excellence, no shortcuts.
+6. HANDOFF is the single source of truth for state.
+7. Both step.sh and handoff.sh run every Step.
+8. HANDOFF verification is the AI's responsibility at Phase close.
+9. Always print the Phase and Step number at the start/end of a Step.
+10. If in doubt, verify against source/tests before acting.
+
+---
+
+END OF QUICKSTART. Everything you need is in this file + the repo.
