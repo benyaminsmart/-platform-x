@@ -186,6 +186,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 66 Step 4 — empty Phase 63 exemption list
 - [x] Phase 66 Step 3 — Business Analytics dashboard
 - [x] Phase 66 Step 2 — Business Customers polish
 - [x] Phase 66 Step 1 — Business Settings API + UI
@@ -300,7 +301,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 66 Step 3 — Business Analytics dashboard (2026-10-02 15:10)
+Last step: Phase 66 Step 4 — empty Phase 63 exemption list (2026-10-02 15:11)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -322,6 +323,7 @@ Last step: Phase 66 Step 3 — Business Analytics dashboard (2026-10-02 15:10)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 263137b Phase 66 Step 4 — empty Phase 63 exemption list
 - 8fe6653 Phase 66 Step 3 — Business Analytics dashboard
 - bba782f Phase 66 Step 2 — Business Customers polish
 - 632a9f9 Phase 66 Step 1 — Business Settings API + UI
