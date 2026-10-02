@@ -2,19 +2,191 @@
 {% block title %}Analytics — Business Panel{% endblock %}
 {% block content %}
 
-<div class="admin-card">
-  <h2>Analytics</h2>
-  <p class="admin-card-sub" style="margin-bottom: 0;">Coming soon — sales trends, occupancy, and AI insights.</p>
+<div class="admin-card" style="margin-bottom: 24px;">
+  <div class="coach-head">
+    <h2 style="margin: 0;">Analytics</h2>
+    <div style="display:flex; gap:6px; align-items:center;">
+      <select id="an-days" class="an-input" style="width:auto;">
+        <option value="30">Last 30 days</option>
+        <option value="90">Last 90 days</option>
+        <option value="180">Last 180 days</option>
+      </select>
+      <button type="button" class="admin-btn" id="an-refresh"
+              style="background:var(--adm-surface-2); color:var(--adm-text);">Refresh</button>
+    </div>
+  </div>
+  <p class="admin-card-sub" style="margin-bottom: 0;">
+    Live occupancy, revenue, and demand signals from your business.
+  </p>
 </div>
+
+<div id="an-kpis" class="an-grid" style="margin-bottom: 24px;"></div>
+
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h3>Revenue forecast</h3>
+  <div id="an-forecast" class="an-muted">Loading…</div>
+</div>
+
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h3>Near-full days</h3>
+  <div id="an-nearfull" class="an-muted">Loading…</div>
+</div>
+
+<div class="admin-card">
+  <h3>Capacity</h3>
+  <div id="an-capacity" class="an-muted">Loading…</div>
+</div>
+
+<style>
+.an-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+@media (max-width: 900px) { .an-grid { grid-template-columns: 1fr 1fr; } }
+.an-card {
+  background: var(--adm-surface-2); border: 1px solid var(--adm-line);
+  border-radius: 12px; padding: 14px 16px;
+}
+.an-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--adm-muted); margin-bottom: 4px;
+}
+.an-value {
+  font-family: var(--adm-font-display); font-size: 22px; font-weight: 800;
+  color: var(--adm-text);
+}
+.an-sub { font-size: 12px; color: var(--adm-muted); margin-top: 4px; }
+.an-muted { color: var(--adm-muted); font-size: 13.5px; }
+.an-list-item {
+  display:flex; justify-content:space-between; padding:6px 0;
+  border-bottom: 1px solid var(--adm-line); font-size: 13.5px;
+}
+.an-input {
+  padding: 8px 10px; background: var(--adm-surface-2);
+  border: 1px solid var(--adm-line-2); border-radius: 8px;
+  color: var(--adm-text); font-family: inherit; font-size: 13px; outline: none;
+}
+</style>
 
 {% endblock %}
 {% block scripts %}
 <script>
 (function(){
-  var token = null; try { token = localStorage.getItem("px_business_token"); } catch(e){}
-  if (!token) { window.location.href = "/business/login?tenant=trianon-hotel"; return; }
-  var lo = document.getElementById("business-logout");
-  if (lo) lo.addEventListener("click", function(){ try{localStorage.removeItem("px_business_token");}catch(e){}; window.location.href = "/business/login?tenant=trianon-hotel"; });
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login"; return; }
+  var slug = null;
+
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function h() { return { "Authorization": "Bearer " + token, "X-Tenant-Slug": slug }; }
+
+  async function resolveSlug() {
+    var res = await fetch("/business/api/me", { headers: { "Authorization": "Bearer " + token } });
+    if (!res.ok) { window.location.href = "/business/login"; return; }
+    slug = (await res.json()).tenant_slug;
+  }
+
+  function kpi(label, value, sub) {
+    return '<div class="an-card">' +
+      '<div class="an-label">' + esc(label) + '</div>' +
+      '<div class="an-value">' + esc(value) + '</div>' +
+      (sub ? '<div class="an-sub">' + esc(sub) + '</div>' : '') +
+    '</div>';
+  }
+
+  async function loadKpis(days) {
+    var el = document.getElementById("an-kpis");
+    el.innerHTML = "";
+    try {
+      // occupancy
+      var occ = await fetch("/business/api/insights/occupancy?days=" + days, { headers: h() })
+        .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+      if (occ) {
+        el.insertAdjacentHTML("beforeend",
+          kpi("Occupancy", (occ.occupancy_pct || 0) + "%", (occ.booked_nights || 0) + " booked nights"));
+      }
+      // revenue forecast
+      var rev = await fetch("/business/api/insights/revenue/forecast?days=" + days, { headers: h() })
+        .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+      if (rev) {
+        el.insertAdjacentHTML("beforeend",
+          kpi("Forecast", (rev.point_estimate || rev.forecast || "—"), "next " + days + " days"));
+      }
+      // trend
+      var trend = await fetch("/business/api/insights/occupancy/trend?days=" + days, { headers: h() })
+        .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+      if (trend && trend.delta_pct != null) {
+        el.insertAdjacentHTML("beforeend",
+          kpi("Occupancy trend", (trend.delta_pct > 0 ? "+" : "") + trend.delta_pct + "%",
+              "vs previous " + days + "d"));
+      }
+      // capacity min
+      var cap = await fetch("/business/api/insights/capacity/available?days=" + days, { headers: h() })
+        .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+      if (cap && cap.summary) {
+        el.insertAdjacentHTML("beforeend",
+          kpi("Min free capacity", cap.summary.min, "across " + days + " days"));
+      }
+      if (!el.innerHTML) el.innerHTML = '<div class="an-muted">No analytics data available.</div>';
+    } catch (e) {
+      el.innerHTML = '<div class="an-muted">Failed to load KPIs.</div>';
+    }
+  }
+
+  async function loadForecast(days) {
+    var el = document.getElementById("an-forecast");
+    el.textContent = "Loading…";
+    var res = await fetch("/business/api/insights/revenue/forecast?days=" + days, { headers: h() });
+    if (!res.ok) { el.textContent = "Not available."; return; }
+    var d = await res.json();
+    var point = d.point_estimate != null ? d.point_estimate : (d.forecast != null ? d.forecast : "—");
+    var lo = d.low != null ? d.low : (d.lower_bound != null ? d.lower_bound : "—");
+    var hi = d.high != null ? d.high : (d.upper_bound != null ? d.upper_bound : "—");
+    el.innerHTML = '<div class="an-value">' + esc(point) + '</div>' +
+      '<div class="an-sub">Range ' + esc(lo) + ' – ' + esc(hi) + '</div>';
+  }
+
+  async function loadNearFull(days) {
+    var el = document.getElementById("an-nearfull");
+    el.textContent = "Loading…";
+    var res = await fetch("/business/api/insights/capacity/near-full?days=" + days, { headers: h() })
+      .catch(function(){ return null; });
+    if (!res || !res.ok) { el.textContent = "Not available."; return; }
+    var d = await res.json();
+    var list = d.days || d.items || [];
+    if (!list.length) { el.textContent = "No near-full days in this window."; return; }
+    el.innerHTML = list.slice(0, 8).map(function(x){
+      return '<div class="an-list-item"><span>' + esc(x.date || x.day || "—") + '</span>' +
+        '<strong>' + esc(x.remaining != null ? x.remaining : (x.free != null ? x.free : "—")) + ' free</strong></div>';
+    }).join("");
+  }
+
+  async function loadCapacity(days) {
+    var el = document.getElementById("an-capacity");
+    el.textContent = "Loading…";
+    var res = await fetch("/business/api/insights/capacity/available?days=" + days, { headers: h() })
+      .catch(function(){ return null; });
+    if (!res || !res.ok) { el.textContent = "Not available."; return; }
+    var d = await res.json();
+    var s = d.summary || {};
+    el.innerHTML =
+      '<div class="an-value">' + esc(s.min != null ? s.min : "—") + ' – ' + esc(s.max != null ? s.max : "—") + '</div>' +
+      '<div class="an-sub">avg ' + esc(s.avg != null ? s.avg : "—") + ' free per day</div>';
+  }
+
+  async function loadAll() {
+    var days = document.getElementById("an-days").value;
+    loadKpis(days);
+    loadForecast(days);
+    loadNearFull(days);
+    loadCapacity(days);
+  }
+
+  document.getElementById("an-refresh").addEventListener("click", loadAll);
+  document.getElementById("an-days").addEventListener("change", loadAll);
+
+  (async function(){
+    await resolveSlug();
+    if (!slug) return;
+    loadAll();
+  })();
 })();
 </script>
 {% endblock %}
