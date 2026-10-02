@@ -1,18 +1,188 @@
 {% extends "business/business_base.html" %}
 {% block title %}Settings — Business Panel{% endblock %}
 {% block content %}
-<div class="admin-card">
+
+<div class="admin-card" style="margin-bottom: 24px;">
   <h2>Business Settings</h2>
-  <p class="admin-card-sub" style="margin-bottom: 0;">Coming soon — branding, hours, contact info, and more.</p>
+  <p class="admin-card-sub" style="margin-bottom: 0;">Branding, contact, hours, and preferences for your business.</p>
 </div>
+
+<div id="st-alert" style="display:none; margin-bottom:16px; padding:10px 14px; border-radius:8px; font-size:13.5px;"></div>
+
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h3>Identity</h3>
+  <div class="st-grid">
+    <div>
+      <label class="st-label">Tagline</label>
+      <input type="text" id="st-tagline" class="st-input" maxlength="300" placeholder="Luxury stay in the heart of the city">
+    </div>
+    <div>
+      <label class="st-label">Location</label>
+      <input type="text" id="st-location" class="st-input" maxlength="200" placeholder="Downtown Dubai, UAE">
+    </div>
+  </div>
+  <div class="st-grid">
+    <div>
+      <label class="st-label">Currency</label>
+      <input type="text" id="st-currency" class="st-input" maxlength="10" placeholder="AED">
+    </div>
+    <div>
+      <label class="st-label">Default language</label>
+      <select id="st-default-language" class="st-input">
+        <option value="en">English</option>
+        <option value="ar">العربية</option>
+        <option value="fil">Filipino</option>
+        <option value="hi">हिन्दी</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h3>Contact</h3>
+  <div class="st-grid">
+    <div>
+      <label class="st-label">Phone</label>
+      <input type="text" id="st-phone" class="st-input" maxlength="40" placeholder="+971-4-000-0000">
+    </div>
+    <div>
+      <label class="st-label">Email</label>
+      <input type="email" id="st-email" class="st-input" maxlength="255" placeholder="info@example.com">
+    </div>
+  </div>
+  <div>
+    <label class="st-label">Website</label>
+    <input type="text" id="st-website" class="st-input" maxlength="300" placeholder="https://example.com">
+  </div>
+</div>
+
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h3>Amenities</h3>
+  <p class="admin-card-sub">One per line.</p>
+  <textarea id="st-amenities" class="st-input" rows="5" placeholder="Pool&#10;Spa&#10;Free WiFi"></textarea>
+</div>
+
+<div class="admin-card" style="margin-bottom: 24px;">
+  <h3>Branding colors</h3>
+  <div class="st-grid-3">
+    <div>
+      <label class="st-label">Primary</label>
+      <input type="text" id="st-primary" class="st-input" maxlength="20" placeholder="#1B3A5C">
+    </div>
+    <div>
+      <label class="st-label">Secondary</label>
+      <input type="text" id="st-secondary" class="st-input" maxlength="20" placeholder="#C9A961">
+    </div>
+    <div>
+      <label class="st-label">Accent</label>
+      <input type="text" id="st-accent" class="st-input" maxlength="20" placeholder="#F5F1EA">
+    </div>
+  </div>
+</div>
+
+<div style="display:flex; gap:10px; justify-content:flex-end; margin-bottom:24px;">
+  <button type="button" class="admin-btn" id="st-reload" style="background:var(--adm-surface-2); color:var(--adm-text);">Reload</button>
+  <button type="button" class="admin-btn" id="st-save">Save changes</button>
+</div>
+
+<style>
+.st-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.st-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+@media (max-width: 700px) { .st-grid, .st-grid-3 { grid-template-columns: 1fr; } }
+.st-label {
+  display: block; font-size: 11px; font-weight: 700; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--adm-muted); margin-bottom: 4px;
+}
+.st-input {
+  width: 100%; padding: 10px 12px; background: var(--adm-surface-2);
+  border: 1px solid var(--adm-line-2); border-radius: 8px;
+  color: var(--adm-text); font-family: inherit; font-size: 13.5px; outline: none;
+}
+.st-input:focus { border-color: var(--adm-brand); }
+</style>
+
 {% endblock %}
 {% block scripts %}
 <script>
 (function(){
-  var token = null; try { token = localStorage.getItem("px_business_token"); } catch(e){}
-  if (!token) { window.location.href = "/business/login?tenant=trianon-hotel"; return; }
-  var lo = document.getElementById("business-logout");
-  if (lo) lo.addEventListener("click", function(){ try{localStorage.removeItem("px_business_token");}catch(e){}; window.location.href = "/business/login?tenant=trianon-hotel"; });
+  var token = null;
+  try { token = localStorage.getItem("px_business_token"); } catch(e){}
+  if (!token) { window.location.href = "/business/login"; return; }
+  var slug = null;
+
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function h() { return { "Authorization": "Bearer " + token, "X-Tenant-Slug": slug, "Content-Type": "application/json" }; }
+
+  function alertBox(msg, kind) {
+    var box = document.getElementById("st-alert");
+    box.textContent = msg;
+    box.style.display = "block";
+    box.style.background = kind === "error" ? "#fee2e2" : "#dcfce7";
+    box.style.color = kind === "error" ? "#991b1b" : "#166534";
+    setTimeout(function(){ box.style.display = "none"; }, 3500);
+  }
+
+  async function resolveSlug() {
+    var res = await fetch("/business/api/me", { headers: { "Authorization": "Bearer " + token } });
+    if (!res.ok) { window.location.href = "/business/login"; return; }
+    slug = (await res.json()).tenant_slug;
+  }
+
+  async function load() {
+    var res = await fetch("/business/api/settings", { headers: h() });
+    if (!res.ok) { alertBox("Could not load settings.", "error"); return; }
+    var d = await res.json();
+    document.getElementById("st-tagline").value = d.tagline || "";
+    document.getElementById("st-location").value = d.location || "";
+    document.getElementById("st-currency").value = d.currency || "";
+    document.getElementById("st-default-language").value = d.default_language || "en";
+    document.getElementById("st-phone").value = d.phone || "";
+    document.getElementById("st-email").value = d.email || "";
+    document.getElementById("st-website").value = d.website || "";
+    document.getElementById("st-amenities").value = (d.amenities || []).join("\n");
+    var b = d.branding || {};
+    document.getElementById("st-primary").value = b.primary_color || "";
+    document.getElementById("st-secondary").value = b.secondary_color || "";
+    document.getElementById("st-accent").value = b.accent_color || "";
+  }
+
+  async function save() {
+    var languages = ["en", "ar", "fil", "hi"];
+    var payload = {
+      tagline: document.getElementById("st-tagline").value.trim() || null,
+      location: document.getElementById("st-location").value.trim() || null,
+      currency: document.getElementById("st-currency").value.trim() || null,
+      default_language: document.getElementById("st-default-language").value || "en",
+      phone: document.getElementById("st-phone").value.trim() || null,
+      email: document.getElementById("st-email").value.trim() || null,
+      website: document.getElementById("st-website").value.trim() || null,
+      amenities: document.getElementById("st-amenities").value.split(/\n+/).map(function(x){return x.trim();}).filter(Boolean),
+      languages: languages,
+      branding: {
+        primary_color: document.getElementById("st-primary").value.trim() || null,
+        secondary_color: document.getElementById("st-secondary").value.trim() || null,
+        accent_color: document.getElementById("st-accent").value.trim() || null,
+      },
+    };
+    var res = await fetch("/business/api/settings", {
+      method: "PATCH", headers: h(), body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      var e = await res.json().catch(function(){ return {}; });
+      alertBox(e.detail || "Save failed.", "error");
+      return;
+    }
+    alertBox("Settings saved.");
+  }
+
+  document.getElementById("st-save").addEventListener("click", save);
+  document.getElementById("st-reload").addEventListener("click", load);
+
+  (async function(){
+    await resolveSlug();
+    if (!slug) return;
+    load();
+  })();
 })();
 </script>
 {% endblock %}

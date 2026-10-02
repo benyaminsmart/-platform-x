@@ -472,3 +472,110 @@ def delete_business_staff(
     target.status = "suspended"
     db.commit()
     return {"id": target.id, "message": "Staff deactivated"}
+
+# ---------- Business Settings (Phase 66, Step 1) ----------
+
+from pydantic import BaseModel as _BM, Field as _F
+
+
+class SettingsResponse(_BM):
+    slug: str
+    name: str
+    tagline: str | None = None
+    location: str | None = None
+    phone: str | None = None
+    email: str | None = None
+    website: str | None = None
+    currency: str | None = None
+    default_language: str | None = None
+    languages: list[str] = []
+    amenities: list[str] = []
+    branding: dict = {}
+    hours: dict = {}
+
+
+class SettingsUpdate(_BM):
+    tagline: str | None = _F(default=None, max_length=300)
+    location: str | None = _F(default=None, max_length=200)
+    phone: str | None = _F(default=None, max_length=40)
+    email: str | None = _F(default=None, max_length=255)
+    website: str | None = _F(default=None, max_length=300)
+    currency: str | None = _F(default=None, max_length=10)
+    default_language: str | None = _F(default=None, max_length=10)
+    languages: list[str] | None = None
+    amenities: list[str] | None = None
+    branding: dict | None = None
+    hours: dict | None = None
+
+
+def _config_to_response(tenant: Tenant) -> SettingsResponse:
+    cfg = tenant.config or {}
+    contact = cfg.get("contact") or {}
+    return SettingsResponse(
+        slug=tenant.slug,
+        name=tenant.name,
+        tagline=cfg.get("tagline"),
+        location=cfg.get("location"),
+        phone=contact.get("phone"),
+        email=contact.get("email"),
+        website=contact.get("website"),
+        currency=cfg.get("currency"),
+        default_language=cfg.get("default_language"),
+        languages=cfg.get("languages") or [],
+        amenities=cfg.get("amenities") or [],
+        branding=cfg.get("branding") or {},
+        hours=cfg.get("hours") or {},
+    )
+
+
+@router.get("/settings", response_model=SettingsResponse)
+def get_business_settings(
+    tenant: Tenant = Depends(get_business_tenant),
+    user: User = Depends(get_current_business_user),
+) -> SettingsResponse:
+    return _config_to_response(tenant)
+
+
+@router.patch("/settings", response_model=SettingsResponse)
+def update_business_settings(
+    payload: SettingsUpdate,
+    tenant: Tenant = Depends(get_business_tenant),
+    user: User = Depends(get_current_business_user),
+    db: DBSession = Depends(get_db),
+) -> SettingsResponse:
+    if user.business_role not in {"owner", "manager"}:
+        raise HTTPException(status_code=403, detail="Only owner or manager can update settings")
+
+    cfg = dict(tenant.config or {})
+    contact = dict(cfg.get("contact") or {})
+
+    data = payload.model_dump(exclude_unset=True)
+    if "tagline" in data:
+        cfg["tagline"] = data["tagline"]
+    if "location" in data:
+        cfg["location"] = data["location"]
+    if "currency" in data:
+        cfg["currency"] = data["currency"]
+    if "default_language" in data:
+        cfg["default_language"] = data["default_language"]
+    if "languages" in data:
+        cfg["languages"] = data["languages"]
+    if "amenities" in data:
+        cfg["amenities"] = data["amenities"]
+    if "branding" in data:
+        cfg["branding"] = data["branding"] or {}
+    if "hours" in data:
+        cfg["hours"] = data["hours"] or {}
+    if "phone" in data:
+        contact["phone"] = data["phone"]
+    if "email" in data:
+        contact["email"] = data["email"]
+    if "website" in data:
+        contact["website"] = data["website"]
+    cfg["contact"] = contact
+
+    tenant.config = cfg
+    db.commit()
+    db.refresh(tenant)
+    return _config_to_response(tenant)
+
