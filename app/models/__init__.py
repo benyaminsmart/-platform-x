@@ -34,6 +34,7 @@ from app.models.review import Review
 from app.models.review_photo import ReviewPhoto
 from app.models.room import Room
 from app.models.reward import Reward
+from app.models.reward_campaign import RewardCampaign, RewardCampaignUse
 from app.models.reward_rule import RewardRule
 from app.models.reward_wallet import RewardWallet
 from app.models.service import Service
@@ -82,6 +83,8 @@ __all__ = [
     "Room",
     "ReviewPhoto",
     "Reward",
+    "RewardCampaign",
+    "RewardCampaignUse",
     "RewardRule",
     "RewardWallet",
     "Service",
