@@ -1,9 +1,9 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.58.0-rewards-eligibility (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-76 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. STAGE 2 IN PROGRESS. STAGE 3 PAUSED AT 69/74.
+> Version: v0.59.0-referral-engine (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-77 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. STAGE 2 IN PROGRESS — Phase 77 DONE. STAGE 3 PAUSED AT 69/74.
 
-Last updated: 2026-10-02
+Last updated: 2026-10-04
 
 ---
 
@@ -114,7 +114,7 @@ User-side only. Business Loyalty remains a separate future layer.
       * Final reward <= transaction cap and <= economic budget
       * Tier multipliers apply only to eligible bonus/referral
         components (not blindly to all platform-funded rewards)
-- [ ] Phase 77 — Referral Engine (New)
+- [x] Phase 77 — Referral Engine (New) — tag v0.59.0
       * ReferralCode + ReferralRelationship + ReferralEvent +
         ReferralReward
       * Lifecycle: INVITED → REGISTERED → VERIFIED → QUALIFIED →
@@ -245,6 +245,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 77 Step 4 — referral API + payment-flow wiring + E2E tests
 - [x] Phase 77 Step 3 — fraud + monthly limits
 - [x] Phase 77 Step 2 — referral lifecycle service
 - [x] Phase 77 Step 1 — referral engine models + migration
@@ -373,7 +374,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 77 Step 3 — fraud + monthly limits (2026-10-04 16:36)
+Last step: phase-77-step-4 (2026-10-04 16:45)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -686,6 +687,30 @@ Tag: phase-1-lessons (lightweight)
 - New regression test suite for business panel templates
 - Two rules: no hardcoded light backgrounds; every template references
   --adm-* token (with Phase 65 exemption list for placeholders)
+
+
+### Phase 77 — Referral Engine (Stage 2): COMPLETE
+Tag: v0.59.0-referral-engine
+- Step 1 — Referral models + migration + config
+  - ReferralCode, ReferralRelationship, ReferralEvent, ReferralReward
+  - Migration b1a2c3d4e5f7 (4 tables + backfill one default code per existing user)
+- Step 2 — Referral lifecycle service (app/services/referral_engine.py)
+  - generate_code, apply_code, mark_verified, evaluate_qualification,
+    mark_qualified, award_referral, list_my_referrals, count_by_status
+  - Writes ReferralEvent on every transition (append-only audit)
+  - Award path uses reward_engine.create_ledger_entry(funding_source="REFERRAL")
+  - Idempotent: a relationship can only be REWARDED once
+- Step 3 — Fraud checks + monthly limits
+  - app/services/referral_fraud.py (same_phone, circular, velocity,
+    cancellations, account_age, same_ip) → REVIEW if score >= 30
+  - app/services/referral_limits.py — AED 100/month per user cap
+  - award_referral: fraud gate (→ REVIEW) + limit gate (→ REWARD_DEFERRED)
+- Step 4 — API + payment-flow wiring + E2E
+  - GET /referrals/me, POST /referrals/apply, POST /referrals/generate,
+    GET /referrals/history/{relationship_id}
+  - payment_service.mark_success: referral qualification hook (try/except,
+    never fails payment)
+  - 43 new tests across 4 test files
 
 ### Phase 76 — Eligibility + Calculation Engine (Stage 2): COMPLETE
 Tag: v0.58.0-rewards-eligibility
