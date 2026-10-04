@@ -79,14 +79,21 @@ def create_ledger_entry(
     source_id: str | None = None,
     description: str | None = None,
     extra: dict | None = None,
+    allow_negative: bool = False,
 ) -> tuple[Reward, str]:
     """Append a ledger entry.
 
     status: 'created' | 'exists' (idempotent for transaction-bound rewards).
+
+    allow_negative: when True, a negative `amount` is accepted. This is
+    used exclusively for compensating entries (expiration, reversal).
+    A positive amount must still be > 0. A negative amount must be < 0.
     """
     amount = _round2(amount)
-    if amount <= 0:
-        raise ValueError("amount must be > 0")
+    if amount == 0:
+        raise ValueError("amount must be non-zero")
+    if amount < 0 and not allow_negative:
+        raise ValueError("negative amount requires allow_negative=True")
 
     # Idempotency: only for rewards tied to a transaction
     if transaction_id is not None:
