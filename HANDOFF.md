@@ -314,7 +314,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 80 Step 2 — AI + analytics + admin + wiring (2026-10-04 18:48)
+Last step: Phase 88 (Stage 6) — deployment status + sales prep complete (2026-10-04 21:52)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
