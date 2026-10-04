@@ -372,11 +372,11 @@ HANDOFF Section 0.1.5.
 
 | Phase | Title | Status |
 |-------|-------|--------|
-| 81 | Deploy Scripts (install / update / backup / restore) | ❌ planned |
-| 82 | PostgreSQL Migration + Dry-run + Edge Cases | ❌ planned |
-| 83 | Production Env Config (.env.example + systemd + nginx) | ❌ planned |
+| 83 | Production Env Config (.env.example + systemd + nginx) | ✅ done |
+| 81 | Deploy Scripts (install / update / backup / restore) | ⏳ next |
 | 84 | Smoke Test Suite (critical flows E2E) | ❌ planned |
 | 85 | Documentation for Buyer (TECH-OVERVIEW + DEPLOY-GUIDE) | ❌ planned |
+| 82 | PostgreSQL Migration + Dry-run + Edge Cases | ❌ planned |
 
 ### Phase 81 — Deploy Scripts
 - `scripts/deploy/install.sh` — Ubuntu 22.04 one-shot installer.
@@ -422,6 +422,8 @@ onboard without friction. **No purchases required by us.**
 | 86 | Handover Package (CHECKLIST + TRANSFER + BUYER-GUIDE) | ❌ planned |
 | 87 | Sales Assets (SELLING-PITCH + TECH-DEBT + INVENTORY) | ❌ planned |
 | 88 | Final Audit + Cleanup (secrets, test data, license) | ❌ planned |
+
+> **Order revised 2026-10-04:** Stages 5/6 are sequenced light → heavy. Phase 83 done first; Phase 82 (heaviest) last of Stage 5.
 
 ### Phase 86 — Handover Package
 - `HANDOVER-CHECKLIST.md` — step-by-step what the seller and buyer do.

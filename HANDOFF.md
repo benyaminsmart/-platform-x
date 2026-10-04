@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.60.0-rewards-complete (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-69, 75-80 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. STAGE 2 & 4 COMPLETE. STAGE 3 COMPLETE. STAGE 5 NEXT.
+> Version: v0.60.1-env-config (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-69, 75-80, 83 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. STAGE 2 & 4 COMPLETE. STAGE 3 COMPLETE. STAGE 5 IN PROGRESS (83 done; 81, 84, 85, 82 next — reordered light-to-heavy).
 
 Last updated: 2026-10-04
 
@@ -74,6 +74,16 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
 ## 0.1.5 STRATEGIC ROADMAP TO SALE — see `docs/16-MASTER-ROADMAP.md`
 
 > **Stage 2 & 4 (Rewards & Referral Engine) = COMPLETE as of v0.60.0.**
+>
+> **Stage 5/6 reordered (2026-10-04) — light to heavy:**
+> 1. Phase 83 — Production Env Config ✅ DONE
+> 2. Phase 81 — Deploy Scripts (next)
+> 3. Phase 84 — Smoke Test Suite
+> 4. Phase 85 — Buyer Documentation
+> 5. Phase 82 — PostgreSQL Migration (heaviest, last)
+> 6. Phase 86 — Handover Package
+> 7. Phase 87 — Sales Assets
+> 8. Phase 88 — Final Audit + Cleanup
 > All phases 75–80 shipped. Next: Stage 5 (Production Readiness, phases 81–85).
 
 > **The full end-to-end roadmap (Phase 0 → Sale) now lives in
