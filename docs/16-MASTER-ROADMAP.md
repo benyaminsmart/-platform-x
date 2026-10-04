@@ -297,9 +297,9 @@ are a separate future module (not built here).
 | 75 | Rewards Foundation (Ledger + Wallet + Tier migration) | ✅ | v0.57.0-rewards-foundation |
 | 76 | Eligibility + Calculation Engine | ✅ | v0.58.0-rewards-eligibility |
 | 77 | Referral Engine | ✅ | v0.59.0-referral-engine |
-| 78 | Expiration + Reversal | ⏳ NEXT | — |
-| 79 | Redemption + Wallet API | ❌ planned | — |
-| 80 | Campaigns + AI-ready + Analytics | ❌ planned | — |
+| 78 | Expiration + Reversal | ✅ | v0.60.0-rewards-complete |
+| 79 | Redemption + Wallet API | ✅ | v0.60.0-rewards-complete |
+| 80 | Campaigns + AI-ready + Analytics | ✅ | v0.60.0-rewards-complete |
 
 **Phase 75 — Rewards Foundation ✅**
 - Immutable `Reward` ledger (funding_source, status, expiry,
@@ -478,7 +478,7 @@ This is an upsell, not part of the sale itself.
 |--------|-------|
 | Phases complete | 0, 0.5, 2–7, 9, 11, 14, 18–23, 25–30, 32–69, 75–77 |
 | Phases deferred / skipped | 1 (intentional), 8 (superseded), 24 (deferred) |
-| Phases remaining (Stage 4) | 78, 79, 80 |
+| Phases remaining (Stage 4) | none — COMPLETE |
 | Phases remaining (Stage 5) | 81, 82, 83, 84, 85 |
 | Phases remaining (Stage 6) | 86, 87, 88 |
 | Total shipping tags | 59 (v0.2.0 → v0.59.0) |
@@ -489,7 +489,7 @@ This is an upsell, not part of the sale itself.
 | Public API version | v1 |
 
 **Estimated remaining effort (free work only):**
-- Stage 4 (78–80): 3 phases × 3–5 steps = ~12 steps.
+- Stage 4: COMPLETE.
 - Stage 5 (81–85): 5 phases × 1–3 steps = ~10 steps.
 - Stage 6 (86–88): 3 phases × 1–2 steps = ~5 steps.
 - **Total remaining:** ~27 steps, all free, no purchases.

@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v0.59.0-referral-engine (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-77 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. STAGE 2 IN PROGRESS — Phase 77 DONE. STAGE 3 PAUSED AT 69/74.
+> Version: v0.60.0-rewards-complete (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-69, 75-80 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. STAGE 2 & 4 COMPLETE. STAGE 3 COMPLETE. STAGE 5 NEXT.
 
 Last updated: 2026-10-04
 
@@ -72,6 +72,9 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
 ---
 
 ## 0.1.5 STRATEGIC ROADMAP TO SALE — see `docs/16-MASTER-ROADMAP.md`
+
+> **Stage 2 & 4 (Rewards & Referral Engine) = COMPLETE as of v0.60.0.**
+> All phases 75–80 shipped. Next: Stage 5 (Production Readiness, phases 81–85).
 
 > **The full end-to-end roadmap (Phase 0 → Sale) now lives in
 > `docs/16-MASTER-ROADMAP.md`.** That document is the single source
@@ -642,6 +645,50 @@ Tag: v0.59.0-referral-engine
   - payment_service.mark_success: referral qualification hook (try/except,
     never fails payment)
   - 43 new tests across 4 test files
+
+
+
+### Phase 80 — Campaigns + AI-ready + Analytics (Stage 4): COMPLETE
+Tag: v0.60.0-rewards-complete (with 78, 79)
+- Step 1 — Campaign engine + economic guardrails
+  - RewardCampaign + RewardCampaignUse models + migration d3e4f5a6b7c8
+  - app/services/reward_campaign.py (find_best_campaign, record_campaign_use)
+  - app/services/reward_economics.py (snapshot, reward_cost_ratio)
+  - Conditions: category, min_transaction, user_tier, first_booking, repeat_booking
+  - Budget / usage / user limits + economic cap enforced deterministically
+- Step 2 — AI interface + Analytics + Admin + wiring
+  - app/services/reward_ai.py (deterministic recommendation, never bypasses caps)
+  - app/services/reward_analytics.py (user / financial / campaign metrics)
+  - app/api/rewards_admin.py (4 admin endpoints under /platform/rewards)
+  - payment_service.mark_success wires campaign matching after base reward
+  - 19 tests
+
+### Phase 79 — Redemption + Wallet API (Stage 4): COMPLETE
+Tag: v0.60.0-rewards-complete (with 78, 80)
+- Step 1 — Redemption service + real catalog
+  - RedeemOption extended with platform_cost, funding_source, category
+  - Migration c2b3d4e5f6a7
+  - app/services/reward_redemption.py (server-authoritative redemption)
+  - Real catalog seeded (7 options; 3 legacy deactivated)
+  - 8 tests
+- Step 2 — Wallet API + UI
+  - 4 new endpoints: /rewards/wallet, /rewards/catalog, /rewards/redeem-option, /rewards/ledger
+  - Schema app/schemas/reward_wallet.py
+  - Page /account/wallet (wallet.html) with balance, catalog, ledger
+  - 9 tests
+
+### Phase 78 — Expiration + Reversal (Stage 4): COMPLETE
+Tag: v0.60.0-rewards-complete (with 79, 80)
+- Step 1 — Expiration service
+  - app/services/reward_expiration.py (find_expired_candidates, find_expiring_soon, expire_reward, run_expiration)
+  - Negative compensating ledger entries (allow_negative flag added to reward_engine)
+  - Wallet rebuilt from ledger
+  - 9 tests
+- Step 2 — Reversal + Notifications + Cancellation wiring
+  - app/services/reward_reversal.py (reverse_reward, reverse_rewards_for_booking, reverse_referral_rewards)
+  - app/services/reward_notifications.py (notify_expiring_soon 7/3/1 days, notify_expired)
+  - cancellation_service.cancel_booking wired (never fails cancellation)
+  - 9 tests
 
 ### Phase 76 — Eligibility + Calculation Engine (Stage 2): COMPLETE
 Tag: v0.58.0-rewards-eligibility
@@ -2055,7 +2102,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1390 tests, all passing
+## 14. Test Count: 1487 tests, all passing
 
 Test files:
 - test_health.py
