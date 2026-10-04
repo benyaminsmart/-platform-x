@@ -86,7 +86,6 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
 > 8. Phase 88 — Final Audit + Cleanup ✅
 >
 > **The platform is SALE-READY. Buyer-driven Stage 7 is the only work left.**
-> All phases 75–80 shipped. Next: Stage 5 (Production Readiness, phases 81–85).
 
 > **The full end-to-end roadmap (Phase 0 → Sale) now lives in
 > `docs/16-MASTER-ROADMAP.md`.** That document is the single source
@@ -1815,8 +1814,8 @@ User (2026-09-29): do NOT start until explicitly told.
 **Phase 67 (Full Bug Sweep) COMPLETE — logging, N+1, FK indexes.**
 **Phase 68 (Security Review) COMPLETE — rate limits on all routes.**
 **Phase 69 (Performance Review) COMPLETE — N+1, payload caps, index audit.**
-**STAGE 3 remaining: 70 Deploy Scripts, 71 PostgreSQL Dry-run,
-72 Prod Env Config, 73 Smoke Test, 74 Sales docs.**
+**STAGE 3, STAGE 4, STAGE 5, STAGE 6: ALL COMPLETE (as of v1.0.0-sale-ready).
+The platform is SALE-READY. Only Stage 7 (buyer-driven) remains.**
 
 ## STAGE 1 COMPLETE (v0.52.0-local-experiences)
 
