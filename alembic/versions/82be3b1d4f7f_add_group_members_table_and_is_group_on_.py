@@ -40,7 +40,7 @@ def upgrade() -> None:
     op.create_index(op.f('ix_group_members_booking_id'), 'group_members', ['booking_id'], unique=False)
     op.create_index('ix_group_members_tenant', 'group_members', ['tenant_id'], unique=False)
     op.create_index(op.f('ix_group_members_tenant_id'), 'group_members', ['tenant_id'], unique=False)
-    op.add_column('bookings', sa.Column('is_group', sa.Boolean(), nullable=False, server_default=sa.text('0')))
+    op.add_column('bookings', sa.Column('is_group', sa.Boolean(), nullable=False, server_default=sa.text('false')))
     # ### end Alembic commands ###
 
 

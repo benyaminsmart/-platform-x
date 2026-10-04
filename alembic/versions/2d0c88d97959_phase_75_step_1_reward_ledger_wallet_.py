@@ -29,7 +29,7 @@ def upgrade() -> None:
         sa.Column('platform_reward_rate', sa.Numeric(precision=6, scale=4), nullable=False),
         sa.Column('max_reward_amount', sa.Numeric(precision=12, scale=2), nullable=False),
         sa.Column('min_transaction_amount', sa.Numeric(precision=12, scale=2), nullable=False),
-        sa.Column('enabled', sa.Boolean(), nullable=False, server_default=sa.text('1')),
+        sa.Column('enabled', sa.Boolean(), nullable=False, server_default=sa.text('true')),
         sa.Column('effective_from', sa.Date(), nullable=True),
         sa.Column('effective_to', sa.Date(), nullable=True),
         sa.Column('id', sa.String(length=36), nullable=False),

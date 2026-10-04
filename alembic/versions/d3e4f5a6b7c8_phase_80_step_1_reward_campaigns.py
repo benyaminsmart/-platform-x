@@ -22,7 +22,7 @@ def upgrade() -> None:
         sa.Column('tenant_id', sa.String(length=36), nullable=False),
         sa.Column('name', sa.String(length=120), nullable=False),
         sa.Column('description', sa.Text(), nullable=True),
-        sa.Column('active', sa.Boolean(), nullable=False, server_default=sa.text('1')),
+        sa.Column('active', sa.Boolean(), nullable=False, server_default=sa.text('true')),
         sa.Column('start_at', sa.DateTime(timezone=True), nullable=True),
         sa.Column('end_at', sa.DateTime(timezone=True), nullable=True),
         sa.Column('conditions', sa.JSON(), nullable=False, server_default='{}'),
