@@ -71,119 +71,38 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
 
 ---
 
-## 0.1.5 STRATEGIC ROADMAP TO SALE (4 STAGES, user directive 2026-10-01)
+## 0.1.5 STRATEGIC ROADMAP TO SALE — see `docs/16-MASTER-ROADMAP.md`
 
-> **User's plan:** finish the platform, then sell it.
-> This section tracks the 4-phase plan to production-ready sale.
-> Every completed item is ticked here so any new AI session picks up
-> exactly where we left off.
+> **The full end-to-end roadmap (Phase 0 → Sale) now lives in
+> `docs/16-MASTER-ROADMAP.md`.** That document is the single source
+> of truth for every phase from day one to sale, including the new
+> Stage 5 (Production Readiness, Phase 81–85) and Stage 6 (Sales
+> Preparation, Phase 86–88). Read it before starting any new phase.
+>
+> Quick summary of the extended stages:
+>
+> | Stage | Phases | Goal |
+> |-------|--------|------|
+> | 0 | 0, 0.5 | Strategic foundation |
+> | 1 | 1–30 | Core platform |
+> | 2 | 32–65 | Feature waves 1–4 (parity + blue-ocean) |
+> | 3 | 66–69 | Production audit (security, perf, bugs) |
+> | 4 | 75–80 | Rewards & Referral Engine |
+> | 5 | 81–85 | Production Readiness (deploy scripts, PostgreSQL, docs) |
+> | 6 | 86–88 | Sales Preparation (handover, pitch, cleanup) |
+> | 7 | — | Post-sale (buyer purchases VPS + domain, we optionally assist) |
+>
+> **Remaining free work:** ~27 steps across Phases 78–88.
+> **Remaining paid work (buyer's):** VPS, domain, payment provider,
+> AI keys — all on the buyer's accounts.
 
-### The 4-stage plan
 
-**STAGE 1 — Free work (Phases 61+)**
-- [x] Phase 61 — Lessons Learned batch update (commits 47ff760 + bba0cf3)
-- [x] Phase 62 — Expand /docs/api (commit 3970313 + 4d6c042)
-- [x] Phase 63 — UI consistency guard (Phase 63 test, commits 7e37b76 + next)
-- [x] Phase 64 — AI Voice Booking (B1) — mock provider (commit 1e1369f)
-- [x] Phase 65 — Live Local Experiences (B14) — mock data source (commit 748539b)
-- [ ] Any additional free items user requests
+### Historical plan (superseded — kept for git history)
 
-**STAGE 2 — User Rewards & Referral Engine (plan received 2026-10-02)**
-
-Plan: "USER REWARDS & REFERRAL ENGINE — Technical Implementation
-Specification" (24 sections, immutable ledger, economic guardrails,
-referral lifecycle, expiration, campaigns, AI-ready).
-
-User-side only. Business Loyalty remains a separate future layer.
-
-- [x] Phase 75 — Rewards Foundation (Ledger + Wallet + Tier migration) — tag v0.57.0
-      * Extend Reward into an immutable ledger with funding_source,
-        status, available_at, expires_at, transaction_id, referral_id,
-        campaign_id, metadata
-      * RewardWallet projection (available/locked/expiring/referral/
-        experience/bonus balances)
-      * reward_rules config (category rates: HOTEL 1.0%, FLIGHT 0.5%,
-        EXPERIENCE 1.5%, DINING 1.2%; caps; min transaction)
-      * Tier model replaces current (EXPLORER/TRAVELER/INSIDER/VIP
-        with 1.0x/1.25x/1.5x/2.0x multipliers)
-      * Migration from welcome/silver/gold/platinum/royal
-- [x] Phase 76 — Eligibility + Calculation Engine — tag v0.58.0
-      * is_qualifying_transaction() (payment, category, min amount,
-        not cancelled, not refunded, not already rewarded)
-      * base_reward = amount × category_rate
-      * Final reward <= transaction cap and <= economic budget
-      * Tier multipliers apply only to eligible bonus/referral
-        components (not blindly to all platform-funded rewards)
-- [x] Phase 77 — Referral Engine (New) — tag v0.59.0
-      * ReferralCode + ReferralRelationship + ReferralEvent +
-        ReferralReward
-      * Lifecycle: INVITED → REGISTERED → VERIFIED → QUALIFIED →
-        REWARDED → REVERSED → EXPIRED
-      * Reward: referrer AED 20, new user AED 15 (first qualifying
-        transaction, min AED 300)
-      * Limits: max AED 100 referral credit per user/month
-      * Fraud checks (same phone/IP/device, velocity, cancellations,
-        circular) — flag as REVIEW, do not auto-pay
-- [ ] Phase 78 — Expiration + Reversal
-      * Expiration windows 30/60/90 days (configurable)
-      * Automated job: AVAILABLE + expires_at <= now → EXPIRED
-      * Pre-expiry notifications (7/3/1 days before)
-      * Cancellation/refund → PENDING→CANCELLED, AVAILABLE→REVERSED
-      * Spent reward → negative compensating ledger entry (never delete)
-- [ ] Phase 79 — Redemption + Wallet API
-      * Server-authoritative redemption (never trust client balance)
-      * Validation: ownership, expiration, booking/category eligibility,
-        max redemption, duplicate check
-      * Replace the Phase 44 TEMP catalog with a real catalog
-        (platform_cost + funding_source per item)
-      * Endpoints: wallet, history, available, expiring, redeem,
-        tiers, campaigns (aligned with existing conventions)
-- [ ] Phase 80 — Campaigns + AI-ready + Analytics
-      * Campaign engine (conditions, budget, usage/user limits,
-        economic_cap)
-      * Economic guardrails (6% commission assumption; track
-        gross_booking_value, platform_commission, reward_cost,
-        referral_cost, net_platform_value)
-      * AI Reward Decision interface (recommendation only — MUST NOT
-        bypass deterministic economic limits)
-      * Analytics: user, financial, campaign metrics
-      * Admin config + audit log
-
-**SUPERSEDED by the plan above:**
-- Phase 8 (Rewards + Referral Complete) — never started; replaced
-- Phase 24 (Cross-Business Rewards) — never started; replaced
-- Phase 44 catalog portion — Phase 44 itself stays COMPLETE; its
-  TEMP catalog is replaced in Phase 79
-
-**STAGE 3 — Production readiness audit (Phase 66 DONE, 67-74 remaining)**
-- [x] Full bug sweep across the codebase (Phase 67)
-- [x] Fix all findings (bugs, edge cases, race conditions) (Phase 67)
-- [x] Verify all tests green (100% pass, no skips on critical paths) (Phase 67)
-- [x] Security review (rate limits, auth, CORS, secrets) (Phase 68)
-- [x] Performance review (N+1 queries, indexes, payload sizes) (Phase 67)
-- [ ] Prepare deploy scripts (scripts/deploy/*.sh)
-- [ ] Prepare production env config (DATABASE_URL, secrets, CORS_ORIGINS)
-- [ ] PostgreSQL migration dry-run + edge-case doc
-- [ ] Smoke test each critical flow end-to-end
-- [ ] Prepare SELLING-PITCH + TECH-OVERVIEW docs
-
-**STAGE 4 — VPS + Domain + Production**
-- [ ] User purchases VPS + Domain
-- [ ] Phase 12 — VPS Deploy + Domain + Named Tunnel
-- [ ] Phase 10 — Payment Production (Telr/Stripe)
-- [ ] Phase 13 — Business Onboarding Tools
-- [ ] Phase 15 — Trianon Migration (first real customer)
-- [ ] Sale-ready
-
-### Rules for this plan
-1. Phase 1 and Phase 2 can run in either order if user decides.
-2. Phase 3 MUST be complete before Phase 4 begins.
-3. Phase 4 requires user purchases; AI cannot start it.
-4. Every ticked item here must also be reflected in Section 0.5 and
-   the relevant Phase's section (5).
-5. Any new AI session: read this section first to know where we are.
-
----
+> The original 4-stage plan has been superseded by the extended
+> 7-stage roadmap in `docs/16-MASTER-ROADMAP.md`. All completed
+> items remain in git history and in Section 5 of this file.
+> **Do not edit this list — edit `docs/16-MASTER-ROADMAP.md`.**
 
 ## 0.2 Working Method (fast + safe)
 
