@@ -372,11 +372,11 @@ HANDOFF Section 0.1.5.
 
 | Phase | Title | Status |
 |-------|-------|--------|
-| 83 | Production Env Config (.env.example + systemd + nginx) | ✅ done |
-| 81 | Deploy Scripts (install / update / backup / restore) | ⏳ next |
-| 84 | Smoke Test Suite (critical flows E2E) | ❌ planned |
-| 85 | Documentation for Buyer (TECH-OVERVIEW + DEPLOY-GUIDE) | ❌ planned |
-| 82 | PostgreSQL Migration + Dry-run + Edge Cases | ❌ planned |
+| 83 | Production Env Config (.env.example + systemd + nginx) | ✅ v0.60.1 |
+| 81 | Deploy Scripts (install / update / backup / restore) | ✅ v0.60.2 |
+| 84 | Smoke Test Suite (critical flows E2E) | ✅ v0.60.3 |
+| 85 | Documentation for Buyer (TECH-OVERVIEW + DEPLOY-GUIDE) | ✅ v0.60.3 |
+| 82 | PostgreSQL Migration + Dry-run + Edge Cases | ✅ v1.0.0 |
 
 ### Phase 81 — Deploy Scripts
 - `scripts/deploy/install.sh` — Ubuntu 22.04 one-shot installer.
@@ -419,9 +419,9 @@ onboard without friction. **No purchases required by us.**
 
 | Phase | Title | Status |
 |-------|-------|--------|
-| 86 | Handover Package (CHECKLIST + TRANSFER + BUYER-GUIDE) | ❌ planned |
-| 87 | Sales Assets (SELLING-PITCH + TECH-DEBT + INVENTORY) | ❌ planned |
-| 88 | Final Audit + Cleanup (secrets, test data, license) | ❌ planned |
+| 86 | Handover Package (CHECKLIST + TRANSFER + BUYER-GUIDE) | ✅ v0.60.4 |
+| 87 | Sales Assets (SELLING-PITCH + TECH-DEBT + INVENTORY) | ✅ v0.60.4 |
+| 88 | Final Audit + Cleanup (secrets, test data, license) | ✅ v0.60.4 |
 
 > **Order revised 2026-10-04:** Stages 5/6 are sequenced light → heavy. Phase 83 done first; Phase 82 (heaviest) last of Stage 5.
 
@@ -491,7 +491,7 @@ This is an upsell, not part of the sale itself.
 | Public API version | v1 |
 
 **Estimated remaining effort (free work only):**
-- Stage 4: COMPLETE.
+- ALL STAGES COMPLETE. Only Stage 7 (buyer-driven) remains.
 - Stage 5 (81–85): 5 phases × 1–3 steps = ~10 steps.
 - Stage 6 (86–88): 3 phases × 1–2 steps = ~5 steps.
 - **Total remaining:** ~27 steps, all free, no purchases.
