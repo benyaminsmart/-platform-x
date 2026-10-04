@@ -83,30 +83,47 @@ At the END of each Step write:
 ALWAYS write the Phase and Step number — the user needs to see them.
 Never ask the user to decide between options that are technical.
 
-## 7. CURRENT STATE (as of 2026-10-02)
+## 7. CURRENT STATE (as of 2026-10-04)
 
-- Version: v0.58.0-rewards-eligibility
-- Tests: 1390 passing
-- Stage 1 (free work): DONE
-- Stage 2 (User Rewards Engine): IN PROGRESS — Phases 75, 76 done
-- Stage 3 (Production readiness): PAUSED at Phase 69/74
-- Stage 4 (VPS + production): waiting on user purchases
+- Version: v1.0.0-sale-ready (latest tag: v1.0.2-final-handoff)
+- Tests: 1487 passing
+- Stage 0 — Strategic Foundation: COMPLETE
+- Stage 1 — Core Platform: COMPLETE
+- Stage 2 — Feature Waves 1–4: COMPLETE
+- Stage 3 — Production Audit: COMPLETE
+- Stage 4 — Rewards & Referral Engine: COMPLETE
+- Stage 5 — Production Readiness: COMPLETE
+- Stage 6 — Sales Preparation: COMPLETE
+- Stage 7 — Post-Sale (buyer-driven): pending a buyer
 
-Latest tags:
-v0.56.0-performance, v0.57.0-rewards-foundation,
-v0.58.0-rewards-eligibility
+**ALL FREE WORK IS DONE. The platform is SALE-READY.**
+
+Latest tags (top 5):
+v1.0.2-final-handoff, v1.0.1-deployment-status, v1.0.0-final,
+v1.0.0-sale-ready, v0.60.4-handover-and-sales
 
 ## 8. WHAT TO DO NEXT
 
-**STAGE 2 — User Rewards & Referral Engine** (plan received 2026-10-02).
-The full plan is in `docs/` (search for "USER REWARDS & REFERRAL").
-Phases 75 and 76 are DONE. Remaining:
-- Phase 77 — Referral Engine (New)
-- Phase 78 — Expiration + Reversal
-- Phase 79 — Redemption + Wallet API
-- Phase 80 — Campaigns + AI-ready + Analytics
+**The project is complete.** No free work remains. The seller is
+now in the sales phase — preparing the PDF, listing the platform
+on marketplaces (Flippa, Acquire.com, MicroAcquire), and talking
+to buyers.
 
-After Stage 2: finish Stage 3 (70-74), then Stage 4 (VPS purchase).
+**If a buyer arrives**, Stage 7 begins (buyer-driven):
+
+1. Buyer purchases VPS (Ubuntu 22.04, min 2 vCPU / 4 GB RAM)
+2. Buyer purchases domain
+3. Buyer runs `scripts/deploy/install.sh <domain> <repo_url>`
+4. Buyer fills `.env`, runs migrations, seeds
+5. Buyer sets up SSL (`certbot --nginx`)
+6. Buyer connects payment provider (Telr / Stripe) — Phase 10
+7. Buyer connects AI provider key
+8. Optional: paid activation service by the seller
+
+**If a technical question comes from a buyer**, the AI's role is to
+answer authoritatively from the codebase, docs, and history.
+
+**See `docs/16-MASTER-ROADMAP.md` for the full 7-stage picture.**
 
 ## 9. CRITICAL PITFALLS (learned from real errors)
 
