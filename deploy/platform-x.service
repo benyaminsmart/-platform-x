@@ -1,0 +1,48 @@
+# Platform-X — systemd service unit
+# Install location: /etc/systemd/system/platform-x.service
+#
+# After editing:
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now platform-x
+#   sudo systemctl status platform-x
+
+[Unit]
+Description=Platform-X (FastAPI + Uvicorn)
+Documentation=https://your-domain.example
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=platformx
+Group=platformx
+WorkingDirectory=/opt/platform-x
+EnvironmentFile=/opt/platform-x/.env
+
+# Start Uvicorn (ASGI server)
+ExecStart=/opt/platform-x/venv/bin/uvicorn app.main:app \
+    --host 0.0.0.0 \
+    --port 8000 \
+    --workers 2 \
+    --proxy-headers \
+    --forwarded-allow-ips='127.0.0.1'
+
+# Restart policy
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=20s
+
+# Logging
+StandardOutput=append:/var/log/platform-x/app.log
+StandardError=append:/var/log/platform-x/error.log
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/platform-x /var/log/platform-x
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
