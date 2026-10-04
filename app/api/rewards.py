@@ -13,7 +13,13 @@ from app.models.tenant import Tenant
 from app.models.user import User
 from app.schemas.common import PaginatedResponse
 from app.schemas.reward import RedeemRequest, RewardPublic, RewardsSummary
-from app.services import reward_service
+from app.schemas.reward_wallet import (
+    RedeemCatalogItemPublic,
+    RedeemOptionRequest,
+    RewardLedgerEntryPublic,
+    RewardWalletPublic,
+)
+from app.services import reward_engine, reward_redemption, reward_service
 
 router = APIRouter(prefix="/rewards", tags=["rewards"])
 
@@ -70,3 +76,69 @@ def redeem_reward(
     if redemption is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reward not found")
     return RewardPublic.model_validate(redemption)
+
+
+# ---------- Phase 79: Wallet + Catalog + Ledger ----------
+
+
+@limiter.limit("60/minute")
+@router.get("/wallet", response_model=RewardWalletPublic)
+def get_my_wallet(
+    request: Request,
+    user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+) -> RewardWalletPublic:
+    """Return the current user's wallet balances."""
+    w = reward_engine.get_or_create_wallet(db, user=user)
+    return RewardWalletPublic.model_validate(w)
+
+
+@limiter.limit("60/minute")
+@router.get("/catalog", response_model=list[RedeemCatalogItemPublic])
+def get_redeem_catalog(
+    request: Request,
+    user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+) -> list[RedeemCatalogItemPublic]:
+    """Return the active redeem catalog."""
+    rows = reward_redemption.list_active_options(db)
+    return [RedeemCatalogItemPublic.model_validate(o) for o in rows]
+
+
+@limiter.limit("30/minute")
+@router.post("/redeem-option", response_model=RewardLedgerEntryPublic, status_code=status.HTTP_201_CREATED)
+def redeem_catalog_option(
+    request: Request,
+    payload: RedeemOptionRequest,
+    tenant: Tenant = Depends(get_current_tenant),
+    user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+) -> RewardLedgerEntryPublic:
+    """Redeem a catalog option using the user's available balance."""
+    try:
+        entry = reward_redemption.redeem_option(
+            db,
+            tenant=tenant,
+            user=user,
+            option_id=payload.option_id,
+            reference_id=payload.reference_id,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
+        ) from exc
+    return RewardLedgerEntryPublic.model_validate(entry)
+
+
+@limiter.limit("60/minute")
+@router.get("/ledger", response_model=list[RewardLedgerEntryPublic])
+def get_my_ledger(
+    request: Request,
+    limit: Annotated[int, Query(ge=1, le=200)] = 50,
+    user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+) -> list[RewardLedgerEntryPublic]:
+    """Return the current user's ledger entries (newest first)."""
+    rows = reward_engine.list_ledger(db, user_id=user.id, limit=limit)
+    # list_ledger returns dicts; validate through the schema
+    return [RewardLedgerEntryPublic(**r) for r in rows]

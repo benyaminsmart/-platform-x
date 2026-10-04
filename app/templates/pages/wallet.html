@@ -1,0 +1,208 @@
+{% extends "layouts/platform_base.html" %}
+{% block title %}My Wallet — Platform-X{% endblock %}
+
+{% block content %}
+<section class="px-hero px-hero-compact">
+  <div class="px-container">
+    <div class="px-hero-content">
+      <div class="px-breadcrumb">
+        <a href="/">Home</a><span>/</span><a href="/account">Account</a><span>/</span><span>Wallet</span>
+      </div>
+      <h1 class="px-hero-title-sm">My Rewards Wallet</h1>
+      <p class="px-hero-sub-sm">Your balance, ledger, and redeemable rewards.</p>
+    </div>
+  </div>
+</section>
+
+<section class="px-section">
+  <div class="px-container" style="max-width: 1000px;">
+
+    {% if wallet %}
+    <div class="px-wallet-grid">
+      <div class="px-wallet-card px-wallet-primary">
+        <div class="px-wallet-label">Available Balance</div>
+        <div class="px-wallet-value">{{ "%.2f"|format(wallet.available_balance) }} {{ wallet.currency }}</div>
+        <div class="px-wallet-sub">Ready to redeem</div>
+      </div>
+      <div class="px-wallet-card">
+        <div class="px-wallet-label">Referral Credit</div>
+        <div class="px-wallet-value-sm">{{ "%.2f"|format(wallet.referral_balance) }}</div>
+      </div>
+      <div class="px-wallet-card">
+        <div class="px-wallet-label">Bonus</div>
+        <div class="px-wallet-value-sm">{{ "%.2f"|format(wallet.bonus_balance) }}</div>
+      </div>
+      <div class="px-wallet-card">
+        <div class="px-wallet-label">Expiring Soon</div>
+        <div class="px-wallet-value-sm">{{ "%.2f"|format(wallet.expiring_balance) }}</div>
+      </div>
+    </div>
+    {% else %}
+    <div class="px-wallet-card" style="margin-bottom:40px;">
+      <div class="px-wallet-label">Available Balance</div>
+      <div class="px-wallet-value-sm">Sign in to see your wallet</div>
+    </div>
+    {% endif %}
+
+    <h2 class="px-section-title">Redeem your balance</h2>
+    {% if catalog %}
+    <div class="px-catalog-grid">
+      {% for o in catalog %}
+      <div class="px-catalog-card">
+        <div class="px-catalog-name">{{ o.name }}</div>
+        <div class="px-catalog-desc">{{ o.description or "" }}</div>
+        <div class="px-catalog-meta">
+          <span class="px-catalog-value">{{ "%.2f"|format(o.reward_value) }} value</span>
+          {% if o.category %}<span class="px-catalog-tag">{{ o.category }}</span>{% endif %}
+          {% if o.funding_source %}<span class="px-catalog-tag">{{ o.funding_source }}</span>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="px-muted">No redeem options available at the moment.</p>
+    {% endif %}
+
+    <h2 class="px-section-title">Recent ledger</h2>
+    {% if ledger %}
+    <table class="px-ledger">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Type</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in ledger %}
+        <tr>
+          <td>{{ (e.created_at or "")[:10] }}</td>
+          <td>{{ e.reward_type }}</td>
+          <td class="{% if e.amount < 0 %}px-neg{% else %}px-pos{% endif %}">
+            {{ "%.2f"|format(e.amount) }}
+          </td>
+          <td>{{ e.status }}</td>
+          <td>{{ e.description or "" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="px-muted">No ledger entries yet.</p>
+    {% endif %}
+
+  </div>
+</section>
+
+<style>
+.px-wallet-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+@media (max-width: 780px) {
+  .px-wallet-grid { grid-template-columns: 1fr 1fr; }
+}
+.px-wallet-card {
+  padding: 20px;
+  background: #fff;
+  border: 1px solid var(--px-line);
+  border-radius: 14px;
+}
+.px-wallet-primary {
+  background: linear-gradient(135deg, #0f3d5c 0%, #1e5a7d 100%);
+  color: #fff;
+  border: none;
+}
+.px-wallet-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.px-wallet-value {
+  font-size: 36px;
+  font-weight: 800;
+  margin-top: 8px;
+  line-height: 1.1;
+}
+.px-wallet-value-sm {
+  font-size: 24px;
+  font-weight: 700;
+  margin-top: 6px;
+}
+.px-wallet-sub {
+  font-size: 13px;
+  opacity: 0.85;
+  margin-top: 6px;
+}
+.px-section-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 30px 0 16px;
+  color: var(--px-text);
+}
+.px-catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+.px-catalog-card {
+  padding: 18px;
+  border: 1px solid var(--px-line);
+  border-radius: 12px;
+  background: #fff;
+}
+.px-catalog-name {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+.px-catalog-desc {
+  font-size: 13px;
+  color: var(--px-muted);
+  margin-bottom: 10px;
+  min-height: 34px;
+}
+.px-catalog-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+.px-catalog-value {
+  font-weight: 700;
+  color: var(--px-text);
+}
+.px-catalog-tag {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #eef3f7;
+  color: #1e5a7d;
+  font-weight: 600;
+}
+.px-ledger {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.px-ledger th {
+  text-align: left;
+  padding: 10px 12px;
+  background: #f5f7f9;
+  border-bottom: 1px solid var(--px-line);
+  font-weight: 600;
+}
+.px-ledger td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--px-line);
+}
+.px-pos { color: #1a7f37; font-weight: 600; }
+.px-neg { color: #b42318; font-weight: 600; }
+.px-muted { color: var(--px-muted); font-size: 14px; }
+</style>
+{% endblock %}

@@ -1118,6 +1118,54 @@ def tenant_home(
     )
 
 
+
+
+# ---------- Phase 79: Rewards wallet page ----------
+
+
+@router.get("/account/wallet", response_class=HTMLResponse)
+def account_wallet_page(
+    request: Request,
+    db: DBSession = Depends(get_db),
+) -> HTMLResponse:
+    """Render the wallet + redeem catalog page.
+
+    Auth is resolved best-effort from the request. When no user is
+    found, the page still renders with an empty wallet so the layout
+    is reachable. Full auth gating is part of Stage 5 hardening.
+    """
+    from app.models.user import User
+    from app.services import redeem_service, reward_engine
+
+    user = None
+    # Best-effort: look for an email header set by the auth middleware
+    # for web pages (the same convention used elsewhere in the app).
+    email = request.headers.get("X-Email") or request.query_params.get("email")
+    if email:
+        user = db.query(User).filter(User.email == email).first()
+
+    wallet = None
+    ledger = []
+    if user is not None:
+        wallet = reward_engine.get_or_create_wallet(db, user=user)
+        ledger = reward_engine.list_ledger(db, user_id=user.id, limit=30)
+    catalog = redeem_service.list_options(db)
+
+    _lang = resolve_language(request)
+    return templates.TemplateResponse(
+        request,
+        "pages/wallet.html",
+        {
+            "tenant": None,
+            "lang": _lang,
+            "user": user,
+            "wallet": wallet,
+            "catalog": catalog,
+            "ledger": ledger,
+        },
+    )
+
+
 # ---------- 404 (must stay last) ----------
 
 
