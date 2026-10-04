@@ -25,10 +25,10 @@ Business owners pay → their value comes first.
 Every phase, doc, and design decision serves that outcome. The
 7-stage plan (Strategy → Core → Waves → Audit → Rewards →
 Production Readiness → Sales Prep) lives in
-`docs/16-MASTER-ROADMAP.md`. Stage 0–4 are complete. Stage 5
-(Production Readiness) is next. The final deliverable is a
-sale-ready codebase with deployment scripts, buyer documentation,
-and a commercial package — no purchase required from the seller.
+`docs/16-MASTER-ROADMAP.md`. **Stages 0–6 are complete. The platform
+is SALE-READY.** The final deliverable is a sale-ready codebase with
+deployment scripts, buyer documentation, and a commercial package —
+no purchase required from the seller.
 
 ## 3. HOW TO WORK (per step, TWO commands, MANDATORY)
 
