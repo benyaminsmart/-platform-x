@@ -186,6 +186,7 @@ payments (mock), admin, i18n, and the public API.
 | 28 | AI Review Writer + Responder | ✅ | v0.19.0-reviews |
 | 14 | Public API + Webhooks + SDK | ✅ | v0.20.0-public-api |
 | 30 | Wave 0 part A (Foundation) | ✅ | v0.21.0-wave0-part-a |
+| 31 | Wave 0 part B (VPS + Domain + Payment) | ❌ moved to Stage 7 | — |
 
 **Phase 8 (Rewards + Referral v1):** superseded by Stage 4 (Phases 75–80).
 **Phase 24 (Cross-Business Rewards):** deferred by user directive (2026-09-29).
