@@ -42,8 +42,6 @@ Thumbs.db
 node_modules/
 dist/
 build/
-HANDOFF-STATE.txt
-CONTEXT-FULL.txt
 logs/
 *.db
 .pytest_cache/
