@@ -491,10 +491,9 @@ This is an upsell, not part of the sale itself.
 | Public API version | v1 |
 
 **Estimated remaining effort (free work only):**
-- ALL STAGES COMPLETE. Only Stage 7 (buyer-driven) remains.
-- Stage 5 (81–85): 5 phases × 1–3 steps = ~10 steps.
-- Stage 6 (86–88): 3 phases × 1–2 steps = ~5 steps.
-- **Total remaining:** ~27 steps, all free, no purchases.
+- **ALL STAGES COMPLETE. Zero free work remains.**
+- Only Stage 7 (buyer-driven): VPS, domain, payment provider,
+  AI provider keys — all on the buyer's accounts.
 
 ---
 

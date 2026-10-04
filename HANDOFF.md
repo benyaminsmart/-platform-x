@@ -106,7 +106,9 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
 > | 6 | 86–88 | Sales Preparation (handover, pitch, cleanup) |
 > | 7 | — | Post-sale (buyer purchases VPS + domain, we optionally assist) |
 >
-> **Remaining free work:** ~27 steps across Phases 78–88.
+> **Product release:** `v1.0.0-sale-ready`
+> **Latest Git tag:** `v1.0.6-cleanup-final`
+> **ALL FREE WORK IS DONE.**
 > **Remaining paid work (buyer's):** VPS, domain, payment provider,
 > AI keys — all on the buyer's accounts.
 
@@ -1826,8 +1828,8 @@ All free work done:
 - 64: AI Voice Booking (mock)
 - 65: Live Local Experiences (mock)
 Remaining before Stage 2: nothing.
-NEXT: Stage 2 — awaiting user Guest Rewards + Referral plan.
-STAGE 3 (Production Readiness Audit) can also begin any time (free).
+**NOTE (2026-10-04):** All stages complete. This section is preserved
+for historical context only.
 
 ## WAVE 2 COMPLETE (v0.43.0-ai-receptionist)
 
@@ -1842,10 +1844,10 @@ Plus (Wave 3, early deliers): 47 Price Locks, 48 Smart Waitlist, 49 Trust Score.
 NEXT WAVE: Wave 3 — Blue-Ocean innovations (remaining) or Wave 0 part B
 (pending purchases: VPS, Domain, Payment).
 
-Remaining phases all require user-side decisions or purchases:
-- Phase 10 (Payment Production / Telr) — needs business account
-- Phase 12 (VPS + Domain + Named Tunnel) — needs purchase
-- Phase 13 (Business Onboarding Tools) — needs Phase 12
+**Stage 7 (buyer-driven) — pending a buyer:**
+- Phase 10 (Payment Production) — buyer's own Telr/Stripe account
+- Phase 12 (VPS + Domain) — buyer's own purchase
+- Phase 13 (Business Onboarding Tools) — after buyer setup
 - Phase 15 (Trianon Migration) — after VPS
 - Phase 16 / 30 (Mobile App) — long-term
 

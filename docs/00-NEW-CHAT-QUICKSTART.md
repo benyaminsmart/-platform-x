@@ -85,7 +85,8 @@ Never ask the user to decide between options that are technical.
 
 ## 7. CURRENT STATE (as of 2026-10-04)
 
-- Version: v1.0.0-sale-ready (latest tag: v1.0.2-final-handoff)
+- Product release: v1.0.0-sale-ready
+- Latest Git tag: v1.0.6-cleanup-final
 - Tests: 1487 passing
 - Stage 0 — Strategic Foundation: COMPLETE
 - Stage 1 — Core Platform: COMPLETE
@@ -99,7 +100,7 @@ Never ask the user to decide between options that are technical.
 **ALL FREE WORK IS DONE. The platform is SALE-READY.**
 
 Latest tags (top 5):
-v1.0.2-final-handoff, v1.0.1-deployment-status, v1.0.0-final,
+v1.0.6-cleanup-final, v1.0.5-quickstart-final, v1.0.4-handoff-clean,
 v1.0.0-sale-ready, v0.60.4-handover-and-sales
 
 ## 8. WHAT TO DO NEXT
