@@ -40,7 +40,15 @@ from app.schemas.partner import (
     TenantType,
     TierInterest,
 )
-from app.schemas.referral import ApplyReferralRequest, ReferralPublic, ReferralsMe
+from app.schemas.referral import (
+    ApplyReferralRequest,
+    GenerateReferralCodeRequest,
+    ReferralCodePublic,
+    ReferralEventPublic,
+    ReferralRelationshipPublic,
+    ReferralRewardPublic,
+    ReferralsMe,
+)
 from app.schemas.reward import RedeemRequest, RewardPublic, RewardsSummary
 from app.schemas.service import ServiceCreate, ServicePublic, ServiceType, ServiceUpdate
 from app.schemas.tenant import TenantPublic

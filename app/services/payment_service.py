@@ -212,6 +212,33 @@ def mark_success(
                 except Exception:
                     pass
 
+            # Referral qualification hook (Phase 77, plan §9-§11).
+            # If the payer is a referred user, and this is their first
+            # qualifying transaction (>= AED 300, paid, confirmed), then
+            # move the relationship to QUALIFIED and issue the referral
+            # rewards via the immutable Reward ledger. Never fails the
+            # payment (P10).
+            try:
+                from app.services import referral_engine as _rfe
+                _rel = _rfe.get_relationship_for_referred(
+                    db, referred_user_id=payment.user_id
+                )
+                if _rel is not None and _rel.status in (
+                    "REGISTERED", "VERIFIED", "QUALIFIED",
+                ):
+                    ok, _reason = _rfe.evaluate_qualification(
+                        db, relationship=_rel, booking=booking
+                    )
+                    if ok:
+                        if _rel.status != "QUALIFIED":
+                            _rel = _rfe.mark_qualified(
+                                db, relationship=_rel, booking=booking
+                            )
+                        # Idempotent: returns None if already REWARDED/REVIEW
+                        _rfe.award_referral(db, relationship=_rel)
+            except Exception:
+                logger.warning("Referral hook failed", exc_info=True)
+
             # Record booking notification + send email (both non-blocking)
             try:
                 from app.models.tenant import Tenant as _T

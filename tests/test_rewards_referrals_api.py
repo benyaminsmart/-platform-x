@@ -145,9 +145,15 @@ def test_apply_unknown_code_rejected(
     assert resp.status_code == 400
 
 
-def test_apply_success_awards_points(
+def test_apply_registers_relationship_no_immediate_points(
     client: TestClient, sample_tenant: Tenant
 ) -> None:
+    """Phase 77: apply no longer awards points immediately.
+
+    Rewards fire only after the referred user completes a qualifying
+    transaction (>= AED 300, paid). This test asserts the registered
+    state, not points.
+    """
     h_a = _register(client, sample_tenant, "referrer@example.com")
     code_a = client.get("/referrals/me", headers=h_a).json()["referral_code"]
 
@@ -156,29 +162,26 @@ def test_apply_success_awards_points(
         "/referrals/apply", json={"referral_code": code_a}, headers=h_b
     )
     assert resp.status_code == 201, resp.text
+    rel = resp.json()
+    assert rel["status"] == "REGISTERED"
 
-    # Referrer earned points
-    me_a = client.get("/rewards/me", headers=h_a).json()
-    assert me_a["points"] == 100
-
-    # Referred earned points
-    me_b = client.get("/rewards/me", headers=h_b).json()
-    assert me_b["points"] == 50
-
-    # Referrer sees completed referral
     refs = client.get("/referrals/me", headers=h_a).json()
-    assert refs["completed_count"] == 1
     assert refs["referred_count"] == 1
+    assert refs["completed_count"] == 0
+    assert refs["pending_count"] == 1
 
 
-def test_apply_twice_rejected(client: TestClient, sample_tenant: Tenant) -> None:
+def test_apply_twice_is_idempotent(client: TestClient, sample_tenant: Tenant) -> None:
+    """Phase 77: applying the same code twice returns the same row."""
     h_a = _register(client, sample_tenant, "referrer2@example.com")
     code_a = client.get("/referrals/me", headers=h_a).json()["referral_code"]
     h_b = _register(client, sample_tenant, "referred2@example.com")
-    client.post("/referrals/apply", json={"referral_code": code_a}, headers=h_b)
-    resp = client.post("/referrals/apply", json={"referral_code": code_a}, headers=h_b)
-    assert resp.status_code == 400
-    assert "already applied" in resp.json()["detail"].lower()
+    r1 = client.post("/referrals/apply", json={"referral_code": code_a}, headers=h_b)
+    r2 = client.post("/referrals/apply", json={"referral_code": code_a}, headers=h_b)
+    assert r1.status_code == 201
+    assert r2.status_code == 201
+    assert r1.json()["id"] == r2.json()["id"]
+
 
 
 # --- reward_service tier unit tests ---
