@@ -164,6 +164,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 80 Step 2 — AI + analytics + admin + wiring
 - [x] Phase 80 Step 1 — campaign engine + economics
 - [x] Phase 79 Step 2 — wallet API + UI
 - [x] Phase 79 Step 1 — redemption service + catalog
@@ -298,7 +299,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 80 Step 1 — campaign engine + economics (2026-10-04 18:44)
+Last step: Phase 80 Step 2 — AI + analytics + admin + wiring (2026-10-04 18:48)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -320,6 +321,7 @@ Last step: Phase 80 Step 1 — campaign engine + economics (2026-10-04 18:44)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- d8d628f Phase 80 Step 2 — AI + analytics + admin + wiring
 - 3f9167e Phase 80 Step 1 — campaign engine + economics
 - f19f0a7 Phase 79 Step 2 — wallet API + UI
 - 4c73fa4 Phase 79 Step 1 — redemption service + catalog
