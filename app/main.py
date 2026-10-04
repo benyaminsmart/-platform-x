@@ -50,6 +50,7 @@ from app.api import referrals as referrals_router
 from app.api import reviews as reviews_router
 from app.api import rewards as rewards_router
 from app.api import rewards_redeem as rewards_redeem_router
+from app.api import rewards_admin as rewards_admin_router
 from app.api import search as search_router
 from app.api import services as services_router
 from app.api import tenants as tenants_router
@@ -219,6 +220,7 @@ app.include_router(public_v1_router.router)
 app.include_router(reviews_router.router)
 app.include_router(rewards_router.router)
 app.include_router(rewards_redeem_router.router)
+app.include_router(rewards_admin_router.router)
 app.include_router(search_router.router)
 app.include_router(services_router.router)
 app.include_router(tenants_router.router)

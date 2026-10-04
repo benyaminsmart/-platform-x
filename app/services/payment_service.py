@@ -239,6 +239,51 @@ def mark_success(
             except Exception:
                 logger.warning("Referral hook failed", exc_info=True)
 
+            # Campaign bonus (Phase 80, Step 2, plan §17-§18).
+            # Evaluated after the base reward. Never fails the payment.
+            try:
+                from app.services import reward_campaign as _rcd
+                from app.services import reward_eligibility as _rce
+                _tenant = db.query(_RT).filter(_RT.id == payment.tenant_id).one_or_none()
+                _user = db.query(_RU).filter(_RU.id == payment.user_id).one_or_none()
+                if _tenant is not None and _user is not None:
+                    _cat = _rce.category_for(tenant=_tenant, booking=booking)
+                    _match = _rcd.find_best_campaign(
+                        db, tenant=_tenant, user=_user,
+                        booking=booking, category=_cat,
+                    )
+                    if _match is not None and _match.amount > 0:
+                        from datetime import datetime as _cdt, timedelta as _ctd, timezone as _ctz
+                        from app.core.rewards_config import EXPIRATION_DEFAULT_DAYS
+                        _now = _cdt.now(_ctz.utc)
+                        _entry, _status = _reng.create_ledger_entry(
+                            db,
+                            tenant=_tenant,
+                            user=_user,
+                            reward_type="CAMPAIGN_BONUS",
+                            amount=_match.amount,
+                            currency=booking.currency or "AED",
+                            funding_source="CAMPAIGN",
+                            platform_cost=_match.amount,
+                            status="AVAILABLE",
+                            available_at=_now,
+                            expires_at=_now + _ctd(days=EXPIRATION_DEFAULT_DAYS),
+                            transaction_id=f"campaign-{_match.campaign.id}-{booking.id}",
+                            campaign_id=_match.campaign.id,
+                            source_type="CAMPAIGN",
+                            source_id=_match.campaign.id,
+                            description=f"Campaign: {_match.campaign.name}",
+                            extra={"campaign_id": _match.campaign.id},
+                        )
+                        if _status == "created":
+                            _rcd.record_campaign_use(
+                                db, tenant=_tenant, user=_user,
+                                campaign=_match.campaign, booking=booking,
+                                amount=_match.amount, ledger_reward_id=_entry.id,
+                            )
+            except Exception:
+                logger.warning("Campaign hook failed", exc_info=True)
+
             # Record booking notification + send email (both non-blocking)
             try:
                 from app.models.tenant import Tenant as _T
