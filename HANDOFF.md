@@ -164,6 +164,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 79 Step 1 — redemption service + catalog
 - [x] Phase 78 Step 2 — reversal + notifications + cancellation
 - [x] Phase 78 Step 1 — reward expiration service
 - [x] Phase 77 Step 4 — referral API + payment-flow wiring + E2E tests
@@ -295,7 +296,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 78 Step 2 — reversal + notifications + cancellation (2026-10-04 18:30)
+Last step: Phase 79 Step 1 — redemption service + catalog (2026-10-04 18:34)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -317,6 +318,7 @@ Last step: Phase 78 Step 2 — reversal + notifications + cancellation (2026-10-
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 4c73fa4 Phase 79 Step 1 — redemption service + catalog
 - 8dc1001 Phase 78 Step 2 — reversal + notifications + cancellation
 - 2497938 Phase 78 Step 1 — reward expiration service
 - 768ef97 Phase 77 Step 3 — fraud + monthly limits
