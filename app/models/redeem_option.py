@@ -33,5 +33,12 @@ class RedeemOption(UUIDMixin, TimestampMixin, Base):
     active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     display_order: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
+    # Phase 79: economic and category metadata for the real catalog.
+    # Nullable to keep old rows valid; the redemption service applies
+    # safe defaults when NULL.
+    platform_cost: Mapped[Decimal | None] = mapped_column(Numeric(12, 2), nullable=True)
+    funding_source: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    category: Mapped[str | None] = mapped_column(String(50), nullable=True)
+
     def __repr__(self) -> str:
         return f"<RedeemOption {self.name} cost={self.points_cost}>"
