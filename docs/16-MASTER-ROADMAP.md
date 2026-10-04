@@ -22,6 +22,32 @@
 
 ---
 
+## 0.1 A Note on Phase Numbering
+
+Platform-X uses **historical phase numbers** — some numbers are
+intentionally skipped, deferred, or superseded. This is normal for a
+project that evolved over 2+ years. Specifically:
+
+- **Skipped:** Phase 1 (First Tenant Live — moved to Stage 7).
+- **Superseded:** Phase 8 (Rewards v1 → replaced by Phases 75–80);
+  Phase 24 (Cross-Business Rewards — deferred, may become a future
+  module).
+- **Moved to Stage 7 (buyer-driven):** Phases 10 (Payment Production),
+  12 (VPS + Domain), 13 (Business Onboarding Tools),
+  15 (Trianon Migration), 16 (Mobile App).
+- **Rolled into Stage 5:** Phases 70–74 (Deploy scripts, PostgreSQL
+  migration, production env, smoke test, sales docs). The work is
+  preserved but renumbered under Stage 5 (Phases 81–85) for clarity.
+- **First official shipping tag:** `v0.2.0-frontend` (there is no
+  `v0.1.0` — the project's first internal milestone was not tagged).
+
+**Numbers are not a continuous sequence from 0 to 88; they are the
+map of what was actually shipped.** Every number that appears in this
+document maps to a real, tagged milestone or a planned phase with a
+clear owner.
+
+---
+
 ## 1. Executive Summary
 
 Platform-X is an **AI-First Hospitality Platform** designed to be
@@ -162,6 +188,8 @@ payments (mock), admin, i18n, and the public API.
 | 30 | Wave 0 part A (Foundation) | ✅ | v0.21.0-wave0-part-a |
 
 **Phase 8 (Rewards + Referral v1):** superseded by Stage 4 (Phases 75–80).
+**Phase 24 (Cross-Business Rewards):** deferred by user directive (2026-09-29).
+
 **Phase 10 (Payment Production):** moved to Stage 7 (buyer-driven).
 **Phase 12 (VPS + Domain):** moved to Stage 7 (buyer-driven).
 **Phase 13 (Business Onboarding Tools):** planned for Stage 7.
@@ -240,8 +268,16 @@ features + 15 AI layers. Waves 1–4 fully shipped.
 | 68 | Security Review (rate limits on all routes) | ✅ | v0.55.0-security |
 | 69 | Performance Review (N+1, payload caps) | ✅ | v0.56.0-performance |
 
-**Stage 3 is COMPLETE through Phase 69.** Phases 70–74 were rolled
-into the new Stage 5 (Production Readiness) — see Section 8.
+**Stage 3 is COMPLETE through Phase 69.**
+
+**Note on Phases 70–74:** these numbers were reserved in the
+original HANDOFF Section 0.1.5 for production-readiness work
+(deploy scripts, PostgreSQL dry-run, prod env config, smoke test,
+sales docs). That work was **not shipped under 70–74**. It has
+been reorganized and is now tracked as Stage 5, Phases 81–85
+(see Section 8). No 70–74 work was lost — it was renumbered for
+clarity so that "70" cannot be confused with the numbers of the
+actual production phases.
 
 ---
 
