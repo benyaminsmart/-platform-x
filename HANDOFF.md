@@ -245,6 +245,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 77 Step 3 — fraud + monthly limits
 - [x] Phase 77 Step 2 — referral lifecycle service
 - [x] Phase 77 Step 1 — referral engine models + migration
 - [x] Phase 76 Step 2 — wire reward engine into payment flow
@@ -372,7 +373,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 77 Step 2 — referral lifecycle service (2026-10-04 16:32)
+Last step: Phase 77 Step 3 — fraud + monthly limits (2026-10-04 16:36)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -394,6 +395,7 @@ Last step: Phase 77 Step 2 — referral lifecycle service (2026-10-04 16:32)
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 768ef97 Phase 77 Step 3 — fraud + monthly limits
 - 3ce8a4f Phase 77 Step 2 — referral lifecycle service
 - 4dc77eb Phase 77 Step 1 — referral engine models + migration
 - abf9bda Phase 76 Step 2 — wire reward engine into payment flow
