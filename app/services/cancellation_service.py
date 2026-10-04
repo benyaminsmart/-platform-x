@@ -110,6 +110,15 @@ def cancel_booking(
 
     db.add(booking)
     db.commit()
+    # Reverse any rewards earned on this booking (Phase 78, Step 2).
+    # Never fails the cancellation (P10).
+    try:
+        from app.services import reward_reversal as _rr
+        _rr.reverse_rewards_for_booking(
+            db, booking_id=booking.id, reason="cancellation"
+        )
+    except Exception:
+        logger.warning("Reward reversal hook failed", exc_info=True)
     db.refresh(booking)
 
     # best-effort waitlist notify (Phase 48, Step 4)
