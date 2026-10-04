@@ -38,6 +38,7 @@ from app.models.referral_reward import ReferralReward
 from app.models.tenant import Tenant
 from app.models.user import User
 from app.services import reward_engine
+from app.services import referral_fraud, referral_limits
 
 logger = get_logger(__name__)
 
@@ -333,6 +334,8 @@ def award_referral(
     """
     if relationship.status == "REWARDED":
         return None
+    if relationship.status == "REVIEW":
+        return None
     if relationship.status != "QUALIFIED":
         raise ValueError(f"cannot award from status {relationship.status}")
 
@@ -342,8 +345,53 @@ def award_referral(
     if referrer is None or referred is None or tenant is None:
         raise ValueError("referrer, referred or tenant not found")
 
+    # --- fraud gate (plan §12) ---
+    booking = (
+        db.get(Booking, relationship.qualifying_booking_id)
+        if relationship.qualifying_booking_id
+        else None
+    )
+    fraud = referral_fraud.evaluate(db, relationship=relationship, booking=booking)
+    if fraud.decision == "REVIEW":
+        prev = relationship.status
+        relationship.status = "REVIEW"
+        relationship.review_reason = ",".join(fraud.flags) or "fraud_score"
+        db.add(relationship)
+        _emit(
+            db,
+            tenant_id=relationship.tenant_id,
+            relationship=relationship,
+            event_type="REVIEW_FLAGGED",
+            from_status=prev,
+            to_status="REVIEW",
+            extra={"flags": fraud.flags, "score": fraud.score},
+        )
+        db.commit()
+        db.refresh(relationship)
+        return None
+
     referrer_amt = Decimal(str(rewards_config.REFERRAL_REFERRER_CREDIT))
     referred_amt = Decimal(str(rewards_config.REFERRAL_REFERRED_CREDIT))
+
+    # --- monthly limit gate (plan §11) ---
+    ref_ok, _ = referral_limits.can_credit(db, user_id=referrer.id, amount=referrer_amt)
+    refd_ok, _ = referral_limits.can_credit(db, user_id=referred.id, amount=referred_amt)
+    if not (ref_ok and refd_ok):
+        _emit(
+            db,
+            tenant_id=relationship.tenant_id,
+            relationship=relationship,
+            event_type="REWARD_DEFERRED",
+            from_status=relationship.status,
+            to_status=relationship.status,
+            extra={
+                "reason": "monthly_limit",
+                "referrer_ok": ref_ok,
+                "referred_ok": refd_ok,
+            },
+        )
+        db.commit()
+        return None
 
     # 1. Ledger entries (idempotent by (user, transaction=None, reward_type)
     #    We cannot use transaction_id here (referral is not a transaction),
