@@ -180,6 +180,7 @@ Persian only.
 
 **Phase 30 — Wave 0 / Foundation for advertising (part A, free)**
 Started: 2026-09-29
+- [x] Phase 89 Step 1: Payment webhook HMAC-SHA256 signature verification (generic + Stripe), mock bypass gated by ENABLE_MOCK_PAYMENTS
 - [x] Phase 80 Step 2 — AI + analytics + admin + wiring
 - [x] Phase 80 Step 1 — campaign engine + economics
 - [x] Phase 79 Step 2 — wallet API + UI
@@ -315,7 +316,7 @@ Started: 2026-09-29
 - [x] Step 3 — Leaflet map in /search
 - [x] Step 2 — Geographic filter in search
 - [x] Step 1 — Coordinates seed for tenants
-Last step: Phase 88 (Stage 6) — deployment status + sales prep complete (2026-10-04 21:52)
+Last step: Phase 89 Step 1: Payment webhook HMAC-SHA256 signature verification (generic + Stripe), mock bypass gated by ENABLE_MOCK_PAYMENTS (2026-10-12 16:12)
 
 - [x] Step 1 — Search service (cross-tenant, availability, filters)
 - [x] Step 2 — /api/search endpoint
@@ -337,6 +338,7 @@ Last step: Phase 88 (Stage 6) — deployment status + sales prep complete (2026-
 - [x] Phase close — milestone tag (v0.21.0-wave0-part-a) + full HANDOFF update
 
 **Commits (recent):**
+- 6733d9c Phase 89 Step 1: Payment webhook HMAC-SHA256 signature verification (generic + Stripe), mock bypass gated by ENABLE_MOCK_PAYMENTS
 - d8d628f Phase 80 Step 2 — AI + analytics + admin + wiring
 - 3f9167e Phase 80 Step 1 — campaign engine + economics
 - f19f0a7 Phase 79 Step 2 — wallet API + UI
