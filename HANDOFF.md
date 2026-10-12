@@ -1,9 +1,9 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v1.0.0-sale-ready (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-69, 75-88 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. ALL STAGES 2, 3, 4, 5, 6 COMPLETE. STAGE 7 (post-sale, buyer-driven) pending a buyer.
+> Version: v1.0.8-security-complete (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-69, 75-89 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. ALL STAGES 2, 3, 4, 5, 6 COMPLETE. STAGE 7 (post-sale, buyer-driven) pending a buyer. Phase 89 closed the last two security gaps (webhook signature, admin 2FA).
 
-Last updated: 2026-10-04
+Last updated: 2026-10-12
 
 ---
 
@@ -84,6 +84,7 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
 > 6. Phase 86 — Handover Package ✅
 > 7. Phase 87 — Sales Assets ✅
 > 8. Phase 88 — Final Audit + Cleanup ✅
+> 9. Phase 89 — Security Completion (webhook signature + admin 2FA) ✅
 >
 > **The platform is SALE-READY. Buyer-driven Stage 7 is the only work left.**
 
@@ -106,9 +107,11 @@ Full details: `docs/14-ROADMAP-V3-COMPETITIVE.md`.
 > | 6 | 86–88 | Sales Preparation (handover, pitch, cleanup) |
 > | 7 | — | Post-sale (buyer purchases VPS + domain, we optionally assist) |
 >
-> **Product release:** `v1.0.0-sale-ready`
-> **Latest Git tag:** `v1.0.6-cleanup-final`
+> **Product release:** `v1.0.8-security-complete` (up from `v1.0.0-sale-ready`)
+> **Latest Git tag:** `v1.0.7-docs-clean`
 > **ALL FREE WORK IS DONE.**
+> **Phase 89 (Security Completion, 2026-10-12)** closed the last two gaps:
+> payment webhook HMAC-SHA256 verification and admin TOTP 2FA.
 > **Remaining paid work (buyer's):** VPS, domain, payment provider,
 > AI keys — all on the buyer's accounts.
 
@@ -2243,23 +2246,23 @@ User's style:
 
 ## 18. Security Checklist (Before Production)
 
-- [ ] Rate Limiting enabled
-- [ ] Security headers configured
-- [ ] JWT Refresh tokens implemented
-- [ ] Password policy enforced
-- [ ] Account lockout after failures
-- [ ] Session revocation works
-- [ ] CSRF protection on forms
-- [ ] XSS audit complete
-- [ ] SQL injection audit complete
-- [ ] HTTPS enforced
-- [ ] CORS restricted to real domains
-- [ ] 2FA for admins
-- [ ] Audit logs complete
-- [ ] Secrets in secure store
-- [ ] Backup strategy active
-- [ ] Payment webhook signature verified
-- [ ] PCI compliance reviewed
+- [x] Rate Limiting enabled — 40+ API files via app/core/rate_limit.py
+- [x] Security headers configured — app/core/security_headers.py, wired in main.py
+- [x] JWT Refresh tokens implemented — auth.py rotation + revocation
+- [x] Password policy enforced — schemas/auth.py (min 8 + strength validator + bcrypt)
+- [x] Account lockout after failures — user_service.py (5 attempts / 15 min)
+- [x] Session revocation works — auth.py revoke_by_token + rotation
+- [x] CSRF protection on forms — N/A (JWT header-based, no cookies; verified no set_cookie)
+- [x] XSS audit complete — grep on |safe/Markup/autoescape: 0 hits; Jinja uses select_autoescape(["html","xml"])
+- [x] SQL injection audit complete — 0 raw SQL; SQLAlchemy ORM only; 0 f-string SQL
+- [ ] HTTPS enforced — buyer-driven (Nginx + certbot on VPS)
+- [x] CORS restricted to real domains — config.py rejects localhost in production
+- [x] 2FA for admins — Phase 89 Step 2 (TOTP via pyotp; setup/verify/disable + mfa_token login)
+- [x] Audit logs complete — platform_admin.py + AuditLog model
+- [ ] Secrets in secure store — buyer-driven (.env on VPS; current .env is dev-only)
+- [ ] Backup strategy active — buyer-driven (scripts/deploy/backup.sh ready; VPS cron needed)
+- [x] Payment webhook signature verified — Phase 89 Step 1 (HMAC-SHA256 generic + Stripe)
+- [ ] PCI compliance reviewed — buyer-driven (provider-dependent; Telr/Stripe handle PCI)
 
 ---
 
@@ -2706,3 +2709,99 @@ that import.
 
 
 END OF HANDOFF
+
+
+---
+
+## PHASE 89 — SECURITY COMPLETION (2026-10-12)
+
+> Closes the two real security gaps that remained after Phase 68.
+> Verified by grep + targeted tests, not by documentation alone.
+
+**Version:** v1.0.8-security-complete
+**Commits:** 6733d9c (Step 1), 97a012a (Step 2), plus HANDOFF commits.
+**Tests added:** 15 (7 webhook signature + 8 admin 2FA).
+**Full suite after Phase 89:** 1502 passed (was 1487).
+
+### Step 1 — Payment webhook HMAC-SHA256 verification
+
+**Problem:** `POST /payments/webhook/{provider}` accepted any JSON payload
+without verifying authenticity. An attacker could POST
+`{"provider_reference": "...", "status": "success"}` and mark a payment
+successful without paying.
+
+**Fix:**
+- New module `app/core/webhook_signature.py`:
+  - `verify_generic_signature` — `X-PlatformX-Signature: sha256=<hex>`
+  - `verify_stripe_signature` — `Stripe-Signature: t=<ts>,v1=<hex>` with
+    300s replay tolerance
+  - `verify_provider_webhook` — dispatcher
+- `app/api/payments.py` — provider_webhook now reads raw body, verifies
+  signature before touching payment state.
+- `app/core/config.py` — new fields: `PAYMENT_WEBHOOK_SECRET`,
+  `STRIPE_WEBHOOK_SECRET`, `WEBHOOK_SIGNATURE_ENFORCED`.
+- `.env.example` — documented new keys.
+- Mock provider (`provider=mock`) is exempted but still gated by the
+  existing `ENABLE_MOCK_PAYMENTS` flag, which `config.py` refuses to
+  allow in production.
+
+**Tests:** `tests/test_webhook_signature.py` (7 tests):
+generic valid/invalid/missing, Stripe valid/invalid/expired,
+secret-not-configured, enforcement disabled.
+
+### Step 2 — TOTP 2FA for platform admins
+
+**Problem:** `PlatformAdmin` model already had `mfa_enabled` and
+`mfa_secret` columns, but no code used them. Admin login was
+single-factor.
+
+**Fix:**
+- `app/core/security.py`:
+  - `TokenType` extended: `Literal["access", "refresh", "mfa"]`
+  - New `create_mfa_token()` — 5-minute JWT with `type="mfa"`
+- `app/schemas/platform_admin.py`:
+  - `AdminTokenResponse` extended with `mfa_required`, `mfa_token`
+  - New: `MfaLoginRequest`, `MfaSetupResponse`, `MfaVerifyRequest`,
+    `MfaDisableRequest`
+- `app/services/admin_service.py`:
+  - `authenticate()` refactored — no longer mutates last_login_at
+  - New: `record_login()`, `set_mfa_secret()`, `enable_mfa()`,
+    `disable_mfa()`
+- `app/api/platform_admin.py`:
+  - `admin_login` is now two-branch (with/without 2FA)
+  - New endpoints: `POST /platform/auth/2fa/login`, `/setup`,
+    `/verify`, `/disable`
+  - All 2FA events logged to `audit_log`
+- `requirements.txt`: added `pyotp==2.9.0`
+
+**Tests:** `tests/test_admin_2fa.py` (8 tests): login without 2FA,
+wrong password, setup requires auth, full enable+login flow, wrong
+code, access-token rejected as mfa_token, disable flow, verify without
+setup.
+
+### Step 3 — XSS + SQL injection audit (code-level)
+
+**XSS:**
+- 82 Jinja templates, 0 uses of `|safe`, `Markup`, or `autoescape=False`.
+- `notification_service.py` uses `select_autoescape(["html", "xml"])` —
+  correct.
+- 0 uses of `render_template_string` / `Template(...)`.
+
+**SQL injection:**
+- 0 raw SQL (`text(...)` with literal, `.execute("...")`, `literal_column`).
+- 0 f-string SQL.
+- All DB access via SQLAlchemy ORM.
+
+**Conclusion:** No XSS or SQLi issues found at code level. Not a full
+SAST scan (bandit/semgrep not run); results are grep-based.
+
+### Security checklist status after Phase 89
+
+12/17 `[x]` verified, 5 `[ ]` remain but all are buyer-driven (VPS,
+domain, provider PCI, production secrets, production backups).
+
+### Known gap for the buyer
+
+- HTTPS, secrets-in-store, backup automation, PCI compliance — all
+  become the buyer's responsibility after VPS purchase (Stage 7).
+- Payment webhook secrets must be configured in `.env` before going live.
