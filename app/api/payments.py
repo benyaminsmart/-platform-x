@@ -1,5 +1,6 @@
 """Payment endpoints — intent, webhook, detail, mock confirm."""
 
+import json
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -9,6 +10,7 @@ from sqlalchemy.orm import Session as DBSession
 from app.api.deps import get_current_tenant, get_current_user
 from app.core.config import settings
 from app.core.rate_limit import LIMITS, limiter
+from app.core.webhook_signature import verify_provider_webhook
 from app.db.session import get_db
 from app.models.tenant import Tenant
 from app.models.user import User
@@ -80,11 +82,40 @@ async def provider_webhook(
 ) -> JSONResponse:
     """Receive provider webhook.
 
-    Signature verification will be added per provider.
-    For now, accepts {provider_reference, status} JSON and updates state.
+    Verifies the HMAC-SHA256 signature before accepting the payload.
+    Generic providers use X-PlatformX-Signature: sha256=<hex>.
+    Stripe uses Stripe-Signature: t=<ts>,v1=<hex>.
     """
+    raw_body = await request.body()
+
+    # Dev-only: mock provider is gated by ENABLE_MOCK_PAYMENTS and
+    # never accepts traffic in production. Skip signature checks for it.
+    is_mock = provider.lower() == "mock"
+    if is_mock and not settings.ENABLE_MOCK_PAYMENTS:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Not found",
+        )
+
+    if settings.WEBHOOK_SIGNATURE_ENFORCED and not is_mock:
+        secret = (
+            settings.STRIPE_WEBHOOK_SECRET
+            if provider.lower() == "stripe"
+            else settings.PAYMENT_WEBHOOK_SECRET
+        )
+        if not secret:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Webhook signature secret not configured",
+            )
+        verify_provider_webhook(
+            provider=provider,
+            request=request,
+            body=raw_body,
+            secret=secret,
+        )
     try:
-        body: dict[str, Any] = await request.json()
+        body: dict[str, Any] = json.loads(raw_body)
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid JSON body"

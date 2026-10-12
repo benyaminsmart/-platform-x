@@ -46,6 +46,11 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: list[str] = ["http://localhost:8000", "http://127.0.0.1:8000"]
 
+    # Payment webhook signature verification
+    PAYMENT_WEBHOOK_SECRET: str = ""
+    STRIPE_WEBHOOK_SECRET: str = ""
+    WEBHOOK_SIGNATURE_ENFORCED: bool = True
+
     # Multi-tenancy
     DEFAULT_TENANT_SLUG: str = "demo"
 
