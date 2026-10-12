@@ -5,7 +5,7 @@
 - docs/ (18+ files: strategy + technical + operational)
 - scripts/deploy/ (install/update/backup/restore)
 - scripts/smoke_test.sh
-- 1487 automated tests
+- 1502 automated tests
 - .env.example (all variables, commented)
 - deploy/ (systemd + nginx samples)
 - LICENSE (custom, proprietary)

@@ -22,7 +22,7 @@ Booking.com and Agoda. Multi-tenant, AI-native, rewards-ledgered.
 - alembic/        -> DB migrations
 - scripts/        -> dev helpers (backup, step, handoff)
 - scripts/deploy/ -> install/update/backup/restore
-- tests/          -> 1487 tests
+- tests/          -> 1502 tests
 - docs/           -> technical + strategy documents
 
 ## 4. Key subsystems
@@ -46,7 +46,7 @@ Versioned; API keys; webhooks.
 - No secrets in repo
 
 ## 6. Testing
-- 1487 tests, all passing, ~60s parallel
+- 1502 tests, all passing, ~60s parallel
 - Coverage: auth, bookings, payments, rewards, referrals, AI, admin
 
 ## 7. Deployment

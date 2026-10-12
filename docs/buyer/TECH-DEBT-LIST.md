@@ -10,7 +10,7 @@
 - Trianon first-tenant migration — Phase 15
 
 ## Known limitations
-- 1487 tests pass but no CI pipeline is committed (easy add: GitHub Actions)
+- 1502 tests pass but no CI pipeline is committed (easy add: GitHub Actions)
 - No metrics/Prometheus exporter enabled by default (optional)
 - No caching layer (Redis) — fine at current scale
 - Single-language docs (product itself supports 4 languages)

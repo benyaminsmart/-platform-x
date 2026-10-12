@@ -5,7 +5,7 @@
 
 ## 1. VERIFIED (real, executed)
 
-- **1487 automated tests pass** (pytest, ~60 s parallel)
+- **1502 automated tests pass** (pytest, ~60 s parallel)
 - **SQLAlchemy models compile** on SQLite + dialect-checked for PG
 - **All API endpoints respond** in tests (TestClient)
 - **Rewards ledger** is immutable, idempotent, reversal-tested
@@ -72,7 +72,7 @@ closely their VPS matches the reference Ubuntu 22.04 setup.
 
 ## 7. WHAT THE BUYER GETS ON DAY ONE
 
-- A production-shaped codebase with 1487 green tests
+- A production-shaped codebase with 1502 green tests
 - A deploy checklist that a competent engineer can follow
 - A working demo dataset (optional; the buyer can also start fresh)
 - No secrets, no seller accounts, no obligations

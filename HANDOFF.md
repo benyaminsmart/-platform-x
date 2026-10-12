@@ -2122,7 +2122,7 @@ Leaderboard endpoints:
 
 ---
 
-## 14. Test Count: 1487 tests, all passing
+## 14. Test Count: 1502 tests, all passing (verified 2026-10-13, pytest 59.4s on Termux)
 
 Test files:
 - test_health.py
