@@ -19,7 +19,7 @@ from app.core.config import settings
 # bcrypt has a 72-byte limit; we truncate to avoid errors on long inputs.
 _BCRYPT_MAX_BYTES = 72
 
-TokenType = Literal["access", "refresh"]
+TokenType = Literal["access", "refresh", "mfa"]
 
 
 def _to_bytes(password: str) -> bytes:
@@ -95,6 +95,20 @@ def create_refresh_token(
         expires_delta=expires_delta
         or timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
         tenant_id=tenant_id,
+    )
+
+
+def create_mfa_token(
+    subject: str,
+    extra_claims: dict[str, Any] | None = None,
+    expires_delta: timedelta | None = None,
+) -> str:
+    """Create a short-lived JWT used only for completing 2FA login."""
+    return _create_token(
+        subject=subject,
+        token_type="mfa",
+        expires_delta=expires_delta or timedelta(minutes=5),
+        extra_claims=extra_claims,
     )
 
 

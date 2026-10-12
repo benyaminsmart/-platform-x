@@ -3,6 +3,8 @@
 from datetime import datetime, timezone
 from typing import Annotated
 
+import pyotp
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
 
 from app.core.rate_limit import limiter
@@ -11,7 +13,7 @@ from sqlalchemy.orm import Session as DBSession
 
 from app.api.deps_admin import get_current_admin, require_role
 from app.core.config import settings
-from app.core.security import create_access_token
+from app.core.security import create_access_token, create_mfa_token, decode_token
 from app.db.session import get_db
 from app.models.booking import Booking
 from app.models.order import Order
@@ -25,6 +27,10 @@ from app.schemas.platform_admin import (
     AdminLoginRequest,
     AdminPublic,
     AdminTokenResponse,
+    MfaDisableRequest,
+    MfaLoginRequest,
+    MfaSetupResponse,
+    MfaVerifyRequest,
 )
 from app.schemas.subscription import SubscriptionCreate, SubscriptionPublic
 from app.schemas.tenant import TenantPublic
@@ -43,13 +49,30 @@ def admin_login(
     payload: AdminLoginRequest,
     db: DBSession = Depends(get_db),
 ) -> AdminTokenResponse:
-    """Authenticate a platform admin and return a JWT."""
+    """Authenticate a platform admin.
+
+    If the admin has 2FA enabled, returns mfa_required=True with a
+    short-lived mfa_token. The client must then call /auth/2fa/login.
+    Otherwise returns a full access token as before.
+    """
     admin = admin_service.authenticate(db, payload.email, payload.password)
     if admin is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
         )
+
+    if admin.mfa_enabled and admin.mfa_secret:
+        mfa_token = create_mfa_token(
+            admin.id,
+            extra_claims={"actor": "platform_admin_mfa", "role": admin.role},
+        )
+        return AdminTokenResponse(
+            mfa_required=True,
+            mfa_token=mfa_token,
+        )
+
+    admin_service.record_login(db, admin)
     token = create_access_token(
         admin.id,
         extra_claims={"actor": "platform_admin", "role": admin.role},
@@ -76,6 +99,144 @@ def admin_me(
 ) -> AdminPublic:
     """Return the current admin's profile."""
     return AdminPublic.model_validate(admin)
+
+
+# ---------- 2FA ----------
+
+
+@limiter.limit("10/minute")
+@router.post("/auth/2fa/login", response_model=AdminTokenResponse)
+def admin_mfa_login(
+    request: Request,
+    payload: MfaLoginRequest,
+    db: DBSession = Depends(get_db),
+) -> AdminTokenResponse:
+    """Complete login with a TOTP code in exchange for an mfa_token."""
+    try:
+        claims = decode_token(payload.mfa_token, expected_type="mfa")
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired mfa_token",
+        )
+    admin = admin_service.get_by_id(db, claims.get("sub", ""))
+    if admin is None or not admin.mfa_enabled or not admin.mfa_secret:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid mfa state",
+        )
+    totp = pyotp.TOTP(admin.mfa_secret)
+    if not totp.verify(payload.totp_code, valid_window=1):
+        audit_service.log(
+            db,
+            actor_id=admin.id,
+            actor_type="platform_admin",
+            action="mfa_login_failed",
+            ip_address=None,
+            user_agent=None,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid TOTP code",
+        )
+    admin_service.record_login(db, admin)
+    token = create_access_token(
+        admin.id,
+        extra_claims={"actor": "platform_admin", "role": admin.role},
+    )
+    audit_service.log(
+        db,
+        actor_id=admin.id,
+        actor_type="platform_admin",
+        action="login_2fa",
+        ip_address=None,
+        user_agent=None,
+    )
+    return AdminTokenResponse(
+        access_token=token,
+        expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+    )
+
+
+@limiter.limit("10/minute")
+@router.post("/auth/2fa/setup", response_model=MfaSetupResponse)
+def admin_mfa_setup(
+    request: Request,
+    admin: PlatformAdmin = Depends(get_current_admin),
+    db: DBSession = Depends(get_db),
+) -> MfaSetupResponse:
+    """Generate a new TOTP secret. 2FA is not enabled until /verify succeeds."""
+    secret = pyotp.random_base32()
+    admin_service.set_mfa_secret(db, admin, secret)
+    uri = pyotp.TOTP(secret).provisioning_uri(
+        name=admin.email,
+        issuer_name="Platform-X Admin",
+    )
+    return MfaSetupResponse(secret=secret, provisioning_uri=uri)
+
+
+@limiter.limit("10/minute")
+@router.post("/auth/2fa/verify", response_model=MessageResponse)
+def admin_mfa_verify(
+    request: Request,
+    payload: MfaVerifyRequest,
+    admin: PlatformAdmin = Depends(get_current_admin),
+    db: DBSession = Depends(get_db),
+) -> MessageResponse:
+    """Confirm the pending secret with a TOTP code and enable 2FA."""
+    if not admin.mfa_secret:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No pending 2FA setup — call /auth/2fa/setup first",
+        )
+    totp = pyotp.TOTP(admin.mfa_secret)
+    if not totp.verify(payload.totp_code, valid_window=1):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid TOTP code",
+        )
+    admin_service.enable_mfa(db, admin)
+    audit_service.log(
+        db,
+        actor_id=admin.id,
+        actor_type="platform_admin",
+        action="mfa_enabled",
+        ip_address=None,
+        user_agent=None,
+    )
+    return MessageResponse(message="2FA enabled successfully")
+
+
+@limiter.limit("10/minute")
+@router.post("/auth/2fa/disable", response_model=MessageResponse)
+def admin_mfa_disable(
+    request: Request,
+    payload: MfaDisableRequest,
+    admin: PlatformAdmin = Depends(get_current_admin),
+    db: DBSession = Depends(get_db),
+) -> MessageResponse:
+    """Disable 2FA. Requires a valid current TOTP code."""
+    if not admin.mfa_enabled or not admin.mfa_secret:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="2FA is not enabled",
+        )
+    totp = pyotp.TOTP(admin.mfa_secret)
+    if not totp.verify(payload.totp_code, valid_window=1):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid TOTP code",
+        )
+    admin_service.disable_mfa(db, admin)
+    audit_service.log(
+        db,
+        actor_id=admin.id,
+        actor_type="platform_admin",
+        action="mfa_disabled",
+        ip_address=None,
+        user_agent=None,
+    )
+    return MessageResponse(message="2FA disabled successfully")
 
 
 # ---------- Tenants ----------
