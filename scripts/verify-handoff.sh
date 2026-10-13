@@ -30,7 +30,7 @@ if [ ! -f HANDOFF.md ]; then
 fi
 
 # ---- Check 1: version line vs latest tag ----
-LATEST_TAG=$(git describe --tags 2>/dev/null || echo "none")
+LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
 VERSION_LINE=$(grep -m1 "^> Version:" HANDOFF.md || echo "")
 if echo "$VERSION_LINE" | grep -q "$LATEST_TAG"; then
   ok "Check 1: version line matches latest tag ($LATEST_TAG)"
@@ -47,7 +47,7 @@ else
   info "Check 2: running pytest (this takes ~60s)..."
   PYTEST_OUT=$(source venv/bin/activate 2>/dev/null; pytest tests/ -n auto --tb=no -q 2>&1 | grep -oE "[0-9]+ passed" | head -1)
   REAL_COUNT=$(echo "$PYTEST_OUT" | grep -oE "^[0-9]+")
-  HND_COUNT=$(grep -m1 "^## 14. Test Count:" HANDOFF.md | grep -oE "[0-9]+" | head -1)
+  HND_COUNT=$(grep -m1 "^## 14. Test Count:" HANDOFF.md | grep -oE "Test Count: [0-9]+" | grep -oE "[0-9]+")
   if [ -z "$REAL_COUNT" ]; then
     bad "Check 2: could not parse pytest output"
     info "  raw: $PYTEST_OUT"
