@@ -1,7 +1,7 @@
 # Platform-X — Project Handoff
 
 > Complete overview for any new AI/dev session. Read this + PROJECT-RULES.md + AI-CONTEXT.md.
-> Version: v1.0.15-payment-test-guide (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-69, 75-89 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. ALL STAGES 2, 3, 4, 5, 6 COMPLETE. STAGE 7 (post-sale, buyer-driven) pending a buyer. Phase 89 closed the last two security gaps (webhook signature, admin 2FA).
+> Version: v1.0.16-postgres-verified (Phases 0-7, 9, 11, 14, 18-23, 25-30, 32-69, 75-89 complete; 24 DEFERRED). TIER 1+2 = 100%. WAVE 2 COMPLETE. ALL STAGES 2, 3, 4, 5, 6 COMPLETE. STAGE 7 (post-sale, buyer-driven) pending a buyer. Phase 89 closed the last two security gaps (webhook signature, admin 2FA).
 
 Last updated: 2026-10-14
 
