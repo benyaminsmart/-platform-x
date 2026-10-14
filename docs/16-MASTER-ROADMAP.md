@@ -29,9 +29,10 @@ intentionally skipped, deferred, or superseded. This is normal for a
 project that evolved over 2+ years. Specifically:
 
 - **Skipped:** Phase 1 (First Tenant Live — moved to Stage 7).
-- **Superseded:** Phase 8 (Rewards v1 → replaced by Phases 75–80);
-  Phase 24 (Cross-Business Rewards — deferred, may become a future
-  module).
+- **Superseded:** Phase 8 (Rewards v1 → replaced by Phases 75–80).
+- **Post-Sale (buyer-driven):** Phase 24 (Cross-Business Rewards) —
+  deferred by user directive (2026-09-29). Not in scope for the current
+  sale. The buyer may activate this as a Stage 7 module if desired.
 - **Moved to Stage 7 (buyer-driven):** Phases 10 (Payment Production),
   12 (VPS + Domain), 13 (Business Onboarding Tools),
   15 (Trianon Migration), 16 (Mobile App).
@@ -189,7 +190,7 @@ payments (mock), admin, i18n, and the public API.
 | 31 | Wave 0 part B (VPS + Domain + Payment) | ❌ moved to Stage 7 | — |
 
 **Phase 8 (Rewards + Referral v1):** superseded by Stage 4 (Phases 75–80).
-**Phase 24 (Cross-Business Rewards):** deferred by user directive (2026-09-29).
+**Phase 24 (Cross-Business Rewards):** POST-SALE module — deferred by user directive (2026-09-29). Not in scope for the current sale; buyer may activate in Stage 7.
 
 **Phase 10 (Payment Production):** moved to Stage 7 (buyer-driven).
 **Phase 12 (VPS + Domain):** moved to Stage 7 (buyer-driven).

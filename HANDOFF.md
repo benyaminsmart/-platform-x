@@ -1797,8 +1797,9 @@ All idempotent.
 
 ## 11. Remaining Work
 
-**Phase 24 (merged with Phase 8) — Cross-Business Rewards: DEFERRED BY USER**
-User (2026-09-29): do NOT start until explicitly told.
+**Phase 24 (merged with Phase 8) — Cross-Business Rewards: POST-SALE module**
+Deferred by user directive (2026-09-29). Not in scope for the current
+sale. Buyer may activate in Stage 7 if desired.
 
 **All AI-focused phases + Public API are COMPLETE.**
 **Phase 45 (AI Location Recommender) is COMPLETE — Wave 2 first deliverable.**
@@ -2588,7 +2589,7 @@ Current working order. Do NOT jump phases. Do NOT skip.
 5. Phase 29 (Leaderboard + AI Scoring) — COMPLETE
 6. Phase 19 (User AI) — COMPLETE
 7. Phase 23 (AI Content Writer) — COMPLETE
-8. Phase 24 (Cross-Business Rewards) — DEFERRED BY USER (do not start until told)
+8. Phase 24 (Cross-Business Rewards) — POST-SALE module (buyer-driven Stage 7)
 9. Phase 10 (Payment Production — needs Telr/Stripe account)
 10. Phases 25-28 DONE (all AI features complete) (AI Marketing, Occupancy, Competitor Insights, Review Responder)
 11. Phase 12 (VPS + Domain + Named Tunnel — needs purchase)
@@ -2625,7 +2626,7 @@ before guests. Reason: businesses pay; users use.
 5. Phase 29 (Leaderboard + AI Scoring) — SOON
 6. Phase 19 (User AI) — COMPLETE (was done early because foundation was ready)
 7. Phase 23 (AI Content Writer) — COMPLETE
-8. Phase 24 (Cross-Business Rewards) — DEFERRED BY USER (do not start until told)
+8. Phase 24 (Cross-Business Rewards) — POST-SALE module (buyer-driven Stage 7)
 9. Phase 10 (Payment Production)
 10. Phase 25-28 (AI Marketing, Occupancy, Competitor Insights, Review Responder)
 11. Phase 12 (VPS + Domain + Named Tunnel) — requires purchase
@@ -2672,7 +2673,7 @@ before guests. Reason: businesses pay; users use.
 - **Phase 16 / 30** (Mobile App) — last
 - **Phase 23-25** (AI Content Writer, Cross-Business Rewards, AI Marketing) — soon
 - **Phase 26-28** (Realtime Occupancy, Competitor Insights, Review Writer) — soon
-- **Phase 24 (merged with 8)** — WAITING for user's Rewards + Referral plan
+- **Phase 24 (merged with 8)** — POST-SALE module (not in current scope)
 - **Phases 25-28 ALL DONE (AI features complete)**
 - **Phase 14 (API/Webhooks/SDK)** — next candidate (no purchases needed)
 

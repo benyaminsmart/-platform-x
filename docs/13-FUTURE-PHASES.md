@@ -1,6 +1,12 @@
-# Platform-X — Future Phases (Roadmap v3)
+# Platform-X — Future Phases (HISTORICAL SNAPSHOT)
 
-**Last updated:** 2026-09-28 (after partner meeting)
+> ⚠️ **HISTORICAL DOCUMENT — DO NOT USE FOR CURRENT STATUS.**
+> This file is a snapshot from 2026-09-28 (before Stages 2–6 were completed).
+> Most phases listed below as "in progress" or "future" are now COMPLETE.
+> **For current status, always read `HANDOFF.md` and `docs/16-MASTER-ROADMAP.md`.**
+> Kept for git history only.
+
+**Snapshot date:** 2026-09-28 (after partner meeting)
 
 ## Currently Complete:
 - Phase 0, 0.5, 2, 3, 4, 5, 6, 7, 9 (Tags v0.1.0 → v0.7.0)
@@ -16,7 +22,7 @@
 6. Phase 29 — Business Leaderboard + AI Scoring
 7. Phase 19 — AI Guest Assistant
 8. Phase 23 — AI Content Writer + Onboarding
-9. Phase 24 — Cross-Business Rewards
+9. Phase 24 — Cross-Business Rewards (⚠️ POST-SALE module, deferred)
 10. Phase 10 — Payment Production (Telr/Stripe)
 11. Phase 25 — AI Marketing Copilot
 12. Phase 26 — Real-Time Occupancy
