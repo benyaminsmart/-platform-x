@@ -139,6 +139,12 @@ Notifications        /notifications       JWT
 Analytics            /analytics           public track, admin summary
 Platform Admin       /platform            admin JWT
 
+## License & Authors
+
+- **License:** Proprietary — All Rights Reserved. See [LICENSE](LICENSE).
+- **Authors:** See [AUTHORS.md](AUTHORS.md).
+- **Transfer on sale:** See LICENSE § "TRANSFER ON SALE".
+
 ## Project Rules
 
 See PROJECT-RULES.md for the quality bar (EXCELLENCE).
