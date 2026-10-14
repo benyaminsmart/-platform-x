@@ -84,7 +84,7 @@ with unique AI layers and blue-ocean features.
 
 | # | Feature | Phase | Tag | Why it matters |
 |---|---------|-------|-----|----------------|
-| B1 | AI Voice Booking | 64 | v0.51.0 | Guests can book by voice; no competitor offers this. |
+| B1 | AI Voice Booking | 64 | v0.51.0 | Guests can book by voice (⚠️ INTEGRATION-READY: transcript input only — voice→text deferred to Stage 7). |
 | B2 | AI Auto-Repricing Live | 60 | v0.50.0 | Real-time dynamic pricing driven by AI. |
 | B3 | Multi-Business Bundle Deals | 51 | v0.41.0 | Cross-business packages (hotel + restaurant + activity). |
 | B5 | Instant Refund AI | 54 | v0.44.0 | AI previews refunds before the guest cancels. |
@@ -95,7 +95,7 @@ with unique AI layers and blue-ocean features.
 | B11 | Trust Score per Business | 49 | v0.39.0 | Composite reputation score beyond ratings. |
 | B12 | Deep Peer Benchmark | 52 | v0.42.0 | Businesses see how they compare to peers, privately. |
 | B13 | AI Upsell Engine | 56 | v0.46.0 | Contextual up-sells on the booking page. |
-| B14 | Live Local Experiences | 65 | v0.52.0 | Nearby experiences integrated into the booking flow. |
+| B14 | Live Local Experiences | 65 | v0.52.0 | Nearby experiences integrated (⚠️ INTEGRATION-READY: events are mock data; haversine + AI logic are real). |
 | B15 | Family & Kids Mode | 55 | v0.45.0 | Filters tuned for traveling families. |
 
 ### 2.2 AI-First Layers
@@ -115,7 +115,7 @@ with unique AI layers and blue-ocean features.
 - Business AI Receptionist (53 — v0.43.0)
 - Instant Refund AI (54 — v0.44.0)
 - AI Upsell Engine (56 — v0.46.0)
-- AI Voice Booking (64 — v0.51.0)
+- AI Voice Booking (64 — v0.51.0) — ⚠️ INTEGRATION-READY: transcript-only, real voice input deferred
 
 **Core AI Foundations:**
 - AI Foundation (18 — v0.10.0)

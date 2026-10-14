@@ -96,6 +96,23 @@ Rollback one:
 - Switch to real provider by implementing PaymentProvider in app/services/payment_provider.py.
 - /payments/mock/confirm/{ref} disabled when ENABLE_MOCK_PAYMENTS=false.
 
+## INTEGRATION-READY Features (mock data/provider)
+
+The following features are code-complete, logic-tested, and ready to
+plug real providers/data in Stage 7 (buyer-driven). Until then they
+run on mock data or mock providers so the platform stays demoable.
+
+| Feature | What is mock | What is real |
+|---------|--------------|--------------|
+| AI Voice Booking (Phase 64) | Voice→text input — user sends a transcript | Intent parsing, search, AI polish |
+| Local Experiences (Phase 65) | Event data | Haversine distance, AI recommendation |
+| AI Provider | Default replies | Full integration layer (switch to gemini/openai via `AI_PROVIDER` env) |
+| Payment Provider | Provider selection | Full abstraction (Telr/Stripe/PayTabs ready via `PaymentProvider`) |
+| Installments | Payment capture | Installment ledger, scheduling logic |
+
+> ⚠️ Anything marked "mock" above becomes real after the buyer
+> configures the relevant `.env` keys (Stage 7). No code changes needed.
+
 ## Seed Data
 
 python -m app.scripts.seed_all          - tenants + services + demo admin
