@@ -99,6 +99,21 @@ else
   git status --short | sed 's/^/    /'
 fi
 
+# ---- Check 7: Quickstart version line also matches latest tag ----
+QS_FILE="docs/00-NEW-CHAT-QUICKSTART.md"
+if [ -f "$QS_FILE" ]; then
+  QS_VERSION=$(grep -m1 "Latest Git tag:" "$QS_FILE" | grep -oE "v[0-9]+\.[0-9]+\.[0-9]+[a-z0-9-]*" || echo "")
+  if [ "$QS_VERSION" = "$LATEST_TAG" ]; then
+    ok "Check 7: Quickstart version matches latest tag ($LATEST_TAG)"
+  else
+    bad "Check 7: Quickstart version mismatch"
+    info "  latest tag:        $LATEST_TAG"
+    info "  Quickstart tag:    $QS_VERSION"
+  fi
+else
+  info "Check 7: SKIPPED (Quickstart not found)"
+fi
+
 # ---- Summary ----
 echo ""
 echo "=== summary: $PASS passed, $FAIL failed ==="
