@@ -31,7 +31,7 @@ fi
 
 # ---- Check 1: version line vs latest tag ----
 LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
-VERSION_LINE=$(grep -m1 "^> Version:" HANDOFF.md || echo "")
+VERSION_LINE=$(grep -m1 -E "^(> Version:|\*\*Version:\*\*)" HANDOFF.md || echo "")
 if echo "$VERSION_LINE" | grep -q "$LATEST_TAG"; then
   ok "Check 1: version line matches latest tag ($LATEST_TAG)"
 else
@@ -47,7 +47,7 @@ else
   info "Check 2: running pytest (this takes ~60s)..."
   PYTEST_OUT=$(source venv/bin/activate 2>/dev/null; pytest tests/ -n auto --tb=no -q 2>&1 | grep -oE "[0-9]+ passed" | head -1)
   REAL_COUNT=$(echo "$PYTEST_OUT" | grep -oE "^[0-9]+")
-  HND_COUNT=$(grep -m1 "^## 14. Test Count:" HANDOFF.md | grep -oE "Test Count: [0-9]+" | grep -oE "[0-9]+")
+  HND_COUNT=$(grep -m1 -E "^\| Automated tests \|" HANDOFF.md | grep -oE "[0-9,]+" | head -1 | tr -d ",")
   if [ -z "$REAL_COUNT" ]; then
     bad "Check 2: could not parse pytest output"
     info "  raw: $PYTEST_OUT"
@@ -83,7 +83,7 @@ fi
 
 # ---- Check 5: Last updated == today ----
 TODAY=$(date '+%Y-%m-%d')
-LAST_UPDATED=$(grep -m1 "^Last updated:" HANDOFF.md | grep -oE "[0-9]{4}-[0-9]{2}-[0-9]{2}")
+LAST_UPDATED=$(grep -m1 -E "^(Last updated:|\*\*Last updated:\*\*)" HANDOFF.md | grep -oE "[0-9]{4}-[0-9]{2}-[0-9]{2}")
 if [ "$LAST_UPDATED" = "$TODAY" ]; then
   ok "Check 5: Last updated = today ($TODAY)"
 else
