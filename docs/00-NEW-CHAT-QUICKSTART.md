@@ -85,8 +85,8 @@ Never ask the user to decide between options that are technical.
 
 ## 7. CURRENT STATE (as of 2026-10-14)
 
-- Product release: v1.0.24-valuation-defense
-- Latest Git tag: v1.0.24-valuation-defense
+- Product release: v1.0.25-target-buyers
+- Latest Git tag: v1.0.25-target-buyers
 - Tests: 1509 passing (verified 2026-10-14, pytest ~60s on Termux)
 - Security: Phase 89 complete (webhook signature + admin 2FA)
 - Sale package: docs/17-INVESTMENT-MEMO.md (AED 5M+ floor)
