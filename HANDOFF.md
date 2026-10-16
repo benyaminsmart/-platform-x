@@ -4,7 +4,7 @@
 > This document replaces all previous HANDOFF versions.
 > For historical snapshots see `docs/ARCHIVE-HANDOFF-v1.0.18.md`.
 
-**Version:** v1.0.30-wave3-complete
+**Version:** v1.0.31-docs-consistency
 **Last updated:** 2026-10-16
 **Status:** SALE-READY (buyer-driven Stage 7 pending)
 **Owner:** Benjamin Bahoush (platformx2026@gmail.com)
