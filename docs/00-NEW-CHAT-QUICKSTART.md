@@ -85,8 +85,8 @@ Never ask the user to decide between options that are technical.
 
 ## 7. CURRENT STATE (as of 2026-10-14)
 
-- Product release: v1.0.26-pitch-deck
-- Latest Git tag: v1.0.26-pitch-deck
+- Product release: v1.0.27-outreach-emails
+- Latest Git tag: v1.0.27-outreach-emails
 - Tests: 1509 passing (verified 2026-10-14, pytest ~60s on Termux)
 - Security: Phase 89 complete (webhook signature + admin 2FA)
 - Sale package: docs/17-INVESTMENT-MEMO.md (AED 5M+ floor)
