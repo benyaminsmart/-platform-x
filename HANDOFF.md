@@ -4,7 +4,7 @@
 > This document replaces all previous HANDOFF versions.
 > For historical snapshots see `docs/ARCHIVE-HANDOFF-v1.0.18.md`.
 
-**Version:** v1.0.32-docs-final
+**Version:** v1.0.33-tech-due-diligence
 **Last updated:** 2026-10-16
 **Status:** SALE-READY (buyer-driven Stage 7 pending)
 **Owner:** Benjamin Bahoush (platformx2026@gmail.com)
@@ -34,7 +34,7 @@ license, and ongoing operations.
 
 | Metric | Value |
 |--------|-------|
-| Version | v1.0.31-docs-consistency |
+| Version | v1.0.33-tech-due-diligence |
 | Python files | 252 |
 | Lines of Python | 34,342 |
 | Automated tests | 1,509 (all passing) |
