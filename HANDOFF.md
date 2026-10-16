@@ -34,7 +34,7 @@ license, and ongoing operations.
 
 | Metric | Value |
 |--------|-------|
-| Version | v1.0.18-changelog |
+| Version | v1.0.30-wave3-complete |
 | Python files | 252 |
 | Lines of Python | 34,342 |
 | Automated tests | 1,509 (all passing) |
@@ -44,8 +44,8 @@ license, and ongoing operations.
 | Templates | 82 |
 | Migrations | 33 (verified on PostgreSQL 18.2) |
 | Features shipped | 79 |
-| Git tags | 85 |
-| Git commits | 639 |
+| Git tags | 98 |
+| Git commits | 669 |
 
 **Full test suite:** `pytest tests/ -n auto` — 1,509 pass, ~60s.
 

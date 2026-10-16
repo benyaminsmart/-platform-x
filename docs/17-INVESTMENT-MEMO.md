@@ -324,7 +324,7 @@ not from end-users. Guests use the platform for free.
 - Year 1 target: 30 tenants (Starter + Growth mix)
 - Year 2 target: 120 tenants
 - Year 3 target: 300 tenants
-- Average subscription: AED 1,500/month (placeholder)
+- Average subscription: AED 1,500/month [ASSUMPTION]
 - Average commission: 3% of booking value
 - Average booking value: AED 800
 - Average bookings per tenant per month: 50

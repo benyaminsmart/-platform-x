@@ -9,7 +9,7 @@
 > (milestones), `docs/14-ROADMAP-V3-COMPETITIVE.md` (strategy).
 >
 > **Last updated:** 2026-10-04
-> **Current version:** v0.59.0-referral-engine
+> **Current version:** v1.0.30-wave3-complete
 
 ---
 
@@ -65,8 +65,8 @@ dimension**. It serves three sides of the market:
 capabilities that Booking.com and Agoda do not offer (see Section 2).
 
 **Current state (2026-10-04):**
-- Version: `v0.59.0-referral-engine`
-- Test suite: **1433 passing, 0 failing**
+- Version: `v1.0.30-wave3-complete`
+- Test suite: **1509 passing, 0 failing**
 - Phase 77 (Referral Engine) just completed.
 - **Stage 4 (Rewards Engine)** is at ~75%.
 - **Stage 5–6 (Production readiness + Sales prep)** are the remaining
@@ -315,7 +315,7 @@ are a separate future module (not built here).
 - `is_qualifying_transaction()` — payment, category, min amount,
   not cancelled, not refunded, not already rewarded.
 - Base reward = amount × category_rate; final capped by category
-  cap + economic guardrail (≤ 50% of the 6% commission estimate).
+  cap + economic guardrail (≤ 50% of the 3% commission estimate).
 - Tier multipliers applied only to eligible bonus components.
 - Wired into `payment_service.mark_success` with legacy fallback.
 
@@ -485,7 +485,7 @@ This is an upsell, not part of the sale itself.
 | Phases remaining (Stage 5) | 81, 82, 83, 84, 85 |
 | Phases remaining (Stage 6) | 86, 87, 88 |
 | Total shipping tags | 59 (v0.2.0 → v0.59.0) |
-| Tests passing | **1433** |
+| Tests passing | **1509** |
 | Languages | EN / AR / FIL / HI |
 | AI features | 15+ |
 | Blue-ocean features | 15 |
@@ -503,7 +503,7 @@ This is an upsell, not part of the sale itself.
 **What the buyer receives:**
 - Full source code (git repository with 59 shipping tags).
 - `docs/` — 16+ technical, strategy, and operational documents.
-- Test suite (1433 tests) — green.
+- Test suite (1509 tests) — green.
 - Deploy scripts and production config (Stage 5 output).
 - Sales and handover documents (Stage 6 output).
 - Full commit history with tagged milestones.

@@ -87,7 +87,7 @@ Never ask the user to decide between options that are technical.
 
 - Product release: v1.0.30-wave3-complete
 - Latest Git tag: v1.0.30-wave3-complete
-- Tests: 1509 passing (verified 2026-10-14, pytest ~60s on Termux)
+- Tests: 1509 passing (verified 2026-10-16, pytest ~60s on Termux)
 - Security: Phase 89 complete (webhook signature + admin 2FA)
 - Sale package: docs/17-INVESTMENT-MEMO.md (AED 5M+ floor)
 - Stage 0 — Strategic Foundation: COMPLETE
@@ -102,8 +102,8 @@ Never ask the user to decide between options that are technical.
 **ALL FREE WORK IS DONE. The platform is SALE-READY.**
 
 Latest tags (top 5):
-v1.0.19-handoff-final, v1.0.18-changelog, v1.0.17-investment-memo,
-v1.0.16-postgres-verified, v1.0.15-payment-test-guide
+v1.0.30-wave3-complete, v1.0.29-delivery-package, v1.0.28-data-room,
+v1.0.27-outreach-emails, v1.0.26-pitch-deck
 
 ## 8. WHAT TO DO NEXT
 
