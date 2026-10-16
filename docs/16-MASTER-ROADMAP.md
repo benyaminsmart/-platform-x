@@ -9,7 +9,7 @@
 > (milestones), `docs/14-ROADMAP-V3-COMPETITIVE.md` (strategy).
 >
 > **Last updated:** 2026-10-04
-> **Current version:** v1.0.30-wave3-complete
+> **Current version:** v1.0.31-docs-consistency
 
 ---
 
@@ -65,7 +65,7 @@ dimension**. It serves three sides of the market:
 capabilities that Booking.com and Agoda do not offer (see Section 2).
 
 **Current state (2026-10-04):**
-- Version: `v1.0.30-wave3-complete`
+- Version: `v1.0.31-docs-consistency`
 - Test suite: **1509 passing, 0 failing**
 - Phase 77 (Referral Engine) just completed.
 - **Stage 4 (Rewards Engine)** is at ~75%.
