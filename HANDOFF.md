@@ -5,7 +5,7 @@
 > For historical snapshots see `docs/ARCHIVE-HANDOFF-v1.0.18.md`.
 
 **Version:** v1.0.36-sales-package
-**Last updated:** 2026-10-16
+**Last updated:** 2026-10-27
 **Status:** SALE-READY (buyer-driven Stage 7 pending)
 **Owner:** Benjamin Bahoush (platformx2026@gmail.com)
 

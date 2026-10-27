@@ -83,13 +83,13 @@ At the END of each Step write:
 ALWAYS write the Phase and Step number — the user needs to see them.
 Never ask the user to decide between options that are technical.
 
-## 7. CURRENT STATE (as of 2026-10-14)
+## 7. CURRENT STATE (as of 2026-10-27)
 
 - Product release: v1.0.36-sales-package
 - Latest Git tag: v1.0.36-sales-package
 - Tests: 1509 passing (verified 2026-10-16, pytest ~60s on Termux)
 - Security: Phase 89 complete (webhook signature + admin 2FA)
-- Sale package: docs/17-INVESTMENT-MEMO.md (AED 5M+ floor)
+- Sale package (11 docs): 17 (IM), 18 (Sale Term Sheet), 19 (NDA), 22 (Valuation Defense), 23 (Target Buyers), 24 (Pitch Deck), 26 (Outreach), 27 (Data Room), 28 (Technical DD), 29 (License Audit), 30 (Buyer Activation)
 - Stage 0 — Strategic Foundation: COMPLETE
 - Stage 1 — Core Platform: COMPLETE
 - Stage 2 — Feature Waves 1–4: COMPLETE
@@ -102,8 +102,8 @@ Never ask the user to decide between options that are technical.
 **ALL FREE WORK IS DONE. The platform is SALE-READY.**
 
 Latest tags (top 5):
-v1.0.30-wave3-complete, v1.0.29-delivery-package, v1.0.28-data-room,
-v1.0.27-outreach-emails, v1.0.26-pitch-deck
+v1.0.36-sales-package, v1.0.35-buyer-activation, v1.0.34-license-audit,
+v1.0.33-tech-due-diligence, v1.0.32-docs-final
 
 ## 8. WHAT TO DO NEXT
 
