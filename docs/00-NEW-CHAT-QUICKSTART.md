@@ -85,8 +85,8 @@ Never ask the user to decide between options that are technical.
 
 ## 7. CURRENT STATE (as of 2026-10-27)
 
-- Product release: v1.0.36-sales-package
-- Latest Git tag: v1.0.36-sales-package
+- Product release: v1.0.37-docs-consistency-2
+- Latest Git tag: v1.0.37-docs-consistency-2
 - Tests: 1509 passing (verified 2026-10-16, pytest ~60s on Termux)
 - Security: Phase 89 complete (webhook signature + admin 2FA)
 - Sale package (11 docs): 17 (IM), 18 (Sale Term Sheet), 19 (NDA), 22 (Valuation Defense), 23 (Target Buyers), 24 (Pitch Deck), 26 (Outreach), 27 (Data Room), 28 (Technical DD), 29 (License Audit), 30 (Buyer Activation)
