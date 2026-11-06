@@ -15,12 +15,8 @@ services:
       - key: SECRET_KEY
         value: a8f3e9c2b1d4f6a7e8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2
       - key: DATABASE_URL
-        value: sqlite:///./data/platform_x.db
+        value: sqlite:///./platform_x.db
       - key: ENABLE_MOCK_PAYMENTS
         value: true
       - key: AI_ENABLED
         value: false
-    disk:
-      name: platform-x-data
-      mountPath: /data
-      sizeGB: 1
