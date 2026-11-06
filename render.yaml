@@ -4,7 +4,7 @@ services:
     env: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: alembic upgrade head && python -m app.scripts.seed_all && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.0
@@ -14,8 +14,6 @@ services:
         value: false
       - key: SECRET_KEY
         value: a8f3e9c2b1d4f6a7e8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2
-      - key: DATABASE_URL
-        value: sqlite:///./platform_x.db
       - key: ENABLE_MOCK_PAYMENTS
         value: true
       - key: AI_ENABLED
